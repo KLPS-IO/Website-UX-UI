@@ -42,7 +42,7 @@ return array(
 		 ),
 		
 		'urlManager' => array(
-			'urlFormat' => 'path',
+			'urlFormat' => 'get',
 			'rules' => array(
 				// You can add your own rules here
 			),
