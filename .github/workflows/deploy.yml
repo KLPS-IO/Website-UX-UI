@@ -12,12 +12,17 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v2
 
+    - name: Add Droplet Host Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DROPLET_HOST_KEY }}" >> ~/.ssh/known_hosts
+
     - name: Deploy via SSH
       uses: appleboy/ssh-action@master
       with:
         host: 167.71.133.117
         username: root
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        key: ${{ secrets.DROPLET_PRIVATE_KEY }}
         script: |
           cd /var/www/klps.co.uk
-          git pull origin main
+          git pull origin main || git clone git@github.com:your-repo/your-repo-name.git .
