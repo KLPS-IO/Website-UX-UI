@@ -22,7 +22,7 @@ jobs:
       with:
         host: 167.71.133.117
         username: root
-        key: ${{ secrets.DROPLET_PRIVATE_KEY }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /var/www/klps.co.uk
           git pull origin main || git clone git@github.com:your-repo/your-repo-name.git .
