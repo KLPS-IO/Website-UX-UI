@@ -12,7 +12,7 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v2
 
-    - name: Add Droplet Host Key
+    - name: Add Droplet Host to Known Hosts
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.DROPLET_HOST_KEY }}" >> ~/.ssh/known_hosts
@@ -25,4 +25,10 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /var/www/klps.co.uk
-          git pull origin main || git clone git@github.com:your-repo/your-repo-name.git .
+          if [ -d .git ]; then
+            git reset --hard HEAD
+            git pull origin main
+          else
+            git clone https://github.com/KLPS-IO/Website-UX-UI.git .
+          fi
+          sudo systemctl restart apache2
