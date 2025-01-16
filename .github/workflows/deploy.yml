@@ -8,27 +8,32 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      # Step 1: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Add Droplet Host to Known Hosts
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.DROPLET_HOST_KEY }}" >> ~/.ssh/known_hosts
+      # Step 2: Set up SSH Agent
+      - name: Set up SSH for Deployment
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy via SSH
-      uses: appleboy/ssh-action@master
-      with:
-        host: 167.71.133.117
-        username: root
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
+      # Step 3: Deploy to Droplet
+      - name: Deploy application to Droplet
+        run: |
+          set -e
+          ssh -o StrictHostKeyChecking=no user@your-droplet-ip << 'EOF'
+          echo "Pulling latest code from GitHub..."
           cd /var/www/klps.co.uk
-          if [ -d .git ]; then
-            git reset --hard HEAD
-            git pull origin main
-          else
-            git clone https://github.com/KLPS-IO/Website-UX-UI.git .
-          fi
-          sudo systemctl restart apache2
+          git reset --hard
+          git pull origin main
+          echo "Installing dependencies..."
+          npm install --production
+          echo "Building application..."
+          npm run build
+          echo "Restarting Apache..."
+          sudo systemctl reload apache2
+          echo "Deployment complete."
+          EOF
