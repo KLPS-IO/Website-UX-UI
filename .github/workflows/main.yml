@@ -1,0 +1,38 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Install Node.js and dependencies
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build the React app
+      run: npm run build
+
+    # Deploy files to the server
+    - name: Deploy to server
+      uses: burnett01/rsync-deployments@v1.0
+      with:
+        switches: -avz
+        path: ./build/
+        remote_path: /var/www/klps.co.uk/build
+        remote_host: 167.71.133.117
+        remote_user: root
+        remote_key: ${{ secrets.SERVER_SSH_KEY }}
