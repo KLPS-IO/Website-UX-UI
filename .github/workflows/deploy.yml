@@ -2,38 +2,29 @@ name: Deploy to Droplet
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0, v2.0, etc.
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up SSH Agent
-      - name: Set up SSH for Deployment
+      - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      # Step 3: Deploy to Droplet
-      - name: Deploy application to Droplet
+      - name: Deploy to Droplet
         run: |
-          set -e
           ssh -o StrictHostKeyChecking=no user@your-droplet-ip << 'EOF'
-          echo "Pulling latest code from GitHub..."
           cd /var/www/klps.co.uk
-          git reset --hard
-          git pull origin main
-          echo "Installing dependencies..."
-          npm install --production
-          echo "Building application..."
+          git fetch --tags
+          git checkout tags/${{ github.ref_name }} -b deploy
+          npm install
           npm run build
-          echo "Restarting Apache..."
           sudo systemctl reload apache2
-          echo "Deployment complete."
           EOF
