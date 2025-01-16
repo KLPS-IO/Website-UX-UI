@@ -13,6 +13,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install Dependencies
+      run: |
+        npm install
+
+    - name: Build Project
+      run: |
+        npm run build
+
     - name: Set up SSH
       run: |
         mkdir -p ~/.ssh
@@ -22,4 +30,4 @@ jobs:
 
     - name: Deploy to Droplet
       run: |
-        rsync -avz --exclude '.git*' --exclude 'node_modules' ./ root@167.71.133.117:/var/www/klps.co.uk/build/
+        rsync -avz --exclude '.git*' --exclude 'node_modules' ./build/ root@167.71.133.117:/var/www/klps.co.uk/
