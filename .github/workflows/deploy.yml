@@ -2,33 +2,29 @@ name: Deploy to Droplet
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0, v2.0, etc.
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Add Droplet Host to Known Hosts
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.DROPLET_HOST_KEY }}" >> ~/.ssh/known_hosts
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy via SSH
-      uses: appleboy/ssh-action@master
-      with:
-        host: 167.71.133.117
-        username: root
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
+      - name: Deploy to Droplet
+        run: |
+          ssh -o StrictHostKeyChecking=no user@your-droplet-ip << 'EOF'
           cd /var/www/klps.co.uk
-          if [ -d .git ]; then
-            git reset --hard HEAD
-            git pull origin main
-          else
-            git clone https://github.com/KLPS-IO/Website-UX-UI.git .
-          fi
-          sudo systemctl restart apache2
+          git fetch --tags
+          git checkout tags/${{ github.ref_name }} -b deploy
+          npm install
+          npm run build
+          sudo systemctl reload apache2
+          EOF
