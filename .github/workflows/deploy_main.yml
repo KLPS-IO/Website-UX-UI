@@ -3,33 +3,32 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - main  
+      - main
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-22.04  
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16  
+          node-version: 16
 
-      - name: Install and Build
+      - name: Install dependencies and build
         run: |
           npm ci  # Clean install dependencies
-          npm run build  
+          npm run build
 
-      - name: Deploy to Server
-        uses: burnett01/rsync-deployments@v1
-        with:
-          switches: -avz --delete
-          path: ./build/
-          remote_path: /var/www/klps.co.uk/build
-          remote_host: 167.71.133.117
-          remote_user: root
+      - name: Deploy to server
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 167.71.133.117 >> ~/.ssh/known_hosts
+          rsync -avz --delete ./build/ root@167.71.133.117:/var/www/klps.co.uk/build/
