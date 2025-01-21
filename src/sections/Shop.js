@@ -204,19 +204,24 @@ const Shop = () => {
   }, []);
 
   return (
-    <Section ref={ref} id="shop">
-      <Title data-scroll data-scroll-speed="-1">
-        Survey
-      </Title>
-      <Left>
+    <Section id="shop">
+    <Title data-scroll data-scroll-speed="-1">Survey</Title>
+    <Left>
         <p>
-          Imagine a space where your opinions and preferences help shape the future
-          of comfort and wellness.
-          <br />
-          <br />
-          <SurveyButton/>
+        <SurveyButton />
+            <br />
+            <br />
+            Step into Your Own Personalised World!
+            <br />
+            <br />
+            Click on one of the images to the right and unlock a portal to a unique,
+            interactive ChatGPT world where your voice is guided through endless possibilities!
+            <br />
+            <br />
+            KLPS World is Like chatting with a sister, shaping the future of femaninity
+            while discovering endless insights – all tailored just for you.
         </p>
-      </Left>
+    </Left>
       <Right ref={horizontalRef}>
         <Product img={img1} title="First Underwear" />
         <Product img={img2} title="Teenager" />

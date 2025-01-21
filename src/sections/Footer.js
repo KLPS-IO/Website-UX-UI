@@ -163,7 +163,7 @@ const Footer = () => {
         {/* Right-side element */}
         <path d="M175,120 L330,0.3 L450,4 L300,145 L500,399 L379,399 Z" stroke="white" strokeWidth="15" fill="#FF00FF" />
         </svg>
-        <Title>PRODUCT COMING SOON</Title>
+        <Title>PRODUCTS COMING SOON</Title>
         <h3 data-scroll data-scroll-speed="-1">
             KLPS
           </h3>

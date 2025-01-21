@@ -1,9 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 
-import img1 from "../assets/Images/1.webp";
-import img2 from "../assets/Images/2.webp";
-import img3 from "../assets/Images/3.webp";
+import img1 from "../assets/Images/klpsBrandAmbassador.png";
+import img2 from "../assets/Images/klpsFourFemales.png";
+import img3 from "../assets/Images/klpsSixFemales.png";
 
 const Section = styled.section`
   position: relative;
@@ -133,10 +133,16 @@ const About = () => {
       KLPS is here to listen, understand, and reflect what matters most to women, kids, and parents
       by creating products that feel like they were made specifically with you in mind. */}
         <br />
+        Meet Kové – Your KLPS Brand Ambassador!
         <br />
-      KLPS is here to listen, understand, and reflect what matters most to women, kids, and parents
-      by tailoring products specifically designed for you.
-
+        <br />
+        Kové is not just a music artist, model, and influencer – she’s the visionary behind KLPS’s first exclusive product!
+        <br />
+        <br />
+        And here's the exciting part: KLPS’s product launch is now open to the first 500 survey participants.
+        <br />
+        <br />
+        Want in? Simply hit the 'Take the Survey' button below and join the action.
         <br />
         <br />
         <br />
