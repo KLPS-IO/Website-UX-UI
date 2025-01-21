@@ -122,7 +122,7 @@ const Item = styled.div`
   }
 `;
 
-const Product = ({ img, title = "" }) => {
+const NewArrival = ({ img, title = "" }) => {
   return (
     <Item>
       <img src={img} alt={title} />
@@ -131,113 +131,114 @@ const Product = ({ img, title = "" }) => {
   );
 };
 
-const NewArrival = () => {
-  gsap.registerPlugin(ScrollTrigger);
+// const NewArrival = () => {
+//   gsap.registerPlugin(ScrollTrigger);
 
-  const ref = useRef(null);
-  const ScrollingRef = useRef(null);
+//   const ref = useRef(null);
+//   const ScrollingRef = useRef(null);
 
-  useLayoutEffect(() => {
-    let element = ref.current;
-    let scrollingElement = ScrollingRef.current;
+//   useLayoutEffect(() => {
+//     let element = ref.current;
+//     let scrollingElement = ScrollingRef.current;
 
-    let t1 = gsap.timeline();
+//     let t1 = gsap.timeline();
 
-    setTimeout(() => {
-      t1.to(element, {
-        scrollTrigger: {
-          trigger: element,
-          start: "top top",
-          end: "bottom+=100% top-=100%",
-          scroller: ".App", // locomotive element
-          scrub: true,
-          pin: true,
-          //   markers:true,
-        },
-        // we have to increase scrolling height of this section same as the scrolling element width
-        ease: "none,",
-      });
+//     setTimeout(() => {
+//       t1.to(element, {
+//         scrollTrigger: {
+//           trigger: element,
+//           start: "top top",
+//           end: "bottom+=100% top-=100%",
+//           scroller: ".App", // locomotive element
+//           scrub: true,
+//           pin: true,
+//           //   markers:true,
+//         },
+//         // we have to increase scrolling height of this section same as the scrolling element width
+//         ease: "none,",
+//       });
 
-      // Verticle Scrolling
-      t1.fromTo(
-        scrollingElement,
-        {
-          y: "0",
-        },
+//       // Verticle Scrolling
+//       t1.fromTo(
+//         scrollingElement,
+//         {
+//           y: "0",
+//         },
 
-        {
-          y: "-100%",
-          scrollTrigger: {
-            trigger: scrollingElement,
-            start: "top top",
-            end: "bottom top",
-            scroller: ".App", // locomotive element
-            scrub: true,
+//         {
+//           y: "-100%",
+//           scrollTrigger: {
+//             trigger: scrollingElement,
+//             start: "top top",
+//             end: "bottom top",
+//             scroller: ".App", // locomotive element
+//             scrub: true,
 
-            //   markers:true,
-          },
-          // we have to increase scrolling height of this section same as the scrolling element width
-        }
-      );
-      ScrollTrigger.refresh();
-    }, 1000);
+//             //   markers:true,
+//           },
+//           // we have to increase scrolling height of this section same as the scrolling element width
+//         }
+//       );
+//       ScrollTrigger.refresh();
+//     }, 1000);
 
-    return () => {
-      // Let's clear instances
-      t1.kill();
-      ScrollTrigger.kill();
-    };
-  }, []);
+//     return () => {
+//       // Let's clear instances
+//       t1.kill();
+//       ScrollTrigger.kill();
+//     };
+//   }, []);
 
-  return (
-    <Section ref={ref} id="new-arrival">
-      <Overlay />
-      <Title
-        data-scroll
-        data-scroll-speed="-4"
-        data-scroll-direction="horizontal"
-      >
-        The Movement
-      </Title>
+//   return
+//   (
+//     <Section ref={ref} id="new-arrival">
+//       <Overlay />
+//       <Title
+//         data-scroll
+//         data-scroll-speed="-4"
+//         data-scroll-direction="horizontal"
+//       >
+//         The Movement
+//       </Title>
 
-    <Container
-      ref={ScrollingRef}
-      style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      overflowX: 'auto',
-      overflowY: 'hidden',
-      width: '100%',
-    }}>
-        <Product img={img1} title="Join the Conversation" />
-        <Product img={img2} title="Define What Matters" />
-        <Product img={img3} title="Be the Change in Wearable Wellness" />
-        <Product img={img4} title="Discover Personalised Comforts" />
-      </Container>
+//     <Container
+//       ref={ScrollingRef}
+//       style={{
+//       display: 'flex',
+//       justifyContent: 'space-between',
+//       overflowX: 'auto',
+//       overflowY: 'hidden',
+//       width: '100%',
+//     }}>
+//         <Product img={img1} title="Join the Conversation" />
+//         <Product img={img2} title="Define What Matters" />
+//         <Product img={img3} title="Be the Change in Wearable Wellness" />
+//         <Product img={img4} title="Discover Personalised Comforts" />
+//       </Container>
 
-      <Text data-scroll data-scroll-speed="-2">
-      We believe your opinions carry incredible weight.
-      When you engage with us, you’re not just filling out a form or clicking a
-      box—you’re directly influencing the future of everyday products in ways that count.
-      Your insights drive the creation of items that prioritise comfort, style, and wellness,
-      with precision. Imagine knowing that the products you see tomorrow were
-      inspired by the preferences and experiences you share today.
-        <br />
-        <br />
-        Build this community.We see you individually,
-        not just as another user. You’re setting the standards for comfort and
-        quality for yourself, your family, and others. Together,
-        we’ll shape a world where products resonate on a personal level.
+//       <Text data-scroll data-scroll-speed="-2">
+//       We believe your opinions carry incredible weight.
+//       When you engage with us, you’re not just filling out a form or clicking a
+//       box—you’re directly influencing the future of everyday products in ways that count.
+//       Your insights drive the creation of items that prioritise comfort, style, and wellness,
+//       with precision. Imagine knowing that the products you see tomorrow were
+//       inspired by the preferences and experiences you share today.
+//         <br />
+//         <br />
+//         Build this community.We see you individually,
+//         not just as another user. You’re setting the standards for comfort and
+//         quality for yourself, your family, and others. Together,
+//         we’ll shape a world where products resonate on a personal level.
 
-        So, come in, explore, and let your voice lead the way.
-        With KLPS, the future of wearable wellness isn’t just
-        influenced by your needs—it’s powered by them.
-        <br />
-        <br />
-        Give it a try and experience a new look.
-      </Text>
-    </Section>
-  );
-};
+//         So, come in, explore, and let your voice lead the way.
+//         With KLPS, the future of wearable wellness isn’t just
+//         influenced by your needs—it’s powered by them.
+//         <br />
+//         <br />
+//         Give it a try and experience a new look.
+//       </Text>
+//     </Section>
+//   );
+// };
 
 export default NewArrival;

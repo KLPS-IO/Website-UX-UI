@@ -204,19 +204,16 @@ const Shop = () => {
   }, []);
 
   return (
-    <Section ref={ref} id="shop">
-      <Title data-scroll data-scroll-speed="-1">
-        Survey
-      </Title>
-      <Left>
+    <Section id="shop">
+    <Title data-scroll data-scroll-speed="-1">Survey</Title>
+    <Left>
         <p>
-          Imagine a space where your opinions and preferences help shape the future
-          of comfort and wellness.
-          <br />
-          <br />
-          <SurveyButton/>
+            Imagine a space where your opinions and preferences help shape the future of comfort and wellness.
+            <br />
+            <br />
+            <SurveyButton />
         </p>
-      </Left>
+    </Left>
       <Right ref={horizontalRef}>
         <Product img={img1} title="First Underwear" />
         <Product img={img2} title="Teenager" />
