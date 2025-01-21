@@ -68,7 +68,7 @@ const Banner = () => {
             data-scroll-speed="8"
             data-scroll-target="#up"
           >
-            Underwear{" "}
+            KLPS{" "}
           </span>
         </BannerComponent>
         <BannerComponent>
@@ -78,7 +78,7 @@ const Banner = () => {
             data-scroll-speed="-6"
             data-scroll-target="#up"
           >
-            Tailor Made
+            Made
           </span>
         </BannerComponent>
         <BannerComponent>
