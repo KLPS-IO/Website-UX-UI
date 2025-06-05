@@ -210,25 +210,42 @@ const Shop = () => {
       </Title>
       <Left>
         <p>
-          Imagine a space where your opinions and preferences help shape the future
-          of comfort and wellness.
+        <SurveyButton/>
+
+        <br />
           <br />
           <br />
-          <SurveyButton/>
+          <br />
+        Step into your personalised KLPS World!
+        <br />
+        <br />
+        Click the image to the right.
+        <br />
+        <br />
+        Like chatting with a sister,
+        <br />
+        <br />
+        where your voice drives insights
+        <br />
+        <br />
+        and shapes the products you actually use.
+        <br />
+        <br />
+        Only at KLPS. Where women co-create the future..
         </p>
       </Left>
       <Right ref={horizontalRef}>
-        <Product img={img1} title="First Underwear" />
-        <Product img={img2} title="Teenager" />
-        <Product img={img3} title="College Age" />
-        <Product img={img4} title="Young Adult" />
-        <Product img={img5} title="Young Parents" />
-        <Product img={img6} title="Fathers Raising Girls" />
-        <Product img={img7} title="Natural Fibres" />
-        <Product img={img8} title="Sexy" />
-        <Product img={img9} title="Grown Women" />
-        <Product img={img10} title="Counselling with ChatGPT" />
-      </Right>
+  <Product img={img1} title="Welcome: The Story" />
+  <Product img={img2} title="Gen Z Speaks" />
+  <Product img={img3} title="Campus & Confident" />
+  <Product img={img4} title="The Twenties Edit" />
+  <Product img={img5} title="Real Parents, Real Talk" />
+  <Product img={img6} title="The Dad Download" />
+  <Product img={img7} title="Planet Picks" />
+  <Product img={img8} title="Confidence, Quantified" />
+  <Product img={img9} title="Everyday Icons (35+)" />
+  <Product img={img10} title="My AI Stylist" />
+</Right>
     </Section>
   );
 };

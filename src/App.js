@@ -59,10 +59,10 @@ function App() {
           <AnimatePresence>
           <main className='App' data-scroll-container ref={containerRef}>
             <Home />
-            <About />
+            {/* <About /> */}
             <Shop />
             <Banner />
-            <NewArrival />
+            {/* <NewArrival /> */}
             <Footer />
           </main>
           </AnimatePresence>

@@ -126,26 +126,26 @@ const NavBar = () => {
           Home
         </MenuItem>
         <MenuItem
-          onClick={() => handleScroll(".about")}
-          whileHover={{ scale: 1.1, y: -5 }}
-          whileTap={{ scale: 0.9, Y: 0 }}
-        >
-          about
-        </MenuItem>
-        <MenuItem
           onClick={() => handleScroll("#shop")}
           whileHover={{ scale: 1.1, y: -5 }}
           whileTap={{ scale: 0.9, Y: 0 }}
         >
           survey
         </MenuItem>
-        <MenuItem
+        {/* <MenuItem
+          onClick={() => handleScroll(".about")}
+          whileHover={{ scale: 1.1, y: -5 }}
+          whileTap={{ scale: 0.9, Y: 0 }}
+        >
+          about
+        </MenuItem> */}
+        {/* <MenuItem
           onClick={() => handleScroll("#new-arrival")}
           whileHover={{ scale: 1.1, y: -5 }}
           whileTap={{ scale: 0.9, Y: 0 }}
         >
           the movement
-        </MenuItem>
+        </MenuItem> */}
       </MenuItems>
     </NavContainer>
   );
