@@ -152,7 +152,7 @@ const Footer = () => {
       <LogoContainer data-scroll
         data-scroll-speed="-2"
         data-scroll-direction="horizontal">
-        <svg width="600" height="200" viewBox="0 0 500 1300">
+        <svg width="600" height="200" viewBox="180 -150 80 700">
 
         {/* First Shape */}
         <polygon points="100,0 100,280 0 400 1,0" stroke="white" strokeWidth="15" fill="#FF00FF" />
@@ -163,7 +163,6 @@ const Footer = () => {
         {/* Right-side element */}
         <path d="M175,120 L330,0.3 L450,4 L300,145 L500,399 L379,399 Z" stroke="white" strokeWidth="15" fill="#FF00FF" />
         </svg>
-        <Title>PRODUCTS COMING SOON</Title>
         <h3 data-scroll data-scroll-speed="-1">
             KLPS
           </h3>
@@ -178,17 +177,17 @@ const Footer = () => {
       >
         <ul>
           <li onClick={() => handleScroll("#home")}>home</li>
-          <li onClick={() => handleScroll(".about")}>about</li>
-          <li onClick={() => handleScroll("#ai")}>explore</li>
-          <li onClick={() => handleScroll("#shop")}>shop</li>
-          <li>
+          {/* <li onClick={() => handleScroll(".about")}>about</li>
+          <li onClick={() => handleScroll("#ai")}>explore</li> */}
+          <li onClick={() => handleScroll("#shop")}>survey</li>
+          {/* <li>
             <a href="https://google.com" target="_blank" rel="noreferrer">
               look book
             </a>
-          </li>
+          </li> */}
           <li>
-            <a href="https://google.com" target="_blank" rel="noreferrer">
-              reviews
+            <a href="https://eu.jotform.com/agent/0197401631d2758183c3efbb654b257765c5" target="_blank" rel="noreferrer">
+              contact
             </a>
           </li>
         </ul>
