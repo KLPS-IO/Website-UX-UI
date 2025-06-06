@@ -111,29 +111,6 @@ const Bottom = styled.div`
   }
 `;
 
-const Title = styled.h1`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: ${(props) => `calc(${props.theme.fontBig} - 5vw)`}; /* Adjust font size */
-  font-family: "Kaushan Script";
-  font-weight: 300;
-  text-align: center;
-  white-space: nowrap; /* Prevent text wrapping */
-  z-index: 5;
-
-  @media (max-width: 60em) {
-    font-size: ${(props) => `calc(${props.theme.fontBig} - 8vw)`};
-  }
-  @media (max-width: 48em) {
-    font-size: ${(props) => props.theme.fontxxl}; /* Further reduce size on smaller screens */
-  }
-`;
-
-
-
-
 const Footer = () => {
   const { scroll } = useLocomotiveScroll();
 

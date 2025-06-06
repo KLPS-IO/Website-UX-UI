@@ -7,11 +7,9 @@ import 'locomotive-scroll/dist/locomotive-scroll.css'
 
 import Home from "./sections/Home";
 import { AnimatePresence } from "framer-motion";
-import About from "./sections/About";
 import Shop from "./sections/Shop";
 import ScrollTriggerProxy from './components/ScrollTriggerProxy';
 import Banner from "./sections/Banner";
-import NewArrival from "./sections/NewArrival";
 import Footer from './sections/Footer';
 import Loader from "./components/Loader";
 
