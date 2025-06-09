@@ -235,7 +235,7 @@ const Shop = () => {
         </p>
       </Left>
       <Right ref={horizontalRef}>
-  <Product img={img1} title="Females: Welcome Start Story" />
+  <Product img={img1} title="Welcome: The Story" />
   <Product img={img2} title="Gen Z Speaks" />
   <Product img={img3} title="Campus & Confident" />
   <Product img={img4} title="The Twenties Edit" />
