@@ -1,0 +1,10 @@
+2024-12-14 14:32:29.101 GMT [82107] LOG:  starting PostgreSQL 14.15 (Homebrew) on aarch64-apple-darwin24.1.0, compiled by Apple clang version 16.0.0 (clang-1600.0.26.4), 64-bit
+2024-12-14 14:32:29.103 GMT [82107] LOG:  listening on IPv6 address "::1", port 5432
+2024-12-14 14:32:29.103 GMT [82107] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2024-12-14 14:32:29.103 GMT [82107] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2024-12-14 14:32:29.105 GMT [82108] LOG:  database system was shut down at 2024-12-14 14:32:02 GMT
+2024-12-14 14:32:29.107 GMT [82107] LOG:  database system is ready to accept connections
+2024-12-14 14:37:19.360 GMT [82107] LOG:  received smart shutdown request
+2024-12-14 14:37:19.363 GMT [82107] LOG:  background worker "logical replication launcher" (PID 82114) exited with exit code 1
+2024-12-14 14:37:19.363 GMT [82109] LOG:  shutting down
+2024-12-14 14:37:19.370 GMT [82107] LOG:  database system is shut down
