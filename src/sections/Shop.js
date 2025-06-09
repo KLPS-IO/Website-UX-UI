@@ -219,19 +219,19 @@ const Shop = () => {
         Step into your personalised KLPS World!
         <br />
         <br />
-        Click the image to the right.
+        Click any image to the right.
         <br />
         <br />
-        Like chatting with a sister,
+        Like chatting with a sister.
         <br />
         <br />
-        where your voice drives insights
+        Your voice drives insights,
         <br />
         <br />
         and shapes the products you actually use.
         <br />
         <br />
-        Only at KLPS. Where women co-create the future..
+        Only at KLPS, females co-create our future.
         </p>
       </Left>
       <Right ref={horizontalRef}>
