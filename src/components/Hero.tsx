@@ -1,9 +1,70 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 import heroImage from "@/assets/hero-femtech.jpg";
+
+/**
+ * Local lightweight fallback Button and Input components used when
+ * the project's shared UI module ('@/components/ui') is not available.
+ * Replace these with your real components or restore the original import
+ * once the module and its types are present.
+ */
+
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: string;
+  size?: string;
+  className?: string;
+  children?: React.ReactNode;
+};
+const Button = ({ children, className = "", ...props }: ButtonProps) => {
+  const base = "inline-flex items-center justify-center rounded-md";
+  const sizeClasses = props.size === "lg" ? "px-5 py-3 text-base" : "px-3 py-2 text-sm";
+  const variantClasses = props.variant === "hero" ? "bg-primary text-white" : "bg-gray-200 text-black";
+  return (
+    <button {...props} className={`${base} ${sizeClasses} ${variantClasses} ${className}`}>
+      {children}
+    </button>
+  );
+};
+
+type InputProps = React.InputHTMLAttributes<HTMLInputElement> & { className?: string };
+const Input = ({ className = "", ...props }: InputProps) => {
+  return <input {...props} className={`w-full rounded-md border px-3 py-2 bg-white/80 ${className}`} />;
+};
+
+const toast = (opts: {
+  title: string;
+  description?: string;
+  variant?: "default" | "destructive" | string;
+}) => {
+  // Lightweight fallback toast used when the project's toast hook isn't available.
+  // For destructive variants we show a blocking alert so the user notices the problem.
+  if (typeof window === "undefined") return;
+
+  const message = `${opts.title}${opts.description ? "\n\n" + opts.description : ""}`;
+
+  if (opts.variant === "destructive") {
+    window.alert(message);
+    return;
+  }
+
+  // Non-blocking visual toast: append a temporary DOM node.
+  console.log("Toast:", opts.title, opts.description ?? "");
+  const el = document.createElement("div");
+  el.textContent = `${opts.title}${opts.description ? " — " + opts.description : ""}`;
+  el.style.position = "fixed";
+  el.style.right = "20px";
+  el.style.bottom = "20px";
+  el.style.background = "rgba(0,0,0,0.85)";
+  el.style.color = "white";
+  el.style.padding = "10px 14px";
+  el.style.borderRadius = "8px";
+  el.style.zIndex = "9999";
+  el.style.boxShadow = "0 4px 14px rgba(0,0,0,0.25)";
+  document.body.appendChild(el);
+  setTimeout(() => {
+    if (el.parentElement) el.parentElement.removeChild(el);
+  }, 3000);
+};
 
 const Hero = () => {
   const [email, setEmail] = useState("");

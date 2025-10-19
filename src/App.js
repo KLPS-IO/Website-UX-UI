@@ -12,6 +12,7 @@ import Shop from "./sections/Shop";
 import ScrollTriggerProxy from './components/ScrollTriggerProxy';
 import Banner from "./sections/Banner";
 import NewArrival from "./sections/NewArrival";
+import Features from "./sections/Features";
 import Footer from './sections/Footer';
 import Loader from "./components/Loader";
 
@@ -60,7 +61,8 @@ function App() {
           <main className='App' data-scroll-container ref={containerRef}>
             <Home />
             {/* <About /> */}
-            <Shop />
+            {/* <Shop /> */}
+            <Features />
             <Banner />
             {/* <NewArrival /> */}
             <Footer />
