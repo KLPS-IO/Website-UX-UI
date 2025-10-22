@@ -58,19 +58,19 @@ const CoverVideo = () => {
           </motion.h1>
           <motion.h1
             variants={item}
-            className="text-[clamp(7rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
+            className="text-[clamp(5rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
           >
             P
           </motion.h1>
           <motion.h1
             variants={item}
-            className="text-[clamp(7rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
+            className="text-[clamp(5rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
           >
             S
           </motion.h1>
           <motion.h1
             variants={item}
-            className="text-[clamp(7rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
+            className="text-[clamp(5rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
           >
           </motion.h1>
         </div>

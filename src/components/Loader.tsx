@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import logo from "@/assets/logo2.webp";
+import logo from "@/assets/logo.webp";
 
 const textVariants = {
   hidden: {
@@ -43,7 +43,7 @@ const Loader = () => {
         variants={pathVariants}
         initial="hidden"
         animate="visible"
-        className="w-[100vw] h-auto md:w-[100vw] max-md:w-[10vw]"
+        className="w-[100%] h-auto md:w-[100%] max-md:w-[10vw]"
         />
       <motion.span
         variants={textVariants}
