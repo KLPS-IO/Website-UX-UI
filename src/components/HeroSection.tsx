@@ -47,7 +47,7 @@ const HeroSection = () => {
           A revolutionary approach to femtech that puts you first. 
           Join our waitlist to be part of something extraordinary.
         </p>
-
+{/* 
         <form onSubmit={handleJoinWaitlist} className="max-w-md mx-auto mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <Input
@@ -66,7 +66,7 @@ const HeroSection = () => {
 
         <p className="text-sm text-muted-foreground">
           Be the first to know when we launch. No spam, ever.
-        </p>
+        </p> */}
       </div>
 
       {/* Decorative Elements */}
