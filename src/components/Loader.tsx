@@ -43,7 +43,7 @@ const Loader = () => {
         variants={pathVariants}
         initial="hidden"
         animate="visible"
-        className="w-[100%] h-auto md:w-[100%] max-md:w-[10vw]"
+        className="w-100 h-auto md:w-100 lg:w-100"        
         />
       <motion.span
         variants={textVariants}
