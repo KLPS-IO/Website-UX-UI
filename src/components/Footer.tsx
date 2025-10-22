@@ -28,14 +28,13 @@ const Footer = () => {
         </div>
 
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>&copy; {currentYear} Made with &hearts; by &nbsp; 
+          <p>&copy; {currentYear} All rights reserved. Made with &hearts; by KLPS Ltd.&nbsp; 
             <a
               href="https://klps.netlify.app/"
               target="_blank"
               rel="noreferrer"
             >
-              KLPS.
-            </a> All rights reserved.</p>
+            </a> </p>
         </div>
       </div>
     </footer>
