@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Logo from "@/components/Logo";
+import { DashboardPage } from "@/components/DashboardPage";
+import { StatsPage } from "@/components/StatsPage";
 
 const BetaDashboard = () => {
   const [userEmail, setUserEmail] = useState("");
@@ -53,14 +55,7 @@ const BetaDashboard = () => {
               You have beta access
             </p>
           </div>
-
-          <Button 
-            onClick={handleLogout}
-            variant="outline"
-            size="lg"
-          >
-            Logout
-          </Button>
+          <StatsPage />
         </div>
       </div>
     </div>

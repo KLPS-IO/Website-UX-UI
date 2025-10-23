@@ -33,7 +33,7 @@ const pathVariants = {
 
 const Logo = () => {
   return (
-    <div className="absolute top-4 left-4 w-full text-foreground z-[5]">
+    <div className="absolute top-4 left-0 w-full text-foreground z-[5]">
       <Link to="/" className="flex items-end">
         <motion.div
           initial={{ y: -10, opacity: 0   }}

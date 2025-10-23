@@ -7,6 +7,11 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BetaLogin from "./pages/BetaLogin";
 import BetaDashboard from "./pages/BetaDashboard";
+import { DashboardLayout } from "./components/DasboardLayout";
+import { BodyScanPage } from "./components/BodyScanPage";
+import ChatLema from "./pages/ChatLema";
+import { StatsPage } from "./components/StatsPage";
+import { ProfilePage } from "./components/ProfilePage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -18,7 +23,13 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/beta-login" element={<BetaLogin />} />
-          <Route path="/beta-dashboard" element={<BetaDashboard />} />
+          <Route path="/beta-dashboard" element={<DashboardLayout />}>
+            <Route index element={<BetaDashboard />} />
+            <Route path="bodyscan" element={<BodyScanPage />} />
+            <Route path="chat" element={< ChatLema />} />
+            <Route path="stats" element={< StatsPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

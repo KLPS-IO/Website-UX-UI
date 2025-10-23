@@ -45,7 +45,7 @@ const HeroSection = () => {
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
           A revolutionary approach to femtech that puts you first. 
-          Join our waitlist to be part of something extraordinary.
+          {/* Join our waitlist to be part of something extraordinary. */}
         </p>
         <div className="mb-8">
           <Button
