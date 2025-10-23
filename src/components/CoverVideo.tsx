@@ -46,7 +46,7 @@ const CoverVideo = () => {
         <div className="flex flex-row">
           <motion.h1
             variants={item}
-            className="text-[clamp(5rem,15vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
+            className="text-[clamp(5rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
           >
             K
           </motion.h1>

@@ -17,13 +17,13 @@ const Footer = () => {
           </div>
 
           <div className="flex items-center gap-6">
-            <a 
+            {/* <a 
               href="mailto:hello@femtech.com" 
               className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-smooth"
             >
               <Mail className="w-4 h-4" />
               <span className="text-sm">Contact Us</span>
-            </a>
+            </a> */}
           </div>
         </div>
 

@@ -13,7 +13,7 @@ const features = [
   },
   {
     icon: Heart,
-    title: "Personalized Care",
+    title: "Personalised Care",
     description: "Tailored experiences that adapt to your unique health journey.",
   },
   {
