@@ -47,6 +47,16 @@ const HeroSection = () => {
           A revolutionary approach to femtech that puts you first. 
           Join our waitlist to be part of something extraordinary.
         </p>
+        <div className="mb-8">
+          <Button
+            onClick={() => window.location.href = '/beta-login'}
+            variant="hero"
+            size="lg"
+            className="whitespace-nowrap"
+          >
+            Login for Beta Users
+          </Button>
+        </div>
 {/* 
         <form onSubmit={handleJoinWaitlist} className="max-w-md mx-auto mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
