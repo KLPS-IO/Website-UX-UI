@@ -71,9 +71,15 @@ const CoverVideo = () => {
           <motion.h1
             variants={item}
             className="text-[clamp(5rem,17vw,10rem)] font-['Kaushan Script'] drop-shadow-md"
-          >
+          > 
           </motion.h1>
         </div>
+              <motion.h2
+          variants={item}
+          className="text-2xl md:text-4xl font-['Sirin_Stencil',cursive] font-light capitalize drop-shadow-md mt-4 md:mt-0"
+        >
+          Shhhh... we're launching soon...
+        </motion.h2>
       </motion.div>
     </section>
   );
