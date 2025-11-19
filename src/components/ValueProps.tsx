@@ -29,7 +29,7 @@ const ValueProps = () => {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <h2 className="text-3xl md:text-5xl mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Built for You, With You
+            Non-Invasive Insights!
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Innovation meets empathy in a platform designed to transform women's healthcare.
