@@ -3,18 +3,18 @@ import { Shield, Sparkles, Heart, Zap } from "lucide-react";
 const features = [
   {
     icon: Shield,
-    title: "Privacy First",
-    description: "Your health data is yours. Built with security and privacy at the core.",
+    title: "Nano Materials",
+    description: "Worlds First Nano-Material Based Health Insight Material.",
   },
   {
     icon: Sparkles,
     title: "Science-Backed",
-    description: "Evidence-based solutions developed with leading healthcare experts.",
+    description: "Evidence-based solutions developed with leading nano-material experts.",
   },
   {
     icon: Heart,
     title: "Personalised Care",
-    description: "Tailored experiences that adapt to your unique health journey.",
+    description: "Tailored experiences adapted to your unique health journey.",
   },
   {
     icon: Zap,
