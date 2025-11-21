@@ -7,11 +7,26 @@ import heroBg from "@/assets/hero-bg.jpg";
 const HeroSection = () => {
   const [email, setEmail] = useState("");
 
-  const handleJoinWaitlist = (e: React.FormEvent) => {
+  const handleJoinWaitlist = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      toast.success("You're on the list! We'll be in touch soon.");
-      setEmail("");
+      try {
+        await fetch('https://hook.eu1.make.com/4m32clsh9kcf4vlg8nud3islepc51chr', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            timestamp: new Date().toISOString(),
+            source: 'waitlist'
+          }),
+        });
+        toast.success("You're on the list! We'll be in touch soon.");
+        setEmail("");
+      } catch (error) {
+        toast.error("Something went wrong. Please try again.");
+      }
     }
   };
 
@@ -45,19 +60,19 @@ const HeroSection = () => {
         
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
           A revolutionary approach to femtech that puts you first. 
-          {/* Join our waitlist to be part of something extraordinary. */}
+          Join our waitlist to be part of something extraordinary.
         </p>
+
         <div className="mb-8">
-          <Button
-            onClick={() => window.location.href = '/beta-login'}
-            variant="hero"
+          <Button 
+            variant="hero" 
             size="lg"
-            className="whitespace-nowrap"
-          >
+            onClick={() => window.location.href = '/beta-login'}
+            className="whitespace-nowrap"          >
             Login for Beta Users
           </Button>
         </div>
-{/* 
+
         <form onSubmit={handleJoinWaitlist} className="max-w-md mx-auto mb-8">
           <div className="flex flex-col sm:flex-row gap-3">
             <Input
@@ -76,7 +91,7 @@ const HeroSection = () => {
 
         <p className="text-sm text-muted-foreground">
           Be the first to know when we launch. No spam, ever.
-        </p> */}
+        </p>
       </div>
 
       {/* Decorative Elements */}
