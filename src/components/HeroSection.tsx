@@ -1,34 +1,9 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
-  const [email, setEmail] = useState("");
-
-  const handleJoinWaitlist = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      try {
-        await fetch('https://hook.eu1.make.com/4m32clsh9kcf4vlg8nud3islepc51chr', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            timestamp: new Date().toISOString(),
-            source: 'waitlist'
-          }),
-        });
-        toast.success("You're on the list! We'll be in touch soon.");
-        setEmail("");
-      } catch (error) {
-        toast.error("Something went wrong. Please try again.");
-      }
-    }
-  };
+  
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -73,21 +48,15 @@ const HeroSection = () => {
           </Button>
         </div>
 
-        <form onSubmit={handleJoinWaitlist} className="max-w-md mx-auto mb-8">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="flex-1 h-12 px-6 shadow-soft"
-            />
-            <Button type="submit" variant="hero" size="lg" className="whitespace-nowrap">
-              Join Waitlist
-            </Button>
-          </div>
-        </form>
+        <div className="mb-8">
+          <Button 
+            variant="hero" 
+            size="lg"
+            onClick={() => window.open('https://form.typeform.com/to/P1ZOHV7k', '_blank')}
+          >
+            Join Waitlist
+          </Button>
+        </div>
 
         <p className="text-sm text-muted-foreground">
           Be the first to know when we launch. No spam, ever.
