@@ -1,16 +1,103 @@
+import { useEffect, useState } from "react";
 import { TrendingDown, TrendingUp, Ruler } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Progress } from './ui/progress';
 
 export function BodyScanPage() {
-  const measurements = [
-    { label: 'Waist', current: 32.74, previous: 34.15, unit: 'in', change: -4.1 },
-    { label: 'Chest', current: 38.5, previous: 38.2, unit: 'in', change: 0.8 },
-    { label: 'Arms', current: 13.2, previous: 12.8, unit: 'in', change: 3.1 },
-    { label: 'Thighs', current: 22.1, previous: 22.8, unit: 'in', change: -3.1 },
-    { label: 'Hips', current: 36.8, previous: 37.5, unit: 'in', change: -1.9 },
-  ];
+
+  const [waistValue, setWaistValue] = useState<number | null>(null);
+
+useEffect(() => {
+
+  async function fetchWaist() {
+
+    try {
+
+      const response = await fetch(
+        "http://localhost:3001/api/waist"
+      );
+
+      const data = await response.json();
+
+      if (data.length > 0) {
+
+        const latest =
+          data[data.length - 1];
+
+        setWaistValue(
+          Number(latest.waist_value)
+        );
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Fetch waist failed:",
+        error
+      );
+
+    }
+
+  }
+
+  fetchWaist();
+
+  const interval =
+    setInterval(fetchWaist, 5000);
+
+  return () =>
+    clearInterval(interval);
+
+}, []);
+
+const measurements = [
+
+  {
+    label: "Waist",
+    current:
+      waistValue !== null
+        ? waistValue
+        : "--",
+    previous: 34.15,
+    unit: "in",
+    change: -4.1
+  },
+
+  // {
+  //   label: "Chest",
+  //   current: 38.5,
+  //   previous: 38.2,
+  //   unit: "in",
+  //   change: 0.8
+  // },
+
+  // {
+  //   label: "Arms",
+  //   current: 13.2,
+  //   previous: 12.8,
+  //   unit: "in",
+  //   change: 3.1
+  // },
+
+  // {
+  //   label: "Thighs",
+  //   current: 22.1,
+  //   previous: 22.8,
+  //   unit: "in",
+  //   change: -3.1
+  // },
+
+  {
+    label: "Hips",
+    current: 36.8,
+    previous: 37.5,
+    unit: "in",
+    change: -1.9
+  }
+
+];
 
   const bodyComposition = [
     { label: 'Body Fat', value: 18.5, target: 15, unit: '%', color: 'pink' },
@@ -18,8 +105,10 @@ export function BodyScanPage() {
     { label: 'Water', value: 62.5, target: 65, unit: '%', color: 'purple' },
   ];
 
+  
+
   return (
-    <div className="space-y-6 pb-20 px-4 md:px-8 lg:px-16">
+    <div className="space-y-6 pb-20">
       <div className="space-y-2">
         <h1 className="text-3xl text-purple-900">Body Scan</h1>
         <p className="text-gray-600">Track your body measurements</p>

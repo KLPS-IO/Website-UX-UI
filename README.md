@@ -1,73 +1,143 @@
-# Welcome to your Lovable project
 
-## Project info
+  # Mobile App Wireframe
 
-**URL**: https://lovable.dev/projects/831490b5-7b38-4df2-a875-5a9e384cbfe3
+  This is a code bundle for Mobile App Wireframe.
 
-## How can I edit this code?
+  ## Running the code
 
-There are several ways of editing your application.
+  Run `npm i` to install the dependencies.
 
-**Use Lovable**
+  Run `npm run dev` to start the development server.
+  
+  ## Local Development Setup (Mac)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/831490b5-7b38-4df2-a875-5a9e384cbfe3) and start prompting.
+This project uses:
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
+- Node.js
+- PostgreSQL
 - TypeScript
 - React
-- shadcn-ui
-- Tailwind CSS
+- Arduino Serial Integration
 
-## How can I deploy this project?
+Follow these steps exactly on a new machine.
 
-Simply open [Lovable](https://lovable.dev/projects/831490b5-7b38-4df2-a875-5a9e384cbfe3) and click on Share -> Publish.
+---
 
-## Can I connect a custom domain to my Lovable project?
+## 1. Install Homebrew
 
-Yes, you can!
+Homebrew is required to install PostgreSQL.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Run:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+After installation, verify:
+
+brew --version
+
+You should see a version number.
+
+---
+
+## 2. Install Node.js (if not installed)
+
+brew install node
+
+Verify:
+
+node -v
+npm -v
+
+---
+
+## 3. Install PostgreSQL
+
+brew install postgresql@16
+
+Start PostgreSQL:
+
+brew services start postgresql@16
+
+Verify PostgreSQL is running:
+
+psql postgres
+
+You should see:
+
+postgres=#
+
+To exit:
+
+\q
+
+---
+
+## 4. Create KLPS Database
+
+Run:
+
+createdb klps_db
+
+Then open database:
+
+psql klps_db
+
+---
+
+## 5. Create Waist Measurement Table
+
+Inside psql:
+
+CREATE TABLE waist_measurements (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    user_id UUID NOT NULL,
+
+    waist_value DECIMAL(5,2),
+
+    source TEXT DEFAULT 'wearable',
+
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+Exit:
+
+\q
+
+---
+
+## 6. Install Required Node Packages
+
+Inside project root:
+
+npm install express pg cors dotenv
+
+For TypeScript:
+
+npm install -D typescript ts-node @types/node @types/express
+
+---
+
+## 7. Create .env File
+
+Create:
+
+.env
+
+Add:
+
+DATABASE_URL=postgresql://localhost:5432/klps_db
+PORT=3001
+DB_USER=emmamendez
+DB_HOST=localhost
+DB_NAME=klps_db
+DB_PASSWORD=
+DB_PORT=5432
+
+---
+
+## 8. Run Local API
+
+Later:
+
+npm run dev
