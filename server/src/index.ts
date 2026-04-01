@@ -2,27 +2,116 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import pkg from "pg";
+import rateLimit from "express-rate-limit";
+import { z } from "zod";
+import morgan from "morgan";
 
 dotenv.config();
 
 const { Pool } = pkg;
 
+
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(morgan("combined"));
+
+/* =========================================
+  RATE LIMITING (First Shield)
+  PREVENTS: Bot spam, API flooding, Basic abuse
+========================================= */
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+});
+
+app.use(limiter);
+
+
+/* =========================================
+   API KEY SECURITY
+========================================= */
+
+app.use((req, res, next) => {
+
+  // Allow health endpoint without API key
+  if (req.path === "/health") {
+    return next();
+  }
+
+  const key = req.headers["x-api-key"];
+
+  if (key !== process.env.API_KEY) {
+    return res.status(401).json({
+      error: "Unauthorized"
+    });
+  }
+
+  next();
+
+});
+
+/* ===========================
+   HEALTH ENDPOINT
+=========================== */
+
+app.use((req, res, next) => {
+
+  // Allow health checks without API key
+  if (req.path === "/health") {
+    return next();
+  }
+
+  const key = req.headers["x-api-key"];
+
+  if (key !== process.env.API_KEY) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  next();
+
+});
+
 
 /* ===========================
    DATABASE CONNECTION
 =========================== */
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: Number(process.env.DB_PORT),
+  connectionString: process.env.DATABASE_URL,
+  ssl: isProduction
+    ? { rejectUnauthorized: false }
+    : false
 });
+
+
+app.get("/health", async (req, res) => {
+  try {
+
+    // Test database connection
+    await pool.query("SELECT 1");
+
+    res.json({
+      status: "ok",
+      database: "connected",
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      status: "error",
+      database: "disconnected"
+    });
+
+  }
+});
+
 
 /* ===========================
    TEST ROUTE
@@ -36,38 +125,30 @@ app.get("/", (req, res) => {
    INSERT WAIST MEASUREMENT
 =========================== */
 
+const waistSchema = z.object({
+  user_id: z.string(),
+  waist_value: z.number().min(20).max(80)
+});
+
 app.post("/api/waist", async (req, res) => {
-  try {
-    const { user_id, waist_value } = req.body;
 
-    if (!user_id || !waist_value) {
-      return res.status(400).json({
-        error: "Missing user_id or waist_value",
-      });
-    }
+  const result = waistSchema.safeParse(req.body);
 
-    const result = await pool.query(
-      `
-      INSERT INTO waist_measurements
-      (user_id, waist_value)
-      VALUES ($1, $2)
-      RETURNING *;
-      `,
-      [user_id, waist_value]
-    );
+  if (!result.success) {
 
-    res.json(result.rows[0]);
-
-  } catch (error) {
-
-    console.error("DB ERROR:", error);
-
-    res.status(500).json({
-      error: "Database insert failed",
+    return res.status(400).json({
+      error: "Invalid input"
     });
 
   }
+
+  const { user_id, waist_value } =
+    result.data;
+
+  // continue DB insert
+
 });
+
 
 /* ===========================
    GET ALL WAIST DATA
@@ -123,6 +204,7 @@ app.get("/api/waist/latest", async (req, res) => {
 
   }
 });
+
 
 /* ===========================
    START SERVER

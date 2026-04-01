@@ -1,45 +1,93 @@
+# KLPS Platform – Website UX/UI
 
-  # Mobile App Wireframe
+Core frontend and backend platform for KLPS wearable data ingestion and visualisation.
 
-  This is a code bundle for Mobile App Wireframe.
+This system includes:
 
-  ## Running the code
-
-  Run `npm i` to install the dependencies.
-
-  Run `npm run dev` to start the development server.
-  
-  ## Local Development Setup (Mac)
-
-This project uses:
-
-- Node.js
-- PostgreSQL
-- TypeScript
-- React
-- Arduino Serial Integration
-
-Follow these steps exactly on a new machine.
+- React + Vite frontend
+- Express API backend
+- PostgreSQL database
+- API key authentication
+- Rate limiting
+- Health monitoring
+- Automated database backups
+- Structured request logging
+- TypeScript server architecture
 
 ---
 
-## 1. Install Homebrew
+# System Architecture
 
-Homebrew is required to install PostgreSQL.
+Frontend:
+React + Vite
 
-Run:
+Backend:
+Express API
+
+Database:
+PostgreSQL 16
+
+Security:
+- API Key protection
+- Input validation (Zod)
+- Rate limiting
+- Role-based database access
+
+Observability:
+- Health endpoint (`/health`)
+- Morgan request logging
+
+Backup:
+- Automated PostgreSQL dumps
+- Cron scheduled nightly backup
+
+---
+
+# Running the Project
+
+Install dependencies:
+
+npm install
+
+Start development environment:
+
+npm run full
+
+This starts:
+
+- Frontend (Vite)
+- Backend (Express API)
+
+---
+
+# Health Check
+
+Verify system status:
+
+curl http://localhost:3001/health
+
+Expected:
+
+{
+  "status": "ok",
+  "database": "connected"
+}
+
+---
+
+# Local Development Setup (Mac)
+
+## Install Homebrew
 
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-After installation, verify:
+Verify:
 
 brew --version
 
-You should see a version number.
-
 ---
 
-## 2. Install Node.js (if not installed)
+## Install Node.js
 
 brew install node
 
@@ -50,94 +98,104 @@ npm -v
 
 ---
 
-## 3. Install PostgreSQL
+## Install PostgreSQL
 
 brew install postgresql@16
 
-Start PostgreSQL:
+Start:
 
 brew services start postgresql@16
 
-Verify PostgreSQL is running:
-
-psql postgres
-
-You should see:
-
-postgres=#
-
-To exit:
-
-\q
-
 ---
 
-## 4. Create KLPS Database
-
-Run:
+## Create Database
 
 createdb klps_db
 
-Then open database:
+Connect:
 
 psql klps_db
 
 ---
 
-## 5. Create Waist Measurement Table
-
-Inside psql:
+## Create Table
 
 CREATE TABLE waist_measurements (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
     user_id UUID NOT NULL,
-
     waist_value DECIMAL(5,2),
-
     source TEXT DEFAULT 'wearable',
-
     created_at TIMESTAMP DEFAULT NOW()
 );
 
-Exit:
-
-\q
-
 ---
 
-## 6. Install Required Node Packages
-
-Inside project root:
-
-npm install express pg cors dotenv
-
-For TypeScript:
-
-npm install -D typescript ts-node @types/node @types/express
-
----
-
-## 7. Create .env File
+# Environment Variables
 
 Create:
 
 .env
 
-Add:
+Example:
 
-DATABASE_URL=postgresql://localhost:5432/klps_db
+DATABASE_URL=postgresql://klps_app:yourpassword@localhost:5432/klps_db
+API_KEY=yourStrongKey
+NODE_ENV=development
 PORT=3001
-DB_USER=emmamendez
-DB_HOST=localhost
-DB_NAME=klps_db
-DB_PASSWORD=
-DB_PORT=5432
 
 ---
 
-## 8. Run Local API
+# Logging
 
-Later:
+Request logging is enabled using:
 
-npm run dev
+morgan
+
+Logs include:
+
+- Route
+- Status
+- Response time
+- IP address
+
+---
+
+# Backups
+
+Automated nightly backups run using:
+
+cron
+
+Schedule:
+
+02:00 daily
+
+Script:
+
+backup.sh
+
+Backups stored in:
+
+backups/
+
+---
+
+# Security Controls
+
+Implemented:
+
+- API Key validation
+- Rate limiting
+- Input validation
+- Database role isolation
+
+---
+
+# Future Components
+
+Planned:
+
+- KLPS LEMA (AI intelligence system)
+- Analytics pipeline
+- Visual inference engine
+- Model training architecture

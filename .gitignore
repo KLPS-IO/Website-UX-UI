@@ -17,9 +17,11 @@ venv/
 .env
 data/input/
 data/output/
-
+.env*
 .env.local
 .env.*.local
+.env.production
+.env.development
 
 # Log files
 logs/
