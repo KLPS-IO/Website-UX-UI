@@ -48,6 +48,14 @@ const ChatLema = () => {
         const data = await res.json();
 
         console.log("API RESPONSE:", data);
+        console.log("API RESPONSE FULL:", data);
+        console.log("QUESTIONS:", data.questions);
+        console.log("DAY:", data.day);
+
+        setQuestions(data.questions || []);
+        setDayNumber(data.day || 1);
+
+        setLoading(false);
 
         // ✅ store questions
         setQuestions(data.questions);
