@@ -12,6 +12,14 @@ import { BodyScanPage } from "./components/BodyScanPage";
 import ChatLema from "./pages/ChatLema";
 import { StatsPage } from "./components/StatsPage";
 import { ProfilePage } from "./components/ProfilePage";
+import Dashboard from '@/pages/Dashboard';
+import CheckIn from '@/pages/CheckIn';
+import Goals from '@/pages/Goals';
+import Progress from '@/pages/Progress';
+import Streaks from '@/pages/Streaks';
+import Rewards from '@/pages/Rewards';
+import Avatar from '@/pages/Avatar';
+import Profile from '@/pages/Profile';
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -29,6 +37,14 @@ const App = () => (
             <Route path="chat" element={< ChatLema />} />
             <Route path="stats" element={< StatsPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="check-in" element={<CheckIn />} />
+            <Route path="goals" element={<Goals />} />
+            <Route path="progress" element={<Progress />} />
+            <Route path="streaks" element={<Streaks />} />
+            <Route path="rewards" element={<Rewards />} />
+            <Route path="avatar" element={<Avatar />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
