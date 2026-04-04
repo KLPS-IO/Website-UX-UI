@@ -1,9 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Mic, AudioLines } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+type Option = {
+  value: string;
+  label: string;
+};
+
+type Question = {
+  question_key: string;
+  question_text: string;
+  domain: string;
+  response_type: string;
+  options: Option[];
+};
+
 const ChatLema = () => {
+
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const [message, setMessage] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -13,11 +31,39 @@ const ChatLema = () => {
     setMessage("");
   };
 
+  useEffect(() => {
+  const fetchQuestions = async () => {
+    try {
+      const res = await fetch(
+        "https://klps-lema-production.up.railway.app/api/questions/today"
+      );
+
+      const data = await res.json();
+
+      console.log("API RESPONSE:", data);
+
+      setQuestions(data.questions);
+      setLoading(false);
+
+    } catch (error) {
+      console.error("Failed to load questions", error);
+      setLoading(false);
+    }
+  };
+
+  fetchQuestions();
+}, []);
+
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-4xl mx-auto space-y-8">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-foreground mb-12">
-          Where should we begin?
+          {/* Where should we begin? */}
+          {loading
+            ? "Loading your session..."
+            : questions.length === 0
+              ? "No questions found for today."
+              : questions[currentIndex]?.question_text}
         </h1>
 
         <form onSubmit={handleSubmit} className="relative">
