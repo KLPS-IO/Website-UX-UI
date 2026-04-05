@@ -134,13 +134,15 @@ export default function CheckIn() {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-
             user_id: USER_ID,
+
+            day_number: 1, // TEMP — dynamic later
 
             question_key: key,
 
-            response_value: value
+            response_value: value,
 
+            domain: "daily_checkin"
           })
         }
       );
