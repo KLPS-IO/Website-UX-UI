@@ -18,9 +18,8 @@ export default function CheckIn() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-
-          user_id: USER_ID
-
+          user_id:
+            "11111111-1111-1111-1111-111111111111"
         })
       }
     );
