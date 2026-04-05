@@ -12,7 +12,7 @@ import { BodyScanPage } from "./components/BodyScanPage";
 import ChatLema from "./pages/ChatLema";
 import { StatsPage } from "./components/StatsPage";
 import { ProfilePage } from "./components/ProfilePage";
-import Dashboard from '@/pages/Dashboard';
+import Summary from '@/pages/Summary';
 import CheckIn from '@/pages/CheckIn';
 import Goals from '@/pages/Goals';
 import Progress from '@/pages/Progress';
@@ -37,7 +37,7 @@ const App = () => (
             <Route path="chat" element={< ChatLema />} />
             <Route path="stats" element={< StatsPage />} />
             <Route path="profile" element={<ProfilePage />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="summary" element={<Summary />} />
             <Route path="check-in" element={<CheckIn />} />
             <Route path="goals" element={<Goals />} />
             <Route path="progress" element={<Progress />} />

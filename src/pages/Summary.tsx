@@ -18,16 +18,15 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-export default function Dashboard() {
+export default function Summary() {
   return (
     <motion.div variants={container} initial="hidden" animate="show" className="px-5 pt-6 max-w-2xl mx-auto">
       {/* Header */}
       <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-sm text-muted-foreground">Good morning</p>
-          <h1 className="font-heading text-2xl font-bold">Welcome back 👋</h1>
+          <h1 className="font-heading text-2xl font-bold">Summary</h1>
         </div>
-        <Link to="/profile">
+        <Link to="/beta-dashboard/profile">
           <div className="w-10 h-10 bg-wellness-mint rounded-full flex items-center justify-center">
             <span className="text-sm font-semibold text-primary">U</span>
           </div>
@@ -42,7 +41,7 @@ export default function Dashboard() {
             <p className="text-sm font-medium mt-3">Today's Progress — 60%</p>
             <p className="text-xs text-muted-foreground mt-1 mb-4">3 of 5 daily goals completed</p>
             <Link
-              to="/check-in"
+              to="/beta-dashboard/check-in"
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary bg-primary/10 px-5 py-2 rounded-2xl hover:bg-primary/15 transition-colors"
             >
               Start Check-In <ChevronRight className="w-4 h-4" />
@@ -77,8 +76,8 @@ export default function Dashboard() {
       <motion.div variants={item} className="mb-6">
         <h3 className="font-heading font-semibold text-sm mb-3">Quick Actions</h3>
         <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar">
-          <Link to="/check-in"><QuickAction icon={ClipboardCheck} label="Check-In" gradient="mint" onClick={() => {}} /></Link>
-          <Link to="/goals"><QuickAction icon={Target} label="Goals" gradient="peach" onClick={() => {}} /></Link>
+          <Link to="/beta-dashboard/check-in"><QuickAction icon={ClipboardCheck} label="Check-In" gradient="mint" onClick={() => {}} /></Link>
+          <Link to="/beta-dashboard/goals"><QuickAction icon={Target} label="Goals" gradient="peach" onClick={() => {}} /></Link>
           <QuickAction icon={Droplets} label="Water" gradient="sky" onClick={() => {}} />
           <QuickAction icon={Moon} label="Sleep" gradient="lavender" onClick={() => {}} />
           <QuickAction icon={Footprints} label="Steps" gradient="mint" onClick={() => {}} />
@@ -89,7 +88,7 @@ export default function Dashboard() {
       <motion.div variants={item} className="mb-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-heading font-semibold text-sm">Active Goals</h3>
-          <Link to="/goals" className="text-xs text-primary font-medium">See all</Link>
+          <Link to="/beta-dashboard/goals" className="text-xs text-primary font-medium">See all</Link>
         </div>
         <div className="space-y-3">
           <GoalCard title="Daily Steps" type="activity" current={6240} target={10000} unit="steps" progress={62} />
