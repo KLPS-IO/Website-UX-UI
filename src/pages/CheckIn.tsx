@@ -1,10 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import Lema from '@/components/mascot/Lema';
 
 export default function CheckIn() {
+
+  useEffect(() => {
+
+  const startSession = async () => {
+
+    await fetch(
+      "https://klps-lema-production.up.railway.app/api/session/start",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+
+          user_id: USER_ID
+
+        })
+      }
+    );
+
+  };
+
+  startSession();
+
+}, []);
 
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
