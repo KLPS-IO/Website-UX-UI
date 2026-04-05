@@ -119,37 +119,64 @@ export default function CheckIn() {
    * Send answers to backend
    */
 
-  const submitSignals = async () => {
+const submitSignals = async () => {
 
   const entries =
     Object.entries(answers);
 
-    for (const [key, value] of entries) {
+  for (const [key, value] of entries) {
 
-      await fetch(
-        "https://klps-lema-production.up.railway.app/api/signal",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            user_id: USER_ID,
+    if (!value) continue;
 
-            day_number: 1, // TEMP — dynamic later
+    const payload = {
 
-            question_key: key,
+      user_id: USER_ID,
 
-            response_value: value,
+      day_number: 1,
 
-            domain: "daily_checkin"
-          })
-        }
+      question_key: key,
+
+      response_value: value,
+
+      domain: "daily_checkin"
+
+    };
+
+    console.log(
+      "Sending signal:",
+      payload
+    );
+
+    const res = await fetch(
+      "https://klps-lema-production.up.railway.app/api/signal",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(payload)
+
+      }
+    );
+
+    if (!res.ok) {
+
+      const errorText =
+        await res.text();
+
+      console.error(
+        "Signal failed:",
+        payload,
+        errorText
       );
 
     }
 
-  };
+  }
+
+};
 
 
   /**
@@ -158,20 +185,60 @@ export default function CheckIn() {
 
   const fetchSummary = async () => {
 
-    await submitSignals();
+  /**
+   * STEP 1 — Start session
+   */
 
-    const res = await fetch(
-      `https://klps-lema-production.up.railway.app/api/summary/today?user_id=${USER_ID}`
+  const sessionRes = await fetch(
+    `https://klps-lema-production.up.railway.app/api/questions/today?user_id=${USER_ID}`
+  );
+
+  if (!sessionRes.ok) {
+
+    console.error(
+      "Session start failed"
     );
 
-    const data =
-      await res.json();
+    return;
 
-    setSummary(data.summary);
+  }
 
-    setCompleted(true);
+  /**
+   * STEP 2 — Submit signals
+   */
 
-  };
+  await submitSignals();
+
+  /**
+   * STEP 3 — Get summary
+   */
+
+  const res = await fetch(
+    `https://klps-lema-production.up.railway.app/api/summary/today?user_id=${USER_ID}`
+  );
+
+  if (!res.ok) {
+
+    const err =
+      await res.text();
+
+    console.error(
+      "Summary failed:",
+      err
+    );
+
+    return;
+
+  }
+
+  const data =
+    await res.json();
+
+  setSummary(data.summary);
+
+  setCompleted(true);
+
+};
 
 
   const next = async () => {
