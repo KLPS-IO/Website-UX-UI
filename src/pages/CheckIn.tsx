@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import Lema from '@/components/mascot/Lema';
 
 export default function CheckIn() {
@@ -10,59 +9,72 @@ export default function CheckIn() {
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
   const [completed, setCompleted] = useState(false);
-
   const [summary, setSummary] = useState<string | null>(null);
 
+  const USER_ID =
+    "11111111-1111-1111-1111-111111111111";
+
   const questions = [
+
     {
       id: 1,
+      key: "mood",
       text: "How are you feeling today?",
       type: 'selection',
       options: [
-        { label: 'Great', emoji: '😊' },
-        { label: 'Good', emoji: '🙂' },
-        { label: 'Okay', emoji: '😐' },
-        { label: 'Not great', emoji: '😔' },
-        { label: 'Struggling', emoji: '😣' },
+        { label: 'Great' },
+        { label: 'Good' },
+        { label: 'Okay' },
+        { label: 'Not great' },
+        { label: 'Struggling' },
       ],
     },
+
     {
       id: 2,
+      key: "sleep",
       text: "How well did you sleep last night?",
       type: 'selection',
       options: [
-        { label: 'Excellent', emoji: '🌟' },
-        { label: 'Good', emoji: '😴' },
-        { label: 'Fair', emoji: '😑' },
-        { label: 'Poor', emoji: '😫' },
+        { label: 'Excellent' },
+        { label: 'Good' },
+        { label: 'Fair' },
+        { label: 'Poor' },
       ],
     },
+
     {
       id: 3,
+      key: "energy",
       text: "What's your energy level?",
       type: 'selection',
       options: [
-        { label: 'High', emoji: '⚡' },
-        { label: 'Medium', emoji: '🔋' },
-        { label: 'Low', emoji: '🪫' },
+        { label: 'High' },
+        { label: 'Medium' },
+        { label: 'Low' },
       ],
     },
+
     {
       id: 4,
+      key: "exercise",
       text: "Did you exercise today?",
       type: 'selection',
       options: [
-        { label: 'Yes, intense', emoji: '🏋️' },
-        { label: 'Light exercise', emoji: '🚶' },
-        { label: 'Not yet', emoji: '💤' },
+        { label: 'Yes intense' },
+        { label: 'Light exercise' },
+        { label: 'Not yet' },
       ],
     },
+
     {
       id: 5,
+      key: "reflection",
       text: "Anything on your mind today?",
       type: 'text',
       placeholder: 'Share your thoughts...',
-    },
+    }
+
   ];
 
   const q = questions[currentQ];
@@ -70,41 +82,106 @@ export default function CheckIn() {
   const progress = ((currentQ + 1) / total) * 100;
 
   const selectAnswer = (value) => {
-    setAnswers({ ...answers, [q.id]: value });
+
+    setAnswers({
+      ...answers,
+      [q.key]: value
+    });
+
   };
 
-  const fetchSummary = async () => {
-    const res = await fetch(
-      "https://klps-lema-production.up.railway.app/api/summary/today"
-    );
 
-    const data = await res.json();
+  /**
+   * Send answers to backend
+   */
 
-    setSummary(data.summary);
-    setCompleted(true);
-  };
+  const submitSignals = async () => {
 
-  const next = async () => {
+  const entries =
+    Object.entries(answers);
 
-    if (currentQ < total - 1) {
-      setCurrentQ(currentQ + 1);
-    } else {
-      await fetchSummary();
+    for (const [key, value] of entries) {
+
+      await fetch(
+        "https://klps-lema-production.up.railway.app/api/signal",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+
+            user_id: USER_ID,
+
+            question_key: key,
+
+            response_value: value
+
+          })
+        }
+      );
+
     }
 
   };
 
-  const prev = () => {
-    if (currentQ > 0) setCurrentQ(currentQ - 1);
+
+  /**
+   * Fetch summary after signals saved
+   */
+
+  const fetchSummary = async () => {
+
+    await submitSignals();
+
+    const res = await fetch(
+      `https://klps-lema-production.up.railway.app/api/summary/today?user_id=${USER_ID}`
+    );
+
+    const data =
+      await res.json();
+
+    setSummary(data.summary);
+
+    setCompleted(true);
+
   };
 
-  // =====================
-  // COMPLETION SCREEN
-  // =====================
+
+  const next = async () => {
+
+    if (currentQ < total - 1) {
+
+      setCurrentQ(currentQ + 1);
+
+    } else {
+
+      await fetchSummary();
+
+    }
+
+  };
+
+
+  const prev = () => {
+
+    if (currentQ > 0) {
+
+      setCurrentQ(currentQ - 1);
+
+    }
+
+  };
+
+
+  /**
+   * Completion Screen
+   */
 
   if (completed) {
 
     return (
+
       <div className="px-5 pt-6 max-w-lg mx-auto text-center">
 
         <div className="mb-6">
@@ -119,98 +196,168 @@ export default function CheckIn() {
           {summary}
         </p>
 
-        <Button onClick={() => window.location.href = "/beta-dashboard/summary"}>
+        <Button
+          onClick={() =>
+            window.location.href =
+            "/beta-dashboard/summary"
+          }
+        >
           Back to Dashboard
         </Button>
 
       </div>
+
     );
+
   }
 
-  // =====================
-  // QUESTIONS UI
-  // =====================
+
+  /**
+   * Question UI
+   */
 
   return (
+
     <div className="px-5 pt-6 max-w-lg mx-auto">
 
-      {/* Progress */}
       <div className="mb-6">
+
         <div className="flex justify-between text-xs mb-2">
-          <span>Question {currentQ + 1} of {total}</span>
-          <span>{Math.round(progress)}%</span>
+
+          <span>
+            Question {currentQ + 1} of {total}
+          </span>
+
+          <span>
+            {Math.round(progress)}%
+          </span>
+
         </div>
 
         <div className="h-2 bg-muted rounded-full">
+
           <motion.div
             className="h-full bg-primary"
-            animate={{ width: `${progress}%` }}
+            animate={{
+              width: `${progress}%`
+            }}
           />
+
         </div>
+
       </div>
 
-      {/* Mascot */}
+
       <div className="flex justify-center mb-6">
-        <Lema state={currentQ === total - 1 ? 'encouraging' : 'idle'} message="" />
+
+        <Lema
+          state={
+            currentQ === total - 1
+              ? 'encouraging'
+              : 'idle'
+          }
+          message=""
+        />
+
       </div>
 
-      {/* Question */}
+
       <AnimatePresence mode="wait">
+
         <motion.div
           key={q.id}
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
+          initial={{
+            opacity: 0,
+            x: 30
+          }}
+          animate={{
+            opacity: 1,
+            x: 0
+          }}
+          exit={{
+            opacity: 0,
+            x: -30
+          }}
         >
 
           <h2 className="text-xl font-bold text-center mb-8">
             {q.text}
           </h2>
 
+
           {q.type === 'selection' && (
+
             <div className="space-y-3">
+
               {q.options.map((opt) => (
+
                 <button
                   key={opt.label}
-                  onClick={() => selectAnswer(opt.label)}
+                  onClick={() =>
+                    selectAnswer(opt.label)
+                  }
                   className={`w-full p-4 border rounded-xl ${
-                    answers[q.id] === opt.label
+                    answers[q.key] === opt.label
                       ? "border-primary bg-primary/5"
                       : "border-border"
                   }`}
                 >
+
                   {opt.label}
+
                 </button>
+
               ))}
+
             </div>
+
           )}
 
+
           {q.type === 'text' && (
+
             <Textarea
-              value={answers[q.id] || ''}
-              onChange={(e) => selectAnswer(e.target.value)}
+              value={
+                answers[q.key] || ''
+              }
+              onChange={(e) =>
+                selectAnswer(
+                  e.target.value
+                )
+              }
             />
+
           )}
 
         </motion.div>
+
       </AnimatePresence>
 
-      {/* Navigation */}
+
       <div className="flex justify-between mt-8">
 
-        <Button onClick={prev} disabled={currentQ === 0}>
+        <Button
+          onClick={prev}
+          disabled={currentQ === 0}
+        >
           Back
         </Button>
 
         <Button
           onClick={next}
-          disabled={!answers[q.id]}
+          disabled={!answers[q.key]}
         >
-          {currentQ === total - 1 ? "Complete" : "Next"}
+
+          {currentQ === total - 1
+            ? "Complete"
+            : "Next"}
+
         </Button>
 
       </div>
 
     </div>
+
   );
+
 }
