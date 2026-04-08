@@ -16,7 +16,7 @@ import Logo from "./Logo";
 const items = [
   { title: "Dashboard", url: "/beta-dashboard", icon: LayoutDashboard },
   { title: "BodyScan", url: "/beta-dashboard/bodyscan", icon: Scan },
-  { title: "Chat to Lema", url: "/beta-dashboard/summary", icon: MessageSquare },
+  { title: "Chat to Lema", url: "/beta-dashboard/chat", icon: MessageSquare },
   { title: "Stats", url: "/beta-dashboard/stats", icon: TrendingUp },
   { title: "Profile", url: "/beta-dashboard/profile", icon: User },
 ];

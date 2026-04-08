@@ -20,6 +20,7 @@ import Streaks from '@/pages/Streaks';
 import Rewards from '@/pages/Rewards';
 import Avatar from '@/pages/Avatar';
 import Profile from '@/pages/Profile';
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="rewards" element={<Rewards />} />
             <Route path="avatar" element={<Avatar />} />
             <Route path="profile" element={<Profile />} />
+
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

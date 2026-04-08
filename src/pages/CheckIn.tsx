@@ -1,42 +1,92 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import Lema from '@/components/mascot/Lema';
+import React, { useEffect, useState } from "react";
+
+import { motion, AnimatePresence } from "framer-motion";
+
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+
+import Lema from "@/components/mascot/Lema";
 
 export default function CheckIn() {
 
-  useEffect(() => {
-
-  const startSession = async () => {
-
-    await fetch(
-      "https://klps-lema-production.up.railway.app/api/session/start",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          user_id:
-            "11111111-1111-1111-1111-111111111111"
-        })
-      }
-    );
-
-  };
-
-  startSession();
-
-}, []);
-
-  const [currentQ, setCurrentQ] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [completed, setCompleted] = useState(false);
-  const [summary, setSummary] = useState<string | null>(null);
-
   const USER_ID =
     "11111111-1111-1111-1111-111111111111";
+
+  const [currentQ, setCurrentQ] = useState(0);
+
+  type Answers = Record<string, string>;
+
+  const [answers, setAnswers] = useState<Answers>({});
+
+  const [completed, setCompleted] =
+    useState(false);
+
+  const [summary, setSummary] =
+    useState<string | null>(null);
+
+  const [dayNumber, setDayNumber] =
+    useState<number>(1);
+
+  /**
+   * START SESSION — runs once
+   */
+
+  useEffect(() => {
+
+    const initSession = async () => {
+
+      try {
+
+        const res = await fetch(
+          "https://klps-lema-production.up.railway.app/api/session/start",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              user_id: USER_ID
+            })
+          }
+        );
+
+        const data =
+          await res.json();
+
+        console.log(
+          "Session started:",
+          data
+        );
+
+        if (data.day) {
+
+          setDayNumber(data.day);
+
+        }
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Session start failed",
+          error
+        );
+
+      }
+
+    };
+
+    initSession();
+
+  }, []);
+
+
+  /**
+   * QUESTIONS
+   */
 
   const questions = [
 
@@ -44,68 +94,76 @@ export default function CheckIn() {
       id: 1,
       key: "mood",
       text: "How are you feeling today?",
-      type: 'selection',
+      type: "selection",
       options: [
-        { label: 'Great' },
-        { label: 'Good' },
-        { label: 'Okay' },
-        { label: 'Not great' },
-        { label: 'Struggling' },
-      ],
+        { label: "Great" },
+        { label: "Good" },
+        { label: "Okay" },
+        { label: "Not great" },
+        { label: "Struggling" }
+      ]
     },
 
     {
       id: 2,
       key: "sleep",
       text: "How well did you sleep last night?",
-      type: 'selection',
+      type: "selection",
       options: [
-        { label: 'Excellent' },
-        { label: 'Good' },
-        { label: 'Fair' },
-        { label: 'Poor' },
-      ],
+        { label: "Excellent" },
+        { label: "Good" },
+        { label: "Fair" },
+        { label: "Poor" }
+      ]
     },
 
     {
       id: 3,
       key: "energy",
       text: "What's your energy level?",
-      type: 'selection',
+      type: "selection",
       options: [
-        { label: 'High' },
-        { label: 'Medium' },
-        { label: 'Low' },
-      ],
+        { label: "High" },
+        { label: "Medium" },
+        { label: "Low" }
+      ]
     },
 
     {
       id: 4,
       key: "exercise",
       text: "Did you exercise today?",
-      type: 'selection',
+      type: "selection",
       options: [
-        { label: 'Yes intense' },
-        { label: 'Light exercise' },
-        { label: 'Not yet' },
-      ],
+        { label: "Yes intense" },
+        { label: "Light exercise" },
+        { label: "Not yet" }
+      ]
     },
 
     {
       id: 5,
       key: "reflection",
       text: "Anything on your mind today?",
-      type: 'text',
-      placeholder: 'Share your thoughts...',
+      type: "text",
+      placeholder: "Share your thoughts..."
     }
 
   ];
 
   const q = questions[currentQ];
-  const total = questions.length;
-  const progress = ((currentQ + 1) / total) * 100;
 
-  const selectAnswer = (value) => {
+  const total = questions.length;
+
+  const progress =
+    ((currentQ + 1) / total) * 100;
+
+
+  /**
+   * STORE ANSWERS
+   */
+
+  const selectAnswer = (value: string) => {
 
     setAnswers({
       ...answers,
@@ -116,101 +174,83 @@ export default function CheckIn() {
 
 
   /**
-   * Send answers to backend
+   * SEND SIGNALS
    */
 
-const submitSignals = async () => {
+  const submitSignals = async () => {
 
-  const entries =
-    Object.entries(answers);
+    const entries =
+      Object.entries(answers);
 
-  for (const [key, value] of entries) {
+    for (const [key, value] of entries) {
 
-    if (!value) continue;
+      if (!value) continue;
 
-    const payload = {
+      const payload = {
 
-      user_id: USER_ID,
+        user_id: USER_ID,
 
-      day_number: 1,
+        day_number: dayNumber,
 
-      question_key: key,
+        question_key: key,
 
-      response_value: value,
+        response_value: value,
 
-      domain: "daily_checkin"
+        domain: "daily_checkin"
 
-    };
+      };
 
-    console.log(
-      "Sending signal:",
-      payload
-    );
+      console.log(
+        "Sending signal:",
+        payload
+      );
 
-    const res = await fetch(
-      "https://klps-lema-production.up.railway.app/api/signal",
-      {
-        method: "POST",
+      const res = await fetch(
+        "https://klps-lema-production.up.railway.app/api/signal",
+        {
+          method: "POST",
 
-        headers: {
-          "Content-Type": "application/json"
-        },
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-        body: JSON.stringify(payload)
+          body: JSON.stringify(payload)
+
+        }
+      );
+
+      if (!res.ok) {
+
+        const errorText =
+          await res.text();
+
+        console.error(
+          "Signal failed:",
+          payload,
+          errorText
+        );
 
       }
-    );
-
-    if (!res.ok) {
-
-      const errorText =
-        await res.text();
-
-      console.error(
-        "Signal failed:",
-        payload,
-        errorText
-      );
 
     }
 
-  }
-
-};
+  };
 
 
   /**
-   * Fetch summary after signals saved
+   * FETCH SUMMARY
    */
 
   const fetchSummary = async () => {
 
   /**
-   * STEP 1 — Start session
-   */
-
-  const sessionRes = await fetch(
-    `https://klps-lema-production.up.railway.app/api/questions/today?user_id=${USER_ID}`
-  );
-
-  if (!sessionRes.ok) {
-
-    console.error(
-      "Session start failed"
-    );
-
-    return;
-
-  }
-
-  /**
-   * STEP 2 — Submit signals
+   * STEP 1 — Submit signals
    */
 
   await submitSignals();
 
   /**
-   * STEP 3 — Get summary
+   * STEP 2 — Get summary
    */
 
   const res = await fetch(
@@ -241,15 +281,31 @@ const submitSignals = async () => {
 };
 
 
+  /**
+   * NAVIGATION
+   */
+
   const next = async () => {
 
     if (currentQ < total - 1) {
 
       setCurrentQ(currentQ + 1);
 
-    } else {
+    }
 
-      await fetchSummary();
+    else {
+
+      try {
+
+        await fetchSummary();
+
+      } catch (err) {
+
+        alert(
+          "Something went wrong — your responses were still saved."
+        );
+
+}
 
     }
 
@@ -268,7 +324,7 @@ const submitSignals = async () => {
 
 
   /**
-   * Completion Screen
+   * COMPLETION SCREEN
    */
 
   if (completed) {
@@ -306,12 +362,14 @@ const submitSignals = async () => {
 
 
   /**
-   * Question UI
+   * UI
    */
 
   return (
 
     <div className="px-5 pt-6 max-w-lg mx-auto">
+
+      {/* Progress */}
 
       <div className="mb-6">
 
@@ -341,13 +399,15 @@ const submitSignals = async () => {
       </div>
 
 
+      {/* Mascot */}
+
       <div className="flex justify-center mb-6">
 
         <Lema
           state={
             currentQ === total - 1
-              ? 'encouraging'
-              : 'idle'
+              ? "encouraging"
+              : "idle"
           }
           message=""
         />
@@ -355,22 +415,15 @@ const submitSignals = async () => {
       </div>
 
 
+      {/* Question */}
+
       <AnimatePresence mode="wait">
 
         <motion.div
           key={q.id}
-          initial={{
-            opacity: 0,
-            x: 30
-          }}
-          animate={{
-            opacity: 1,
-            x: 0
-          }}
-          exit={{
-            opacity: 0,
-            x: -30
-          }}
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -30 }}
         >
 
           <h2 className="text-xl font-bold text-center mb-8">
@@ -378,7 +431,7 @@ const submitSignals = async () => {
           </h2>
 
 
-          {q.type === 'selection' && (
+          {q.type === "selection" && (
 
             <div className="space-y-3">
 
@@ -407,11 +460,11 @@ const submitSignals = async () => {
           )}
 
 
-          {q.type === 'text' && (
+          {q.type === "text" && (
 
             <Textarea
               value={
-                answers[q.key] || ''
+                answers[q.key] || ""
               }
               onChange={(e) =>
                 selectAnswer(
@@ -426,6 +479,8 @@ const submitSignals = async () => {
 
       </AnimatePresence>
 
+
+      {/* Navigation */}
 
       <div className="flex justify-between mt-8">
 

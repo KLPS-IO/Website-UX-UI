@@ -10,6 +10,12 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import Lema from "@/components/mascot/Lema";
 
+import ChatCompleteState
+from "@/components/lema/ChatCompleteState";
+
+// ✅ API base import
+import { API_BASE } from "@/config/api";
+
 type Option = {
   value: string;
   label: string;
@@ -25,16 +31,24 @@ type Question = {
 
 export default function CheckIn() {
 
+  console.log("CHAT LEMA LOADED");
+
   const navigate = useNavigate();
 
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [questions, setQuestions] =
+    useState<Question[]>([]);
 
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [currentIndex, setCurrentIndex] =
+    useState(0);
 
-  const [dayNumber, setDayNumber] = useState<number>(1);
+  const [answers, setAnswers] =
+    useState<Record<string, string>>({});
 
-  const [loading, setLoading] = useState(true);
+  const [dayNumber, setDayNumber] =
+    useState<number>(1);
+
+  const [loading, setLoading] =
+    useState(true);
 
   // ==========================
   // Fetch Questions
@@ -46,22 +60,58 @@ export default function CheckIn() {
 
       try {
 
+        console.log("Fetching questions...");
+
         const res = await fetch(
-          "https://klps-lema-production.up.railway.app/api/questions/today"
+          `${API_BASE}/api/questions/today`
         );
 
-        const data = await res.json();
+        if (!res.ok) {
 
-        console.log("Fetched Questions:", data);
+          const err =
+            await res.text();
 
-        setQuestions(data.questions || []);
-        setDayNumber(data.day || 1);
+          console.error(
+            "Question fetch failed:",
+            err
+          );
 
-      } catch (error) {
+          setQuestions([]);
 
-        console.error("Failed loading questions:", error);
+          return;
 
-      } finally {
+        }
+
+        const data =
+          await res.json();
+
+        console.log(
+          "Fetched Questions:",
+          data
+        );
+
+        setQuestions(
+          data.questions || []
+        );
+
+        setDayNumber(
+          data.day || 1
+        );
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Failed loading questions:",
+          error
+        );
+
+        setQuestions([]);
+
+      }
+
+      finally {
 
         setLoading(false);
 
@@ -95,30 +145,43 @@ export default function CheckIn() {
     try {
 
       await fetch(
-        "https://klps-lema-production.up.railway.app/api/signal",
+        `${API_BASE}/api/signal`,
         {
           method: "POST",
+
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           },
+
           body: JSON.stringify({
             user_id:
               "11111111-1111-1111-1111-111111111111",
 
-            day_number: dayNumber,
+            day_number:
+              dayNumber,
 
-            question_key: questionKey,
+            question_key:
+              questionKey,
 
-            response_value: value,
+            response_value:
+              value,
 
-            domain: domain
+            domain:
+              domain
           })
+
         }
       );
 
-    } catch (error) {
+    }
 
-      console.error("Signal save failed:", error);
+    catch (error) {
+
+      console.error(
+        "Signal save failed:",
+        error
+      );
 
     }
 
@@ -128,19 +191,29 @@ export default function CheckIn() {
   // Select Answer
   // ==========================
 
-  const selectAnswer = async (value: string) => {
+  const selectAnswer = async (
+    value: string
+  ) => {
 
     if (!currentQuestion) return;
 
     setAnswers(prev => ({
+
       ...prev,
-      [currentQuestion.question_key]: value
+
+      [currentQuestion.question_key]:
+        value
+
     }));
 
     await saveSignal(
+
       currentQuestion.question_key,
+
       value,
+
       currentQuestion.domain
+
     );
 
   };
@@ -153,15 +226,22 @@ export default function CheckIn() {
 
     if (!currentQuestion) return;
 
-    if (currentIndex < questions.length - 1) {
+    if (
+      currentIndex <
+      questions.length - 1
+    ) {
 
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex(prev =>
+        prev + 1
+      );
 
-    } else {
+    }
 
-      // ✅ FINAL STEP → Summary
+    else {
 
-      navigate("/beta-dashboard/summary");
+      navigate(
+        "/beta-dashboard/summary"
+      );
 
     }
 
@@ -171,7 +251,9 @@ export default function CheckIn() {
 
     if (currentIndex > 0) {
 
-      setCurrentIndex(prev => prev - 1);
+      setCurrentIndex(prev =>
+        prev - 1
+      );
 
     }
 
@@ -201,24 +283,28 @@ export default function CheckIn() {
 
   if (!currentQuestion) {
 
-    return (
+  console.warn(
+    "No questions returned from API"
+  );
 
-      <div className="flex items-center justify-center h-screen">
+  return (
 
-        No questions available.
+    <ChatCompleteState
+      streak={dayNumber}
+    />
 
-      </div>
+  );
 
-    );
-
-  }
+}
 
   // ==========================
   // Progress
   // ==========================
 
   const progress =
-    ((currentIndex + 1) / questions.length) * 100;
+    ((currentIndex + 1) /
+      questions.length) *
+    100;
 
   return (
 
@@ -248,7 +334,10 @@ export default function CheckIn() {
 
           <motion.div
             className="h-full bg-primary"
-            animate={{ width: `${progress}%` }}
+            animate={{
+              width:
+                `${progress}%`
+            }}
           />
 
         </div>
@@ -261,7 +350,8 @@ export default function CheckIn() {
 
         <Lema
           state={
-            currentIndex === questions.length - 1
+            currentIndex ===
+            questions.length - 1
               ? "encouraging"
               : "idle"
           }
@@ -275,10 +365,24 @@ export default function CheckIn() {
       <AnimatePresence mode="wait">
 
         <motion.div
-          key={currentQuestion.question_key}
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
+          key={
+            currentQuestion.question_key
+          }
+
+          initial={{
+            opacity: 0,
+            x: 30
+          }}
+
+          animate={{
+            opacity: 1,
+            x: 0
+          }}
+
+          exit={{
+            opacity: 0,
+            x: -30
+          }}
         >
 
           <h2 className="text-xl font-bold text-center mb-8">
@@ -287,46 +391,58 @@ export default function CheckIn() {
 
           </h2>
 
-          {/* Selection */}
-
-          {currentQuestion.response_type === "selection" && (
+          {currentQuestion.response_type ===
+            "selection" && (
 
             <div className="space-y-3">
 
-              {currentQuestion.options?.map(opt => (
+              {currentQuestion.options?.map(
+                opt => (
 
-                <button
-                  key={opt.value}
-                  onClick={() =>
-                    selectAnswer(opt.value)
-                  }
-                  className={`w-full p-4 border rounded-xl text-left ${
-                    answers[currentQuestion.question_key] === opt.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border"
-                  }`}
-                >
+                  <button
+                    key={opt.value}
 
-                  {opt.label}
+                    onClick={() =>
+                      selectAnswer(
+                        opt.value
+                      )
+                    }
 
-                </button>
+                    className={`w-full p-4 border rounded-xl text-left ${
+                      answers[
+                        currentQuestion.question_key
+                      ] === opt.value
+                        ? "border-primary bg-primary/5"
+                        : "border-border"
+                    }`}
+                  >
 
-              ))}
+                    {opt.label}
+
+                  </button>
+
+                )
+
+              )}
 
             </div>
 
           )}
 
-          {/* Text */}
-
-          {currentQuestion.response_type === "text_long" && (
+          {currentQuestion.response_type ===
+            "text_long" && (
 
             <Textarea
               value={
-                answers[currentQuestion.question_key] || ""
+                answers[
+                  currentQuestion.question_key
+                ] || ""
               }
+
               onChange={(e) =>
-                selectAnswer(e.target.value)
+                selectAnswer(
+                  e.target.value
+                )
               }
             />
 
@@ -343,21 +459,29 @@ export default function CheckIn() {
         <Button
           variant="ghost"
           onClick={prev}
-          disabled={currentIndex === 0}
+          disabled={
+            currentIndex === 0
+          }
         >
 
-          <ArrowLeft /> Back
+          <ArrowLeft />
+
+          Back
 
         </Button>
 
         <Button
           onClick={next}
+
           disabled={
-            !answers[currentQuestion.question_key]
+            !answers[
+              currentQuestion.question_key
+            ]
           }
         >
 
-          {currentIndex === questions.length - 1
+          {currentIndex ===
+          questions.length - 1
             ? "Complete"
             : "Next"}
 
