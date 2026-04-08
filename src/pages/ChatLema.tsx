@@ -13,7 +13,6 @@ import Lema from "@/components/mascot/Lema";
 import ChatCompleteState
 from "@/components/lema/ChatCompleteState";
 
-// ✅ API base import
 import { API_BASE } from "@/config/api";
 
 type Option = {
@@ -35,6 +34,13 @@ export default function CheckIn() {
 
   const navigate = useNavigate();
 
+  /**
+   * ✅ Get logged-in user ID
+   */
+
+  const userId =
+    localStorage.getItem("user_id");
+
   const [questions, setQuestions] =
     useState<Question[]>([]);
 
@@ -50,20 +56,34 @@ export default function CheckIn() {
   const [loading, setLoading] =
     useState(true);
 
-  // ==========================
-  // Fetch Questions
-  // ==========================
+  /**
+   * Fetch Questions
+   */
 
   useEffect(() => {
 
     const fetchQuestions = async () => {
 
+      if (!userId) {
+
+        console.error(
+          "No user_id found in localStorage"
+        );
+
+        setLoading(false);
+
+        return;
+
+      }
+
       try {
 
-        console.log("Fetching questions...");
+        console.log(
+          "Fetching questions..."
+        );
 
         const res = await fetch(
-          `${API_BASE}/api/questions/today`
+          `${API_BASE}/api/questions/today?user_id=${userId}`
         );
 
         if (!res.ok) {
@@ -121,26 +141,28 @@ export default function CheckIn() {
 
     fetchQuestions();
 
-  }, []);
+  }, [userId]);
 
-  // ==========================
-  // Safe Current Question
-  // ==========================
+  /**
+   * Current Question
+   */
 
   const currentQuestion =
     questions.length > 0
       ? questions[currentIndex]
       : null;
 
-  // ==========================
-  // Save Signal
-  // ==========================
+  /**
+   * Save Signal
+   */
 
   const saveSignal = async (
     questionKey: string,
     value: string,
     domain: string
   ) => {
+
+    if (!userId) return;
 
     try {
 
@@ -155,8 +177,8 @@ export default function CheckIn() {
           },
 
           body: JSON.stringify({
-            user_id:
-              "11111111-1111-1111-1111-111111111111",
+
+            user_id: userId,
 
             day_number:
               dayNumber,
@@ -169,6 +191,7 @@ export default function CheckIn() {
 
             domain:
               domain
+
           })
 
         }
@@ -187,9 +210,9 @@ export default function CheckIn() {
 
   };
 
-  // ==========================
-  // Select Answer
-  // ==========================
+  /**
+   * Select Answer
+   */
 
   const selectAnswer = async (
     value: string
@@ -218,9 +241,9 @@ export default function CheckIn() {
 
   };
 
-  // ==========================
-  // Navigation
-  // ==========================
+  /**
+   * Navigation
+   */
 
   const next = () => {
 
@@ -259,9 +282,9 @@ export default function CheckIn() {
 
   };
 
-  // ==========================
-  // Loading Guard
-  // ==========================
+  /**
+   * Loading
+   */
 
   if (loading) {
 
@@ -277,29 +300,29 @@ export default function CheckIn() {
 
   }
 
-  // ==========================
-  // No Questions Guard
-  // ==========================
+  /**
+   * No Questions → Completion State
+   */
 
   if (!currentQuestion) {
 
-  console.warn(
-    "No questions returned from API"
-  );
+    console.warn(
+      "No questions returned from API"
+    );
 
-  return (
+    return (
 
-    <ChatCompleteState
-      streak={dayNumber}
-    />
+      <ChatCompleteState
+        streak={dayNumber}
+      />
 
-  );
+    );
 
-}
+  }
 
-  // ==========================
-  // Progress
-  // ==========================
+  /**
+   * Progress
+   */
 
   const progress =
     ((currentIndex + 1) /

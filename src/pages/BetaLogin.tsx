@@ -30,6 +30,11 @@ const BetaLogin = () => {
 
       if (account) {
         localStorage.setItem(
+          "user_id",
+          account.id
+        );
+
+        localStorage.setItem(
           "betaUser",
           account.email
         );

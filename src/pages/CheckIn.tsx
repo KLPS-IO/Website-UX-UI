@@ -1,358 +1,286 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
 import Lema from "@/components/mascot/Lema";
+
+import ChatCompleteState
+from "@/components/lema/ChatCompleteState";
+
+import { API_BASE } from "@/config/api";
+
+type Option = {
+  value: string;
+  label: string;
+};
+
+type Question = {
+  question_key: string;
+  question_text: string;
+  domain: string;
+  response_type: string;
+  options: Option[];
+};
 
 export default function CheckIn() {
 
-  const USER_ID =
-    "11111111-1111-1111-1111-111111111111";
+  console.log("CHAT LEMA LOADED");
 
-  const [currentQ, setCurrentQ] = useState(0);
+  const navigate = useNavigate();
 
-  type Answers = Record<string, string>;
+  /**
+   * ✅ REAL USER ID
+   */
 
-  const [answers, setAnswers] = useState<Answers>({});
+  const userId =
+    localStorage.getItem("user_id");
 
-  const [completed, setCompleted] =
-    useState(false);
+  const [questions, setQuestions] =
+    useState<Question[]>([]);
 
-  const [summary, setSummary] =
-    useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] =
+    useState(0);
+
+  const [answers, setAnswers] =
+    useState<Record<string, string>>({});
 
   const [dayNumber, setDayNumber] =
     useState<number>(1);
 
+  const [loading, setLoading] =
+    useState(true);
+
   /**
-   * START SESSION — runs once
+   * Fetch Questions
    */
 
   useEffect(() => {
 
-    const initSession = async () => {
+    const fetchQuestions = async () => {
 
       try {
 
+        console.log("Fetching questions...");
+
         const res = await fetch(
-          "https://klps-lema-production.up.railway.app/api/session/start",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-              user_id: USER_ID
-            })
-          }
+          `${API_BASE}/api/questions/today?user_id=${userId}`
         );
+
+        if (!res.ok) {
+
+          const err =
+            await res.text();
+
+          console.error(
+            "Question fetch failed:",
+            err
+          );
+
+          setQuestions([]);
+
+          return;
+
+        }
 
         const data =
           await res.json();
 
         console.log(
-          "Session started:",
+          "Fetched Questions:",
           data
         );
 
-        if (data.day) {
+        setQuestions(
+          data.questions || []
+        );
 
-          setDayNumber(data.day);
-
-        }
+        setDayNumber(
+          data.day || 1
+        );
 
       }
 
       catch (error) {
 
         console.error(
-          "Session start failed",
+          "Failed loading questions:",
           error
         );
+
+        setQuestions([]);
+
+      }
+
+      finally {
+
+        setLoading(false);
 
       }
 
     };
 
-    initSession();
+    if (userId) {
 
-  }, []);
+      fetchQuestions();
 
-
-  /**
-   * QUESTIONS
-   */
-
-  const questions = [
-
-    {
-      id: 1,
-      key: "mood",
-      text: "How are you feeling today?",
-      type: "selection",
-      options: [
-        { label: "Great" },
-        { label: "Good" },
-        { label: "Okay" },
-        { label: "Not great" },
-        { label: "Struggling" }
-      ]
-    },
-
-    {
-      id: 2,
-      key: "sleep",
-      text: "How well did you sleep last night?",
-      type: "selection",
-      options: [
-        { label: "Excellent" },
-        { label: "Good" },
-        { label: "Fair" },
-        { label: "Poor" }
-      ]
-    },
-
-    {
-      id: 3,
-      key: "energy",
-      text: "What's your energy level?",
-      type: "selection",
-      options: [
-        { label: "High" },
-        { label: "Medium" },
-        { label: "Low" }
-      ]
-    },
-
-    {
-      id: 4,
-      key: "exercise",
-      text: "Did you exercise today?",
-      type: "selection",
-      options: [
-        { label: "Yes intense" },
-        { label: "Light exercise" },
-        { label: "Not yet" }
-      ]
-    },
-
-    {
-      id: 5,
-      key: "reflection",
-      text: "Anything on your mind today?",
-      type: "text",
-      placeholder: "Share your thoughts..."
     }
 
-  ];
-
-  const q = questions[currentQ];
-
-  const total = questions.length;
-
-  const progress =
-    ((currentQ + 1) / total) * 100;
-
+  }, [userId]);
 
   /**
-   * STORE ANSWERS
+   * Current Question
    */
 
-  const selectAnswer = (value: string) => {
-
-    setAnswers({
-      ...answers,
-      [q.key]: value
-    });
-
-  };
-
+  const currentQuestion =
+    questions.length > 0
+      ? questions[currentIndex]
+      : null;
 
   /**
-   * SEND SIGNALS
+   * Save Signal
    */
 
-  const submitSignals = async () => {
+  const saveSignal = async (
+    questionKey: string,
+    value: string,
+    domain: string
+  ) => {
 
-    const entries =
-      Object.entries(answers);
+    try {
 
-    for (const [key, value] of entries) {
-
-      if (!value) continue;
-
-      const payload = {
-
-        user_id: USER_ID,
-
-        day_number: dayNumber,
-
-        question_key: key,
-
-        response_value: value,
-
-        domain: "daily_checkin"
-
-      };
-
-      console.log(
-        "Sending signal:",
-        payload
-      );
-
-      const res = await fetch(
-        "https://klps-lema-production.up.railway.app/api/signal",
+      await fetch(
+        `${API_BASE}/api/signal`,
         {
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           },
 
-          body: JSON.stringify(payload)
+          body: JSON.stringify({
+
+            user_id: userId,
+
+            day_number:
+              dayNumber,
+
+            question_key:
+              questionKey,
+
+            response_value:
+              value,
+
+            domain:
+              domain
+
+          })
 
         }
       );
 
-      if (!res.ok) {
+    }
 
-        const errorText =
-          await res.text();
+    catch (error) {
 
-        console.error(
-          "Signal failed:",
-          payload,
-          errorText
-        );
-
-      }
+      console.error(
+        "Signal save failed:",
+        error
+      );
 
     }
 
   };
 
-
   /**
-   * FETCH SUMMARY
+   * Select Answer
    */
 
-  const fetchSummary = async () => {
+  const selectAnswer = async (
+    value: string
+  ) => {
 
-  /**
-   * STEP 1 — Submit signals
-   */
+    if (!currentQuestion) return;
 
-  await submitSignals();
+    setAnswers(prev => ({
 
-  /**
-   * STEP 2 — Get summary
-   */
+      ...prev,
 
-  const res = await fetch(
-    `https://klps-lema-production.up.railway.app/api/summary/today?user_id=${USER_ID}`
-  );
+      [currentQuestion.question_key]:
+        value
 
-  if (!res.ok) {
+    }));
 
-    const err =
-      await res.text();
+    await saveSignal(
 
-    console.error(
-      "Summary failed:",
-      err
+      currentQuestion.question_key,
+
+      value,
+
+      currentQuestion.domain
+
     );
 
-    return;
-
-  }
-
-  const data =
-    await res.json();
-
-  setSummary(data.summary);
-
-  setCompleted(true);
-
-};
-
+  };
 
   /**
-   * NAVIGATION
+   * Navigation
    */
 
-  const next = async () => {
+  const next = () => {
 
-    if (currentQ < total - 1) {
+    if (!currentQuestion) return;
 
-      setCurrentQ(currentQ + 1);
+    if (
+      currentIndex <
+      questions.length - 1
+    ) {
+
+      setCurrentIndex(prev =>
+        prev + 1
+      );
 
     }
 
     else {
 
-      try {
-
-        await fetchSummary();
-
-      } catch (err) {
-
-        alert(
-          "Something went wrong — your responses were still saved."
-        );
-
-}
+      navigate(
+        "/beta-dashboard/summary"
+      );
 
     }
 
   };
-
 
   const prev = () => {
 
-    if (currentQ > 0) {
+    if (currentIndex > 0) {
 
-      setCurrentQ(currentQ - 1);
+      setCurrentIndex(prev =>
+        prev - 1
+      );
 
     }
 
   };
 
-
   /**
-   * COMPLETION SCREEN
+   * Loading
    */
 
-  if (completed) {
+  if (loading) {
 
     return (
 
-      <div className="px-5 pt-6 max-w-lg mx-auto text-center">
+      <div className="flex items-center justify-center h-screen">
 
-        <div className="mb-6">
-          <Lema state="celebrating" message="" />
-        </div>
-
-        <h2 className="text-2xl font-bold mb-4">
-          Check-In Complete 🎉
-        </h2>
-
-        <p className="mb-6 text-muted-foreground">
-          {summary}
-        </p>
-
-        <Button
-          onClick={() =>
-            window.location.href =
-            "/beta-dashboard/summary"
-          }
-        >
-          Back to Dashboard
-        </Button>
+        Loading check-in...
 
       </div>
 
@@ -360,10 +288,34 @@ export default function CheckIn() {
 
   }
 
+  /**
+   * No Questions → Show Completion
+   */
+
+  if (!currentQuestion) {
+
+    console.warn(
+      "No questions returned from API"
+    );
+
+    return (
+
+      <ChatCompleteState
+        streak={dayNumber}
+      />
+
+    );
+
+  }
 
   /**
-   * UI
+   * Progress
    */
+
+  const progress =
+    ((currentIndex + 1) /
+      questions.length) *
+    100;
 
   return (
 
@@ -376,11 +328,15 @@ export default function CheckIn() {
         <div className="flex justify-between text-xs mb-2">
 
           <span>
-            Question {currentQ + 1} of {total}
+
+            Question {currentIndex + 1} of {questions.length}
+
           </span>
 
           <span>
+
             {Math.round(progress)}%
+
           </span>
 
         </div>
@@ -390,7 +346,8 @@ export default function CheckIn() {
           <motion.div
             className="h-full bg-primary"
             animate={{
-              width: `${progress}%`
+              width:
+                `${progress}%`
             }}
           />
 
@@ -398,14 +355,14 @@ export default function CheckIn() {
 
       </div>
 
-
       {/* Mascot */}
 
       <div className="flex justify-center mb-6">
 
         <Lema
           state={
-            currentQ === total - 1
+            currentIndex ===
+            questions.length - 1
               ? "encouraging"
               : "idle"
           }
@@ -414,58 +371,85 @@ export default function CheckIn() {
 
       </div>
 
-
       {/* Question */}
 
       <AnimatePresence mode="wait">
 
         <motion.div
-          key={q.id}
-          initial={{ opacity: 0, x: 30 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -30 }}
+          key={
+            currentQuestion.question_key
+          }
+
+          initial={{
+            opacity: 0,
+            x: 30
+          }}
+
+          animate={{
+            opacity: 1,
+            x: 0
+          }}
+
+          exit={{
+            opacity: 0,
+            x: -30
+          }}
         >
 
           <h2 className="text-xl font-bold text-center mb-8">
-            {q.text}
+
+            {currentQuestion.question_text}
+
           </h2>
 
-
-          {q.type === "selection" && (
+          {currentQuestion.response_type ===
+            "selection" && (
 
             <div className="space-y-3">
 
-              {q.options.map((opt) => (
+              {currentQuestion.options?.map(
+                opt => (
 
-                <button
-                  key={opt.label}
-                  onClick={() =>
-                    selectAnswer(opt.label)
-                  }
-                  className={`w-full p-4 border rounded-xl ${
-                    answers[q.key] === opt.label
-                      ? "border-primary bg-primary/5"
-                      : "border-border"
-                  }`}
-                >
+                  <button
+                    key={opt.value}
 
-                  {opt.label}
+                    onClick={() =>
+                      selectAnswer(
+                        opt.value
+                      )
+                    }
 
-                </button>
+                    className={`w-full p-4 border rounded-xl text-left ${
+                      answers[
+                        currentQuestion.question_key
+                      ] === opt.value
+                        ? "border-primary bg-primary/5"
+                        : "border-border"
+                    }`}
+                  >
 
-              ))}
+                    {opt.label}
+
+                  </button>
+
+                )
+
+              )}
 
             </div>
 
           )}
 
-
-          {q.type === "text" && (
+          {currentQuestion.response_type ===
+            "text_long" && (
 
             <Textarea
               value={
-                answers[q.key] || ""
+                answers[
+                  currentQuestion.question_key
+                ] || ""
               }
+
               onChange={(e) =>
                 selectAnswer(
                   e.target.value
@@ -479,26 +463,40 @@ export default function CheckIn() {
 
       </AnimatePresence>
 
-
       {/* Navigation */}
 
       <div className="flex justify-between mt-8">
 
         <Button
+          variant="ghost"
           onClick={prev}
-          disabled={currentQ === 0}
+          disabled={
+            currentIndex === 0
+          }
         >
+
+          <ArrowLeft />
+
           Back
+
         </Button>
 
         <Button
           onClick={next}
-          disabled={!answers[q.key]}
+
+          disabled={
+            !answers[
+              currentQuestion.question_key
+            ]
+          }
         >
 
-          {currentQ === total - 1
+          {currentIndex ===
+          questions.length - 1
             ? "Complete"
             : "Next"}
+
+          <ArrowRight />
 
         </Button>
 
