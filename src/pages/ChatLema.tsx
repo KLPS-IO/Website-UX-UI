@@ -28,6 +28,9 @@ type Question = {
   options: Option[];
 };
 
+type AnswerValue =
+  string | string[];
+
 export default function CheckIn() {
 
   console.log("CHAT LEMA LOADED");
@@ -48,10 +51,16 @@ export default function CheckIn() {
     useState(0);
 
   const [answers, setAnswers] =
+    useState<Record<string, AnswerValue>>({});
+
+  const [otherAnswers, setOtherAnswers] =
     useState<Record<string, string>>({});
 
   const [dayNumber, setDayNumber] =
     useState<number>(1);
+
+  const [summary, setSummary] =
+    useState("");
 
   const [loading, setLoading] =
     useState(true);
@@ -143,6 +152,44 @@ export default function CheckIn() {
 
   }, [userId]);
 
+  useEffect(() => {
+
+    const fetchSummary = async () => {
+
+      if (!userId) return;
+
+      try {
+
+        const res = await fetch(
+          `${API_BASE}/api/summary/today?user_id=${userId}`
+        );
+
+        if (!res.ok) return;
+
+        const data =
+          await res.json();
+
+        setSummary(
+          data.summary_text || ""
+        );
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Failed loading summary:",
+          error
+        );
+
+      }
+
+    };
+
+    fetchSummary();
+
+  }, [userId, currentIndex, questions.length]);
+
   /**
    * Current Question
    */
@@ -151,6 +198,111 @@ export default function CheckIn() {
     questions.length > 0
       ? questions[currentIndex]
       : null;
+
+  const currentAnswer =
+    currentQuestion
+      ? answers[
+          currentQuestion.question_key
+        ]
+      : undefined;
+
+  const selectedOptions =
+    Array.isArray(currentAnswer)
+      ? currentAnswer
+      : [];
+
+  const selectedOptionDetails =
+    currentQuestion?.options?.filter(
+      opt =>
+        selectedOptions.includes(
+          opt.value
+        )
+    ) || [];
+
+  const isOtherOption = (
+    value: string
+  ) =>
+    value
+      .toLowerCase()
+      .includes(
+        "something else"
+      ) ||
+    value
+      .toLowerCase()
+      .includes("other");
+
+  const hasOtherOption =
+    currentQuestion?.options?.some(
+      opt =>
+        isOtherOption(opt.label) ||
+        isOtherOption(opt.value)
+    ) || false;
+
+  const otherSelected =
+    selectedOptionDetails.some(
+      opt =>
+        isOtherOption(opt.label) ||
+        isOtherOption(opt.value)
+    ) ||
+    selectedOptions.some(value =>
+      isOtherOption(value)
+    );
+
+  const currentOtherText =
+    currentQuestion
+      ? otherAnswers[
+          currentQuestion.question_key
+        ] || ""
+      : "";
+
+  const normalizeFreeText = (
+    value: string
+  ) => {
+    const trimmed =
+      value.trim();
+
+    if (!trimmed) return "";
+
+    const collapsedSpaces =
+      trimmed.replace(
+        /\s+/g,
+        " "
+      );
+
+    const normalizedPunctuationSpacing =
+      collapsedSpaces
+        .replace(
+          /\s+([,!.?])/g,
+          "$1"
+        )
+        .replace(
+          /([,!.?])([^\s])/g,
+          "$1 $2"
+        );
+
+    const sentenceCased =
+      normalizedPunctuationSpacing.replace(
+        /(^\s*[a-z])|([.!?]\s+[a-z])/g,
+        match =>
+          match.toUpperCase()
+      );
+
+    if (
+      /[.!?]$/.test(
+        sentenceCased
+      )
+    ) {
+      return sentenceCased;
+    }
+
+    const wordCount =
+      sentenceCased.split(" ")
+        .length;
+
+    return wordCount > 3
+      ? `${sentenceCased}.`
+      : sentenceCased;
+  };
 
   /**
    * Save Signal
@@ -214,7 +366,7 @@ export default function CheckIn() {
    * Select Answer
    */
 
-  const selectAnswer = async (
+  const selectAnswer = (
     value: string
   ) => {
 
@@ -229,16 +381,130 @@ export default function CheckIn() {
 
     }));
 
-    await saveSignal(
+  };
 
-      currentQuestion.question_key,
+  const toggleSelection = (
+    value: string
+  ) => {
 
-      value,
+    if (!currentQuestion) return;
 
-      currentQuestion.domain
+    setAnswers(prev => {
+      const existing =
+        Array.isArray(
+          prev[
+            currentQuestion.question_key
+          ]
+        )
+          ? [
+              ...(
+                prev[
+                  currentQuestion.question_key
+                ] as string[]
+              )
+            ]
+          : [];
 
+      const nextValues =
+        existing.includes(value)
+          ? existing.filter(
+              item =>
+                item !== value
+            )
+          : [...existing, value];
+
+      return {
+        ...prev,
+        [currentQuestion.question_key]:
+          nextValues
+      };
+    });
+
+  };
+
+  const updateOtherAnswer = (
+    value: string
+  ) => {
+
+    if (!currentQuestion) return;
+
+    setOtherAnswers(prev => ({
+      ...prev,
+      [currentQuestion.question_key]:
+        value
+    }));
+
+  };
+
+  const buildResponseValue = () => {
+
+    if (!currentQuestion) return "";
+
+    if (
+      currentQuestion.response_type ===
+      "selection"
+    ) {
+      const combined =
+        selectedOptions.map(value => {
+          const isOther =
+            isOtherOption(value) ||
+            selectedOptionDetails.some(
+              opt =>
+                opt.value === value &&
+                (
+                  isOtherOption(opt.label) ||
+                  isOtherOption(opt.value)
+                )
+            );
+
+          if (
+            isOther &&
+            currentOtherText.trim()
+          ) {
+            return `${value}: ${normalizeFreeText(currentOtherText)}`;
+          }
+
+          return value;
+        });
+
+      return combined.join(" | ");
+    }
+
+    return typeof currentAnswer ===
+      "string"
+      ? normalizeFreeText(
+          currentAnswer
+        )
+      : "";
+  };
+
+  const canContinue = () => {
+
+    if (!currentQuestion) return false;
+
+    if (
+      currentQuestion.response_type ===
+      "selection"
+    ) {
+      if (selectedOptions.length === 0) {
+        return false;
+      }
+
+      if (
+        otherSelected &&
+        !currentOtherText.trim()
+      ) {
+        return false;
+      }
+
+      return true;
+    }
+
+    return Boolean(
+      typeof currentAnswer ===
+        "string" &&
+        currentAnswer.trim()
     );
-
   };
 
   /**
@@ -248,6 +514,17 @@ export default function CheckIn() {
   const next = () => {
 
     if (!currentQuestion) return;
+
+    const responseValue =
+      buildResponseValue();
+
+    if (!responseValue) return;
+
+    void saveSignal(
+      currentQuestion.question_key,
+      responseValue,
+      currentQuestion.domain
+    );
 
     if (
       currentIndex <
@@ -322,6 +599,7 @@ export default function CheckIn() {
       <ChatCompleteState
         streak={dayNumber}
         userId={userId}
+        summary={summary}
       />
 
     );
@@ -434,15 +712,15 @@ export default function CheckIn() {
                     key={opt.value}
 
                     onClick={() =>
-                      selectAnswer(
+                      toggleSelection(
                         opt.value
                       )
                     }
 
                     className={`w-full p-4 border rounded-xl text-left ${
-                      answers[
-                        currentQuestion.question_key
-                      ] === opt.value
+                      selectedOptions.includes(
+                        opt.value
+                      )
                         ? "border-primary bg-primary/5"
                         : "border-border"
                     }`}
@@ -461,13 +739,38 @@ export default function CheckIn() {
           )}
 
           {currentQuestion.response_type ===
+            "selection" &&
+            hasOtherOption &&
+            otherSelected && (
+            <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
+              <p className="mb-2 text-sm font-medium text-foreground">
+                Tell me what that “Something else” is...
+              </p>
+              <Textarea
+                value={currentOtherText}
+                onChange={(e) =>
+                  updateOtherAnswer(
+                    e.target.value
+                  )
+                }
+                placeholder="Type your answer here..."
+                spellCheck
+                autoCorrect="on"
+                autoCapitalize="sentences"
+                className="bg-background"
+              />
+            </div>
+          )}
+
+          {currentQuestion.response_type ===
             "text_long" && (
 
             <Textarea
               value={
-                answers[
-                  currentQuestion.question_key
-                ] || ""
+                typeof currentAnswer ===
+                "string"
+                  ? currentAnswer
+                  : ""
               }
 
               onChange={(e) =>
@@ -475,6 +778,9 @@ export default function CheckIn() {
                   e.target.value
                 )
               }
+              spellCheck
+              autoCorrect="on"
+              autoCapitalize="sentences"
             />
 
           )}
@@ -505,9 +811,7 @@ export default function CheckIn() {
           onClick={next}
 
           disabled={
-            !answers[
-              currentQuestion.question_key
-            ]
+            !canContinue()
           }
         >
 

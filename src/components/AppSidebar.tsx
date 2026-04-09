@@ -1,5 +1,5 @@
 import { Scan, LayoutDashboard, User, TrendingUp, MessageSquare } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
   SidebarContent,
@@ -23,6 +23,7 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const location = useLocation();
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border/50">
@@ -35,24 +36,34 @@ export function AppSidebar() {
           {/* <SidebarGroupLabel>Navigation</SidebarGroupLabel> */}
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {items.map((item) => {
+                const isActive =
+                  item.url === "/beta-dashboard"
+                    ? location.pathname === item.url
+                    : location.pathname.startsWith(item.url);
+
+                return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    className={
+                      isActive
+                        ? "!text-white hover:!text-green-600"
+                        : "!text-white hover:!text-green-600"
+                    }
+                  >
                     <NavLink
                       to={item.url}
                       end={item.url === "/beta-dashboard"}
-                      className={({ isActive }) =>
-                        isActive
-                          ? "bg-primary/10 text-sidebar-foreground hover:!text-green-600 font-medium"
-                          : "text-sidebar-foreground hover:!text-green-600"
-                      }
+                      className="font-medium"
                     >
                       <item.icon className="h-4 w-4" />
                       {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              )})}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

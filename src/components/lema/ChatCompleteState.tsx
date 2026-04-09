@@ -7,11 +7,13 @@ import Lema from "@/components/mascot/Lema";
 type Props = {
   streak?: number;
   userId?: string | null;
+  summary?: string;
 };
 
 export default function ChatCompleteState({
   streak = 1,
-  userId
+  userId,
+  summary
 }: Props) {
 
   const [timeLeft, setTimeLeft] =
@@ -101,6 +103,34 @@ export default function ChatCompleteState({
 
   }, [userId]);
 
+  const summaryLines =
+    summary
+      ? summary
+          .split("\n")
+          .map(line =>
+            line.trim()
+          )
+          .filter(Boolean)
+      : [];
+
+  const hasSummaryHeading =
+    summaryLines.some(line =>
+      line
+        .toLowerCase()
+        .includes(
+          "today you showed"
+        )
+    );
+
+  const formattedSummaryLines =
+    summaryLines.filter(line =>
+      !line
+        .toLowerCase()
+        .includes(
+          "today you showed"
+        )
+    );
+
   return (
 
     <div className="px-6 pt-12 max-w-lg mx-auto text-center">
@@ -152,21 +182,89 @@ export default function ChatCompleteState({
 
       {/* Reflection Card */}
 
-      <div className="bg-muted/40 border rounded-2xl p-5 mb-6">
+      <div className="bg-muted/40 border rounded-2xl p-5 mb-6 text-left">
 
-        <p className="text-sm text-muted-foreground mb-2">
+        {summary ? (
+          <>
+            {!hasSummaryHeading && (
+              <p className="text-sm text-muted-foreground mb-2">
+                Today you showed:
+              </p>
+            )}
 
-          Today's reflection saved
+            <div className="space-y-2.5">
+              {formattedSummaryLines.map(
+                (line, index) => {
+                  const cleanLine =
+                    line.replace(
+                      /^[•*-]\s*/,
+                      ""
+                    );
 
-        </p>
+                  const isLabelValue =
+                    cleanLine.includes(
+                      ":"
+                    );
 
-        <p className="text-base font-medium">
+                  if (!isLabelValue) {
+                    return (
+                      <p
+                        key={`${cleanLine}-${index}`}
+                        className="text-sm leading-relaxed text-foreground/90"
+                      >
+                        {cleanLine}
+                      </p>
+                    );
+                  }
 
-          You're building consistency — one day at a time.
+                  const [
+                    label,
+                    ...rest
+                  ] = cleanLine.split(
+                    ":"
+                  );
 
-        </p>
+                  return (
+                    <div
+                      key={`${cleanLine}-${index}`}
+                      className="flex items-start gap-2 text-sm leading-relaxed"
+                    >
+                      <span className="mt-1 text-primary">
+                        •
+                      </span>
+                      <p className="text-foreground/90">
+                        <span className="font-medium">
+                          {label.trim()}:
+                        </span>{" "}
+                        {rest
+                          .join(":")
+                          .trim()}
+                      </p>
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground mb-2">
+              Today's reflection saved
+            </p>
+
+            <p className="text-base font-medium">
+              You're building consistency — one day at a time.
+            </p>
+          </>
+        )}
 
       </div>
+
+      {summary && (
+        <p className="text-base font-medium mb-6">
+          You're building consistency — one day at a time.
+        </p>
+      )}
 
       {/* Countdown */}
 
