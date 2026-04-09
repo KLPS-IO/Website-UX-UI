@@ -8,12 +8,14 @@ type Props = {
   streak?: number;
   userId?: string | null;
   summary?: string;
+  message?: string;
 };
 
 export default function ChatCompleteState({
   streak = 1,
   userId,
-  summary
+  summary,
+  message
 }: Props) {
 
   const [timeLeft, setTimeLeft] =
@@ -179,6 +181,12 @@ export default function ChatCompleteState({
         You showed up today. That matters.
 
       </p>
+
+      {message && (
+        <p className="text-sm text-muted-foreground mb-6">
+          {message}
+        </p>
+      )}
 
       {/* Reflection Card */}
 

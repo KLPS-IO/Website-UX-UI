@@ -58,6 +58,9 @@ export default function CheckIn() {
   const [summary, setSummary] =
     useState("");
 
+  const [completedToday, setCompletedToday] =
+    useState(false);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -119,6 +122,10 @@ export default function CheckIn() {
           data.questions || []
         );
 
+        setCompletedToday(
+          data.completedToday || false
+        );
+
         setDayNumber(
           data.day || 1
         );
@@ -133,6 +140,7 @@ export default function CheckIn() {
         );
 
         setQuestions([]);
+        setCompletedToday(false);
 
       }
 
@@ -578,11 +586,7 @@ export default function CheckIn() {
    * No Questions → Complete State
    */
 
-  if (!currentQuestion) {
-
-    console.warn(
-      "No questions returned from API"
-    );
+  if (completedToday) {
 
     return (
 
@@ -590,7 +594,19 @@ export default function CheckIn() {
         streak={dayNumber}
         userId={userId}
         summary={summary}
+        message="You've already completed today's check-in. Come back tomorrow."
       />
+
+    );
+
+  }
+
+  if (!currentQuestion) {
+
+    return (
+      <div className="flex items-center justify-center h-screen">
+        No questions available.
+      </div>
 
     );
 
