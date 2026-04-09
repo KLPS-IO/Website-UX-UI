@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Scan, LayoutDashboard, User, TrendingUp, MessageSquare } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -21,9 +22,25 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { state } = useSidebar();
+  const {
+    state,
+    isMobile,
+    setOpenMobile
+  } = useSidebar();
   const isCollapsed = state === "collapsed";
   const location = useLocation();
+
+  useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [isMobile, location.pathname, setOpenMobile]);
+
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border/50">
@@ -57,6 +74,7 @@ export function AppSidebar() {
                       to={item.url}
                       end={item.url === "/beta-dashboard"}
                       className="font-medium"
+                      onClick={handleNavClick}
                     >
                       <item.icon className="h-4 w-4" />
                       {!isCollapsed && <span>{item.title}</span>}
