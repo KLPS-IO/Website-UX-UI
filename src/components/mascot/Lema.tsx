@@ -1,111 +1,89 @@
-import React from 'react';
-import { motion, Variants } from 'framer-motion';
+import welcome from "@/assets/lema_welcome.mp4";
+import idle from "@/assets/lema_idle.mp4";
+import supportive from "@/assets/lema_supportive.mp4";
+import encouraging from "@/assets/lema_encouraging.mp4";
+import celebrating from "@/assets/lema_celebrating.mp4";
 
-const mascotImages = {
-  idle: 'https://media.base44.com/images/public/69d124e7d115287b1baab5b8/640ee1a7e_generated_image.png',
-  happy: 'https://media.base44.com/images/public/69d124e7d115287b1baab5b8/466489f78_generated_image.png',
-  celebrating: 'https://media.base44.com/images/public/69d124e7d115287b1baab5b8/82f2303c6_generated_image.png',
-  encouraging: 'https://media.base44.com/images/public/69d124e7d115287b1baab5b8/c61c972ec_generated_image.png',
+type LemaState =
+  | "welcome"
+  | "idle"
+  | "supportive"
+  | "encouraging"
+  | "celebrating";
+
+type Props = {
+  state?: LemaState;
+  message?: string;
 };
 
-const sizeMap = { sm: 80, md: 120, lg: 160, xl: 200 };
+export default function Lema({
+  state = "idle",
+}: Props) {
 
-const animVariants: Variants = {
-  idle: {
-    y: [0, -6, 0],
-    transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-  },
-  happy: {
-    y: [0, -10, 0],
-    scale: [1, 1.04, 1],
-    transition: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
-  },
-  celebrating: {
-    rotate: [0, -6, 6, -4, 4, 0],
-    scale: [1, 1.08, 1],
-    transition: { duration: 0.7, repeat: Infinity },
-  },
-  encouraging: {
-    y: [0, -5, 0],
-    transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-  },
-};
+  /**
+   * Select correct animation
+   */
 
-export default function Lema({ state = 'idle', size = 'md', message, withRing = false, ringProgress = 0 }) {
-  const px = sizeMap[size] || sizeMap.md;
-  const ringSize = px * 1.6;
+  const getVideo = () => {
+
+    switch (state) {
+
+      case "welcome":
+        return welcome;
+
+      case "supportive":
+        return supportive;
+
+      case "encouraging":
+        return encouraging;
+
+      case "celebrating":
+        return celebrating;
+
+      case "idle":
+      default:
+        return idle;
+
+    }
+
+  };
+
+  const videoSrc = getVideo();
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="relative flex items-center justify-center" style={{ width: ringSize, height: ringSize * 0.7 }}>
-        {/* Arc ring behind mascot */}
-        {withRing && (
-          <svg
-            className="absolute top-0 left-0"
-            width={ringSize}
-            height={ringSize * 0.75}
-            viewBox={`0 0 ${ringSize} ${ringSize * 0.75}`}
-          >
-            <defs>
-              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="hsl(152 30% 42% / 0.2)" />
-                <stop offset={`${ringProgress}%`} stopColor="hsl(152 30% 42%)" />
-                <stop offset={`${ringProgress}%`} stopColor="hsl(152 30% 42% / 0.15)" />
-                <stop offset="100%" stopColor="hsl(152 30% 42% / 0.15)" />
-              </linearGradient>
-            </defs>
-            {/* Track */}
-            <path
-              d={`M ${ringSize * 0.1} ${ringSize * 0.72} A ${ringSize * 0.4} ${ringSize * 0.4} 0 0 1 ${ringSize * 0.9} ${ringSize * 0.72}`}
-              fill="none"
-              stroke="hsl(152 30% 42% / 0.15)"
-              strokeWidth={ringSize * 0.04}
-              strokeLinecap="round"
-            />
-            {/* Progress */}
-            <path
-              d={`M ${ringSize * 0.1} ${ringSize * 0.72} A ${ringSize * 0.4} ${ringSize * 0.4} 0 0 1 ${ringSize * 0.9} ${ringSize * 0.72}`}
-              fill="none"
-              stroke="hsl(152 30% 42%)"
-              strokeWidth={ringSize * 0.04}
-              strokeLinecap="round"
-              strokeDasharray={`${Math.PI * ringSize * 0.4}`}
-              strokeDashoffset={`${Math.PI * ringSize * 0.4 * (1 - ringProgress / 100)}`}
-            />
-            {/* Dot at progress end */}
-            <circle
-              cx={ringSize * 0.9}
-              cy={ringSize * 0.72}
-              r={ringSize * 0.04}
-              fill="hsl(152 30% 42%)"
-            />
-          </svg>
-        )}
 
-        {/* Mascot image */}
-        <motion.div
-          animate={state}
-          variants={animVariants}
-          className="relative z-10"
-          style={{ width: px, height: px }}
-        >
-          <img
-            src={mascotImages[state] || mascotImages.idle}
-            alt="Lema mascot"
-            className="w-full h-full object-contain drop-shadow-lg"
-          />
-        </motion.div>
-      </div>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}
+    >
 
-      {message && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-card border border-border rounded-2xl px-4 py-2.5 text-sm text-center max-w-[220px] shadow-sm"
-        >
-          {message}
-        </motion.div>
-      )}
+      <video
+        key={videoSrc}
+        src={videoSrc}
+
+        autoPlay
+        loop
+        muted
+        playsInline
+
+        style={{
+
+          width: "220px",
+          height: "220px",
+
+          objectFit: "contain",
+
+          pointerEvents: "none"
+
+        }}
+
+      />
+
     </div>
+
   );
+
 }

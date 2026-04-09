@@ -9,6 +9,10 @@ export const BETA_ACCOUNTS = [
     id: "22222222-2222-2222-2222-222222222222",
     email: "klpsglobal@gmail.com",
     password: "Lema04", 
-  }
-
+  },
+  {
+    id: "33333333-3333-3333-3333-333333333333",
+    email: "testuser@gmail.com",
+    password: "TestPassword1",
+  },
 ];

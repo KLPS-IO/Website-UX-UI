@@ -3,6 +3,7 @@ import { TrendingDown, TrendingUp, Ruler } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Progress } from './ui/progress';
+import { API_BASE } from '@/config/api';
 
 export function BodyScanPage() {
 
@@ -15,7 +16,7 @@ useEffect(() => {
     try {
 
       const response = await fetch(
-        "http://localhost:3001/api/waist"
+        `${API_BASE}/api/waist`
       );
 
       const data = await response.json();

@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "ts-node server/src/index.ts",
+    "dev": "vite",
     "client": "vite",
-    "full": "concurrently \"npm run dev\" \"npm run client\"",
+    "full": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",

@@ -390,11 +390,19 @@ export default function CheckIn() {
 
         <Lema
           state={
-            currentIndex ===
-            questions.length - 1
+            currentIndex === -1
+              ? "welcome"
+              : currentIndex === 0
+              ? "supportive"
+              : currentIndex === 1
+              ? "idle"
+              : currentIndex === 2
+              ? "supportive"
+              : currentIndex === 3
               ? "encouraging"
-              : "idle"
+              : "celebrating"
           }
+
           message=""
         />
 
