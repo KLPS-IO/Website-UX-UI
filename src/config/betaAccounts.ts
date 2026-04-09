@@ -12,17 +12,7 @@ export const BETA_ACCOUNTS = [
   },
   {
     id: "33333333-3333-3333-3333-333333333333",
-    email: "testuser@gmail.com",
-    password: "TestPassword1",
+    email: "msamuel@live.co.uk",
+    password: "Lema04",
   },
-  {
-    id: "44444444-4444-4444-4444-444444444444",
-    email: "newuser@gmail.com",
-    password: "NewPassword1",
-  },
-  {
-    id: "55555555-5555-5555-5555-555555555555",
-    email: "anotheruser@gmail.com",
-    password: "AnotherPassword1",
-  }
 ];

@@ -615,6 +615,20 @@ export default function CheckIn() {
       questions.length) *
     100;
 
+  const hasOptions =
+    currentQuestion.options &&
+    currentQuestion.options.length > 0;
+
+  if (
+    currentQuestion.response_type ===
+      "selection" &&
+    !hasOptions
+  ) {
+    console.warn(
+      `Missing options for ${currentQuestion.question_key}`
+    );
+  }
+
   return (
 
     <div className="px-5 pt-6 max-w-lg mx-auto">
@@ -701,7 +715,8 @@ export default function CheckIn() {
           </h2>
 
           {currentQuestion.response_type ===
-            "selection" && (
+            "selection" &&
+            hasOptions && (
 
             <div className="space-y-3">
 
@@ -740,6 +755,7 @@ export default function CheckIn() {
 
           {currentQuestion.response_type ===
             "selection" &&
+            hasOptions &&
             hasOtherOption &&
             otherSelected && (
             <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
@@ -762,8 +778,15 @@ export default function CheckIn() {
             </div>
           )}
 
-          {currentQuestion.response_type ===
-            "text_long" && (
+          {(
+            currentQuestion.response_type ===
+              "text_long" ||
+            (
+              currentQuestion.response_type ===
+                "selection" &&
+              !hasOptions
+            )
+          ) && (
 
             <Textarea
               value={
@@ -778,6 +801,7 @@ export default function CheckIn() {
                   e.target.value
                 )
               }
+              placeholder="Type your response..."
               spellCheck
               autoCorrect="on"
               autoCapitalize="sentences"

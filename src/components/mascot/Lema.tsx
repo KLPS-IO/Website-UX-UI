@@ -56,7 +56,9 @@ export default function Lema({
       style={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        backgroundColor: "#ffffff",
+        borderRadius: "24px"
       }}
     >
 
@@ -75,6 +77,7 @@ export default function Lema({
           height: "220px",
 
           objectFit: "contain",
+          backgroundColor: "#ffffff",
 
           pointerEvents: "none"
 
