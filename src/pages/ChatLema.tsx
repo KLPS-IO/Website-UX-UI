@@ -62,6 +62,9 @@ export default function CheckIn() {
   const [summary, setSummary] =
     useState("");
 
+  const [isCompleting, setIsCompleting] =
+    useState(false);
+
   const [loading, setLoading] =
     useState(true);
 
@@ -507,7 +510,7 @@ export default function CheckIn() {
 
   const next = () => {
 
-    if (!currentQuestion) return;
+    if (!currentQuestion || isCompleting) return;
 
     const responseValue =
       buildResponseValue();
@@ -533,6 +536,8 @@ export default function CheckIn() {
 
     else {
 
+      setIsCompleting(true);
+
       if (userId) {
         localStorage.setItem(
           `checkin_completed_at_${userId}`,
@@ -540,8 +545,8 @@ export default function CheckIn() {
         );
       }
 
-      navigate(
-        "/beta-dashboard/chat"
+      setCurrentIndex(
+        questions.length
       );
 
     }
@@ -829,13 +834,16 @@ export default function CheckIn() {
           onClick={next}
 
           disabled={
-            !canContinue()
+            !canContinue() ||
+            isCompleting
           }
         >
 
           {currentIndex ===
           questions.length - 1
-            ? "Complete"
+            ? isCompleting
+              ? "Completing..."
+              : "Complete"
             : "Next"}
 
           <ArrowRight />
