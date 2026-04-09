@@ -308,7 +308,7 @@ export default function CheckIn() {
    * Save Signal
    */
 
-  const saveSignal = async (
+  const saveSignal = (
     questionKey: string,
     value: string,
     domain: string
@@ -316,49 +316,43 @@ export default function CheckIn() {
 
     if (!userId) return;
 
-    try {
+    fetch(
+      `${API_BASE}/api/signal`,
+      {
+        method: "POST",
 
-      await fetch(
-        `${API_BASE}/api/signal`,
-        {
-          method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+        body: JSON.stringify({
 
-          body: JSON.stringify({
+          user_id: userId,
 
-            user_id: userId,
+          day_number:
+            dayNumber,
 
-            day_number:
-              dayNumber,
+          question_key:
+            questionKey,
 
-            question_key:
-              questionKey,
+          response_value:
+            value,
 
-            response_value:
-              value,
+          domain:
+            domain
 
-            domain:
-              domain
+        })
 
-          })
-
-        }
-      );
-
-    }
-
-    catch (error) {
+      }
+    ).catch(error => {
 
       console.error(
         "Signal save failed:",
         error
       );
 
-    }
+    });
 
   };
 
