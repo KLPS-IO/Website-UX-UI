@@ -34,10 +34,6 @@ export default function CheckIn() {
 
   const navigate = useNavigate();
 
-  /**
-   * ✅ REAL USER ID
-   */
-
   const userId =
     localStorage.getItem("user_id");
 
@@ -64,9 +60,23 @@ export default function CheckIn() {
 
     const fetchQuestions = async () => {
 
+      if (!userId) {
+
+        console.error(
+          "Missing user_id"
+        );
+
+        setLoading(false);
+
+        return;
+
+      }
+
       try {
 
-        console.log("Fetching questions...");
+        console.log(
+          "Fetching questions..."
+        );
 
         const res = await fetch(
           `${API_BASE}/api/questions/today?user_id=${userId}`
@@ -125,11 +135,7 @@ export default function CheckIn() {
 
     };
 
-    if (userId) {
-
-      fetchQuestions();
-
-    }
+    fetchQuestions();
 
   }, [userId]);
 
@@ -151,6 +157,8 @@ export default function CheckIn() {
     value: string,
     domain: string
   ) => {
+
+    if (!userId) return;
 
     try {
 
@@ -289,7 +297,7 @@ export default function CheckIn() {
   }
 
   /**
-   * No Questions → Show Completion
+   * No Questions → Complete State
    */
 
   if (!currentQuestion) {
@@ -316,6 +324,27 @@ export default function CheckIn() {
     ((currentIndex + 1) /
       questions.length) *
     100;
+
+  /**
+   * Detect missing options
+   */
+
+  const hasOptions =
+    currentQuestion.options &&
+    currentQuestion.options.length > 0;
+
+  if (
+
+    currentQuestion.response_type === "selection" &&
+    !hasOptions
+
+  ) {
+
+    console.warn(
+      `Missing options for ${currentQuestion.question_key}`
+    );
+
+  }
 
   return (
 
@@ -402,12 +431,13 @@ export default function CheckIn() {
 
           </h2>
 
-          {currentQuestion.response_type ===
-            "selection" && (
+          {/* Selection */}
+
+          {currentQuestion.response_type === "selection" && hasOptions && (
 
             <div className="space-y-3">
 
-              {currentQuestion.options?.map(
+              {currentQuestion.options.map(
                 opt => (
 
                   <button
@@ -440,8 +470,20 @@ export default function CheckIn() {
 
           )}
 
-          {currentQuestion.response_type ===
-            "text_long" && (
+          {/* Fallback Text Input */}
+
+          {(
+
+            currentQuestion.response_type === "text_long" ||
+
+            (
+
+              currentQuestion.response_type === "selection" &&
+              !hasOptions
+
+            )
+
+          ) && (
 
             <Textarea
               value={
@@ -455,6 +497,9 @@ export default function CheckIn() {
                   e.target.value
                 )
               }
+
+              placeholder="Type your response..."
+
             />
 
           )}
@@ -483,7 +528,6 @@ export default function CheckIn() {
 
         <Button
           onClick={next}
-
           disabled={
             !answers[
               currentQuestion.question_key
