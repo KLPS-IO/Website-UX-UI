@@ -262,8 +262,15 @@ export default function CheckIn() {
 
     else {
 
+      if (userId) {
+        localStorage.setItem(
+          `checkin_completed_at_${userId}`,
+          new Date().toISOString()
+        );
+      }
+
       navigate(
-        "/beta-dashboard/summary"
+        "/beta-dashboard/chat"
       );
 
     }
@@ -314,6 +321,7 @@ export default function CheckIn() {
 
       <ChatCompleteState
         streak={dayNumber}
+        userId={userId}
       />
 
     );

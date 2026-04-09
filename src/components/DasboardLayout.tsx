@@ -20,6 +20,8 @@ export const DashboardLayout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("betaUser");
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("betaCohort");
     navigate("/");
   };
 

@@ -6,39 +6,68 @@ import Lema from "@/components/mascot/Lema";
 
 type Props = {
   streak?: number;
+  userId?: string | null;
 };
 
 export default function ChatCompleteState({
-  streak = 1
+  streak = 1,
+  userId
 }: Props) {
 
   const [timeLeft, setTimeLeft] =
     useState("");
 
   /**
-   * Countdown to midnight
+   * Countdown to 24 hours after
+   * this user's completion time
    */
 
   useEffect(() => {
+
+    if (!userId) {
+      setTimeLeft("24h 0m");
+      return;
+    }
+
+    const completionKey =
+      `checkin_completed_at_${userId}`;
+
+    const getCompletionTime = () => {
+      const saved =
+        localStorage.getItem(
+          completionKey
+        );
+
+      if (saved) {
+        return new Date(saved);
+      }
+
+      const now =
+        new Date();
+
+      localStorage.setItem(
+        completionKey,
+        now.toISOString()
+      );
+
+      return now;
+    };
 
     const updateTimer = () => {
 
       const now =
         new Date();
 
-      const midnight =
-        new Date();
-
-      midnight.setHours(
-        24,
-        0,
-        0,
-        0
-      );
+      const completedAt =
+        getCompletionTime();
 
       const diff =
-        midnight.getTime() -
-        now.getTime();
+        Math.max(
+          0,
+          completedAt.getTime() +
+            24 * 60 * 60 * 1000 -
+            now.getTime()
+        );
 
       const hours =
         Math.floor(
@@ -70,7 +99,7 @@ export default function ChatCompleteState({
     return () =>
       clearInterval(interval);
 
-  }, []);
+  }, [userId]);
 
   return (
 

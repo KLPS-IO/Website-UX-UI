@@ -5,7 +5,6 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -44,8 +43,8 @@ export function AppSidebar() {
                       end={item.url === "/beta-dashboard"}
                       className={({ isActive }) =>
                         isActive
-                          ? "bg-primary text-primary-foreground font-medium"
-                          : "hover:text-green-600"
+                          ? "bg-primary/10 text-sidebar-foreground hover:!text-green-600 font-medium"
+                          : "text-sidebar-foreground hover:!text-green-600"
                       }
                     >
                       <item.icon className="h-4 w-4" />
