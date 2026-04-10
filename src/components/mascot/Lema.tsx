@@ -53,14 +53,10 @@ export default function Lema({
   return (
 
     <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#ffffff",
-        borderRadius: "24px"
-      }}
+      className="relative isolate flex items-center justify-center overflow-hidden rounded-[24px] bg-white"
     >
+
+      <div className="absolute inset-0 bg-white" />
 
       <video
         key={videoSrc}
@@ -71,16 +67,9 @@ export default function Lema({
         muted
         playsInline
 
+        className="relative block h-[220px] w-[220px] bg-white object-contain"
         style={{
-
-          width: "220px",
-          height: "220px",
-
-          objectFit: "contain",
-          backgroundColor: "#ffffff",
-
           pointerEvents: "none"
-
         }}
 
       />
