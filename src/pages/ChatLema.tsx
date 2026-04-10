@@ -14,6 +14,7 @@ import ChatCompleteState
 from "@/components/lema/ChatCompleteState";
 
 import { API_BASE } from "@/config/api";
+import celebratingVideo from "@/assets/lema_celebrating.mp4";
 
 type Option = {
   value: string;
@@ -192,6 +193,23 @@ export default function CheckIn() {
     fetchSummary();
 
   }, [userId, currentIndex, questions.length]);
+
+  useEffect(() => {
+
+    const video =
+      document.createElement("video");
+
+    video.src =
+      celebratingVideo;
+
+    video.preload =
+      "auto";
+
+    video.muted = true;
+    video.playsInline = true;
+    video.load();
+
+  }, []);
 
   /**
    * Current Question
@@ -536,6 +554,15 @@ export default function CheckIn() {
 
     else {
 
+      console.time(
+        "chat-complete-transition"
+      );
+
+      console.log(
+        "Complete tapped at",
+        new Date().toISOString()
+      );
+
       setIsCompleting(true);
 
       if (userId) {
@@ -672,10 +699,17 @@ export default function CheckIn() {
 
         <Lema
           state={
-            currentIndex ===
-            questions.length - 1
+            currentIndex === 0
+              ? "welcome"
+              : currentIndex === 1
+              ? "supportive"
+              : currentIndex === 2
+              ? "idle"
+              : currentIndex === 3
               ? "encouraging"
-              : "idle"
+              : currentIndex === 4
+              ? "encouraging"
+              : "welcome"
           }
           message=""
         />

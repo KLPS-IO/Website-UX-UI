@@ -22,54 +22,38 @@ export default function ChatCompleteState({
     useState("");
 
   /**
-   * Countdown to 24 hours after
-   * this user's completion time
+   * Countdown to next midnight
    */
 
   useEffect(() => {
+    console.timeEnd(
+      "chat-complete-transition"
+    );
 
-    if (!userId) {
-      setTimeLeft("24h 0m");
-      return;
-    }
-
-    const completionKey =
-      `checkin_completed_at_${userId}`;
-
-    const getCompletionTime = () => {
-      const saved =
-        localStorage.getItem(
-          completionKey
-        );
-
-      if (saved) {
-        return new Date(saved);
-      }
-
-      const now =
-        new Date();
-
-      localStorage.setItem(
-        completionKey,
-        now.toISOString()
-      );
-
-      return now;
-    };
+    console.log(
+      "ChatCompleteState mounted at",
+      new Date().toISOString()
+    );
 
     const updateTimer = () => {
 
       const now =
         new Date();
 
-      const completedAt =
-        getCompletionTime();
+      const midnight =
+        new Date();
+
+      midnight.setHours(
+        24,
+        0,
+        0,
+        0
+      );
 
       const diff =
         Math.max(
           0,
-          completedAt.getTime() +
-            24 * 60 * 60 * 1000 -
+          midnight.getTime() -
             now.getTime()
         );
 
@@ -103,7 +87,7 @@ export default function ChatCompleteState({
     return () =>
       clearInterval(interval);
 
-  }, [userId]);
+  }, []);
 
   const summaryLines =
     summary
@@ -280,7 +264,7 @@ export default function ChatCompleteState({
 
         <p className="text-sm text-muted-foreground">
 
-          Next check-in opens in
+          Tomorrow's check-in unlocks in
 
         </p>
 
@@ -300,9 +284,7 @@ export default function ChatCompleteState({
       {/* Encouragement */}
 
       <p className="text-sm text-muted-foreground">
-
-        Rest now. We'll continue tomorrow 🌱
-
+        It unlocks at midnight, but check in after 5 pm tomorrow once your day has unfolded.
       </p>
 
     </div>

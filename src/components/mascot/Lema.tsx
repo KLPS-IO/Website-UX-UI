@@ -66,6 +66,7 @@ export default function Lema({
         loop
         muted
         playsInline
+        preload="auto"
 
         className="relative block h-[220px] w-[220px] bg-white object-contain"
         style={{
