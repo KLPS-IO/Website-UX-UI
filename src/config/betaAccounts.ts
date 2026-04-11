@@ -51,5 +51,11 @@ export const BETA_ACCOUNTS = [
     id: "10101010-1010-1010-1010-101010101010",
     email: "Mbclarke1.mc@gmail.com",
     password: "Lema04", // Monique April cohort
+  },
+  {
+    id: "11111111-1111-1111-1111-111111111111",
+    email: "esthermusafiri1993(@gmail.com",
+    password: "Lema04", // Esther April cohort
+    is_admin: true,
   }
 ];
