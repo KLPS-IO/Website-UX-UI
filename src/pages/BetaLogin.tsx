@@ -44,6 +44,18 @@ const BetaLogin = () => {
           password
         );
 
+        localStorage.setItem(
+          "betaRole",
+          account.role || ""
+        );
+
+        localStorage.setItem(
+          "betaIsAdmin",
+          account.is_admin
+            ? "true"
+            : "false"
+        );
+
         toast.success("Login successful!");
 
         navigate("/beta-dashboard");

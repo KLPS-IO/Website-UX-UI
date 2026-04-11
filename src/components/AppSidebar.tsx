@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Scan, LayoutDashboard, User, TrendingUp, MessageSquare } from "lucide-react";
+import { Scan, LayoutDashboard, User, TrendingUp, MessageSquare, Landmark, Briefcase } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Sidebar,
@@ -12,13 +12,19 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Logo from "./Logo";
+import { isFounderUser } from "@/lib/access";
 
-const items = [
+const baseItems = [
   { title: "Dashboard", url: "/beta-dashboard", icon: LayoutDashboard },
   { title: "BodyScan", url: "/beta-dashboard/bodyscan", icon: Scan },
   { title: "Chat to Lema", url: "/beta-dashboard/chat", icon: MessageSquare },
   { title: "Stats", url: "/beta-dashboard/stats", icon: TrendingUp },
   { title: "Profile", url: "/beta-dashboard/profile", icon: User },
+];
+
+const founderItems = [
+  { title: "Founder Dashboard", url: "/beta-dashboard/founder", icon: Landmark },
+  { title: "Investor Dashboard", url: "/beta-dashboard/investor", icon: Briefcase },
 ];
 
 export function AppSidebar() {
@@ -29,6 +35,12 @@ export function AppSidebar() {
   } = useSidebar();
   const isCollapsed = state === "collapsed";
   const location = useLocation();
+  const founderAccess =
+    isFounderUser();
+  const items =
+    founderAccess
+      ? [...baseItems, ...founderItems]
+      : baseItems;
 
   useEffect(() => {
     if (isMobile) {

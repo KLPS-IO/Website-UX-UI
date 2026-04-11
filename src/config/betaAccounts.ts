@@ -3,6 +3,8 @@ export const BETA_ACCOUNTS = [
     id: "11111111-1111-1111-1111-111111111111",
     email: "emmamendez07@gmail.com",
     password: "SheBuilds1.0", // (EMMA)
+    role: "founder",
+    is_admin: true,
   },
   // April cohort
   {

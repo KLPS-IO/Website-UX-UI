@@ -22,6 +22,8 @@ export const DashboardLayout = () => {
     localStorage.removeItem("betaUser");
     localStorage.removeItem("user_id");
     localStorage.removeItem("betaCohort");
+    localStorage.removeItem("betaRole");
+    localStorage.removeItem("betaIsAdmin");
     navigate("/");
   };
 

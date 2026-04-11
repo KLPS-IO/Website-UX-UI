@@ -20,6 +20,9 @@ import Streaks from '@/pages/Streaks';
 import Rewards from '@/pages/Rewards';
 import Avatar from '@/pages/Avatar';
 import Profile from '@/pages/Profile';
+import FounderDashboard from '@/pages/FounderDashboard';
+import InvestorDashboard from '@/pages/InvestorDashboard';
+import FounderRoute from '@/components/FounderRoute';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +49,22 @@ const App = () => (
             <Route path="rewards" element={<Rewards />} />
             <Route path="avatar" element={<Avatar />} />
             <Route path="profile" element={<Profile />} />
+            <Route
+              path="founder"
+              element={
+                <FounderRoute>
+                  <FounderDashboard />
+                </FounderRoute>
+              }
+            />
+            <Route
+              path="investor"
+              element={
+                <FounderRoute>
+                  <InvestorDashboard />
+                </FounderRoute>
+              }
+            />
 
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
