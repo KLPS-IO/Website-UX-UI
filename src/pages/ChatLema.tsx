@@ -416,7 +416,7 @@ export default function CheckIn() {
 
       <div className="flex justify-center mb-6">
 
-        <Lema state="welcome" message="" />
+        <Lema state="supportive" message="" />
 
       </div>
 

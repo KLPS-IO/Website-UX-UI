@@ -64,16 +64,16 @@ const defaultData: InvestorDashboardData = {
 
 const investorEndpoints = {
   sessionSummary:
-    `${API_BASE}/founder/session-summary`,
+    `${API_BASE}/api/founder/session-summary`,
 
   completionData:
-    `${API_BASE}/founder/checkin-completion`,
+    `${API_BASE}/api/founder/checkin-completion`,
 
   growthData:
-    `${API_BASE}/founder/user-growth`,
+    `${API_BASE}/api/founder/user-growth`,
 
   streakData:
-    `${API_BASE}/founder/streak-summary`,
+    `${API_BASE}/api/founder/streak-summary`,
 };
 
 /* ---------------- FETCH ---------------- */
