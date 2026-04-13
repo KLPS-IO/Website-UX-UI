@@ -9,49 +9,49 @@ export function BodyScanPage() {
 
   const [waistValue, setWaistValue] = useState<number | null>(null);
 
-useEffect(() => {
+// useEffect(() => {
 
-  async function fetchWaist() {
+//   async function fetchWaist() {
 
-    try {
+//     try {
 
-      const response = await fetch(
-        `${API_BASE}/api/waist`
-      );
+//       const response = await fetch(
+//         `${API_BASE}/api/waist`
+//       );
 
-      const data = await response.json();
+//       const data = await response.json();
 
-      if (data.length > 0) {
+//       if (data.length > 0) {
 
-        const latest =
-          data[data.length - 1];
+//         const latest =
+//           data[data.length - 1];
 
-        setWaistValue(
-          Number(latest.waist_value)
-        );
+//         setWaistValue(
+//           Number(latest.waist_value)
+//         );
 
-      }
+//       }
 
-    } catch (error) {
+//     } catch (error) {
 
-      console.error(
-        "Fetch waist failed:",
-        error
-      );
+//       console.error(
+//         "Fetch waist failed:",
+//         error
+//       );
 
-    }
+//     }
 
-  }
+//   }
 
-  fetchWaist();
+//   fetchWaist();
 
-  const interval =
-    setInterval(fetchWaist, 5000);
+//   const interval =
+//     setInterval(fetchWaist, 5000);
 
-  return () =>
-    clearInterval(interval);
+//   return () =>
+//     clearInterval(interval);
 
-}, []);
+// }, []);
 
 const measurements = [
 
