@@ -410,13 +410,18 @@ export default function CheckIn() {
 
   if (!currentQuestion) {
 
-    return (
-      <div className="flex items-center justify-center h-screen">
-        No questions available.
-      </div>
-    );
+  return (
 
-  }
+    <ChatCompleteState
+      streak={dayNumber}
+      userId={userId}
+      summary={summary}
+      message="Today's reflection is complete."
+    />
+
+  );
+
+}
 
   /**
    * Progress
