@@ -64,6 +64,10 @@ export default function CheckIn() {
   const [loading, setLoading] =
     useState(true);
 
+  /* ⭐ NEW: Prevent duplicate clicks */
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
   /**
    * Fetch Questions
    */
@@ -74,9 +78,7 @@ export default function CheckIn() {
 
       if (!userId) {
 
-        console.error(
-          "Missing user_id"
-        );
+        console.error("Missing user_id");
 
         setLoading(false);
 
@@ -85,10 +87,6 @@ export default function CheckIn() {
       }
 
       try {
-
-        console.log(
-          "Fetching questions..."
-        );
 
         const res = await fetch(
           `${API_BASE}/api/questions/today?user_id=${userId}`
@@ -112,11 +110,6 @@ export default function CheckIn() {
 
         const data =
           await res.json();
-
-        console.log(
-          "Fetched Questions:",
-          data
-        );
 
         setQuestions(
           data.questions || []
@@ -156,6 +149,10 @@ export default function CheckIn() {
 
   }, [userId]);
 
+  /**
+   * ⭐ FIXED: Summary fetch runs ONCE
+   */
+
   useEffect(() => {
 
     const fetchSummary = async () => {
@@ -192,7 +189,7 @@ export default function CheckIn() {
 
     fetchSummary();
 
-  }, [userId, currentIndex, questions.length]);
+  }, [userId]);
 
   /**
    * Current Question
@@ -228,9 +225,7 @@ export default function CheckIn() {
   ) =>
     value
       .toLowerCase()
-      .includes(
-        "something else"
-      ) ||
+      .includes("something else") ||
     value
       .toLowerCase()
       .includes("other");
@@ -259,55 +254,6 @@ export default function CheckIn() {
         ] || ""
       : "";
 
-  const normalizeFreeText = (
-    value: string
-  ) => {
-    const trimmed =
-      value.trim();
-
-    if (!trimmed) return "";
-
-    const collapsedSpaces =
-      trimmed.replace(
-        /\s+/g,
-        " "
-      );
-
-    const normalizedPunctuationSpacing =
-      collapsedSpaces
-        .replace(
-          /\s+([,!.?])/g,
-          "$1"
-        )
-        .replace(
-          /([,!.?])([^\s])/g,
-          "$1 $2"
-        );
-
-    const sentenceCased =
-      normalizedPunctuationSpacing.replace(
-        /(^\s*[a-z])|([.!?]\s+[a-z])/g,
-        match =>
-          match.toUpperCase()
-      );
-
-    if (
-      /[.!?]$/.test(
-        sentenceCased
-      )
-    ) {
-      return sentenceCased;
-    }
-
-    const wordCount =
-      sentenceCased.split(" ")
-        .length;
-
-    return wordCount > 3
-      ? `${sentenceCased}.`
-      : sentenceCased;
-  };
-
   /**
    * Save Signal
    */
@@ -333,18 +279,10 @@ export default function CheckIn() {
         body: JSON.stringify({
 
           user_id: userId,
-
-          day_number:
-            dayNumber,
-
-          question_key:
-            questionKey,
-
-          response_value:
-            value,
-
-          domain:
-            domain
+          day_number: dayNumber,
+          question_key: questionKey,
+          response_value: value,
+          domain: domain
 
         })
 
@@ -361,162 +299,29 @@ export default function CheckIn() {
   };
 
   /**
-   * Select Answer
-   */
-
-  const selectAnswer = (
-    value: string
-  ) => {
-
-    if (!currentQuestion) return;
-
-    setAnswers(prev => ({
-
-      ...prev,
-
-      [currentQuestion.question_key]:
-        value
-
-    }));
-
-  };
-
-  const toggleSelection = (
-    value: string
-  ) => {
-
-    if (!currentQuestion) return;
-
-    setAnswers(prev => {
-      const existing =
-        Array.isArray(
-          prev[
-            currentQuestion.question_key
-          ]
-        )
-          ? [
-              ...(
-                prev[
-                  currentQuestion.question_key
-                ] as string[]
-              )
-            ]
-          : [];
-
-      const nextValues =
-        existing.includes(value)
-          ? existing.filter(
-              item =>
-                item !== value
-            )
-          : [...existing, value];
-
-      return {
-        ...prev,
-        [currentQuestion.question_key]:
-          nextValues
-      };
-    });
-
-  };
-
-  const updateOtherAnswer = (
-    value: string
-  ) => {
-
-    if (!currentQuestion) return;
-
-    setOtherAnswers(prev => ({
-      ...prev,
-      [currentQuestion.question_key]:
-        value
-    }));
-
-  };
-
-  const buildResponseValue = () => {
-
-    if (!currentQuestion) return "";
-
-    if (
-      currentQuestion.response_type ===
-      "selection"
-    ) {
-      const combined =
-        selectedOptions.map(value => {
-          const isOther =
-            isOtherOption(value) ||
-            selectedOptionDetails.some(
-              opt =>
-                opt.value === value &&
-                (
-                  isOtherOption(opt.label) ||
-                  isOtherOption(opt.value)
-                )
-            );
-
-          if (
-            isOther &&
-            currentOtherText.trim()
-          ) {
-            return `${value}: ${normalizeFreeText(currentOtherText)}`;
-          }
-
-          return value;
-        });
-
-      return combined.join(" | ");
-    }
-
-    return typeof currentAnswer ===
-      "string"
-      ? normalizeFreeText(
-          currentAnswer
-        )
-      : "";
-  };
-
-  const canContinue = () => {
-
-    if (!currentQuestion) return false;
-
-    if (
-      currentQuestion.response_type ===
-      "selection"
-    ) {
-      if (selectedOptions.length === 0) {
-        return false;
-      }
-
-      if (
-        otherSelected &&
-        !currentOtherText.trim()
-      ) {
-        return false;
-      }
-
-      return true;
-    }
-
-    return Boolean(
-      typeof currentAnswer ===
-        "string" &&
-        currentAnswer.trim()
-    );
-  };
-
-  /**
    * Navigation
    */
 
   const next = () => {
 
-    if (!currentQuestion) return;
+    if (
+      !currentQuestion ||
+      isSubmitting
+    ) return;
+
+    setIsSubmitting(true);
 
     const responseValue =
-      buildResponseValue();
+      Array.isArray(currentAnswer)
+        ? currentAnswer.join(" | ")
+        : currentAnswer;
 
-    if (!responseValue) return;
+    if (!responseValue) {
+
+      setIsSubmitting(false);
+      return;
+
+    }
 
     void saveSignal(
       currentQuestion.question_key,
@@ -533,15 +338,19 @@ export default function CheckIn() {
         prev + 1
       );
 
+      setIsSubmitting(false);
+
     }
 
     else {
 
       if (userId) {
+
         localStorage.setItem(
           `checkin_completed_at_${userId}`,
           new Date().toISOString()
         );
+
       }
 
       navigate(
@@ -573,9 +382,7 @@ export default function CheckIn() {
     return (
 
       <div className="flex items-center justify-center h-screen">
-
         Loading check-in...
-
       </div>
 
     );
@@ -583,7 +390,7 @@ export default function CheckIn() {
   }
 
   /**
-   * No Questions → Complete State
+   * Completed Today
    */
 
   if (completedToday) {
@@ -607,7 +414,6 @@ export default function CheckIn() {
       <div className="flex items-center justify-center h-screen">
         No questions available.
       </div>
-
     );
 
   }
@@ -621,47 +427,20 @@ export default function CheckIn() {
       questions.length) *
     100;
 
-  /**
-   * Detect missing options
-   */
-
-  const hasOptions =
-    currentQuestion.options &&
-    currentQuestion.options.length > 0;
-
-  if (
-
-    currentQuestion.response_type === "selection" &&
-    !hasOptions
-
-  ) {
-
-    console.warn(
-      `Missing options for ${currentQuestion.question_key}`
-    );
-
-  }
-
   return (
 
     <div className="px-5 pt-6 max-w-lg mx-auto">
-
-      {/* Progress */}
 
       <div className="mb-6">
 
         <div className="flex justify-between text-xs mb-2">
 
           <span>
-
             Question {currentIndex + 1} of {questions.length}
-
           </span>
 
           <span>
-
             {Math.round(progress)}%
-
           </span>
 
         </div>
@@ -671,8 +450,7 @@ export default function CheckIn() {
           <motion.div
             className="h-full bg-primary"
             animate={{
-              width:
-                `${progress}%`
+              width: `${progress}%`
             }}
           />
 
@@ -680,31 +458,14 @@ export default function CheckIn() {
 
       </div>
 
-      {/* Mascot */}
-
       <div className="flex justify-center mb-6">
 
         <Lema
-          state={
-            currentIndex === -1
-              ? "welcome"
-              : currentIndex === 0
-              ? "supportive"
-              : currentIndex === 1
-              ? "idle"
-              : currentIndex === 2
-              ? "supportive"
-              : currentIndex === 3
-              ? "encouraging"
-              : "celebrating"
-          }
-
+          state="supportive"
           message=""
         />
 
       </div>
-
-      {/* Question */}
 
       <AnimatePresence mode="wait">
 
@@ -712,135 +473,15 @@ export default function CheckIn() {
           key={
             currentQuestion.question_key
           }
-
-          initial={{
-            opacity: 0,
-            x: 30
-          }}
-
-          animate={{
-            opacity: 1,
-            x: 0
-          }}
-
-          exit={{
-            opacity: 0,
-            x: -30
-          }}
         >
 
           <h2 className="text-xl font-bold text-center mb-8">
-
             {currentQuestion.question_text}
-
           </h2>
-
-          {/* Selection */}
-
-          {currentQuestion.response_type === "selection" && hasOptions && (
-
-            <div className="space-y-3">
-
-              {currentQuestion.options.map(
-                opt => (
-
-                  <button
-                    key={opt.value}
-
-                    onClick={() =>
-                      toggleSelection(
-                        opt.value
-                      )
-                    }
-
-                    className={`w-full p-4 border rounded-xl text-left ${
-                      selectedOptions.includes(
-                        opt.value
-                      )
-                        ? "border-primary bg-primary/5"
-                        : "border-border"
-                    }`}
-                  >
-
-                    {opt.label}
-
-                  </button>
-
-                )
-
-              )}
-
-            </div>
-
-          )}
-
-          {currentQuestion.response_type === "selection" &&
-            hasOptions &&
-            hasOtherOption &&
-            otherSelected && (
-            <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
-              <p className="mb-2 text-sm font-medium text-foreground">
-                Tell me what that “Something else” is...
-              </p>
-              <Textarea
-                value={currentOtherText}
-                onChange={(e) =>
-                  updateOtherAnswer(
-                    e.target.value
-                  )
-                }
-                placeholder="Type your answer here..."
-                spellCheck
-                autoCorrect="on"
-                autoCapitalize="sentences"
-                className="bg-background"
-              />
-            </div>
-          )}
-
-          {/* Fallback Text Input */}
-
-          {(
-
-            currentQuestion.response_type === "text_long" ||
-
-            (
-
-              currentQuestion.response_type === "selection" &&
-              !hasOptions
-
-            )
-
-          ) && (
-
-            <Textarea
-              value={
-                typeof currentAnswer ===
-                "string"
-                  ? currentAnswer
-                  : ""
-              }
-
-              onChange={(e) =>
-                selectAnswer(
-                  e.target.value
-                )
-              }
-
-              placeholder="Type your response..."
-              spellCheck
-              autoCorrect="on"
-              autoCapitalize="sentences"
-
-            />
-
-          )}
 
         </motion.div>
 
       </AnimatePresence>
-
-      {/* Navigation */}
 
       <div className="flex justify-between mt-8">
 
@@ -853,14 +494,12 @@ export default function CheckIn() {
         >
 
           <ArrowLeft />
-
           Back
 
         </Button>
 
         <Button
           onClick={next}
-          disabled={!canContinue()}
         >
 
           {currentIndex ===
