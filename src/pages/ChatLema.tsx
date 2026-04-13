@@ -114,7 +114,7 @@ export default function CheckIn() {
         );
 
         setDayNumber(
-          data.day || 1
+          data.lastCompletedDay || 1
         );
 
       }
