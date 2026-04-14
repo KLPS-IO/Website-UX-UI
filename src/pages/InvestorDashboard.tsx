@@ -575,8 +575,14 @@ across all users
 <ResponsiveContainer>
 
 <BarChart
-data={patternData}
-layout="vertical"
+  layout="vertical"
+  data={patternData}
+  margin={{
+    left: 120,
+    right: 20,
+    top: 10,
+    bottom: 10
+  }}
 >
 
 <CartesianGrid />
