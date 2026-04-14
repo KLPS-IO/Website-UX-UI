@@ -22,6 +22,9 @@ import {
 
 import { API_BASE } from "@/config/api";
 
+import BehaviourWordCloud
+from "@/components/BehaviourWordCloud";
+
 /* ---------------- TYPES ---------------- */
 
 type SessionSummaryRow = {
@@ -53,6 +56,16 @@ type InvestorDashboardData = {
   streakData: StreakRow[];
 };
 
+type WordData = {
+  text: string;
+  value: number;
+};
+
+type WordCloudResponse = {
+  last7Days: WordData[];
+  historical: WordData[];
+};
+
 /* ---------------- DEFAULT ---------------- */
 
 const defaultData: InvestorDashboardData = {
@@ -62,7 +75,7 @@ const defaultData: InvestorDashboardData = {
   streakData: [],
 };
 
-const investorEndpoints = {
+const founderEndpoints = {
   sessionSummary:
     `${API_BASE}/api/founder/session-summary`,
 
@@ -74,6 +87,9 @@ const investorEndpoints = {
 
   streakData:
     `${API_BASE}/api/founder/streak-summary`,
+
+  wordCloud:
+  `${API_BASE}/api/founder/word-cloud`,  
 };
 
 /* ---------------- FETCH ---------------- */
@@ -113,7 +129,7 @@ async function fetchInvestorResource<T>(
 
 /* ---------------- COMPONENT ---------------- */
 
-export default function InvestorDashboard() {
+export default function FounderDashboard() {
 
   const [data, setData] =
     useState<InvestorDashboardData>(
@@ -125,6 +141,12 @@ export default function InvestorDashboard() {
 
   const [error, setError] =
     useState("");
+
+  const [wordCloudData, setWordCloudData] =
+  useState<WordCloudResponse>({
+    last7Days: [],
+    historical: []
+  });  
 
   /* ---------------- LOAD DATA ---------------- */
 
@@ -141,20 +163,27 @@ export default function InvestorDashboard() {
         await Promise.allSettled([
 
           fetchInvestorResource<SessionSummaryRow>(
-            investorEndpoints.sessionSummary
+            founderEndpoints.sessionSummary
           ),
 
           fetchInvestorResource<CompletionRow>(
-            investorEndpoints.completionData
+            founderEndpoints.completionData
           ),
 
           fetchInvestorResource<GrowthRow>(
-            investorEndpoints.growthData
+            founderEndpoints.growthData
           ),
 
           fetchInvestorResource<StreakRow>(
-            investorEndpoints.streakData
+            founderEndpoints.streakData
           ),
+
+          fetch(founderEndpoints.wordCloud)
+            .then(res => res.json())
+            .catch(() => ({
+              last7Days: [],
+              historical: []
+          }))
 
         ]);
 
@@ -183,6 +212,17 @@ export default function InvestorDashboard() {
             : [],
 
       });
+
+      setWordCloudData(
+
+        results[4].status === "fulfilled"
+          ? results[4].value
+          : {
+              last7Days: [],
+              historical: []
+            }
+
+        );
 
       const failedCount =
         results.filter(
@@ -512,11 +552,52 @@ radius={[8,8,0,0]}
 
 </Card>
 
+<Card>
+
+<CardHeader>
+
+<CardTitle>
+Behaviour Insight — Last 7 Days
+</CardTitle>
+
+</CardHeader>
+
+<CardContent>
+
+<BehaviourWordCloud
+words={wordCloudData.last7Days}
+/>
+
+</CardContent>
+
+</Card>
+
+<Card>
+
+<CardHeader>
+
+<CardTitle>
+Behaviour Insight — Historical
+</CardTitle>
+
+</CardHeader>
+
+<CardContent>
+
+<BehaviourWordCloud
+words={wordCloudData.historical}
+/>
+
+</CardContent>
+
+</Card>
+
 </div>
 
   );
 
 }
+
 
 /* KPI COMPONENT */
 
