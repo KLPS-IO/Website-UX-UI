@@ -25,26 +25,54 @@ No behaviour words yet
 
   }
 
-  const max =
-    Math.max(
-      ...words.map(w => w.value),
-      1
+  // Sort largest first
+  const sorted =
+    [...words].sort(
+      (a, b) => b.value - a.value
     );
+
+  const max =
+    sorted[0]?.value || 1;
+
+  const biggest =
+    sorted[0];
+
+  const others =
+    sorted.slice(1);
 
   return (
 
-<div className="flex flex-wrap justify-center gap-3 p-6 min-h-[260px]">
+<div className="flex flex-col items-center p-6 min-h-[260px]">
 
-{words.map((word, i) => {
+{/* BIGGEST WORD CENTER */}
+
+<div
+  className="mb-6 text-center"
+  style={{
+
+    fontSize: "52px",
+    fontWeight: 700,
+    color: "#5b21b6"
+
+  }}
+
+>
+
+{biggest.text}
+
+</div>
+
+{/* OTHER WORDS */}
+
+<div className="flex flex-wrap justify-center gap-3 max-w-4xl">
+
+{others.map((word, i) => {
 
   const scale =
     word.value / max;
 
   const fontSize =
-    14 + scale * 40;
-
-  const opacity =
-    0.4 + scale * 0.6;
+    14 + scale * 32;
 
   return (
 
@@ -56,18 +84,12 @@ No behaviour words yet
   style={{
 
     fontSize: `${fontSize}px`,
-    opacity,
+    opacity:
+      0.4 + scale * 0.6,
 
-    color: "#6b21a8",
-
-    fontWeight:
-      scale > 0.6
-        ? 700
-        : 500
+    color: "#7c3aed"
 
   }}
-
-  className="transition-all"
 
 >
 
@@ -78,6 +100,8 @@ No behaviour words yet
   );
 
 })}
+
+</div>
 
 </div>
 
