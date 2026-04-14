@@ -53,6 +53,11 @@ type InvestorDashboardData = {
   streakData: StreakRow[];
 };
 
+type PatternRow = {
+  pattern: string;
+  count: number;
+};
+
 /* ---------------- DEFAULT ---------------- */
 
 const defaultData: InvestorDashboardData = {
@@ -74,6 +79,9 @@ const investorEndpoints = {
 
   streakData:
     `${API_BASE}/api/founder/streak-summary`,
+
+  patternFrequency:
+    `${API_BASE}/api/founder/pattern-frequency`,
 };
 
 /* ---------------- FETCH ---------------- */
@@ -126,6 +134,9 @@ export default function InvestorDashboard() {
   const [error, setError] =
     useState("");
 
+  const [patternData, setPatternData] =
+    useState<PatternRow[]>([]);
+
   /* ---------------- LOAD DATA ---------------- */
 
   useEffect(() => {
@@ -155,6 +166,10 @@ export default function InvestorDashboard() {
           fetchInvestorResource<StreakRow>(
             investorEndpoints.streakData
           ),
+
+          fetchInvestorResource<PatternRow>(
+            investorEndpoints.patternFrequency
+),
 
         ]);
 
@@ -198,6 +213,14 @@ export default function InvestorDashboard() {
       }
 
       setLoading(false);
+
+      setPatternData(
+
+        results[4].status === "fulfilled"
+          ? results[4].value
+          : []
+
+      );
 
     };
 
@@ -527,6 +550,62 @@ radius={[8,8,0,0]}
 
 </Card>
 
+<Card>
+
+<CardHeader>
+
+<CardTitle>
+Behaviour Pattern Signals
+</CardTitle>
+
+<CardDescription>
+
+Top behavioural patterns detected
+across all users
+
+</CardDescription>
+
+</CardHeader>
+
+<CardContent>
+
+<div className="h-72">
+
+<ResponsiveContainer>
+
+<BarChart
+data={patternData}
+layout="vertical"
+>
+
+<CartesianGrid />
+
+<XAxis
+type="number"
+/>
+
+<YAxis
+type="category"
+dataKey="pattern"
+/>
+
+<Tooltip />
+
+<Bar
+dataKey="count"
+fill="#9333ea"
+radius={[0,8,8,0]}
+/>
+
+</BarChart>
+
+</ResponsiveContainer>
+
+</div>
+
+</CardContent>
+
+</Card>
 </div>
 
   );
