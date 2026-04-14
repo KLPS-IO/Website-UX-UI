@@ -72,5 +72,11 @@ export const BETA_ACCOUNTS = [
     id: "14141414-1414-1414-1414-141414141414",
     email: "solagnelake@gmail.com",
     password: "Lema04", // Solange April cohort
+
+  },
+  {
+    id: "15151515-1515-1515-1515-151515151515",
+    email: "cherryb2020@yahoo.co.uk",
+    password: "Lema04", // CherylApril cohort
   }
 ];
