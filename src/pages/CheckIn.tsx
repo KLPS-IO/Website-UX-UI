@@ -28,12 +28,7 @@ type Question = {
   options: Option[];
 };
 
-type AnswerValue =
-  string | string[];
-
 export default function CheckIn() {
-
-  console.log("CHAT LEMA LOADED");
 
   const navigate = useNavigate();
 
@@ -47,16 +42,10 @@ export default function CheckIn() {
     useState(0);
 
   const [answers, setAnswers] =
-    useState<Record<string, AnswerValue>>({});
-
-  const [otherAnswers, setOtherAnswers] =
     useState<Record<string, string>>({});
 
   const [dayNumber, setDayNumber] =
     useState<number>(1);
-
-  const [summary, setSummary] =
-    useState("");
 
   const [completedToday, setCompletedToday] =
     useState(false);
@@ -64,12 +53,11 @@ export default function CheckIn() {
   const [loading, setLoading] =
     useState(true);
 
-  /* ⭐ NEW: Prevent duplicate clicks */
   const [isSubmitting, setIsSubmitting] =
     useState(false);
 
   /**
-   * Fetch Questions
+   Fetch Questions
    */
 
   useEffect(() => {
@@ -78,10 +66,7 @@ export default function CheckIn() {
 
       if (!userId) {
 
-        console.error("Missing user_id");
-
         setLoading(false);
-
         return;
 
       }
@@ -91,22 +76,6 @@ export default function CheckIn() {
         const res = await fetch(
           `${API_BASE}/api/questions/today?user_id=${userId}`
         );
-
-        if (!res.ok) {
-
-          const err =
-            await res.text();
-
-          console.error(
-            "Question fetch failed:",
-            err
-          );
-
-          setQuestions([]);
-
-          return;
-
-        }
 
         const data =
           await res.json();
@@ -133,7 +102,6 @@ export default function CheckIn() {
         );
 
         setQuestions([]);
-        setCompletedToday(false);
 
       }
 
@@ -150,123 +118,49 @@ export default function CheckIn() {
   }, [userId]);
 
   /**
-   * ⭐ FIXED: Summary fetch runs ONCE
-   */
-
-  useEffect(() => {
-
-    const fetchSummary = async () => {
-
-      if (!userId) return;
-
-      try {
-
-        const res = await fetch(
-          `${API_BASE}/api/summary/today?user_id=${userId}`
-        );
-
-        if (!res.ok) return;
-
-        const data =
-          await res.json();
-
-        setSummary(
-          data.summary_text || ""
-        );
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "Failed loading summary:",
-          error
-        );
-
-      }
-
-    };
-
-    fetchSummary();
-
-  }, [userId]);
-
-  /**
-   * Current Question
+   Current Question
    */
 
   const currentQuestion =
-    questions.length > 0
-      ? questions[currentIndex]
-      : null;
-
-  const currentAnswer =
-    currentQuestion
-      ? answers[
-          currentQuestion.question_key
-        ]
-      : undefined;
-
-  const selectedOptions =
-    Array.isArray(currentAnswer)
-      ? currentAnswer
-      : [];
-
-  const selectedOptionDetails =
-    currentQuestion?.options?.filter(
-      opt =>
-        selectedOptions.includes(
-          opt.value
-        )
-    ) || [];
-
-  const isOtherOption = (
-    value: string
-  ) =>
-    value
-      .toLowerCase()
-      .includes("something else") ||
-    value
-      .toLowerCase()
-      .includes("other");
-
-  const hasOtherOption =
-    currentQuestion?.options?.some(
-      opt =>
-        isOtherOption(opt.label) ||
-        isOtherOption(opt.value)
-    ) || false;
-
-  const otherSelected =
-    selectedOptionDetails.some(
-      opt =>
-        isOtherOption(opt.label) ||
-        isOtherOption(opt.value)
-    ) ||
-    selectedOptions.some(value =>
-      isOtherOption(value)
-    );
-
-  const currentOtherText =
-    currentQuestion
-      ? otherAnswers[
-          currentQuestion.question_key
-        ] || ""
-      : "";
+    questions[currentIndex];
 
   /**
-   * Save Signal
+   Save Answer
    */
 
-  const saveSignal = (
-    questionKey: string,
-    value: string,
-    domain: string
+  const selectAnswer = (
+    value: string
   ) => {
 
-    if (!userId) return;
+    if (!currentQuestion) return;
 
-    fetch(
+    setAnswers(prev => ({
+
+      ...prev,
+
+      [currentQuestion.question_key]:
+        value
+
+    }));
+
+  };
+
+  /**
+   Save Signal
+   */
+
+  const saveSignal = async () => {
+
+    if (!currentQuestion) return;
+
+    const answer =
+      answers[
+        currentQuestion.question_key
+      ];
+
+    if (!answer) return;
+
+    await fetch(
       `${API_BASE}/api/signal`,
       {
         method: "POST",
@@ -279,30 +173,30 @@ export default function CheckIn() {
         body: JSON.stringify({
 
           user_id: userId,
+
           day_number: dayNumber,
-          question_key: questionKey,
-          response_value: value,
-          domain: domain
+
+          question_key:
+            currentQuestion.question_key,
+
+          response_value:
+            answer,
+
+          domain:
+            currentQuestion.domain
 
         })
 
       }
-    ).catch(error => {
-
-      console.error(
-        "Signal save failed:",
-        error
-      );
-
-    });
+    );
 
   };
 
   /**
-   * Navigation
+   Navigation
    */
 
-  const next = () => {
+  const next = async () => {
 
     if (
       !currentQuestion ||
@@ -311,23 +205,7 @@ export default function CheckIn() {
 
     setIsSubmitting(true);
 
-    const responseValue =
-      Array.isArray(currentAnswer)
-        ? currentAnswer.join(" | ")
-        : currentAnswer;
-
-    if (!responseValue) {
-
-      setIsSubmitting(false);
-      return;
-
-    }
-
-    void saveSignal(
-      currentQuestion.question_key,
-      responseValue,
-      currentQuestion.domain
-    );
+    await saveSignal();
 
     if (
       currentIndex <
@@ -343,15 +221,6 @@ export default function CheckIn() {
     }
 
     else {
-
-      if (userId) {
-
-        localStorage.setItem(
-          `checkin_completed_at_${userId}`,
-          new Date().toISOString()
-        );
-
-      }
 
       navigate(
         "/beta-dashboard/summary"
@@ -374,7 +243,7 @@ export default function CheckIn() {
   };
 
   /**
-   * Loading
+   Loading
    */
 
   if (loading) {
@@ -382,7 +251,9 @@ export default function CheckIn() {
     return (
 
       <div className="flex items-center justify-center h-screen">
+
         Loading check-in...
+
       </div>
 
     );
@@ -390,7 +261,7 @@ export default function CheckIn() {
   }
 
   /**
-   * Completed Today
+   Completed Today
    */
 
   if (completedToday) {
@@ -400,8 +271,7 @@ export default function CheckIn() {
       <ChatCompleteState
         streak={dayNumber}
         userId={userId}
-        summary={summary}
-        message="You've already completed today's check-in. Come back tomorrow."
+        message="You've already completed today's check-in."
       />
 
     );
@@ -410,21 +280,20 @@ export default function CheckIn() {
 
   if (!currentQuestion) {
 
-  return (
+    return (
 
-    <ChatCompleteState
-      streak={dayNumber}
-      userId={userId}
-      summary={summary}
-      message="Today's reflection is complete."
-    />
+      <ChatCompleteState
+        streak={dayNumber}
+        userId={userId}
+        message="Today's reflection is complete."
+      />
 
-  );
+    );
 
-}
+  }
 
   /**
-   * Progress
+   Progress
    */
 
   const progress =
@@ -435,6 +304,8 @@ export default function CheckIn() {
   return (
 
     <div className="px-5 pt-6 max-w-lg mx-auto">
+
+      {/* Progress */}
 
       <div className="mb-6">
 
@@ -463,6 +334,8 @@ export default function CheckIn() {
 
       </div>
 
+      {/* Mascot */}
+
       <div className="flex justify-center mb-6">
 
         <Lema
@@ -471,6 +344,8 @@ export default function CheckIn() {
         />
 
       </div>
+
+      {/* Question */}
 
       <AnimatePresence mode="wait">
 
@@ -481,12 +356,77 @@ export default function CheckIn() {
         >
 
           <h2 className="text-xl font-bold text-center mb-8">
+
             {currentQuestion.question_text}
+
           </h2>
+
+          {/* ⭐ SELECTION */}
+
+          {currentQuestion.response_type ===
+            "selection" && (
+
+            <div className="space-y-3">
+
+              {currentQuestion.options?.map(
+                opt => (
+
+                  <button
+                    key={opt.value}
+
+                    onClick={() =>
+                      selectAnswer(
+                        opt.value
+                      )
+                    }
+
+                    className={`w-full p-4 border rounded-xl text-left ${
+                      answers[
+                        currentQuestion.question_key
+                      ] === opt.value
+                        ? "border-primary bg-primary/5"
+                        : "border-border"
+                    }`}
+                  >
+
+                    {opt.label}
+
+                  </button>
+
+                )
+
+              )}
+
+            </div>
+
+          )}
+
+          {/* ⭐ TEXT */}
+
+          {currentQuestion.response_type ===
+            "text_long" && (
+
+            <Textarea
+              value={
+                answers[
+                  currentQuestion.question_key
+                ] || ""
+              }
+
+              onChange={(e) =>
+                selectAnswer(
+                  e.target.value
+                )
+              }
+            />
+
+          )}
 
         </motion.div>
 
       </AnimatePresence>
+
+      {/* Navigation */}
 
       <div className="flex justify-between mt-8">
 
@@ -505,6 +445,12 @@ export default function CheckIn() {
 
         <Button
           onClick={next}
+
+          disabled={
+            !answers[
+              currentQuestion.question_key
+            ]
+          }
         >
 
           {currentIndex ===
