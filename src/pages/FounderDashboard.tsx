@@ -331,12 +331,12 @@ export default function InvestorDashboard() {
   }
 
   let growthMessage =
-    "Growth stabilising.";
+    "Word Cloud Saturation";
 
   if (growthIncreasing) {
 
     growthMessage =
-      "User growth is trending upward.";
+      "User words is trending upward.";
 
   }
 
@@ -347,7 +347,7 @@ export default function InvestorDashboard() {
 <div className="mx-auto max-w-6xl space-y-6 px-5 pt-6">
 
 <h1 className="text-3xl text-purple-900">
-Investor Dashboard
+Founder Dashboard
 </h1>
 
 {/* STORY */}
