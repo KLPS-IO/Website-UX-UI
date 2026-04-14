@@ -15,7 +15,7 @@ export default function BehaviourWordCloud({
 
     return (
 
-<div className="flex h-80 items-center justify-center text-sm text-gray-400">
+<div className="flex h-72 items-center justify-center text-sm text-gray-400">
 
 No behaviour words yet
 
@@ -33,39 +33,41 @@ No behaviour words yet
 
   return (
 
-<div className="flex flex-wrap justify-center gap-3 p-4 min-h-[260px]">
+<div className="flex flex-wrap justify-center gap-3 p-6 min-h-[260px]">
 
 {words.map((word, i) => {
 
-  const size =
-    12 +
-    (word.value / max) * 36;
+  const scale =
+    word.value / max;
+
+  const fontSize =
+    14 + scale * 40;
 
   const opacity =
-    0.4 +
-    (word.value / max) * 0.6;
+    0.4 + scale * 0.6;
 
   return (
 
 <span
   key={i}
+
+  title={`${word.text}: ${word.value}`}
+
   style={{
 
-    fontSize: `${size}px`,
+    fontSize: `${fontSize}px`,
     opacity,
 
     color: "#6b21a8",
 
     fontWeight:
-      word.value > max * 0.6
+      scale > 0.6
         ? 700
         : 500
 
   }}
 
   className="transition-all"
-
-  title={`${word.text}: ${word.value}`}
 
 >
 
