@@ -89,7 +89,7 @@ const founderEndpoints = {
     `${API_BASE}/api/founder/streak-summary`,
 
   wordCloud:
-  `${API_BASE}/api/founder/word-cloud`,  
+    `${API_BASE}/api/summary/word-cloud`, 
 };
 
 /* ---------------- FETCH ---------------- */
