@@ -28,6 +28,10 @@ type Question = {
   options: Option[];
 };
 
+/* ⭐ Multi-value support */
+type AnswerValue =
+  string | string[];
+
 export default function CheckIn() {
 
   const navigate = useNavigate();
@@ -42,7 +46,7 @@ export default function CheckIn() {
     useState(0);
 
   const [answers, setAnswers] =
-    useState<Record<string, string>>({});
+    useState<Record<string, AnswerValue>>({});
 
   const [dayNumber, setDayNumber] =
     useState<number>(1);
@@ -56,9 +60,9 @@ export default function CheckIn() {
   const [isSubmitting, setIsSubmitting] =
     useState(false);
 
-  /**
-   Fetch Questions
-   */
+  /* ----------------------------- */
+  /* Fetch Questions               */
+  /* ----------------------------- */
 
   useEffect(() => {
 
@@ -117,18 +121,79 @@ export default function CheckIn() {
 
   }, [userId]);
 
-  /**
-   Current Question
-   */
+  /* ----------------------------- */
 
   const currentQuestion =
     questions[currentIndex];
 
-  /**
-   Save Answer
-   */
+  /* ----------------------------- */
+  /* Selection Handler             */
+  /* ----------------------------- */
 
-  const selectAnswer = (
+  const toggleSelection = (
+    value: string
+  ) => {
+
+    if (!currentQuestion) return;
+
+    setAnswers(prev => {
+
+      const existing =
+        prev[currentQuestion.question_key];
+
+      /* Multi-select logic */
+
+      if (Array.isArray(existing)) {
+
+        if (existing.includes(value)) {
+
+          return {
+
+            ...prev,
+
+            [currentQuestion.question_key]:
+
+              existing.filter(
+                v => v !== value
+              )
+
+          };
+
+        }
+
+        return {
+
+          ...prev,
+
+          [currentQuestion.question_key]:
+
+            [...existing, value]
+
+        };
+
+      }
+
+      /* First selection */
+
+      return {
+
+        ...prev,
+
+        [currentQuestion.question_key]:
+
+          [value]
+
+      };
+
+    });
+
+  };
+
+  /* ----------------------------- */
+  /* Text Answer                   */
+  /* ----------------------------- */
+
+  const setTextAnswer = (
     value: string
   ) => {
 
@@ -145,20 +210,25 @@ export default function CheckIn() {
 
   };
 
-  /**
-   Save Signal
-   */
+  /* ----------------------------- */
+  /* Save Signal                   */
+  /* ----------------------------- */
 
   const saveSignal = async () => {
 
     if (!currentQuestion) return;
 
-    const answer =
+    const rawAnswer =
       answers[
         currentQuestion.question_key
       ];
 
-    if (!answer) return;
+    if (!rawAnswer) return;
+
+    const value =
+      Array.isArray(rawAnswer)
+        ? rawAnswer.join(" | ")
+        : rawAnswer;
 
     await fetch(
       `${API_BASE}/api/signal`,
@@ -180,7 +250,7 @@ export default function CheckIn() {
             currentQuestion.question_key,
 
           response_value:
-            answer,
+            value,
 
           domain:
             currentQuestion.domain
@@ -192,9 +262,9 @@ export default function CheckIn() {
 
   };
 
-  /**
-   Navigation
-   */
+  /* ----------------------------- */
+  /* Navigation                    */
+  /* ----------------------------- */
 
   const next = async () => {
 
@@ -242,9 +312,9 @@ export default function CheckIn() {
 
   };
 
-  /**
-   Loading
-   */
+  /* ----------------------------- */
+  /* Loading                       */
+  /* ----------------------------- */
 
   if (loading) {
 
@@ -260,9 +330,9 @@ export default function CheckIn() {
 
   }
 
-  /**
-   Completed Today
-   */
+  /* ----------------------------- */
+  /* Completed Today               */
+  /* ----------------------------- */
 
   if (completedToday) {
 
@@ -292,14 +362,26 @@ export default function CheckIn() {
 
   }
 
-  /**
-   Progress
-   */
+  /* ----------------------------- */
 
   const progress =
     ((currentIndex + 1) /
       questions.length) *
     100;
+
+  const selected =
+    answers[
+      currentQuestion.question_key
+    ];
+
+  const selectedArray =
+    Array.isArray(selected)
+      ? selected
+      : [];
+
+  /* ----------------------------- */
+  /* UI                            */
+  /* ----------------------------- */
 
   return (
 
@@ -361,7 +443,7 @@ export default function CheckIn() {
 
           </h2>
 
-          {/* ⭐ SELECTION */}
+          {/* Selection */}
 
           {currentQuestion.response_type ===
             "selection" && (
@@ -375,15 +457,15 @@ export default function CheckIn() {
                     key={opt.value}
 
                     onClick={() =>
-                      selectAnswer(
+                      toggleSelection(
                         opt.value
                       )
                     }
 
-                    className={`w-full p-4 border rounded-xl text-left ${
-                      answers[
-                        currentQuestion.question_key
-                      ] === opt.value
+                    className={`w-full p-4 border rounded-xl text-left transition ${
+                      selectedArray.includes(
+                        opt.value
+                      )
                         ? "border-primary bg-primary/5"
                         : "border-border"
                     }`}
@@ -401,20 +483,20 @@ export default function CheckIn() {
 
           )}
 
-          {/* ⭐ TEXT */}
+          {/* Text */}
 
           {currentQuestion.response_type ===
             "text_long" && (
 
             <Textarea
               value={
-                answers[
-                  currentQuestion.question_key
-                ] || ""
+                typeof selected === "string"
+                  ? selected
+                  : ""
               }
 
               onChange={(e) =>
-                selectAnswer(
+                setTextAnswer(
                   e.target.value
                 )
               }
