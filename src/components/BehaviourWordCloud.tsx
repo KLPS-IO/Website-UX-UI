@@ -1,11 +1,4 @@
-import {
-  ResponsiveContainer,
-  ScatterChart,
-  Scatter,
-  Tooltip,
-  XAxis,
-  YAxis
-} from "recharts";
+import React from "react";
 
 type WordData = {
   text: string;
@@ -18,58 +11,71 @@ export default function BehaviourWordCloud({
   words: WordData[];
 }) {
 
-  const scatterData =
-    words.map((word, i) => ({
+  if (!words.length) {
 
-      x: (i * 17) % 100,
-      y: (i * 31) % 100,
+    return (
 
-      text: word.text,
+<div className="flex h-80 items-center justify-center text-sm text-gray-400">
 
-      value: word.value
+No behaviour words yet
 
-    }));
+</div>
+
+    );
+
+  }
+
+  const max =
+    Math.max(
+      ...words.map(w => w.value),
+      1
+    );
 
   return (
 
-<div className="h-80">
+<div className="flex flex-wrap justify-center gap-3 p-4 min-h-[260px]">
 
-<ResponsiveContainer>
+{words.map((word, i) => {
 
-<ScatterChart>
+  const size =
+    12 +
+    (word.value / max) * 36;
 
-<XAxis
-type="number"
-dataKey="x"
-hide
-/>
+  const opacity =
+    0.4 +
+    (word.value / max) * 0.6;
 
-<YAxis
-type="number"
-dataKey="y"
-hide
-/>
+  return (
 
-<Tooltip
-formatter={(
-  value: number | string,
-  name: string | undefined,
-  props: { payload: { text: string; value: number } }
-) => [
+<span
+  key={i}
+  style={{
 
-`${props.payload.text}: ${props.payload.value}`
+    fontSize: `${size}px`,
+    opacity,
 
-]}
-/>
+    color: "#6b21a8",
 
-<Scatter
-data={scatterData}
-fill="#9333ea"
-/>
+    fontWeight:
+      word.value > max * 0.6
+        ? 700
+        : 500
 
-</ScatterChart>
+  }}
 
-</ResponsiveContainer>
+  className="transition-all"
+
+  title={`${word.text}: ${word.value}`}
+
+>
+
+{word.text}
+
+</span>
+
+  );
+
+})}
 
 </div>
 
