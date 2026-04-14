@@ -84,6 +84,7 @@ const investorEndpoints = {
     `${API_BASE}/api/founder/pattern-frequency`,
 };
 
+ // patternData state moved inside the InvestorDashboard component to comply with React Hooks rules
 /* ---------------- FETCH ---------------- */
 
 async function fetchInvestorResource<T>(
@@ -169,7 +170,7 @@ export default function InvestorDashboard() {
 
           fetchInvestorResource<PatternRow>(
             investorEndpoints.patternFrequency
-),
+          ).catch(() => [])
 
         ]);
 
