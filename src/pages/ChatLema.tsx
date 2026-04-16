@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -32,11 +31,24 @@ type Question = {
 type AnswerValue =
   string | string[];
 
+const isOtherOption = (
+  option: Option
+) => {
+  const normalized =
+    `${option.value} ${option.label}`
+      .toLowerCase()
+      .replace(/[_-]/g, " ");
+
+  return (
+    normalized.includes(
+      "something else"
+    ) || normalized.includes("other")
+  );
+};
+
 export default function CheckIn() {
 
   console.log("CHAT LEMA LOADED");
-
-  const navigate = useNavigate();
 
   const userId =
     localStorage.getItem("user_id");
@@ -142,13 +154,23 @@ export default function CheckIn() {
 
   }, [userId]);
 
+  const currentQuestion =
+    questions.length > 0
+      ? questions[currentIndex]
+      : null;
+
   /**
    Fetch Summary ONLY after completion
    */
 
   useEffect(() => {
 
-    if (!isComplete) return;
+    if (
+      loading ||
+      (!isComplete && !!currentQuestion)
+    ) {
+      return;
+    }
 
     const fetchSummary = async () => {
 
@@ -166,7 +188,9 @@ export default function CheckIn() {
           await res.json();
 
         setSummary(
-          data.summary || ""
+          data.summary_text ||
+            data.summary ||
+            ""
         );
 
       }
@@ -184,7 +208,7 @@ export default function CheckIn() {
 
     fetchSummary();
 
-  }, [isComplete]);
+  }, [isComplete, currentQuestion, loading, userId]);
 
   /**
    Preload celebration video
@@ -207,10 +231,81 @@ export default function CheckIn() {
 
   }, []);
 
-  const currentQuestion =
-    questions.length > 0
-      ? questions[currentIndex]
-      : null;
+  const toggleSelection = (
+    value: string
+  ) => {
+
+    if (!currentQuestion) return;
+
+    setAnswers(prev => {
+      const existing =
+        prev[currentQuestion.question_key];
+
+      if (Array.isArray(existing)) {
+        if (existing.includes(value)) {
+          const option =
+            currentQuestion.options?.find(
+              opt => opt.value === value
+            );
+
+          if (
+            option &&
+            isOtherOption(option)
+          ) {
+            setOtherAnswers(prev => ({
+              ...prev,
+              [currentQuestion.question_key]:
+                ""
+            }));
+          }
+
+          return {
+            ...prev,
+            [currentQuestion.question_key]:
+              existing.filter(
+                v => v !== value
+              )
+          };
+        }
+
+        return {
+          ...prev,
+          [currentQuestion.question_key]:
+            [...existing, value]
+        };
+      }
+
+      return {
+        ...prev,
+        [currentQuestion.question_key]:
+          [value]
+      };
+    });
+  };
+
+  const setTextAnswer = (
+    value: string
+  ) => {
+    if (!currentQuestion) return;
+
+    setAnswers(prev => ({
+      ...prev,
+      [currentQuestion.question_key]:
+        value
+    }));
+  };
+
+  const setOtherTextAnswer = (
+    value: string
+  ) => {
+    if (!currentQuestion) return;
+
+    setOtherAnswers(prev => ({
+      ...prev,
+      [currentQuestion.question_key]:
+        value
+    }));
+  };
 
   /**
    Save Signal
@@ -263,14 +358,64 @@ export default function CheckIn() {
     if (!currentQuestion || isCompleting)
       return;
 
-    const answer =
+    const rawAnswer =
       answers[currentQuestion.question_key];
 
-    if (!answer) return;
+    const otherOptionValues =
+      currentQuestion.options
+        ?.filter(isOtherOption)
+        .map(opt => opt.value) || [];
+
+    const selectedValues =
+      Array.isArray(rawAnswer)
+        ? rawAnswer
+        : [];
+
+    const hasOtherSelected =
+      selectedValues.some(value =>
+        otherOptionValues.includes(value)
+      );
+
+    const customOtherText = (
+      otherAnswers[
+        currentQuestion.question_key
+      ] || ""
+    ).trim();
+
+    if (
+      !rawAnswer ||
+      (Array.isArray(rawAnswer) &&
+        rawAnswer.length === 0) ||
+      (typeof rawAnswer === "string" &&
+        rawAnswer.trim().length === 0) ||
+      (hasOtherSelected &&
+        customOtherText.length === 0)
+    ) {
+      return;
+    }
+
+    const responseValue =
+      Array.isArray(rawAnswer)
+        ? rawAnswer
+            .filter(
+              value =>
+                !otherOptionValues.includes(
+                  value
+                )
+            )
+            .concat(
+              hasOtherSelected
+                ? [
+                    `something_else: ${customOtherText}`
+                  ]
+                : []
+            )
+            .join(" | ")
+        : rawAnswer;
 
     saveSignal(
       currentQuestion.question_key,
-      String(answer),
+      responseValue,
       currentQuestion.domain
     );
 
@@ -379,6 +524,66 @@ export default function CheckIn() {
       questions.length) *
     100;
 
+  const selectedAnswer =
+    answers[currentQuestion.question_key];
+
+  const selectedValues =
+    Array.isArray(selectedAnswer)
+      ? selectedAnswer
+      : [];
+
+  const canContinue =
+    Array.isArray(selectedAnswer)
+      ? (() => {
+          const otherOptionValues =
+            currentQuestion.options
+              ?.filter(isOtherOption)
+              .map(
+                opt => opt.value
+              ) || [];
+
+          const hasOtherSelected =
+            selectedAnswer.some(value =>
+              otherOptionValues.includes(
+                value
+              )
+            );
+
+          if (!hasOtherSelected) {
+            return (
+              selectedAnswer.length > 0
+            );
+          }
+
+          return (
+            selectedAnswer.length > 0 &&
+            (
+              otherAnswers[
+                currentQuestion.question_key
+              ] || ""
+            )
+              .trim()
+              .length > 0
+          );
+        })()
+      : typeof selectedAnswer ===
+            "string" &&
+          selectedAnswer.trim().length > 0;
+
+  const hasOtherSelected =
+    currentQuestion.response_type ===
+      "selection" &&
+    selectedValues.some(value => {
+      const option =
+        currentQuestion.options?.find(
+          opt => opt.value === value
+        );
+
+      return option
+        ? isOtherOption(option)
+        : false;
+    });
+
   return (
 
     <div className="px-5 pt-6 max-w-lg mx-auto">
@@ -447,21 +652,66 @@ export default function CheckIn() {
 
           </h2>
 
-          <Textarea
-            value={
-              answers[
-                currentQuestion.question_key
-              ] as string || ""
-            }
-            onChange={(e) =>
-              setAnswers(prev => ({
-                ...prev,
-                [currentQuestion.question_key]:
+          {currentQuestion.response_type ===
+            "selection" && (
+            <div className="space-y-3">
+              {currentQuestion.options?.map(
+                opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() =>
+                      toggleSelection(
+                        opt.value
+                      )
+                    }
+                    className={`w-full p-4 border rounded-xl text-left transition ${
+                      selectedValues.includes(
+                        opt.value
+                      )
+                        ? "border-primary bg-primary/5"
+                        : "border-border"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                )
+              )}
+
+              {hasOtherSelected && (
+                <Textarea
+                  value={
+                    otherAnswers[
+                      currentQuestion.question_key
+                    ] || ""
+                  }
+                  onChange={(e) =>
+                    setOtherTextAnswer(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Type your response..."
+                />
+              )}
+            </div>
+          )}
+
+          {currentQuestion.response_type ===
+            "text_long" && (
+            <Textarea
+              value={
+                typeof selectedAnswer ===
+                "string"
+                  ? selectedAnswer
+                  : ""
+              }
+              onChange={(e) =>
+                setTextAnswer(
                   e.target.value
-              }))
-            }
-            placeholder="Type your response..."
-          />
+                )
+              }
+              placeholder="Type your response..."
+            />
+          )}
 
         </motion.div>
 
@@ -482,7 +732,10 @@ export default function CheckIn() {
 
         <Button
           onClick={next}
-          disabled={isCompleting}
+          disabled={
+            isCompleting ||
+            !canContinue
+          }
         >
 
           {currentIndex ===

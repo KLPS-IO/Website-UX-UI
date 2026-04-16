@@ -89,9 +89,12 @@ export default function ChatCompleteState({
 
   }, []);
 
+  const normalizedSummary =
+    summary?.trim() || "";
+
   const summaryLines =
-    summary
-      ? summary
+    normalizedSummary
+      ? normalizedSummary
           .split("\n")
           .map(line =>
             line.trim()
@@ -116,6 +119,12 @@ export default function ChatCompleteState({
           "today you showed"
         )
     );
+
+  const hasSummary =
+    normalizedSummary.length > 0;
+
+  const hasRenderableSummaryLines =
+    formattedSummaryLines.length > 0;
 
   return (
 
@@ -176,7 +185,7 @@ export default function ChatCompleteState({
 
       <div className="bg-muted/40 border rounded-2xl p-5 mb-6 text-left">
 
-        {summary ? (
+        {hasSummary ? (
           <>
             {!hasSummaryHeading && (
               <p className="text-sm text-muted-foreground mb-2">
@@ -184,59 +193,65 @@ export default function ChatCompleteState({
               </p>
             )}
 
-            <div className="space-y-2.5">
-              {formattedSummaryLines.map(
-                (line, index) => {
-                  const cleanLine =
-                    line.replace(
-                      /^[•*-]\s*/,
-                      ""
-                    );
+            {hasRenderableSummaryLines ? (
+              <div className="space-y-2.5">
+                {formattedSummaryLines.map(
+                  (line, index) => {
+                    const cleanLine =
+                      line.replace(
+                        /^[•*-]\s*/,
+                        ""
+                      );
 
-                  const isLabelValue =
-                    cleanLine.includes(
+                    const isLabelValue =
+                      cleanLine.includes(
+                        ":"
+                      );
+
+                    if (!isLabelValue) {
+                      return (
+                        <p
+                          key={`${cleanLine}-${index}`}
+                          className="text-sm leading-relaxed text-foreground/90"
+                        >
+                          {cleanLine}
+                        </p>
+                      );
+                    }
+
+                    const [
+                      label,
+                      ...rest
+                    ] = cleanLine.split(
                       ":"
                     );
 
-                  if (!isLabelValue) {
                     return (
-                      <p
+                      <div
                         key={`${cleanLine}-${index}`}
-                        className="text-sm leading-relaxed text-foreground/90"
+                        className="flex items-start gap-2 text-sm leading-relaxed"
                       >
-                        {cleanLine}
-                      </p>
+                        <span className="mt-1 text-primary">
+                          •
+                        </span>
+                        <p className="text-foreground/90">
+                          <span className="font-medium">
+                            {label.trim()}:
+                          </span>{" "}
+                          {rest
+                            .join(":")
+                            .trim()}
+                        </p>
+                      </div>
                     );
                   }
-
-                  const [
-                    label,
-                    ...rest
-                  ] = cleanLine.split(
-                    ":"
-                  );
-
-                  return (
-                    <div
-                      key={`${cleanLine}-${index}`}
-                      className="flex items-start gap-2 text-sm leading-relaxed"
-                    >
-                      <span className="mt-1 text-primary">
-                        •
-                      </span>
-                      <p className="text-foreground/90">
-                        <span className="font-medium">
-                          {label.trim()}:
-                        </span>{" "}
-                        {rest
-                          .join(":")
-                          .trim()}
-                      </p>
-                    </div>
-                  );
-                }
-              )}
-            </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm leading-relaxed text-foreground/90">
+                {normalizedSummary}
+              </p>
+            )}
           </>
         ) : (
           <>
@@ -252,7 +267,7 @@ export default function ChatCompleteState({
 
       </div>
 
-      {summary && (
+      {hasSummary && (
         <p className="text-base font-medium mb-6">
           You're building consistency — one day at a time.
         </p>

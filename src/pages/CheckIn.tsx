@@ -32,6 +32,21 @@ type Question = {
 type AnswerValue =
   string | string[];
 
+const isOtherOption = (
+  option: Option
+) => {
+  const normalized =
+    `${option.value} ${option.label}`
+      .toLowerCase()
+      .replace(/[_-]/g, " ");
+
+  return (
+    normalized.includes(
+      "something else"
+    ) || normalized.includes("other")
+  );
+};
+
 export default function CheckIn() {
 
   const navigate = useNavigate();
@@ -48,11 +63,17 @@ export default function CheckIn() {
   const [answers, setAnswers] =
     useState<Record<string, AnswerValue>>({});
 
+  const [otherAnswers, setOtherAnswers] =
+    useState<Record<string, string>>({});
+
   const [dayNumber, setDayNumber] =
     useState<number>(1);
 
   const [completedToday, setCompletedToday] =
     useState(false);
+
+  const [summary, setSummary] =
+    useState("");
 
   const [loading, setLoading] =
     useState(true);
@@ -121,6 +142,52 @@ export default function CheckIn() {
 
   }, [userId]);
 
+  useEffect(() => {
+
+    if (
+      loading ||
+      !userId ||
+      (!completedToday &&
+        questions.length > 0)
+    ) {
+      return;
+    }
+
+    const fetchSummary = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/summary/today?user_id=${userId}`
+        );
+
+        if (!res.ok) return;
+
+        const data =
+          await res.json();
+
+        setSummary(
+          data.summary_text ||
+            data.summary ||
+            ""
+        );
+      }
+
+      catch (error) {
+        console.error(
+          "Failed loading summary:",
+          error
+        );
+      }
+    };
+
+    fetchSummary();
+
+  }, [
+    completedToday,
+    loading,
+    questions.length,
+    userId
+  ]);
+
   /* ----------------------------- */
 
   const currentQuestion =
@@ -146,6 +213,21 @@ export default function CheckIn() {
       if (Array.isArray(existing)) {
 
         if (existing.includes(value)) {
+          const option =
+            currentQuestion.options?.find(
+              opt => opt.value === value
+            );
+
+          if (
+            option &&
+            isOtherOption(option)
+          ) {
+            setOtherAnswers(prev => ({
+              ...prev,
+              [currentQuestion.question_key]:
+                ""
+            }));
+          }
 
           return {
 
@@ -210,6 +292,23 @@ export default function CheckIn() {
 
   };
 
+  const setOtherTextAnswer = (
+    value: string
+  ) => {
+
+    if (!currentQuestion) return;
+
+    setOtherAnswers(prev => ({
+
+      ...prev,
+
+      [currentQuestion.question_key]:
+        value
+
+    }));
+
+  };
+
   /* ----------------------------- */
   /* Save Signal                   */
   /* ----------------------------- */
@@ -223,11 +322,56 @@ export default function CheckIn() {
         currentQuestion.question_key
       ];
 
-    if (!rawAnswer) return;
+    const otherOptionValues =
+      currentQuestion.options
+        ?.filter(isOtherOption)
+        .map(opt => opt.value) || [];
+
+    const selectedValues =
+      Array.isArray(rawAnswer)
+        ? rawAnswer
+        : [];
+
+    const hasOtherSelected =
+      selectedValues.some(value =>
+        otherOptionValues.includes(value)
+      );
+
+    const customOtherText = (
+      otherAnswers[
+        currentQuestion.question_key
+      ] || ""
+    ).trim();
+
+    if (
+      !rawAnswer ||
+      (Array.isArray(rawAnswer) &&
+        rawAnswer.length === 0) ||
+      (typeof rawAnswer === "string" &&
+        rawAnswer.trim().length === 0) ||
+      (hasOtherSelected &&
+        customOtherText.length === 0)
+    ) {
+      return;
+    }
 
     const value =
       Array.isArray(rawAnswer)
-        ? rawAnswer.join(" | ")
+        ? rawAnswer
+            .filter(
+              item =>
+                !otherOptionValues.includes(
+                  item
+                )
+            )
+            .concat(
+              hasOtherSelected
+                ? [
+                    `something_else: ${customOtherText}`
+                  ]
+                : []
+            )
+            .join(" | ")
         : rawAnswer;
 
     await fetch(
@@ -272,6 +416,42 @@ export default function CheckIn() {
       !currentQuestion ||
       isSubmitting
     ) return;
+
+    const rawAnswer =
+      answers[
+        currentQuestion.question_key
+      ];
+
+    const otherOptionValues =
+      currentQuestion.options
+        ?.filter(isOtherOption)
+        .map(opt => opt.value) || [];
+
+    const hasOtherSelected =
+      Array.isArray(rawAnswer)
+        ? rawAnswer.some(value =>
+            otherOptionValues.includes(
+              value
+            )
+          )
+        : false;
+
+    const canContinue =
+      Array.isArray(rawAnswer)
+        ? rawAnswer.length > 0 &&
+          (!hasOtherSelected ||
+            (
+              otherAnswers[
+                currentQuestion.question_key
+              ] || ""
+            )
+              .trim()
+              .length > 0)
+        : typeof rawAnswer ===
+              "string" &&
+            rawAnswer.trim().length > 0;
+
+    if (!canContinue) return;
 
     setIsSubmitting(true);
 
@@ -341,6 +521,7 @@ export default function CheckIn() {
       <ChatCompleteState
         streak={dayNumber}
         userId={userId}
+        summary={summary}
         message="You've already completed today's check-in."
       />
 
@@ -355,6 +536,7 @@ export default function CheckIn() {
       <ChatCompleteState
         streak={dayNumber}
         userId={userId}
+        summary={summary}
         message="Today's reflection is complete."
       />
 
@@ -378,6 +560,56 @@ export default function CheckIn() {
     Array.isArray(selected)
       ? selected
       : [];
+
+  const canContinue =
+    Array.isArray(selected)
+      ? (() => {
+          const otherOptionValues =
+            currentQuestion.options
+              ?.filter(isOtherOption)
+              .map(
+                opt => opt.value
+              ) || [];
+
+          const hasOtherSelected =
+            selected.some(value =>
+              otherOptionValues.includes(
+                value
+              )
+            );
+
+          if (!hasOtherSelected) {
+            return selected.length > 0;
+          }
+
+          return (
+            selected.length > 0 &&
+            (
+              otherAnswers[
+                currentQuestion.question_key
+              ] || ""
+            )
+              .trim()
+              .length > 0
+          );
+        })()
+      : typeof selected ===
+            "string" &&
+          selected.trim().length > 0;
+
+  const hasOtherSelected =
+    currentQuestion.response_type ===
+      "selection" &&
+    selectedArray.some(value => {
+      const option =
+        currentQuestion.options?.find(
+          opt => opt.value === value
+        );
+
+      return option
+        ? isOtherOption(option)
+        : false;
+    });
 
   /* ----------------------------- */
   /* UI                            */
@@ -479,6 +711,22 @@ export default function CheckIn() {
 
               )}
 
+              {hasOtherSelected && (
+                <Textarea
+                  value={
+                    otherAnswers[
+                      currentQuestion.question_key
+                    ] || ""
+                  }
+                  onChange={(e) =>
+                    setOtherTextAnswer(
+                      e.target.value
+                    )
+                  }
+                  placeholder="Type your response..."
+                />
+              )}
+
             </div>
 
           )}
@@ -529,9 +777,7 @@ export default function CheckIn() {
           onClick={next}
 
           disabled={
-            !answers[
-              currentQuestion.question_key
-            ]
+            !canContinue
           }
         >
 
