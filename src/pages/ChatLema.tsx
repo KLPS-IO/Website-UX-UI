@@ -47,6 +47,29 @@ const isOtherOption = (
   );
 };
 
+const isSelectionQuestion = (
+  question: Question | null
+) => {
+  if (!question) return false;
+
+  const responseType =
+    (
+      question.response_type || ""
+    ).toLowerCase();
+
+  const hasOptions =
+    Array.isArray(question.options) &&
+    question.options.length > 0;
+
+  return (
+    responseType === "selection" ||
+    responseType === "multi_select" ||
+    responseType === "selection_multi" ||
+    (question.allow_multiple &&
+      hasOptions)
+  );
+};
+
 export default function CheckIn() {
 
   console.log("CHAT LEMA LOADED");
@@ -568,14 +591,18 @@ export default function CheckIn() {
         ? [selectedAnswer]
         : [];
 
+  const useSelectionUI =
+    isSelectionQuestion(
+      currentQuestion
+    );
+
   const otherOptionValuesForCurrent =
     currentQuestion.options
       ?.filter(isOtherOption)
       .map(opt => opt.value) || [];
 
   const hasOtherSelected =
-    currentQuestion.response_type ===
-      "selection" &&
+    useSelectionUI &&
     selectedValues.some(value =>
       otherOptionValuesForCurrent.includes(
         value
@@ -583,8 +610,7 @@ export default function CheckIn() {
     );
 
   const canContinue =
-    currentQuestion.response_type ===
-      "selection"
+    useSelectionUI
       ? currentQuestion.allow_multiple
         ? selectedValues.length > 0 &&
           (!hasOtherSelected ||
@@ -676,8 +702,7 @@ export default function CheckIn() {
 
           </h2>
 
-          {currentQuestion.response_type ===
-            "selection" && (
+          {useSelectionUI && (
             <div className="space-y-3">
               {currentQuestion.options?.map(
                 opt => (
@@ -719,8 +744,7 @@ export default function CheckIn() {
             </div>
           )}
 
-          {currentQuestion.response_type ===
-            "text_long" && (
+          {!useSelectionUI && (
             <Textarea
               value={
                 typeof selectedAnswer ===

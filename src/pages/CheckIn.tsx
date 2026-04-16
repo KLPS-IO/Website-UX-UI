@@ -48,6 +48,29 @@ const isOtherOption = (
   );
 };
 
+const isSelectionQuestion = (
+  question: Question | null
+) => {
+  if (!question) return false;
+
+  const responseType =
+    (
+      question.response_type || ""
+    ).toLowerCase();
+
+  const hasOptions =
+    Array.isArray(question.options) &&
+    question.options.length > 0;
+
+  return (
+    responseType === "selection" ||
+    responseType === "multi_select" ||
+    responseType === "selection_multi" ||
+    (question.allow_multiple &&
+      hasOptions)
+  );
+};
+
 export default function CheckIn() {
 
   const navigate = useNavigate();
@@ -599,14 +622,18 @@ export default function CheckIn() {
         ? [selected]
         : [];
 
+  const useSelectionUI =
+    isSelectionQuestion(
+      currentQuestion
+    );
+
   const otherOptionValuesForCurrent =
     currentQuestion.options
       ?.filter(isOtherOption)
       .map(opt => opt.value) || [];
 
   const hasOtherSelected =
-    currentQuestion.response_type ===
-      "selection" &&
+    useSelectionUI &&
     selectedArray.some(value =>
       otherOptionValuesForCurrent.includes(
         value
@@ -614,8 +641,7 @@ export default function CheckIn() {
     );
 
   const canContinue =
-    currentQuestion.response_type ===
-      "selection"
+    useSelectionUI
       ? currentQuestion.allow_multiple
         ? selectedArray.length > 0 &&
           (!hasOtherSelected ||
@@ -705,8 +731,7 @@ export default function CheckIn() {
 
           {/* Selection */}
 
-          {currentQuestion.response_type ===
-            "selection" && (
+          {useSelectionUI && (
 
             <div className="space-y-3">
 
@@ -761,8 +786,7 @@ export default function CheckIn() {
 
           {/* Text */}
 
-          {currentQuestion.response_type ===
-            "text_long" && (
+          {!useSelectionUI && (
 
             <Textarea
               value={
