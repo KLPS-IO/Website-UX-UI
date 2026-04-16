@@ -26,6 +26,7 @@ type Question = {
   domain: string;
   response_type: string;
   options: Option[];
+  allow_multiple?: boolean;
 };
 
 /* ⭐ Multi-value support */
@@ -208,11 +209,15 @@ export default function CheckIn() {
       const existing =
         prev[currentQuestion.question_key];
 
-      /* Multi-select logic */
+      if (
+        currentQuestion.allow_multiple
+      ) {
+        const list =
+          Array.isArray(existing)
+            ? existing
+            : [];
 
-      if (Array.isArray(existing)) {
-
-        if (existing.includes(value)) {
+        if (list.includes(value)) {
           const option =
             currentQuestion.options?.find(
               opt => opt.value === value
@@ -235,7 +240,7 @@ export default function CheckIn() {
 
             [currentQuestion.question_key]:
 
-              existing.filter(
+              list.filter(
                 v => v !== value
               )
 
@@ -249,13 +254,30 @@ export default function CheckIn() {
 
           [currentQuestion.question_key]:
 
-            [...existing, value]
+            [...list, value]
 
         };
 
       }
 
-      /* First selection */
+      const option =
+        currentQuestion.options?.find(
+          opt => opt.value === value
+        );
+
+      if (
+        option &&
+        !isOtherOption(option)
+      ) {
+        setOtherAnswers(prev => ({
+
+          ...prev,
+
+          [currentQuestion.question_key]:
+            ""
+
+        }));
+      }
 
       return {
 
@@ -263,7 +285,7 @@ export default function CheckIn() {
 
         [currentQuestion.question_key]:
 
-          [value]
+          value
 
       };
 
@@ -330,7 +352,9 @@ export default function CheckIn() {
     const selectedValues =
       Array.isArray(rawAnswer)
         ? rawAnswer
-        : [];
+        : typeof rawAnswer === "string"
+          ? [rawAnswer]
+          : [];
 
     const hasOtherSelected =
       selectedValues.some(value =>
@@ -372,7 +396,11 @@ export default function CheckIn() {
                 : []
             )
             .join(" | ")
-        : rawAnswer;
+        : otherOptionValues.includes(
+              rawAnswer
+            )
+          ? `something_else: ${customOtherText}`
+          : rawAnswer;
 
     await fetch(
       `${API_BASE}/api/signal`,
@@ -434,7 +462,11 @@ export default function CheckIn() {
               value
             )
           )
-        : false;
+        : typeof rawAnswer === "string"
+          ? otherOptionValues.includes(
+              rawAnswer
+            )
+          : false;
 
     const canContinue =
       Array.isArray(rawAnswer)
@@ -557,59 +589,55 @@ export default function CheckIn() {
     ];
 
   const selectedArray =
-    Array.isArray(selected)
-      ? selected
-      : [];
+    currentQuestion.allow_multiple
+      ? Array.isArray(selected)
+        ? selected
+        : []
+      : typeof selected ===
+            "string" &&
+          selected.length > 0
+        ? [selected]
+        : [];
+
+  const otherOptionValuesForCurrent =
+    currentQuestion.options
+      ?.filter(isOtherOption)
+      .map(opt => opt.value) || [];
+
+  const hasOtherSelected =
+    currentQuestion.response_type ===
+      "selection" &&
+    selectedArray.some(value =>
+      otherOptionValuesForCurrent.includes(
+        value
+      )
+    );
 
   const canContinue =
-    Array.isArray(selected)
-      ? (() => {
-          const otherOptionValues =
-            currentQuestion.options
-              ?.filter(isOtherOption)
-              .map(
-                opt => opt.value
-              ) || [];
-
-          const hasOtherSelected =
-            selected.some(value =>
-              otherOptionValues.includes(
-                value
-              )
-            );
-
-          if (!hasOtherSelected) {
-            return selected.length > 0;
-          }
-
-          return (
-            selected.length > 0 &&
+    currentQuestion.response_type ===
+      "selection"
+      ? currentQuestion.allow_multiple
+        ? selectedArray.length > 0 &&
+          (!hasOtherSelected ||
             (
               otherAnswers[
                 currentQuestion.question_key
               ] || ""
             )
               .trim()
-              .length > 0
-          );
-        })()
+              .length > 0)
+        : selectedArray.length > 0 &&
+          (!hasOtherSelected ||
+            (
+              otherAnswers[
+                currentQuestion.question_key
+              ] || ""
+            )
+              .trim()
+              .length > 0)
       : typeof selected ===
             "string" &&
           selected.trim().length > 0;
-
-  const hasOtherSelected =
-    currentQuestion.response_type ===
-      "selection" &&
-    selectedArray.some(value => {
-      const option =
-        currentQuestion.options?.find(
-          opt => opt.value === value
-        );
-
-      return option
-        ? isOtherOption(option)
-        : false;
-    });
 
   /* ----------------------------- */
   /* UI                            */
