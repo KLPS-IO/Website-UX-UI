@@ -71,6 +71,56 @@ const isSelectionQuestion = (
   );
 };
 
+const getSummaryText = (
+  payload: unknown
+) => {
+  if (
+    !payload ||
+    typeof payload !== "object"
+  ) {
+    return "";
+  }
+
+  const record =
+    payload as Record<
+      string,
+      unknown
+    >;
+
+  const nested =
+    record.data &&
+    typeof record.data === "object"
+      ? (record.data as Record<
+          string,
+          unknown
+        >)
+      : {};
+
+  const candidates = [
+    record.summary_text,
+    record.summary,
+    nested.summary_text,
+    nested.summary
+  ];
+
+  for (const candidate of candidates) {
+    if (
+      typeof candidate ===
+        "string" &&
+      candidate.trim().length > 0
+    ) {
+      return candidate.trim();
+    }
+  }
+
+  return "";
+};
+
+const wait = (ms: number) =>
+  new Promise(resolve =>
+    setTimeout(resolve, ms)
+  );
+
 export default function CheckIn() {
 
   const navigate = useNavigate();
@@ -177,33 +227,55 @@ export default function CheckIn() {
       return;
     }
 
+    let cancelled = false;
+
     const fetchSummary = async () => {
-      try {
-        const res = await fetch(
-          `${API_BASE}/api/summary/today?user_id=${userId}`
-        );
+      for (
+        let attempt = 0;
+        attempt < 6;
+        attempt += 1
+      ) {
+        try {
+          const res = await fetch(
+            `${API_BASE}/api/summary/today?user_id=${userId}`
+          );
 
-        if (!res.ok) return;
+          if (res.ok) {
+            const data =
+              await res.json();
 
-        const data =
-          await res.json();
+            const nextSummary =
+              getSummaryText(data);
 
-        setSummary(
-          data.summary_text ||
-            data.summary ||
-            ""
-        );
-      }
+            if (nextSummary) {
+              if (!cancelled) {
+                setSummary(
+                  nextSummary
+                );
+              }
+              return;
+            }
+          }
+        }
 
-      catch (error) {
-        console.error(
-          "Failed loading summary:",
-          error
-        );
+        catch (error) {
+          console.error(
+            "Failed loading summary:",
+            error
+          );
+        }
+
+        if (attempt < 5) {
+          await wait(1500);
+        }
       }
     };
 
     fetchSummary();
+
+    return () => {
+      cancelled = true;
+    };
 
   }, [
     completedToday,
