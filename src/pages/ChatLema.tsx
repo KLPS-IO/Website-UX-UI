@@ -47,6 +47,37 @@ const isOtherOption = (
   );
 };
 
+const shouldAllowMultiple = (
+  question: Question | null
+) => {
+  if (!question) return false;
+
+  if (
+    typeof question.allow_multiple ===
+    "boolean"
+  ) {
+    return question.allow_multiple;
+  }
+
+  const responseType =
+    (
+      question.response_type || ""
+    ).toLowerCase();
+
+  if (
+    responseType ===
+      "multi_select" ||
+    responseType ===
+      "selection_multi"
+  ) {
+    return true;
+  }
+
+  return question.question_key
+    .toLowerCase()
+    .endsWith("_check");
+};
+
 const isSelectionQuestion = (
   question: Question | null
 ) => {
@@ -65,7 +96,9 @@ const isSelectionQuestion = (
     responseType === "selection" ||
     responseType === "multi_select" ||
     responseType === "selection_multi" ||
-    (question.allow_multiple &&
+    (shouldAllowMultiple(
+      question
+    ) &&
       hasOptions)
   );
 };
@@ -233,6 +266,11 @@ export default function CheckIn() {
       ? questions[currentIndex]
       : null;
 
+  const allowMultipleSelections =
+    shouldAllowMultiple(
+      currentQuestion
+    );
+
   /**
    Fetch Summary ONLY after completion
    */
@@ -338,7 +376,7 @@ export default function CheckIn() {
         prev[currentQuestion.question_key];
 
       if (
-        currentQuestion.allow_multiple
+        allowMultipleSelections
       ) {
         const list =
           Array.isArray(existing)
@@ -653,7 +691,7 @@ export default function CheckIn() {
     answers[currentQuestion.question_key];
 
   const selectedValues =
-    currentQuestion.allow_multiple
+    allowMultipleSelections
       ? Array.isArray(selectedAnswer)
         ? selectedAnswer
         : []
@@ -683,7 +721,7 @@ export default function CheckIn() {
 
   const canContinue =
     useSelectionUI
-      ? currentQuestion.allow_multiple
+      ? allowMultipleSelections
         ? selectedValues.length > 0 &&
           (!hasOtherSelected ||
             (
