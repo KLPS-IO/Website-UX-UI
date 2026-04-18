@@ -32,6 +32,12 @@ type Question = {
 type AnswerValue =
   string | string[];
 
+type CompletionMeta = {
+  currentStreak?: number;
+  lastCompletedDay?: number;
+  isDayComplete?: boolean;
+};
+
 const isOtherOption = (
   option: Option
 ) => {
@@ -148,6 +154,93 @@ const getSummaryText = (
   return "";
 };
 
+const parsePositiveNumber = (
+  value: unknown
+) => {
+  if (
+    typeof value === "number" &&
+    Number.isFinite(value) &&
+    value > 0
+  ) {
+    return Math.trunc(value);
+  }
+
+  if (
+    typeof value === "string" &&
+    value.trim().length > 0
+  ) {
+    const parsed = Number(value);
+    if (
+      Number.isFinite(parsed) &&
+      parsed > 0
+    ) {
+      return Math.trunc(parsed);
+    }
+  }
+
+  return undefined;
+};
+
+const getCompletionMeta = (
+  payload: unknown
+): CompletionMeta => {
+  if (
+    !payload ||
+    typeof payload !== "object"
+  ) {
+    return {};
+  }
+
+  const record =
+    payload as Record<
+      string,
+      unknown
+    >;
+
+  const nested =
+    record.data &&
+    typeof record.data === "object"
+      ? (record.data as Record<
+          string,
+          unknown
+        >)
+      : {};
+
+  const currentStreak =
+    parsePositiveNumber(
+      nested.currentStreak ??
+        nested.current_streak ??
+        record.currentStreak ??
+        record.current_streak
+    );
+
+  const lastCompletedDay =
+    parsePositiveNumber(
+      nested.lastCompletedDay ??
+        nested.last_completed_day ??
+        record.lastCompletedDay ??
+        record.last_completed_day
+    );
+
+  const rawIsDayComplete =
+    nested.isDayComplete ??
+    nested.is_day_complete ??
+    record.isDayComplete ??
+    record.is_day_complete;
+
+  const isDayComplete =
+    typeof rawIsDayComplete ===
+    "boolean"
+      ? rawIsDayComplete
+      : undefined;
+
+  return {
+    currentStreak,
+    lastCompletedDay,
+    isDayComplete
+  };
+};
+
 const wait = (ms: number) =>
   new Promise(resolve =>
     setTimeout(resolve, ms)
@@ -186,6 +279,36 @@ export default function CheckIn() {
 
   const [loading, setLoading] =
     useState(true);
+
+  const [
+    hasSignalCompletionMeta,
+    setHasSignalCompletionMeta
+  ] = useState(false);
+
+  const applyCompletionMeta = (
+    payload: unknown,
+    source: "signal" | "summary"
+  ) => {
+    const completionMeta =
+      getCompletionMeta(payload);
+
+    const nextDayNumber =
+      completionMeta.currentStreak ??
+      completionMeta.lastCompletedDay;
+
+    if (
+      typeof nextDayNumber ===
+      "number"
+    ) {
+      setDayNumber(nextDayNumber);
+
+      if (source === "signal") {
+        setHasSignalCompletionMeta(
+          true
+        );
+      }
+    }
+  };
 
   /**
    Fetch Questions
@@ -308,6 +431,15 @@ export default function CheckIn() {
             const nextSummary =
               getSummaryText(data);
 
+            if (
+              !hasSignalCompletionMeta
+            ) {
+              applyCompletionMeta(
+                data,
+                "summary"
+              );
+            }
+
             if (nextSummary) {
               if (!cancelled) {
                 setSummary(
@@ -342,7 +474,13 @@ export default function CheckIn() {
       cancelled = true;
     };
 
-  }, [isComplete, currentQuestion, loading, userId]);
+  }, [
+    currentQuestion,
+    hasSignalCompletionMeta,
+    isComplete,
+    loading,
+    userId
+  ]);
 
   /**
    Preload celebration video
@@ -468,7 +606,7 @@ export default function CheckIn() {
    Save Signal
    */
 
-  const saveSignal = (
+  const saveSignal = async (
     questionKey: string,
     value: string,
     domain: string
@@ -476,7 +614,8 @@ export default function CheckIn() {
 
     if (!userId) return;
 
-    fetch(
+    try {
+      const res = await fetch(
       `${API_BASE}/api/signal`,
       {
         method: "POST",
@@ -495,14 +634,35 @@ export default function CheckIn() {
         })
 
       }
-    ).catch(error => {
+    );
+
+      if (!res.ok) {
+        return;
+      }
+
+      try {
+        const data =
+          await res.json();
+        applyCompletionMeta(
+          data,
+          "signal"
+        );
+      }
+      catch (error) {
+        console.error(
+          "Failed reading signal response:",
+          error
+        );
+      }
+    }
+    catch (error) {
 
       console.error(
         "Signal save failed:",
         error
       );
 
-    });
+    }
 
   };
 
@@ -510,7 +670,7 @@ export default function CheckIn() {
    Next
    */
 
-  const next = () => {
+  const next = async () => {
 
     if (!currentQuestion || isCompleting)
       return;
@@ -576,7 +736,8 @@ export default function CheckIn() {
           ? `something_else: ${customOtherText}`
           : rawAnswer;
 
-    saveSignal(
+    const saveSignalPromise =
+      saveSignal(
       currentQuestion.question_key,
       responseValue,
       currentQuestion.domain
@@ -591,6 +752,8 @@ export default function CheckIn() {
         prev => prev + 1
       );
 
+      void saveSignalPromise;
+
     }
 
     else {
@@ -600,6 +763,8 @@ export default function CheckIn() {
       );
 
       setIsCompleting(true);
+
+      await saveSignalPromise;
 
       setTimeout(() => {
 
