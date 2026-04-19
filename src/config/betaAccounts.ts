@@ -57,7 +57,7 @@ export const BETA_ACCOUNTS = [
     email: "Brewster_hannah@yahoo.co.uk",
     password: "Lema04", // Hannah User April cohort
   },
-  // 11 is replicating 1111 -
+  // 11 is replicating 11111 -
   {
     id: "13131313-1313-1313-1313-131313131313",
     email: "megantayxxx@gmail.com",
