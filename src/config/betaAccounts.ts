@@ -53,16 +53,11 @@ export const BETA_ACCOUNTS = [
     password: "Lema04", // Monique April cohort
   },
   {
-    id: "11111111-1111-1111-1111-111111111111",
-    email: "esthermusafiri1993@gmail.com",
-    password: "Lema04", // Esther April cohort
-    is_admin: true,
-  },
-  {
     id: "12121212-1212-1212-1212-121212121212",
     email: "Brewster_hannah@yahoo.co.uk",
     password: "Lema04", // Hannah User April cohort
   },
+  // 11 is repliating 1111 - skipped
   {
     id: "13131313-1313-1313-1313-131313131313",
     email: "megantayxxx@gmail.com",
@@ -78,5 +73,11 @@ export const BETA_ACCOUNTS = [
     id: "15151515-1515-1515-1515-151515151515",
     email: "cherryb2020@yahoo.co.uk",
     password: "Lema04", // CherylApril cohort
-  }
+  },
+  {
+    id: "16161616-1616-1616-1616-161616161616",
+    email: "esthermusafiri1993@gmail.com",
+    password: "Lema04", // Esther April cohort
+    is_admin: true,
+  },
 ];
