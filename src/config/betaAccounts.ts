@@ -78,6 +78,5 @@ export const BETA_ACCOUNTS = [
     id: "16161616-1616-1616-1616-161616161616",
     email: "esthermusafiri1993@gmail.com",
     password: "Lema04", // Esther April cohort
-    is_admin: true,
   },
 ];
