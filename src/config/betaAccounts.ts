@@ -79,4 +79,34 @@ export const BETA_ACCOUNTS = [
     email: "esthermusafiri1993@gmail.com",
     password: "Lema04", // Esther April cohort
   },
+  {
+    id: "17171717-1717-1717-1717-171717171717",
+    email: "catapult@klps.co.uk",
+    password: "Catapult26", // New Catapult Users May cohort
+  },
+  {
+    id: "18181818-1818-1818-1818-181818181818",
+    email: "newuser1@klps.co.uk",
+    password: "Catapult1", // New Catapult Users May cohort
+  },
+  {
+    id: "19191919-1919-1919-1919-191919191919",
+    email: "newuser2@klps.co.uk",
+    password: "Catapult2", // New Catapult Users May cohort
+  },
+  {
+    id: "20202020-2020-2020-2020-202020202020",
+    email: "newuser3@klps.co.uk",
+    password: "Catapult3", // New Catapult Users May cohort
+  },
+  {
+    id: "21212121-2121-2121-2121-212121212121",
+    email: "newuser4@klps.co.uk",
+    password: "Catapult4", // New Catapult Users May cohort
+  },
+  {
+    id: "22222222-2222-2222-2222-222222222222",
+    email: "newuser5@klps.co.uk",
+    password: "Catapult5", // New Catapult Users May cohort
+  }
 ];
