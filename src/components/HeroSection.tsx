@@ -58,6 +58,16 @@ const HeroSection = () => {
           </Button>
         </div>
 
+        <div className="mb-8">
+          <Button
+            variant="hero"
+            size="lg"
+            onClick={() => window.location.href = '/innovation-lab'}
+            className="whitespace-nowrap "          >
+            Enter the Innovation Lab
+          </Button>
+        </div>
+
         <p className="text-sm text-muted-foreground">
           Be the first to know when we launch. No spam, ever.
         </p>

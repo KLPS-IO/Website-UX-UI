@@ -42,6 +42,10 @@ node_modules
 dist
 dist-ssr
 *.local
+.output
+.vinxi
+.tanstack/**
+.nitro
 
 # OS generated files
 .DS_Store
@@ -75,3 +79,11 @@ coverage/
 
 # Lint
 .eslintcache
+
+
+
+
+
+
+
+

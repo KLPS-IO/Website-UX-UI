@@ -23,6 +23,8 @@ import Profile from '@/pages/Profile';
 import FounderDashboard from '@/pages/FounderDashboard';
 import InvestorDashboard from '@/pages/InvestorDashboard';
 import FounderRoute from '@/components/FounderRoute';
+import DataRoom from '@/pages/DataRoom';
+import InnovationLab from '@/pages/InnovationLab';
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/innovation-lab" element={<InnovationLab />} />
+          <Route path="/data-room" element={<DataRoom />} />
           <Route path="/beta-login" element={<BetaLogin />} />
           <Route path="/beta-dashboard" element={<DashboardLayout />}>
             <Route index element={<BetaDashboard />} />
