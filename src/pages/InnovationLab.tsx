@@ -5,6 +5,7 @@ import polymerImg from "@/assets/polymer-lab.jpg";
 import dcLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
 import niyoLogo from "@/assets/niyo-group-logo-l.png";
 import { Section, StatCard } from "@/components/Section";
+import { AnimatedHeadline } from "@/components/AnimatedHeadline";
 
 const navItems = [
   { href: "#overview", label: "Overview" },
@@ -86,14 +87,14 @@ const InnovationLab = () => {
           <div className="flex min-w-0 items-center gap-8">
             <a href="https://klps.co.uk" className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-accent shadow-[0_0_12px_hsl(var(--accent))]" />
-              <span className="text-xs font-semibold tracking-[0.35em] text-foreground">KPLS</span>
+              <span className="text-m font-semibold tracking-[0.35em] text-foreground">KPLS</span>
             </a>
             <nav className="hidden items-center gap-1 lg:flex">
               {navItems.map((item, index) => (
                 <NavLink
                   key={item.label}
                   href={item.href}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium tracking-wide transition-colors ${
+                  className={`rounded-full px-3 py-1.5 text-m font-medium tracking-wide transition-colors ${
                     index === 0 ? "bg-white/5 text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -109,13 +110,13 @@ const InnovationLab = () => {
             </span>
             <a
               href="https://klps.co.uk"
-              className="rounded-full border border-border bg-white/[0.03] px-4 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-white/[0.08]"
+              className="rounded-full border border-border bg-white/[0.03] px-4 py-1.5 text-m font-medium text-foreground transition-colors hover:bg-white/[0.08]"
             >
               Back to Home
             </a>
             <Link
               to="/data-room"
-              className="hidden rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-primary-foreground transition-transform hover:scale-[1.02] sm:inline-flex"
+              className="hidden rounded-full bg-foreground px-4 py-1.5 text-m font-medium text-primary-foreground transition-transform hover:scale-[1.02] sm:inline-flex"
             >
               Access Vault
             </Link>
@@ -138,14 +139,17 @@ const InnovationLab = () => {
 
           <div className="mx-auto max-w-7xl px-6 pt-16 md:pt-24">
             <div className="max-w-4xl animate-fade-up">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.03] px-3 py-1 text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground">
+              <div className="mb-6 inline-flex items-center gap-2 md:text-lg rounded-full border border-border bg-white/[0.03] px-3 py-1 text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground">
                 <span className="size-1 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--accent))]" />
                 Next-generation wearable infrastructure
               </div>
-              <h1 className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-7xl lg:text-8xl">
-                Engineering the future of{" "}
-                <span className="italic text-muted-foreground">intelligent textiles.</span>
-              </h1>
+            <AnimatedHeadline
+              className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-7xl lg:text-8xl"
+              lines={[
+                { text: "Engineering the future of" },
+                { text: "INTELLIGENT TEXTILES.", italic: true, muted: true },
+              ]}
+            />
               <p className="mt-8 max-w-xl text-lg text-muted-foreground">
                 Proprietary conductive polymers integrated into medical-grade textiles.
                 KPLS is building the sensory layer for human-computer interaction.
@@ -255,7 +259,7 @@ const InnovationLab = () => {
         </Section>
 
         <Section
-          className="scroll-mt-20"
+          className="scroll-mt-20 overflow-hidden rounded-2xl border border-border bg-border"
           eyebrow="Traction"
           title="Momentum across science, market and capital."
         >
@@ -301,7 +305,7 @@ const InnovationLab = () => {
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-12 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="text-sm font-semibold tracking-[0.3em]">KPLS</div>
-            <p className="mt-2 max-w-md text-xs text-muted-foreground">
+            <p className="mt-2 max-w-md text-m text-muted-foreground">
               Confidential investor data room. All materials subject to NDA.
               © {new Date().getFullYear()} KPLS Technology Ltd.
             </p>

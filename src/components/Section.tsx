@@ -64,10 +64,12 @@ export function PageHeader({
   eyebrow,
   title,
   description,
+  children,
 }: {
   eyebrow: string;
   title: string;
   description: string;
+  children?: ReactNode;
 }) {
   return (
     <div className="border-b border-border">
@@ -81,6 +83,7 @@ export function PageHeader({
         <p className="mt-6 max-w-2xl text-base text-muted-foreground md:text-lg">
           {description}
         </p>
+        {children && <div className="mt-8">{children}</div>}
       </div>
     </div>
   );
