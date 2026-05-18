@@ -1,162 +1,376 @@
 import { PageHeader, Section } from "@/components/Section";
-import {
-  DATA_ROOM_AUTHORIZED_EMAILS,
-  DATA_ROOM_FOUNDER_EMAIL,
-  DATA_ROOM_INVITE_CODE,
-  DATA_ROOM_NDA_VERSION,
-  isFounderEmail,
-  normalizeAccessEmail,
-} from "@/config/dataRoomAccess";
-import { FormEvent, useMemo, useState } from "react";
+import { API_BASE } from "@/config/api";
+import { DATA_ROOM_NDA_VERSION, normalizeAccessEmail } from "@/config/dataRoomAccess";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-const SESSION_KEY = "klps.dataRoom.session";
-const AUTHORIZED_KEY = "klps.dataRoom.authorizedEmails";
-const ACCESS_LOG_KEY = "klps.dataRoom.accessLog";
-
-const DOCS = [
-  { name: "KPLS_Series_A_Deck.pdf", size: "14.2 MB", updated: "2h ago", v: "v4.1" },
-  { name: "Financial_Projections.xlsx", size: "1.8 MB", updated: "1d ago", v: "v3.0" },
-  { name: "Cap_Table_Current.xlsx", size: "212 KB", updated: "3d ago", v: "v2.4" },
-  { name: "Market_Research_FemTech.pdf", size: "8.6 MB", updated: "1w ago", v: "v1.2" },
-  { name: "Go_To_Market_Strategy.pdf", size: "3.4 MB", updated: "1w ago", v: "v2.0" },
-  { name: "Competitor_Analysis.pdf", size: "2.1 MB", updated: "2w ago", v: "v1.5" },
-  { name: "Business_Model_Canvas.pdf", size: "640 KB", updated: "2w ago", v: "v1.1" },
-  { name: "IP_Portfolio_Audit_2026.pdf", size: "11.2 MB", updated: "1mo ago", v: "v1.0" },
+const LEGACY_KEYS = [
+  "klps.dataRoom.session",
+  "klps.dataRoom.authorizedEmails",
+  "klps.dataRoom.accessLog",
 ];
+
+const TOKEN_KEY = "klps.dataRoom.sessionToken";
+
+type DataRoomUser = {
+  id?: string;
+  email: string;
+  role?: "founder" | "admin" | "authorised_user" | "authorized_user" | "pending_user" | "revoked_user";
+  isAdmin?: boolean;
+  isFounder?: boolean;
+  ndaAccepted?: boolean;
+};
+
+type DocumentItem = {
+  id: string;
+  filename: string;
+  category?: string;
+  fileSize?: string;
+  file_size?: string;
+  version?: string;
+  updatedAt?: string;
+  updated_at?: string;
+};
+
+type AccessLog = {
+  id?: string;
+  email: string;
+  event_type?: string;
+  eventType?: string;
+  detail?: string;
+  document_id?: string;
+  documentId?: string;
+  timestamp?: string;
+  at?: string;
+};
+
+type NdaContent = {
+  version: string;
+  title: string;
+  sections: { title: string; body: string }[];
+  watermark: string;
+};
+
+type ApiRecord = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is ApiRecord =>
+  Boolean(value) && typeof value === "object" && !Array.isArray(value);
+
+const stringValue = (value: unknown) => (typeof value === "string" ? value : undefined);
+
+const booleanValue = (value: unknown) => (typeof value === "boolean" ? value : undefined);
+
+const fallbackDocuments: DocumentItem[] = [
+  { id: "series-a-deck", filename: "KPLS_Series_A_Deck.pdf", fileSize: "14.2 MB", updatedAt: "2h ago", version: "v4.1", category: "Pitch & Deck" },
+  { id: "financial-projections", filename: "Financial_Projections.xlsx", fileSize: "1.8 MB", updatedAt: "1d ago", version: "v3.0", category: "Financials" },
+  { id: "cap-table", filename: "Cap_Table_Current.xlsx", fileSize: "212 KB", updatedAt: "3d ago", version: "v2.4", category: "Financials" },
+  { id: "market-research", filename: "Market_Research_FemTech.pdf", fileSize: "8.6 MB", updatedAt: "1w ago", version: "v1.2", category: "Market" },
+  { id: "gtm-strategy", filename: "Go_To_Market_Strategy.pdf", fileSize: "3.4 MB", updatedAt: "1w ago", version: "v2.0", category: "Market" },
+  { id: "competitor-analysis", filename: "Competitor_Analysis.pdf", fileSize: "2.1 MB", updatedAt: "2w ago", version: "v1.5", category: "Market" },
+  { id: "business-model", filename: "Business_Model_Canvas.pdf", fileSize: "640 KB", updatedAt: "2w ago", version: "v1.1", category: "Pitch & Deck" },
+  { id: "ip-portfolio", filename: "IP_Portfolio_Audit_2026.pdf", fileSize: "11.2 MB", updatedAt: "1mo ago", version: "v1.0", category: "IP Portfolio" },
+];
+
+const fallbackNda: NdaContent = {
+  version: DATA_ROOM_NDA_VERSION,
+  title: "KLPS One-Way Confidentiality & Non-Disclosure Agreement",
+  watermark: "Confidential Property of KLPS Ltd",
+  sections: [
+    {
+      title: "1. Parties and Purpose",
+      body:
+        "This One-Way Confidentiality and Non-Disclosure Agreement applies between KLPS Ltd, company number to be added once registered details are finalised, with registered office address to be added once finalised, and the authorised recipient accessing the KLPS investor data room, R&D lab materials, documents, prototypes, commercial information, and related discussions.",
+    },
+    {
+      title: "2. Confidential Information",
+      body:
+        "Confidential Information includes all non-public information disclosed by KLPS Ltd in any form, including business plans, financials, cap table information, designs, software, algorithms, textile systems, sensor concepts, prototypes, research, manufacturing processes, commercial strategy, investor materials, university or agency materials, and all derivative notes, analyses, summaries, extracts, compilations, copies, or materials created from or based on that information.",
+    },
+    {
+      title: "3. Use and Non-Disclosure",
+      body:
+        "The recipient may use Confidential Information only to evaluate, advise on, invest in, manufacture for, partner with, or otherwise support KLPS Ltd in the specific authorised purpose. The recipient must keep the information confidential, protect it with at least reasonable care, and must not disclose it to any person except approved representatives who have a genuine need to know and are bound by equivalent confidentiality obligations.",
+    },
+    {
+      title: "4. No Implied Licence",
+      body:
+        "No licence, assignment, ownership right, or other intellectual property right is granted or implied by disclosure. KLPS Ltd retains all rights, title, and interest in its Confidential Information, intellectual property, know-how, data, inventions, designs, prototypes, documentation, and related materials.",
+    },
+    {
+      title: "5. Reverse Engineering and AI Restrictions",
+      body:
+        "The recipient must not reverse engineer, decompile, disassemble, reproduce, train artificial intelligence systems on, scrape, mine, upload into public or third-party AI tools, or attempt to derive the composition, structure, source, algorithms, designs, formulae, or underlying methods of any KLPS material, product, prototype, dataset, software, textile, sensor system, or technical disclosure.",
+    },
+    {
+      title: "6. Residual Knowledge",
+      body:
+        "Nothing in this agreement restricts the recipient from using general knowledge, skills, and experience retained unaided in memory, provided that such use does not disclose or rely on KLPS Confidential Information, trade secrets, technical specifics, business plans, or protected intellectual property.",
+    },
+    {
+      title: "7. Non-Circumvention",
+      body:
+        "The recipient must not use Confidential Information to bypass, compete unfairly with, solicit away from, or directly approach KLPS Ltd's investors, partners, manufacturers, suppliers, employees, contractors, universities, agencies, customers, or commercial opportunities for any purpose that harms or circumvents KLPS Ltd.",
+    },
+    {
+      title: "8. Data Room Protections",
+      body:
+        "Access to the data room is personal, permissioned, and logged. The recipient must not share login details, copy files outside authorised channels, remove watermarks, alter metadata, or redistribute materials. Exported PDFs and shared files should include the footer watermark: Confidential Property of KLPS Ltd.",
+    },
+    {
+      title: "9. Assignment, Warranty, and Return",
+      body:
+        "The recipient may not assign this agreement or transfer access without KLPS Ltd's written consent. Confidential Information is provided without warranty as to accuracy, completeness, fitness for purpose, or commercial outcome. On request, the recipient must return or destroy Confidential Information and confirm deletion of copies, subject only to legally required archival retention.",
+    },
+    {
+      title: "10. Duration and Remedies",
+      body:
+        "Confidentiality obligations continue for five years from disclosure, and trade secret obligations continue for as long as the information remains a trade secret. The recipient acknowledges that unauthorised disclosure may cause irreparable harm and that KLPS Ltd may seek injunctive relief and other remedies available by law.",
+    },
+  ],
+};
 
 const categories = ["All Documents", "Pitch & Deck", "Financials", "IP Portfolio", "Market", "Legal"];
 
-type AccessLog = {
-  email: string;
-  action: "login" | "nda_acceptance" | "document_view" | "user_authorised";
-  detail: string;
-  at: string;
+const endpointSets = {
+  requestLogin: ["/api/data-room/auth/request-login", "/api/data-room/request-login", "/api/auth/request-login"],
+  verifyLogin: ["/api/data-room/auth/verify-login", "/api/data-room/verify-login", "/api/auth/verify-login"],
+  me: ["/api/data-room/auth/me", "/api/data-room/me", "/api/auth/me"],
+  ndaStatus: ["/api/data-room/nda/status", "/api/nda/status"],
+  ndaContent: ["/api/data-room/nda/current", "/api/nda/current"],
+  acceptNda: ["/api/data-room/nda/accept", "/api/nda/accept"],
+  documents: ["/api/data-room/documents", "/api/documents"],
+  documentAccess: (id: string) => [
+    `/api/data-room/documents/${id}/access`,
+    `/api/data-room/documents/${id}/signed-url`,
+    `/api/documents/${id}/access`,
+  ],
+  logs: ["/api/data-room/admin/access-logs", "/api/admin/access-logs"],
+  authorise: ["/api/data-room/admin/users/authorise", "/api/admin/users/authorise"],
+  logout: ["/api/data-room/auth/logout", "/api/data-room/logout", "/api/auth/logout"],
 };
 
-const readJson = <T,>(key: string, fallback: T): T => {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
+function getSessionToken() {
+  return sessionStorage.getItem(TOKEN_KEY);
+}
+
+function setSessionToken(token?: string) {
+  if (token) {
+    sessionStorage.setItem(TOKEN_KEY, token);
   }
+}
+
+function clearPrototypeAccess() {
+  LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
+  Object.keys(localStorage)
+    .filter((key) => key.startsWith("klps.dataRoom.ndaAccepted."))
+    .forEach((key) => localStorage.removeItem(key));
+}
+
+async function apiRequest<T>(paths: string[], options: RequestInit = {}): Promise<T> {
+  let lastError = "";
+
+  for (const path of paths) {
+    const token = getSessionToken();
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+    });
+
+    if (response.status === 404) {
+      lastError = `Endpoint not found: ${path}`;
+      continue;
+    }
+
+    const text = await response.text();
+    const data: unknown = text ? JSON.parse(text) : {};
+
+    if (!response.ok) {
+      const payload = isRecord(data) ? data : {};
+      throw new Error(
+        stringValue(payload.message) ||
+          stringValue(payload.error) ||
+          `Request failed with ${response.status}`,
+      );
+    }
+
+    return data as T;
+  }
+
+  throw new Error(lastError || "Backend endpoint is unavailable.");
+}
+
+const isAdminUser = (user: DataRoomUser) =>
+  user.isAdmin || user.isFounder || user.role === "founder" || user.role === "admin";
+
+const normaliseUser = (payload: unknown): DataRoomUser | null => {
+  const root = isRecord(payload) ? payload : {};
+  const user = isRecord(root.user) ? root.user : root;
+  const email = stringValue(user.email);
+  if (!email) return null;
+
+  const role = stringValue(user.role) as DataRoomUser["role"];
+  return {
+    id: stringValue(user.id),
+    email,
+    role,
+    isAdmin: Boolean(booleanValue(user.isAdmin) || booleanValue(user.is_admin)),
+    isFounder: Boolean(booleanValue(user.isFounder) || booleanValue(user.is_founder) || role === "founder"),
+    ndaAccepted: Boolean(
+      booleanValue(user.ndaAccepted) ||
+        booleanValue(user.nda_accepted) ||
+        booleanValue(root.ndaAccepted) ||
+        booleanValue(root.nda_accepted),
+    ),
+  };
 };
 
-const ndaKey = (email: string) =>
-  `klps.dataRoom.ndaAccepted.${DATA_ROOM_NDA_VERSION}.${normalizeAccessEmail(email)}`;
+const normaliseDocuments = (payload: unknown): DocumentItem[] => {
+  const root = isRecord(payload) ? payload : {};
+  const source = Array.isArray(root.documents)
+    ? root.documents
+    : Array.isArray(root.data)
+      ? root.data
+      : Array.isArray(payload)
+        ? payload
+        : [];
 
-const logAccess = (email: string, action: AccessLog["action"], detail: string) => {
-  const current = readJson<AccessLog[]>(ACCESS_LOG_KEY, []);
-  const next = [{ email, action, detail, at: new Date().toISOString() }, ...current].slice(0, 80);
-  localStorage.setItem(ACCESS_LOG_KEY, JSON.stringify(next));
+  return source.filter(isRecord).map((doc) => ({
+    id: stringValue(doc.id) || stringValue(doc.filename) || crypto.randomUUID(),
+    filename: stringValue(doc.filename) || stringValue(doc.name) || "Protected document",
+    category: stringValue(doc.category),
+    fileSize: stringValue(doc.fileSize),
+    file_size: stringValue(doc.file_size),
+    version: stringValue(doc.version),
+    updatedAt: stringValue(doc.updatedAt),
+    updated_at: stringValue(doc.updated_at),
+  }));
 };
 
-const getAuthorizedEmails = () => {
-  const manual = readJson<string[]>(AUTHORIZED_KEY, []);
-  return Array.from(
-    new Set([...DATA_ROOM_AUTHORIZED_EMAILS, ...manual].map(normalizeAccessEmail).filter(Boolean)),
-  );
+const normaliseLogs = (payload: unknown): AccessLog[] => {
+  const root = isRecord(payload) ? payload : {};
+  const source = Array.isArray(root.logs)
+    ? root.logs
+    : Array.isArray(root.events)
+      ? root.events
+      : Array.isArray(root.data)
+        ? root.data
+        : [];
+
+  return source.filter(isRecord).map((log) => ({
+    id: stringValue(log.id),
+    email: stringValue(log.email) || "unknown",
+    event_type: stringValue(log.event_type),
+    eventType: stringValue(log.eventType),
+    detail: stringValue(log.detail),
+    document_id: stringValue(log.document_id),
+    documentId: stringValue(log.documentId),
+    timestamp: stringValue(log.timestamp),
+    at: stringValue(log.at),
+  }));
 };
 
-const ndaSections = [
-  {
-    title: "1. Parties and Purpose",
-    body:
-      "This One-Way Confidentiality and Non-Disclosure Agreement applies between KLPS Ltd, company number to be added once registered details are finalised, with registered office address to be added once finalised, and the authorised recipient accessing the KLPS investor data room, R&D lab materials, documents, prototypes, commercial information, and related discussions.",
-  },
-  {
-    title: "2. Confidential Information",
-    body:
-      "Confidential Information includes all non-public information disclosed by KLPS Ltd in any form, including business plans, financials, cap table information, designs, software, algorithms, textile systems, sensor concepts, prototypes, research, manufacturing processes, commercial strategy, investor materials, university or agency materials, and all derivative notes, analyses, summaries, extracts, compilations, copies, or materials created from or based on that information.",
-  },
-  {
-    title: "3. Use and Non-Disclosure",
-    body:
-      "The recipient may use Confidential Information only to evaluate, advise on, invest in, manufacture for, partner with, or otherwise support KLPS Ltd in the specific authorised purpose. The recipient must keep the information confidential, protect it with at least reasonable care, and must not disclose it to any person except approved representatives who have a genuine need to know and are bound by equivalent confidentiality obligations.",
-  },
-  {
-    title: "4. No Implied Licence",
-    body:
-      "No licence, assignment, ownership right, or other intellectual property right is granted or implied by disclosure. KLPS Ltd retains all rights, title, and interest in its Confidential Information, intellectual property, know-how, data, inventions, designs, prototypes, documentation, and related materials.",
-  },
-  {
-    title: "5. Reverse Engineering and AI Restrictions",
-    body:
-      "The recipient must not reverse engineer, decompile, disassemble, reproduce, train artificial intelligence systems on, scrape, mine, upload into public or third-party AI tools, or attempt to derive the composition, structure, source, algorithms, designs, formulae, or underlying methods of any KLPS material, product, prototype, dataset, software, textile, sensor system, or technical disclosure.",
-  },
-  {
-    title: "6. Residual Knowledge",
-    body:
-      "Nothing in this agreement restricts the recipient from using general knowledge, skills, and experience retained unaided in memory, provided that such use does not disclose or rely on KLPS Confidential Information, trade secrets, technical specifics, business plans, or protected intellectual property.",
-  },
-  {
-    title: "7. Non-Circumvention",
-    body:
-      "The recipient must not use Confidential Information to bypass, compete unfairly with, solicit away from, or directly approach KLPS Ltd's investors, partners, manufacturers, suppliers, employees, contractors, universities, agencies, customers, or commercial opportunities for any purpose that harms or circumvents KLPS Ltd.",
-  },
-  {
-    title: "8. Data Room Protections",
-    body:
-      "Access to the data room is personal, permissioned, and logged. The recipient must not share login details, copy files outside authorised channels, remove watermarks, alter metadata, or redistribute materials. Exported PDFs and shared files should include the footer watermark: Confidential Property of KLPS Ltd.",
-  },
-  {
-    title: "9. Assignment, Warranty, and Return",
-    body:
-      "The recipient may not assign this agreement or transfer access without KLPS Ltd's written consent. Confidential Information is provided without warranty as to accuracy, completeness, fitness for purpose, or commercial outcome. On request, the recipient must return or destroy Confidential Information and confirm deletion of copies, subject only to legally required archival retention.",
-  },
-  {
-    title: "10. Duration and Remedies",
-    body:
-      "Confidentiality obligations continue for five years from disclosure, and trade secret obligations continue for as long as the information remains a trade secret. The recipient acknowledges that unauthorised disclosure may cause irreparable harm and that KLPS Ltd may seek injunctive relief and other remedies available by law.",
-  },
-];
+const normaliseNda = (payload: unknown): NdaContent => {
+  const root = isRecord(payload) ? payload : {};
+  const nda = isRecord(root.nda) ? root.nda : {};
+  const sections = Array.isArray(root.sections)
+    ? root.sections
+    : Array.isArray(nda.sections)
+      ? nda.sections
+      : fallbackNda.sections;
 
-function LoginGate({ onLogin }: { onLogin: (email: string) => void }) {
+  return {
+    version: stringValue(root.version) || stringValue(nda.version) || fallbackNda.version,
+    title: stringValue(root.title) || stringValue(nda.title) || fallbackNda.title,
+    watermark:
+      stringValue(root.watermark) ||
+      stringValue(root.watermarkText) ||
+      stringValue(nda.watermark) ||
+      stringValue(nda.watermark_text) ||
+      fallbackNda.watermark,
+    sections: sections.filter(isRecord).map((section) => ({
+      title: stringValue(section.title) || "NDA section",
+      body: stringValue(section.body) || "",
+    })),
+  };
+};
+
+function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void }) {
   const [email, setEmail] = useState("");
-  const [inviteCode, setInviteCode] = useState("");
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<"email" | "code">("email");
+  const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (event: FormEvent) => {
+  const requestLogin = async (event: FormEvent) => {
     event.preventDefault();
-    const normalized = normalizeAccessEmail(email);
-    const isAuthorized = getAuthorizedEmails().includes(normalized);
-    const hasInvite = inviteCode.trim() === DATA_ROOM_INVITE_CODE;
+    setError("");
+    setStatus("");
 
+    const normalized = normalizeAccessEmail(email);
     if (!normalized.includes("@")) {
       setError("Enter a valid email address.");
       return;
     }
 
-    if (!isAuthorized && !hasInvite) {
-      setError("This email is not authorised for the KLPS data room.");
-      return;
+    setSubmitting(true);
+    try {
+      await apiRequest(endpointSets.requestLogin, {
+        method: "POST",
+        body: JSON.stringify({ email: normalized }),
+      });
+      setEmail(normalized);
+      setStep("code");
+      setStatus("A secure login code has been sent if this email is authorised.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not request a login code.");
+    } finally {
+      setSubmitting(false);
     }
+  };
 
-    if (hasInvite && !isAuthorized) {
-      const next = Array.from(new Set([...readJson<string[]>(AUTHORIZED_KEY, []), normalized]));
-      localStorage.setItem(AUTHORIZED_KEY, JSON.stringify(next));
+  const verifyLogin = async (event: FormEvent) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+
+    try {
+      const payload = await apiRequest<unknown>(endpointSets.verifyLogin, {
+        method: "POST",
+        body: JSON.stringify({ email, code: code.trim() }),
+      });
+      const root = isRecord(payload) ? payload : {};
+      setSessionToken(
+        stringValue(root.token) || stringValue(root.accessToken) || stringValue(root.access_token),
+      );
+      const user = normaliseUser(payload);
+      if (!user) throw new Error("The backend did not return a valid user session.");
+      onVerified(user);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not verify the login code.");
+    } finally {
+      setSubmitting(false);
     }
-
-    localStorage.setItem(SESSION_KEY, normalized);
-    logAccess(normalized, "login", "Data room login");
-    onLogin(normalized);
   };
 
   return (
     <main className="data-room-theme min-h-screen bg-obsidian px-6 py-24 text-foreground">
       <div className="mx-auto max-w-2xl">
-        <form onSubmit={submit} className="glass rounded-lg p-8 md:p-10">
+        <form onSubmit={step === "email" ? requestLogin : verifyLogin} className="glass rounded-lg p-8 md:p-10">
           <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-            Restricted Access
+            Verified Access
           </div>
           <h1 className="mt-4 text-3xl font-light tracking-tight text-foreground">
             Investor Data Room Login
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Click-through notice: by logging in you agree to keep all KLPS materials
-            confidential, use them only for authorised review, and complete the NDA before
-            viewing documents. Access and document activity are logged.
+            Email alone no longer grants access. Founder and authorised users must complete
+            backend-verified secure login before any NDA or file content is shown.
           </p>
 
           <label className="mt-8 block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -165,40 +379,87 @@ function LoginGate({ onLogin }: { onLogin: (email: string) => void }) {
           <input
             type="email"
             value={email}
+            disabled={step === "code"}
             onChange={(event) => setEmail(event.target.value)}
-            className="mt-2 w-full rounded-md border border-border bg-white/[0.04] px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
-            placeholder={DATA_ROOM_FOUNDER_EMAIL}
+            className="mt-2 w-full rounded-md border border-border bg-white/[0.04] px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-accent disabled:opacity-60"
+            placeholder="authorised@email.com"
           />
 
-          <label className="mt-5 block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Invite code
-          </label>
-          <input
-            type="password"
-            value={inviteCode}
-            onChange={(event) => setInviteCode(event.target.value)}
-            className="mt-2 w-full rounded-md border border-border bg-white/[0.04] px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
-            placeholder="Required for new authorised users"
-          />
+          {step === "code" && (
+            <>
+              <label className="mt-5 block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                Secure code
+              </label>
+              <input
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                className="mt-2 w-full rounded-md border border-border bg-white/[0.04] px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-accent"
+                placeholder="Enter the code from your email"
+              />
+            </>
+          )}
 
+          {status && <p className="mt-4 text-sm text-accent">{status}</p>}
           {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
 
-          <button className="mt-8 w-full rounded-full bg-foreground px-6 py-3 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.01]">
-            Continue securely
+          <button
+            disabled={submitting}
+            className="mt-8 w-full rounded-full bg-foreground px-6 py-3 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting ? "Checking..." : step === "email" ? "Send secure code" : "Verify and continue"}
           </button>
+
+          {step === "code" && (
+            <button
+              type="button"
+              onClick={() => {
+                setStep("email");
+                setCode("");
+                setStatus("");
+              }}
+              className="mt-3 w-full rounded-full border border-border px-6 py-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Use a different email
+            </button>
+          )}
         </form>
       </div>
     </main>
   );
 }
 
-function NdaGate({ email, onAccepted }: { email: string; onAccepted: () => void }) {
+function NdaGate({
+  nda,
+  onAccepted,
+}: {
+  nda: NdaContent;
+  onAccepted: () => void;
+}) {
   const [readToEnd, setReadToEnd] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const accept = () => {
-    localStorage.setItem(ndaKey(email), new Date().toISOString());
-    logAccess(email, "nda_acceptance", DATA_ROOM_NDA_VERSION);
-    onAccepted();
+  const accept = async () => {
+    setSubmitting(true);
+    setError("");
+    try {
+      await apiRequest(endpointSets.acceptNda, {
+        method: "POST",
+        body: JSON.stringify({
+          nda_version: nda.version,
+          scroll_completion_required: true,
+          acceptance_method: "clickwrap",
+          accepted_button_label: "I agree",
+        }),
+      });
+      onAccepted();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not record NDA acceptance.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -207,11 +468,9 @@ function NdaGate({ email, onAccepted }: { email: string; onAccepted: () => void 
         <div className="glass overflow-hidden rounded-lg">
           <div className="border-b border-border px-6 py-5 md:px-8">
             <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-              {DATA_ROOM_NDA_VERSION}
+              {nda.version}
             </div>
-            <h1 className="mt-3 text-3xl font-light tracking-tight">
-              KLPS One-Way Confidentiality & Non-Disclosure Agreement
-            </h1>
+            <h1 className="mt-3 text-3xl font-light tracking-tight">{nda.title}</h1>
           </div>
 
           <div
@@ -224,34 +483,33 @@ function NdaGate({ email, onAccepted }: { email: string; onAccepted: () => void 
             className="relative max-h-[62vh] overflow-y-auto px-6 py-6 md:px-8"
           >
             <div className="pointer-events-none sticky top-1/3 z-0 text-center text-4xl font-semibold uppercase tracking-[0.3em] text-white/[0.035] md:text-6xl">
-              Confidential Property of KLPS Ltd
+              {nda.watermark}
             </div>
             <div className="relative z-10 -mt-20 space-y-5 text-sm leading-7 text-muted-foreground">
-              {ndaSections.map((section) => (
+              {nda.sections.map((section) => (
                 <section key={section.title}>
                   <h2 className="text-base font-semibold text-foreground">{section.title}</h2>
                   <p className="mt-2">{section.body}</p>
                 </section>
               ))}
               <div className="rounded-md border border-border bg-white/[0.03] p-4 text-xs leading-6">
-                Footer watermark for exported PDFs: "Confidential Property of KLPS Ltd".
-                Registered company number and registered office address will be added once
-                finalised. Version reference: {DATA_ROOM_NDA_VERSION}.
+                Footer watermark for exported PDFs: "{nda.watermark}". Version reference: {nda.version}.
               </div>
             </div>
           </div>
 
           <div className="border-t border-border bg-obsidian/80 px-6 py-5 md:px-8">
             <p className="text-xs leading-6 text-muted-foreground">
-              Signed in as {email}. Scroll to the bottom of the agreement to enable acceptance.
-              This acknowledgement is stored once for this NDA version.
+              Scroll to the bottom of the agreement to enable acceptance. The backend stores
+              this acknowledgement once for this NDA version with audit metadata.
             </p>
+            {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
             <button
               onClick={accept}
-              disabled={!readToEnd}
+              disabled={!readToEnd || submitting}
               className="mt-4 w-full rounded-full bg-foreground px-6 py-3 text-sm font-medium text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-40"
             >
-              I agree
+              {submitting ? "Recording..." : "I agree"}
             </button>
           </div>
         </div>
@@ -261,60 +519,162 @@ function NdaGate({ email, onAccepted }: { email: string; onAccepted: () => void 
 }
 
 const DataRoom = () => {
-  const [userEmail, setUserEmail] = useState(() => localStorage.getItem(SESSION_KEY) || "");
-  const [ndaAccepted, setNdaAccepted] = useState(() =>
-    userEmail ? Boolean(localStorage.getItem(ndaKey(userEmail))) : false,
-  );
-  const [authorizedEmails, setAuthorizedEmails] = useState(getAuthorizedEmails);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<DataRoomUser | null>(null);
+  const [ndaAccepted, setNdaAccepted] = useState(false);
+  const [nda, setNda] = useState<NdaContent>(fallbackNda);
+  const [documents, setDocuments] = useState<DocumentItem[]>([]);
+  const [logs, setLogs] = useState<AccessLog[]>([]);
   const [newUserEmail, setNewUserEmail] = useState("");
-  const [logs, setLogs] = useState(() => readJson<AccessLog[]>(ACCESS_LOG_KEY, []));
+  const [adminMessage, setAdminMessage] = useState("");
+  const [error, setError] = useState("");
 
-  const isFounder = isFounderEmail(userEmail);
+  const isAdmin = useMemo(() => (user ? isAdminUser(user) : false), [user]);
 
-  const visibleLogs = useMemo(
-    () => logs.filter((log) => isFounder || log.email === userEmail).slice(0, 8),
-    [isFounder, logs, userEmail],
-  );
+  const loadSecureData = async (nextUser: DataRoomUser) => {
+    setError("");
+    setUser(nextUser);
 
-  const refreshLogs = () => setLogs(readJson<AccessLog[]>(ACCESS_LOG_KEY, []));
+    const [ndaStatus, ndaContent] = await Promise.all([
+      apiRequest<unknown>(endpointSets.ndaStatus).catch(() => ({ accepted: nextUser.ndaAccepted })),
+      apiRequest<unknown>(endpointSets.ndaContent).catch(() => fallbackNda),
+    ]);
 
-  const authorizeUser = (event: FormEvent) => {
+    setNda(normaliseNda(ndaContent));
+    const ndaStatusRecord = isRecord(ndaStatus) ? ndaStatus : {};
+    const accepted = Boolean(
+      booleanValue(ndaStatusRecord.accepted) ||
+        booleanValue(ndaStatusRecord.ndaAccepted) ||
+        nextUser.ndaAccepted,
+    );
+    setNdaAccepted(accepted);
+
+    if (accepted) {
+      const docsPayload = await apiRequest<unknown>(endpointSets.documents);
+      setDocuments(normaliseDocuments(docsPayload));
+    }
+
+    if (isAdminUser(nextUser)) {
+      const logPayload = await apiRequest<unknown>(endpointSets.logs).catch(() => ({ logs: [] }));
+      setLogs(normaliseLogs(logPayload));
+    }
+  };
+
+  useEffect(() => {
+    clearPrototypeAccess();
+
+    apiRequest<unknown>(endpointSets.me)
+      .then((payload) => {
+        const sessionUser = normaliseUser(payload);
+        if (!sessionUser) {
+          setUser(null);
+          return;
+        }
+        return loadSecureData(sessionUser);
+      })
+      .catch(() => {
+        sessionStorage.removeItem(TOKEN_KEY);
+        setUser(null);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const acceptNda = async () => {
+    setNdaAccepted(true);
+    const docsPayload = await apiRequest<unknown>(endpointSets.documents);
+    setDocuments(normaliseDocuments(docsPayload));
+  };
+
+  const authorizeUser = async (event: FormEvent) => {
     event.preventDefault();
+    setAdminMessage("");
+    setError("");
+
     const normalized = normalizeAccessEmail(newUserEmail);
     if (!normalized.includes("@")) return;
-    const next = Array.from(new Set([...authorizedEmails, normalized]));
-    localStorage.setItem(AUTHORIZED_KEY, JSON.stringify(next.filter((item) => item !== DATA_ROOM_FOUNDER_EMAIL)));
-    logAccess(userEmail, "user_authorised", normalized);
-    setAuthorizedEmails(next);
-    setNewUserEmail("");
-    refreshLogs();
+
+    try {
+      await apiRequest(endpointSets.authorise, {
+        method: "POST",
+        body: JSON.stringify({ email: normalized }),
+      });
+      setAdminMessage(`${normalized} has been authorised.`);
+      setNewUserEmail("");
+      const logPayload = await apiRequest<unknown>(endpointSets.logs).catch(() => ({ logs: [] }));
+      setLogs(normaliseLogs(logPayload));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not authorise this user.");
+    }
   };
 
-  const viewDocument = (docName: string) => {
-    logAccess(userEmail, "document_view", docName);
-    refreshLogs();
+  const viewDocument = async (doc: DocumentItem) => {
+    setError("");
+    try {
+      const payload = await apiRequest<unknown>(endpointSets.documentAccess(doc.id), {
+        method: "POST",
+        body: JSON.stringify({ action: "view" }),
+      });
+      const root = isRecord(payload) ? payload : {};
+      const url =
+        stringValue(root.url) || stringValue(root.signedUrl) || stringValue(root.signed_url);
+      if (!url) throw new Error("The backend did not return a signed document URL.");
+      window.open(url, "_blank", "noopener,noreferrer");
+
+      if (isAdmin) {
+        const logPayload = await apiRequest<unknown>(endpointSets.logs).catch(() => ({ logs: [] }));
+        setLogs(normaliseLogs(logPayload));
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not open this protected document.");
+    }
   };
 
-  if (!userEmail) {
+  const logout = async () => {
+    await apiRequest(endpointSets.logout, { method: "POST" }).catch(() => undefined);
+    sessionStorage.removeItem(TOKEN_KEY);
+    setUser(null);
+    setNdaAccepted(false);
+    setDocuments([]);
+    setLogs([]);
+  };
+
+  const handleVerifiedUser = async (verifiedUser: DataRoomUser) => {
+    setLoading(true);
+    try {
+      await loadSecureData(verifiedUser);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load the secure data room.");
+      setUser(null);
+      sessionStorage.removeItem(TOKEN_KEY);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
     return (
-      <LoginGate
-        onLogin={(email) => {
-          setUserEmail(email);
-          setNdaAccepted(Boolean(localStorage.getItem(ndaKey(email))));
-          refreshLogs();
-        }}
-      />
+      <main className="data-room-theme flex min-h-screen items-center justify-center bg-obsidian px-6 text-foreground">
+        <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
+          Checking secure session...
+        </div>
+      </main>
     );
   }
 
-  if (!ndaAccepted) {
-    return <NdaGate email={userEmail} onAccepted={() => setNdaAccepted(true)} />;
+  if (!user) {
+    return <LoginGate onVerified={handleVerifiedUser} />;
   }
+
+  if (!ndaAccepted) {
+    return <NdaGate nda={nda} onAccepted={acceptNda} />;
+  }
+
+  const documentList = documents.length ? documents : fallbackDocuments;
 
   return (
     <main className="data-room-theme min-h-screen bg-obsidian text-foreground">
       <PageHeader
-        eyebrow={`NDA Active · ${DATA_ROOM_NDA_VERSION}`}
+        eyebrow={`NDA Active · ${nda.version}`}
         title="Investor Data Room."
         description="Versioned, permissioned documents covering KPLS fundraising, financials, IP and strategy."
       >
@@ -331,28 +691,27 @@ const DataRoom = () => {
           <aside className="space-y-6 lg:col-span-4">
             <div className="glass rounded-lg p-6">
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                Signed In
+                Secure Session
               </div>
-              <div className="mt-3 break-all text-sm text-foreground">{userEmail}</div>
+              <div className="mt-3 break-all text-sm text-foreground">{user.email}</div>
+              <div className="mt-2 text-xs capitalize text-muted-foreground">
+                {user.role || (isAdmin ? "admin" : "authorised_user")}
+              </div>
               <button
-                onClick={() => {
-                  localStorage.removeItem(SESSION_KEY);
-                  setUserEmail("");
-                  setNdaAccepted(false);
-                }}
+                onClick={logout}
                 className="mt-5 rounded-full border border-border px-4 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 Sign out
               </button>
             </div>
 
-            {isFounder && (
+            {isAdmin && (
               <form onSubmit={authorizeUser} className="glass rounded-lg p-6">
                 <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
                   Founder Authorisation
                 </div>
                 <p className="mt-3 text-xs leading-6 text-muted-foreground">
-                  Add a manual authorised user email for this browser-based gate.
+                  Authorised users are created server-side. Email alone cannot bypass this gate.
                 </p>
                 <input
                   type="email"
@@ -364,24 +723,27 @@ const DataRoom = () => {
                 <button className="mt-3 w-full rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground">
                   Authorise user
                 </button>
+                {adminMessage && <p className="mt-3 text-xs text-accent">{adminMessage}</p>}
               </form>
             )}
 
-            <div className="glass rounded-lg p-6">
-              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                Access Log
+            {isAdmin && (
+              <div className="glass rounded-lg p-6">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Server Access Log
+                </div>
+                <ul className="mt-4 space-y-3 text-xs">
+                  {logs.slice(0, 8).map((log, index) => (
+                    <li key={log.id || `${log.timestamp || log.at}-${index}`} className="border-b border-border pb-3 last:border-0 last:pb-0">
+                      <div className="text-foreground">{log.detail || log.event_type || log.eventType}</div>
+                      <div className="mt-1 text-muted-foreground">
+                        {log.email} · {new Date(log.timestamp || log.at || Date.now()).toLocaleString()}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="mt-4 space-y-3 text-xs">
-                {visibleLogs.map((log) => (
-                  <li key={`${log.at}-${log.detail}`} className="border-b border-border pb-3 last:border-0 last:pb-0">
-                    <div className="text-foreground">{log.detail}</div>
-                    <div className="mt-1 text-muted-foreground">
-                      {log.email} · {new Date(log.at).toLocaleString()}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            )}
 
             <div className="glass rounded-lg p-6">
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -396,7 +758,7 @@ const DataRoom = () => {
                     }`}
                   >
                     <span>{category}</span>
-                    <span className="font-mono text-[10px]">{index === 0 ? DOCS.length : "."}</span>
+                    <span className="font-mono text-[10px]">{index === 0 ? documentList.length : "."}</span>
                   </li>
                 ))}
               </ul>
@@ -404,18 +766,23 @@ const DataRoom = () => {
           </aside>
 
           <div className="lg:col-span-8">
+            {error && (
+              <div className="mb-4 rounded-md border border-red-300/30 bg-red-950/20 px-4 py-3 text-sm text-red-200">
+                {error}
+              </div>
+            )}
             <div className="glass overflow-hidden rounded-lg">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4">
                 <h3 className="text-sm font-medium">Documents</h3>
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Confidential Property of KLPS Ltd
+                  {nda.watermark}
                 </span>
               </div>
               <ul className="divide-y divide-border">
-                {DOCS.map((doc) => (
+                {documentList.map((doc) => (
                   <li
-                    key={doc.name}
-                    onClick={() => viewDocument(doc.name)}
+                    key={doc.id}
+                    onClick={() => viewDocument(doc)}
                     className="group flex cursor-pointer items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]"
                   >
                     <div className="flex min-w-0 items-center gap-4">
@@ -423,9 +790,9 @@ const DataRoom = () => {
                         <div className="size-1.5 rounded-full bg-accent" />
                       </div>
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-foreground">{doc.name}</div>
+                        <div className="truncate text-sm font-medium text-foreground">{doc.filename}</div>
                         <div className="font-mono text-[10px] text-muted-foreground">
-                          Updated {doc.updated} · {doc.size} · {doc.v}
+                          Updated {doc.updatedAt || doc.updated_at || "secure"} · {doc.fileSize || doc.file_size || "protected"} · {doc.version || "v1.0"}
                         </div>
                       </div>
                     </div>
@@ -436,7 +803,7 @@ const DataRoom = () => {
                 ))}
               </ul>
               <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                Confidential Property of KLPS Ltd
+                {nda.watermark}
               </div>
             </div>
           </div>

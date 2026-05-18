@@ -144,9 +144,10 @@ const InnovationLab = () => {
                 Next-generation wearable infrastructure
               </div>
             <AnimatedHeadline
-              className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-7xl lg:text-8xl"
+              className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-7xl"
               lines={[
-                { text: "Engineering the future of" },
+                { text: "ENGINEERING", italic: true},
+                { text: "the future of", italic: true},
                 { text: "INTELLIGENT TEXTILES.", italic: true, muted: true },
               ]}
             />
@@ -217,7 +218,7 @@ const InnovationLab = () => {
         </section>
 
         <Section
-          className="scroll-mt-20"
+          className="scroll-mt-20 "
           eyebrow="Core technology"
           title="A new sensory layer, woven into life."
           description="KPLS combines conductive textile science, embedded biometrics, and human-centred design - engineered for the next decade of wearable interfaces."
