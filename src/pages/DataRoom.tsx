@@ -51,6 +51,11 @@ type NdaContent = {
   watermark: string;
 };
 
+type SessionState = {
+  authenticated: boolean;
+  user: DataRoomUser | null;
+};
+
 type ApiRecord = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is ApiRecord =>
@@ -59,17 +64,6 @@ const isRecord = (value: unknown): value is ApiRecord =>
 const stringValue = (value: unknown) => (typeof value === "string" ? value : undefined);
 
 const booleanValue = (value: unknown) => (typeof value === "boolean" ? value : undefined);
-
-const fallbackDocuments: DocumentItem[] = [
-  { id: "series-a-deck", filename: "KPLS_Series_A_Deck.pdf", fileSize: "14.2 MB", updatedAt: "2h ago", version: "v4.1", category: "Pitch & Deck" },
-  { id: "financial-projections", filename: "Financial_Projections.xlsx", fileSize: "1.8 MB", updatedAt: "1d ago", version: "v3.0", category: "Financials" },
-  { id: "cap-table", filename: "Cap_Table_Current.xlsx", fileSize: "212 KB", updatedAt: "3d ago", version: "v2.4", category: "Financials" },
-  { id: "market-research", filename: "Market_Research_FemTech.pdf", fileSize: "8.6 MB", updatedAt: "1w ago", version: "v1.2", category: "Market" },
-  { id: "gtm-strategy", filename: "Go_To_Market_Strategy.pdf", fileSize: "3.4 MB", updatedAt: "1w ago", version: "v2.0", category: "Market" },
-  { id: "competitor-analysis", filename: "Competitor_Analysis.pdf", fileSize: "2.1 MB", updatedAt: "2w ago", version: "v1.5", category: "Market" },
-  { id: "business-model", filename: "Business_Model_Canvas.pdf", fileSize: "640 KB", updatedAt: "2w ago", version: "v1.1", category: "Pitch & Deck" },
-  { id: "ip-portfolio", filename: "IP_Portfolio_Audit_2026.pdf", fileSize: "11.2 MB", updatedAt: "1mo ago", version: "v1.0", category: "IP Portfolio" },
-];
 
 const fallbackNda: NdaContent = {
   version: DATA_ROOM_NDA_VERSION,
@@ -134,7 +128,7 @@ const categories = ["All Documents", "Pitch & Deck", "Financials", "IP Portfolio
 const endpointSets = {
   requestLogin: ["/api/data-room/auth/request-login", "/api/data-room/request-login", "/api/auth/request-login"],
   verifyLogin: ["/api/data-room/auth/verify-login", "/api/data-room/verify-login", "/api/auth/verify-login"],
-  me: ["/api/data-room/auth/me", "/api/data-room/me", "/api/auth/me"],
+  session: ["/api/data-room/session", "/api/session", "/api/data-room/auth/session"],
   ndaStatus: ["/api/data-room/nda/status", "/api/nda/status"],
   ndaContent: ["/api/data-room/nda/current", "/api/nda/current"],
   acceptNda: ["/api/data-room/nda/accept", "/api/nda/accept"],
@@ -227,6 +221,26 @@ const normaliseUser = (payload: unknown): DataRoomUser | null => {
         booleanValue(root.nda_accepted),
     ),
   };
+};
+
+const normaliseSession = (payload: unknown): SessionState => {
+  const root = isRecord(payload) ? payload : {};
+  const authenticated = Boolean(root.authenticated);
+  const user = normaliseUser(root.user ? payload : root);
+
+  return {
+    authenticated: authenticated && Boolean(user),
+    user,
+  };
+};
+
+const getSession = async (): Promise<SessionState> => {
+  try {
+    const payload = await apiRequest<unknown>(endpointSets.session);
+    return normaliseSession(payload);
+  } catch {
+    return { authenticated: false, user: null };
+  }
 };
 
 const normaliseDocuments = (payload: unknown): DocumentItem[] => {
@@ -348,9 +362,11 @@ function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void })
       setSessionToken(
         stringValue(root.token) || stringValue(root.accessToken) || stringValue(root.access_token),
       );
-      const user = normaliseUser(payload);
-      if (!user) throw new Error("The backend did not return a valid user session.");
-      onVerified(user);
+      const session = await getSession();
+      if (!session.authenticated || !session.user) {
+        throw new Error("The backend did not confirm an authenticated session.");
+      }
+      onVerified(session.user);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not verify the login code.");
     } finally {
@@ -534,6 +550,8 @@ const DataRoom = () => {
   const loadSecureData = async (nextUser: DataRoomUser) => {
     setError("");
     setUser(nextUser);
+    setDocuments([]);
+    setLogs([]);
 
     const [ndaStatus, ndaContent] = await Promise.all([
       apiRequest<unknown>(endpointSets.ndaStatus).catch(() => ({ accepted: nextUser.ndaAccepted })),
@@ -563,14 +581,13 @@ const DataRoom = () => {
   useEffect(() => {
     clearPrototypeAccess();
 
-    apiRequest<unknown>(endpointSets.me)
-      .then((payload) => {
-        const sessionUser = normaliseUser(payload);
-        if (!sessionUser) {
+    getSession()
+      .then((session) => {
+        if (!session.authenticated || !session.user) {
           setUser(null);
           return;
         }
-        return loadSecureData(sessionUser);
+        return loadSecureData(session.user);
       })
       .catch(() => {
         sessionStorage.removeItem(TOKEN_KEY);
@@ -669,8 +686,6 @@ const DataRoom = () => {
     return <NdaGate nda={nda} onAccepted={acceptNda} />;
   }
 
-  const documentList = documents.length ? documents : fallbackDocuments;
-
   return (
     <main className="data-room-theme min-h-screen bg-obsidian text-foreground">
       <PageHeader
@@ -758,7 +773,7 @@ const DataRoom = () => {
                     }`}
                   >
                     <span>{category}</span>
-                    <span className="font-mono text-[10px]">{index === 0 ? documentList.length : "."}</span>
+                    <span className="font-mono text-[10px]">{index === 0 ? documents.length : "."}</span>
                   </li>
                 ))}
               </ul>
@@ -778,8 +793,9 @@ const DataRoom = () => {
                   {nda.watermark}
                 </span>
               </div>
-              <ul className="divide-y divide-border">
-                {documentList.map((doc) => (
+              {documents.length > 0 ? (
+                <ul className="divide-y divide-border">
+                  {documents.map((doc) => (
                   <li
                     key={doc.id}
                     onClick={() => viewDocument(doc)}
@@ -800,8 +816,13 @@ const DataRoom = () => {
                       View
                     </span>
                   </li>
-                ))}
-              </ul>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-6 py-12 text-sm text-muted-foreground">
+                  No protected documents are currently available for this session.
+                </div>
+              )}
               <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 {nda.watermark}
               </div>
