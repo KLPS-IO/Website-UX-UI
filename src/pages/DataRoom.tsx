@@ -465,7 +465,7 @@ function NdaGate({
         method: "POST",
         body: JSON.stringify({
           nda_version: nda.version,
-          scroll_completion_required: true,
+          scroll_completed: readToEnd,
           acceptance_method: "clickwrap",
           accepted_button_label: "I agree",
         }),
