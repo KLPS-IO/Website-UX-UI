@@ -3,23 +3,33 @@ import { Shield, Sparkles, Heart, Zap } from "lucide-react";
 const features = [
   {
     icon: Shield,
-    title: "Nano Materials",
-    description: "Worlds First Nano-Material Based Health Insight Material.",
+    title: "Cycle Insights",
+    description: "'You may be approaching your next cycle window.'",
   },
   {
     icon: Sparkles,
-    title: "Science-Backed",
-    description: "Evidence-based solutions developed with leading nano-material experts.",
+    title: "Body Change Insights",
+    description: "'Similar patterns previously occurred before your menstrual cycle.'",
   },
   {
     icon: Heart,
     title: "Personalised Care",
-    description: "Tailored experiences adapted to your unique health journey.",
+    description: "`Recovery appears slower than normal this week.`",
   },
   {
     icon: Zap,
-    title: "Cutting Edge",
-    description: "Leveraging the latest technology to empower better health outcomes.",
+    title: "Pattern Recognition",
+    description: "'Your bloating tends to peak 2-3 days before your cycle.'",
+  },
+  {
+    icon: Shield,
+    title: "Personal Baseline Intelligence",
+    description: "'Compared with your normal pattern...'",
+  },
+  {
+    icon: Heart,
+    title: "Insights developed Around You",
+    description: "Most health tools compare users against everyone else. KLPS compares You versus You.",
   },
 ];
 

@@ -62,7 +62,7 @@ const HeroSection = () => {
           <Button
             size="lg"
             onClick={() => window.location.href = '/innovation-lab'}
-            className="whitespace-nowrap bg-[#d8bd57] text-[#211b08] shadow-[0_14px_35px_-18px_rgba(216,189,87,0.85)] hover:bg-[#e0c96d]"          >
+            className="whitespace-nowrap bg-[#e0c96a] text-[#211b08] shadow-[0_14px_35px_-18px_rgba(216,189,87,0.85)] hover:bg-[#d8bd11]"          >
             Enter the Innovation Lab
           </Button>
         </div>

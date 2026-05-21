@@ -123,7 +123,7 @@ const fallbackNda: NdaContent = {
   ],
 };
 
-const categories = ["All Documents", "Pitch & Deck", "Financials", "IP Portfolio", "Market", "Legal"];
+const categories = ["All Documents", "Pitch & Deck", "Financials", "IP Portfolio", "Market", "Legal", "FAQ"];
 
 const endpointSets = {
   requestLogin: ["/api/data-room/auth/request-login", "/api/data-room/request-login", "/api/auth/request-login"],
