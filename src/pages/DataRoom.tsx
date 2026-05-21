@@ -134,9 +134,7 @@ const endpointSets = {
   acceptNda: ["/api/data-room/nda/accept", "/api/nda/accept"],
   documents: ["/api/data-room/documents", "/api/documents"],
   documentAccess: (id: string) => [
-    `/api/data-room/documents/${id}/access`,
-    `/api/data-room/documents/${id}/signed-url`,
-    `/api/documents/${id}/access`,
+    `/api/data-room/documents/${id}/url`,
   ],
   logs: ["/api/data-room/admin/access-logs", "/api/admin/access-logs"],
   authorise: ["/api/data-room/admin/users/authorise", "/api/admin/users/authorise"],
