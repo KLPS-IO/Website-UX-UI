@@ -259,7 +259,7 @@ const InnovationLab = () => {
           </div>
         </Section>
 
-        <Section
+        {/* <Section
           className="scroll-mt-20 overflow-hidden rounded-2xl border border-border bg-border"
           eyebrow="Traction"
           title="Momentum across science, market and capital."
@@ -270,7 +270,7 @@ const InnovationLab = () => {
             <StatCard value="11" label="Strategic Partners" hint="Manufacturing & clinical" />
             <StatCard value="2.4M" label="TAM (units, EU)" hint="Femtech apparel" />
           </div>
-        </Section>
+        </Section> */}
 
         <Section
           className="scroll-mt-20"
