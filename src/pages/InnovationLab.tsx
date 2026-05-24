@@ -55,7 +55,7 @@ const pillars = [
 ];
 
 const quickNav = [
-  { href: "#founder", title: "Founder Dashboard", desc: "Vision, milestones, accelerators, press." },
+  { href: "/data-room", title: "Founder Dashboard", desc: "Vision, milestones, accelerators, press." },
   { href: "/data-room", title: "Investor Data Room", desc: "Deck, financials, cap table, NDA flow." },
   { href: "#lab", title: "IP & R&D Lab", desc: "Patents, prototypes, materials, roadmap." },
   { href: "#ecosystem", title: "Product Ecosystem", desc: "Smart underwear, textile systems, AI." },
@@ -171,7 +171,7 @@ const InnovationLab = () => {
               </div>
             </div>
 
-            <div className="mt-24 overflow-hidden rounded-2xl border border-border bg-border">
+            <div className="mt-24 overflow-hidden rounded-2xl border border-border bg-border pb-0">
               <div className="grid gap-px md:grid-cols-[0.85fr_1fr_1fr]">
                 <div className="bg-obsidian p-6 md:p-8">
                   <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
@@ -218,7 +218,7 @@ const InnovationLab = () => {
         </section>
 
         <Section
-          className="scroll-mt-20 "
+          className="scroll-mt-20 pb-0"
           eyebrow="Core technology"
           title="A new sensory layer, woven into life."
           description="KPLS combines conductive textile science, embedded biometrics, and human-centred design - engineered for the next decade of wearable interfaces."

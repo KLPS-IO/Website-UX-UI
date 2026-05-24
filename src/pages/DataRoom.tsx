@@ -380,11 +380,10 @@ function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void })
             Verified Access
           </div>
           <h1 className="mt-4 text-3xl font-light tracking-tight text-foreground">
-            Investor Data Room Login
+            Founder & Investor Data Room Login
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Email alone no longer grants access. Founder and authorised users must complete
-            backend-verified secure login before any NDA or file content is shown.
+            Please click 'Send secure code' multiple times if the first time does not work, you will receive a one-time login code if your email is authorised.
           </p>
 
           <label className="mt-8 block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
