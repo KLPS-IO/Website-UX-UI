@@ -12,7 +12,7 @@ export const Route = createFileRoute("/vault")({
 });
 
 const FOLDERS = [
-  { name: "01 · Pitch & Deck", count: 4, updated: "2h ago" },
+  { name: "01 · Pitch Deck", count: 4, updated: "2h ago" },
   { name: "02 · Financials", count: 7, updated: "1d ago" },
   { name: "03 · IP Portfolio", count: 18, updated: "3d ago" },
   { name: "04 · Market Research", count: 9, updated: "1w ago" },

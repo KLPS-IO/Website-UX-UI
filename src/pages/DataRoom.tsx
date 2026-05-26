@@ -133,7 +133,80 @@ const fallbackNda: NdaContent = {
   ],
 };
 
-const categories = ["All Documents", "Pitch & Deck", "Financials", "IP Portfolio", "Market", "Legal", "FAQ"];
+const categories = ["All Documents", "Pitch Deck", "Financials", "IP Portfolio", "Market", "Legal", "FAQ"] as const;
+
+type DataRoomCategory = (typeof categories)[number];
+
+const faqItems = [
+  {
+    question: "What makes KPLS different?",
+    answer: [
+      "The most popular devices give insights from the wrist and finger. KPLS focuses on torso and pelvic signals.",
+      "KPLS is being designed to understand patterns over time. Rather than simply displaying raw data, our vision is to help users understand changes in body measurements, potential cycle-related trends, recovery patterns, personal physiological baselines, and long-term changes and correlations.",
+      "The aim is to provide context, not just data.",
+    ],
+  },
+  {
+    question: "What insights could users receive?",
+    answer: [
+      "Potential future insights may include cycle pattern awareness, waist and bloating trend analysis, recovery and physiological change monitoring, personal baseline comparisons, long-term pattern recognition, behavioural and wellbeing correlations, and passive health journaling without manual tracking.",
+      "For example, rather than showing a single measurement, KPLS may identify trends such as: \"Your waist measurements have increased above your typical baseline over the last four days, a pattern that has previously occurred before your menstrual cycle.\"",
+      "The exact insight set will evolve through research, user testing and validation.",
+    ],
+  },
+  {
+    question: "What is personal baseline intelligence?",
+    answer: [
+      "Most health technologies compare users against population averages. KPLS is exploring a different approach: you compared with you.",
+      "By understanding an individual's historical patterns, the platform may be able to identify meaningful changes relative to their own normal baseline.",
+      "This approach has the potential to make insights more relevant and personalised.",
+    ],
+  },
+  {
+    question: "What stage is the company at?",
+    answer: [
+      "KPLS is currently in the research and development phase.",
+      "We are conducting customer discovery, technical exploration and ecosystem engagement to better understand women's needs and evaluate potential approaches to delivering meaningful health insights.",
+    ],
+  },
+  {
+    question: "How will the product evolve over time?",
+    answer: [
+      "Our long-term vision is to build a continuously improving intelligence platform.",
+      "As more longitudinal data is collected and validated, future versions of KPLS may be able to identify increasingly sophisticated patterns, trends and correlations that help users better understand their health.",
+      "The garment is the mechanism. The intelligence is the product.",
+    ],
+  },
+  {
+    question: "Why are you collecting longitudinal data?",
+    answer: [
+      "Most health measurements are captured as isolated snapshots. KPLS is interested in understanding change over time.",
+      "By observing patterns across weeks, months and eventually years, we believe it may be possible to generate insights that are difficult to obtain through occasional measurements or short-term tracking alone.",
+      "Our ambition is to build one of the world's most valuable longitudinal physiological datasets focused on women's health.",
+    ],
+  },
+];
+
+const normaliseCategoryName = (value?: string): DataRoomCategory | null => {
+  const normalized = value?.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() || "";
+
+  if (!normalized) return null;
+  if (normalized.includes("pitch") || normalized.includes("deck")) return "Pitch Deck";
+  if (normalized.includes("financial") || normalized.includes("projection")) return "Financials";
+  if (normalized.includes("ip") || normalized.includes("portfolio") || normalized.includes("patent")) return "IP Portfolio";
+  if (normalized.includes("market") || normalized.includes("value proposition")) return "Market";
+  if (normalized.includes("legal") || normalized.includes("nda")) return "Legal";
+  if (normalized.includes("faq")) return "FAQ";
+
+  return null;
+};
+
+const getDocumentCategory = (doc: DocumentItem): DataRoomCategory => {
+  const category = normaliseCategoryName(doc.category);
+  if (category && category !== "FAQ") return category;
+
+  return normaliseCategoryName(doc.filename) || "Market";
+};
 
 const endpointSets = {
   requestLogin: ["/api/data-room/auth/request-login", "/api/data-room/request-login", "/api/auth/request-login"],
@@ -592,8 +665,32 @@ const DataRoom = () => {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
   const [error, setError] = useState("");
+  const [activeCategory, setActiveCategory] = useState<DataRoomCategory>("All Documents");
 
   const isAdmin = useMemo(() => (user ? isAdminUser(user) : false), [user]);
+  const categoryCounts = useMemo(
+    () =>
+      categories.reduce<Record<DataRoomCategory, number>>((counts, category) => {
+        counts[category] =
+          category === "All Documents"
+            ? documents.length
+            : category === "FAQ"
+              ? faqItems.length
+              : documents.filter((doc) => getDocumentCategory(doc) === category).length;
+        return counts;
+      }, {} as Record<DataRoomCategory, number>),
+    [documents],
+  );
+  const visibleDocuments = useMemo(
+    () =>
+      activeCategory === "All Documents"
+        ? documents
+        : activeCategory === "FAQ"
+          ? []
+          : documents.filter((doc) => getDocumentCategory(doc) === activeCategory),
+    [activeCategory, documents],
+  );
+  const showingFaq = activeCategory === "FAQ";
 
   const loadSecureData = async (nextUser: DataRoomUser) => {
     setError("");
@@ -701,6 +798,7 @@ const DataRoom = () => {
     setNdaAccepted(false);
     setDocuments([]);
     setLogs([]);
+    setActiveCategory("All Documents");
   };
 
   const handleVerifiedUser = async (verifiedUser: DataRoomUser) => {
@@ -813,15 +911,20 @@ const DataRoom = () => {
                 Categories
               </div>
               <ul className="mt-4 space-y-1 text-sm">
-                {categories.map((category, index) => (
-                  <li
-                    key={category}
-                    className={`flex items-center justify-between rounded-md px-3 py-2 ${
-                      index === 0 ? "bg-white/5 text-foreground" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <span>{category}</span>
-                    <span className="font-mono text-[10px]">{index === 0 ? documents.length : "."}</span>
+                {categories.map((category) => (
+                  <li key={category}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory(category)}
+                      className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                        activeCategory === category
+                          ? "bg-white/5 text-foreground"
+                          : "text-muted-foreground hover:bg-white/[0.03] hover:text-foreground"
+                      }`}
+                    >
+                      <span>{category}</span>
+                      <span className="font-mono text-[10px]">{categoryCounts[category]}</span>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -834,47 +937,82 @@ const DataRoom = () => {
                 {error}
               </div>
             )}
-            <div className="glass overflow-hidden rounded-lg">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4">
-                <h3 className="text-sm font-medium">Documents</h3>
-                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  {nda.watermark}
-                </span>
-              </div>
-              {documents.length > 0 ? (
-                <ul className="divide-y divide-border">
-                  {documents.map((doc) => (
-                  <li
-                    key={doc.id}
-                    onClick={() => viewDocument(doc)}
-                    className="group flex cursor-pointer items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]"
-                  >
-                    <div className="flex min-w-0 items-center gap-4">
-                      <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-onyx">
-                        <div className="size-1.5 rounded-full bg-accent" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-foreground">{doc.filename}</div>
-                        <div className="font-mono text-[10px] text-muted-foreground">
-                          Updated {doc.updatedAt || doc.updated_at || "secure"} · {doc.fileSize || doc.file_size || "protected"} · {doc.version || "v1.0"}
-                        </div>
-                      </div>
-                    </div>
-                    <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition-colors group-hover:text-accent">
-                      View
-                    </span>
-                  </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="px-6 py-12 text-sm text-muted-foreground">
-                  No protected documents are currently available for this session.
+            {showingFaq ? (
+              <div className="glass overflow-hidden rounded-lg">
+                <div className="border-b border-border px-6 py-5">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                    Investor FAQ
+                  </div>
+                  <h3 className="mt-3 text-2xl font-light tracking-tight text-foreground">
+                    Product, data and market context.
+                  </h3>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                    Answers for authorised readers evaluating the KPLS platform, longitudinal dataset and product direction.
+                  </p>
                 </div>
-              )}
-              <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                {nda.watermark}
+
+                <div className="divide-y divide-border">
+                  {faqItems.map((item) => (
+                    <section key={item.question} className="px-6 py-6">
+                      <h4 className="text-base font-medium text-foreground">{item.question}</h4>
+                      <div className="mt-3 space-y-3 text-sm leading-7 text-muted-foreground">
+                        {item.answer.map((paragraph) => (
+                          <p key={paragraph}>{paragraph}</p>
+                        ))}
+                      </div>
+                    </section>
+                  ))}
+                </div>
+
+                <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  {nda.watermark}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="glass overflow-hidden rounded-lg">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4">
+                  <h3 className="text-sm font-medium">
+                    {activeCategory === "All Documents" ? "Documents" : activeCategory}
+                  </h3>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    {nda.watermark}
+                  </span>
+                </div>
+                {visibleDocuments.length > 0 ? (
+                  <ul className="divide-y divide-border">
+                    {visibleDocuments.map((doc) => (
+                      <li
+                        key={doc.id}
+                        onClick={() => viewDocument(doc)}
+                        className="group flex cursor-pointer items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]"
+                      >
+                        <div className="flex min-w-0 items-center gap-4">
+                          <div className="flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-onyx">
+                            <div className="size-1.5 rounded-full bg-accent" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-foreground">{doc.filename}</div>
+                            <div className="font-mono text-[10px] text-muted-foreground">
+                              Updated {doc.updatedAt || doc.updated_at || "secure"} · {doc.fileSize || doc.file_size || "protected"} · {doc.version || "v1.0"} · {getDocumentCategory(doc)}
+                            </div>
+                          </div>
+                        </div>
+                        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground transition-colors group-hover:text-accent">
+                          View
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="px-6 py-12 text-sm text-muted-foreground">
+                    No protected documents are currently available in this category.
+                  </div>
+                )}
+                <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  {nda.watermark}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Section>
