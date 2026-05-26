@@ -1,7 +1,7 @@
 import { PageHeader, Section } from "@/components/Section";
 import { API_BASE } from "@/config/api";
 import { DATA_ROOM_NDA_VERSION, normalizeAccessEmail } from "@/config/dataRoomAccess";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 const LEGACY_KEYS = [
@@ -57,6 +57,16 @@ type SessionState = {
 };
 
 type ApiRecord = Record<string, unknown>;
+
+class ApiRequestError extends Error {
+  status?: number;
+
+  constructor(message: string, status?: number) {
+    super(message);
+    this.name = "ApiRequestError";
+    this.status = status;
+  }
+}
 
 const isRecord = (value: unknown): value is ApiRecord =>
   Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -158,6 +168,14 @@ function clearPrototypeAccess() {
     .forEach((key) => localStorage.removeItem(key));
 }
 
+const wait = (milliseconds: number) =>
+  new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
+
+const isRetryableLoginError = (error: unknown) =>
+  error instanceof ApiRequestError
+    ? typeof error.status === "number" && error.status >= 500
+    : error instanceof TypeError;
+
 async function apiRequest<T>(paths: string[], options: RequestInit = {}): Promise<T> {
   let lastError = "";
 
@@ -183,17 +201,18 @@ async function apiRequest<T>(paths: string[], options: RequestInit = {}): Promis
 
     if (!response.ok) {
       const payload = isRecord(data) ? data : {};
-      throw new Error(
+      throw new ApiRequestError(
         stringValue(payload.message) ||
           stringValue(payload.error) ||
           `Request failed with ${response.status}`,
+        response.status,
       );
     }
 
     return data as T;
   }
 
-  throw new Error(lastError || "Backend endpoint is unavailable.");
+  throw new ApiRequestError(lastError || "Backend endpoint is unavailable.", 404);
 }
 
 const isAdminUser = (user: DataRoomUser) =>
@@ -318,11 +337,16 @@ function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void })
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [retryingLogin, setRetryingLogin] = useState(false);
+  const submittingRef = useRef(false);
 
   const requestLogin = async (event: FormEvent) => {
     event.preventDefault();
+    if (submittingRef.current) return;
+
     setError("");
     setStatus("");
+    setRetryingLogin(false);
 
     const normalized = normalizeAccessEmail(email);
     if (!normalized.includes("@")) {
@@ -330,25 +354,45 @@ function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void })
       return;
     }
 
+    submittingRef.current = true;
     setSubmitting(true);
     try {
-      await apiRequest(endpointSets.requestLogin, {
+      const requestOptions: RequestInit = {
         method: "POST",
         body: JSON.stringify({ email: normalized }),
-      });
+      };
+
+      try {
+        await apiRequest(endpointSets.requestLogin, requestOptions);
+      } catch (firstError) {
+        if (!isRetryableLoginError(firstError)) {
+          throw firstError;
+        }
+
+        setRetryingLogin(true);
+        setStatus("Connecting to secure server... this may take a few seconds.");
+        await wait(5000);
+        await apiRequest(endpointSets.requestLogin, requestOptions);
+      }
+
       setEmail(normalized);
       setStep("code");
       setStatus("A secure login code has been sent if this email is authorised.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not request a login code.");
     } finally {
+      setRetryingLogin(false);
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
 
   const verifyLogin = async (event: FormEvent) => {
     event.preventDefault();
+    if (submittingRef.current) return;
+
     setError("");
+    submittingRef.current = true;
     setSubmitting(true);
 
     try {
@@ -368,6 +412,7 @@ function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void })
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not verify the login code.");
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -383,7 +428,7 @@ function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void })
             Founder & Investor Data Room Login
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            Please click 'Send secure code' multiple times if the first time does not work, you will receive a one-time login code if your email is authorised.
+            You will receive a one-time login code if your email is authorised.
           </p>
 
           <label className="mt-8 block text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -421,7 +466,13 @@ function LoginGate({ onVerified }: { onVerified: (user: DataRoomUser) => void })
             disabled={submitting}
             className="mt-8 w-full rounded-full bg-foreground px-6 py-3 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {submitting ? "Checking..." : step === "email" ? "Send secure code" : "Verify and continue"}
+            {submitting
+              ? retryingLogin
+                ? "Connecting..."
+                : "Checking..."
+              : step === "email"
+                ? "Send secure code"
+                : "Verify and continue"}
           </button>
 
           {step === "code" && (
