@@ -38,6 +38,11 @@ type CompletionMeta = {
   isDayComplete?: boolean;
 };
 
+type QuestionsLoadState =
+  | "loading"
+  | "ready"
+  | "failed";
+
 const isOtherOption = (
   option: Option
 ) => {
@@ -280,6 +285,18 @@ export default function CheckIn() {
   const [loading, setLoading] =
     useState(true);
 
+  const [questionsLoadState, setQuestionsLoadState] =
+    useState<QuestionsLoadState>("loading");
+
+  const [completedToday, setCompletedToday] =
+    useState(false);
+
+  const [checkInError, setCheckInError] =
+    useState("");
+
+  const [connectionStatus, setConnectionStatus] =
+    useState("Loading check-in...");
+
   const [
     hasSignalCompletionMeta,
     setHasSignalCompletionMeta
@@ -332,32 +349,76 @@ export default function CheckIn() {
 
       try {
 
-        const res = await fetch(
-          `${API_BASE}/api/questions/today?user_id=${userId}`
+        setQuestionsLoadState("loading");
+        setCheckInError("");
+        setConnectionStatus(
+          "Loading check-in..."
         );
 
-        if (!res.ok) {
+        let data: {
+          questions?: Question[];
+          completedToday?: boolean;
+          isDayComplete?: boolean;
+          is_day_complete?: boolean;
+          lastCompletedDay?: number;
+        } | null = null;
 
-          console.error(
-            "Question fetch failed"
-          );
+        const maxAttempts = 4;
 
-          setQuestions([]);
+        for (
+          let attempt = 1;
+          attempt <= maxAttempts;
+          attempt += 1
+        ) {
+          try {
+            const res = await fetch(
+              `${API_BASE}/api/questions/today?user_id=${userId}`
+            );
 
-          return;
+            if (!res.ok) {
+              throw new Error(
+                `Question fetch failed with ${res.status}`
+              );
+            }
 
+            data =
+              await res.json();
+            break;
+          }
+          catch (error) {
+            if (attempt >= maxAttempts) {
+              throw error;
+            }
+
+            setConnectionStatus(
+              "Connecting to LEMA... this may take a few seconds."
+            );
+
+            await wait(2500 * attempt);
+          }
         }
 
-        const data =
-          await res.json();
+        if (!data) {
+          throw new Error(
+            "Question fetch returned no data"
+          );
+        }
 
         setQuestions(
           data.questions || []
         );
 
+        setCompletedToday(
+          data.completedToday === true ||
+            data.isDayComplete === true ||
+            data.is_day_complete === true
+        );
+
         setDayNumber(
           data.lastCompletedDay || 1
         );
+
+        setQuestionsLoadState("ready");
 
       }
 
@@ -369,6 +430,10 @@ export default function CheckIn() {
         );
 
         setQuestions([]);
+        setQuestionsLoadState("failed");
+        setCheckInError(
+          "We couldn't load today's check-in. Please try again in a moment."
+        );
 
       }
 
@@ -610,11 +675,13 @@ export default function CheckIn() {
     questionKey: string,
     value: string,
     domain: string
-  ) => {
+  ): Promise<boolean> => {
 
-    if (!userId) return;
+    if (!userId) return false;
 
     try {
+      setCheckInError("");
+
       const res = await fetch(
       `${API_BASE}/api/signal`,
       {
@@ -637,7 +704,9 @@ export default function CheckIn() {
     );
 
       if (!res.ok) {
-        return;
+        throw new Error(
+          `Signal save failed with ${res.status}`
+        );
       }
 
       try {
@@ -654,6 +723,8 @@ export default function CheckIn() {
           error
         );
       }
+
+      return true;
     }
     catch (error) {
 
@@ -661,6 +732,12 @@ export default function CheckIn() {
         "Signal save failed:",
         error
       );
+
+      setCheckInError(
+        "We couldn't save that answer. Please try again before continuing."
+      );
+
+      return false;
 
     }
 
@@ -736,12 +813,17 @@ export default function CheckIn() {
           ? `something_else: ${customOtherText}`
           : rawAnswer;
 
-    const saveSignalPromise =
-      saveSignal(
+    const saved =
+      await saveSignal(
       currentQuestion.question_key,
       responseValue,
       currentQuestion.domain
     );
+
+    if (!saved) {
+      setIsCompleting(false);
+      return;
+    }
 
     if (
       currentIndex <
@@ -752,8 +834,6 @@ export default function CheckIn() {
         prev => prev + 1
       );
 
-      void saveSignalPromise;
-
     }
 
     else {
@@ -763,8 +843,6 @@ export default function CheckIn() {
       );
 
       setIsCompleting(true);
-
-      await saveSignalPromise;
 
       setTimeout(() => {
 
@@ -797,8 +875,7 @@ export default function CheckIn() {
     return (
 
       <div className="flex items-center justify-center h-screen">
-
-        Loading check-in...
+        {connectionStatus}
 
       </div>
 
@@ -806,11 +883,37 @@ export default function CheckIn() {
 
   }
 
+  if (
+    questionsLoadState === "failed"
+  ) {
+    return (
+      <div className="px-6 pt-12 max-w-lg mx-auto text-center">
+        <Lema
+          state="supportive"
+          message=""
+        />
+        <h2 className="text-2xl font-bold mb-3">
+          Check-in unavailable
+        </h2>
+        <p className="text-muted-foreground mb-6">
+          {checkInError}
+        </p>
+        <Button
+          onClick={() =>
+            window.location.reload()
+          }
+        >
+          Try again
+        </Button>
+      </div>
+    );
+  }
+
   /**
    TRUE Completion State
    */
 
-  if (isComplete) {
+  if (isComplete || completedToday) {
 
     return (
 
@@ -818,6 +921,11 @@ export default function CheckIn() {
         streak={dayNumber}
         userId={userId}
         summary={summary}
+        message={
+          completedToday
+            ? "You've already completed today's check-in."
+            : undefined
+        }
       />
 
     );
@@ -832,12 +940,25 @@ export default function CheckIn() {
 
   return (
 
-    <ChatCompleteState
-      streak={dayNumber}
-      userId={userId}
-      summary={summary}
-      message="Today's reflection is complete."
-    />
+    <div className="px-6 pt-12 max-w-lg mx-auto text-center">
+      <Lema
+        state="supportive"
+        message=""
+      />
+      <h2 className="text-2xl font-bold mb-3">
+        No check-in questions loaded
+      </h2>
+      <p className="text-muted-foreground mb-6">
+        Today's check-in has not been marked complete. Refresh to load the questions again.
+      </p>
+      <Button
+        onClick={() =>
+          window.location.reload()
+        }
+      >
+        Refresh
+      </Button>
+    </div>
 
   );
 
@@ -1039,6 +1160,12 @@ export default function CheckIn() {
         </motion.div>
 
       </AnimatePresence>
+
+      {checkInError && (
+        <p className="mt-6 text-sm text-destructive text-center">
+          {checkInError}
+        </p>
+      )}
 
       <div className="flex justify-between mt-8">
 
