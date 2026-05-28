@@ -391,7 +391,7 @@ export default function CheckIn() {
             }
 
             setConnectionStatus(
-              "Connecting to LEMA... this may take a few seconds."
+              "Loading ..."
             );
 
             await wait(2500 * attempt);
