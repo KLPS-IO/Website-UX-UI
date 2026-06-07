@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import logoImage from '/src/assets/40aa64a3f2493868d0c30655a7bc72e7fb6ec5ea.png';
 

@@ -38,7 +38,7 @@ const ValueProps = () => {
     <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h2 className="text-3xl md:text-5xl mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-5xl mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent pb-4">
             Non-Invasive Insights!
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

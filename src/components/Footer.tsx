@@ -11,8 +11,8 @@ const Footer = () => {
             <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
               FemTech Innovation
             </h3>
-            <p className="text-sm text-muted-foreground">
-              Transforming women's health, one innovation at a time.
+            <p className="text-sm text-muted-foreground italic font-bold">
+              Female? You Matter!
             </p>
           </div>
 
@@ -26,15 +26,10 @@ const Footer = () => {
             </a> */}
           </div>
         </div>
-
+ 
         <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
           <p>&copy; {currentYear} All rights reserved. Made with &hearts; by KLPS Ltd.&nbsp; 
-            <a
-              href="https://klps.netlify.app/"
-              target="_blank"
-              rel="noreferrer"
-            >
-            </a> </p>
+          </p>
         </div>
       </div>
     </footer>
