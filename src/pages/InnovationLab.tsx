@@ -308,7 +308,7 @@ const InnovationLab = () => {
             <div className="text-sm font-semibold tracking-[0.3em]">KPLS</div>
             <p className="mt-2 max-w-md text-m text-muted-foreground">
               Confidential investor data room. All materials subject to NDA.
-              © {new Date().getFullYear()} KPLS Technology Ltd.
+              © {new Date().getFullYear()} KPLS Ltd.
             </p>
           </div>
           <div className="flex flex-wrap gap-6 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">

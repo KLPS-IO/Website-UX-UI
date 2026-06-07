@@ -25,6 +25,7 @@ import InvestorDashboard from '@/pages/InvestorDashboard';
 import FounderRoute from '@/components/FounderRoute';
 import DataRoom from '@/pages/DataRoom';
 import InnovationLab from '@/pages/InnovationLab';
+import BodyDiscoverySurvey from '@/pages/BodyDiscoverySurvey';
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
           <Route path="/data-room" element={<DataRoom />} />
           <Route path="/beta-login" element={<BetaLogin />} />

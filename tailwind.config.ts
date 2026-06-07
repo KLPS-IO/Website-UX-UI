@@ -40,6 +40,10 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        blush: "hsl(306 75% 94%)",
+        petal: "hsl(315 68% 68%)",
+        plum: "hsl(282 34% 36%)",
+        orchid: "hsl(304 58% 56%)",
         obsidian: "hsl(var(--obsidian))",
         onyx: "hsl(var(--onyx))",
         popover: {

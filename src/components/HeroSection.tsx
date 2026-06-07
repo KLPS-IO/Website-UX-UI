@@ -43,12 +43,22 @@ const HeroSection = () => {
             variant="hero" 
             size="lg"
             onClick={() => window.location.href = '/beta-login'}
-            className="whitespace-nowrap"          >
+            className="whitespace-nowrap">
             Login for Beta Users
           </Button>
         </div>
 
         <div className="mb-8">
+          <Button
+            size="lg"
+            variant="hero"
+            onClick={() => window.location.href = '/body-discovery'}
+            className="whitespace-nowrap text-white font-bold">
+            Questionnaire
+          </Button>
+        </div>
+
+        {/* <div className="mb-8">
           <Button 
             variant="hero" 
             size="lg"
@@ -56,20 +66,29 @@ const HeroSection = () => {
           >
             Join Waitlist
           </Button>
-        </div>
+        </div> */}
 
         <div className="mb-8">
           <Button
             size="lg"
             onClick={() => window.location.href = '/innovation-lab'}
-            className="whitespace-nowrap bg-[#e0c96a] text-[#211b08] shadow-[0_14px_35px_-18px_rgba(216,189,87,0.85)] hover:bg-[#d8bd11]"          >
-            Enter the Innovation Lab
+            className="
+              whitespace-nowrap
+              bg-gradient-to-r
+              from-[black]
+              via-[purple]
+              to-[black]
+              text-[gold]
+              font-bold
+              hover:opacity-90
+            ">
+            Investors Innovation Lab
           </Button>
         </div>
 
-        <p className="text-sm text-muted-foreground">
+        {/* <p className="text-sm text-muted-foreground">
           Be the first to know when we launch. No spam, ever.
-        </p>
+        </p> */}
       </div>
 
       {/* Decorative Elements */}

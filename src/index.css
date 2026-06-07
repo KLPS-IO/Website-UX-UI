@@ -234,4 +234,101 @@ All colors MUST be HSL.
     backdrop-filter: blur(12px);
     border: 1px solid hsl(var(--border));
   }
+
+  .survey-theme {
+    --background: 306 100% 96%;
+    --foreground: 282 16% 27%;
+    --card: 0 0% 100%;
+    --card-foreground: 282 16% 27%;
+    --primary: 294 58% 64%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 306 75% 94%;
+    --secondary-foreground: 282 16% 27%;
+    --muted: 294 42% 94%;
+    --muted-foreground: 282 10% 47%;
+    --accent: 315 68% 68%;
+    --accent-foreground: 0 0% 100%;
+    --border: 300 45% 85%;
+    --input: 300 45% 85%;
+    --ring: 294 58% 64%;
+  }
+
+  .font-display {
+    font-family: "DM Sans", sans-serif;
+  }
+
+  .text-plum {
+    color: hsl(282 34% 36%);
+  }
+
+  .text-orchid {
+    color: hsl(304 58% 56%);
+  }
+
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(304 58% 70%), hsl(280 58% 68%));
+  }
+
+  .bg-gradient-warm {
+    background: radial-gradient(circle, hsl(315 68% 76% / 0.45), hsl(306 75% 94% / 0));
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(304 58% 56%), hsl(280 58% 58%));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .shadow-glow {
+    box-shadow: 0 18px 45px -20px hsl(304 58% 56% / 0.75);
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2.2s ease-in-out infinite;
+  }
+
+  .animate-float-in {
+    animation: float-in 0.35s ease-out both;
+  }
+
+  .animate-bloom {
+    animation: bloom 0.45s ease-out both;
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.025);
+  }
+}
+
+@keyframes float-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }

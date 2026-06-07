@@ -7,6 +7,7 @@ import celebrating from "@/assets/lema_celebrating.mp4";
 type LemaState =
   | "welcome"
   | "idle"
+  | "happy"
   | "supportive"
   | "encouraging"
   | "celebrating";
@@ -14,6 +15,9 @@ type LemaState =
 type Props = {
   state?: LemaState;
   message?: string;
+  size?: "sm" | "md" | "lg";
+  withRing?: boolean;
+  ringProgress?: number;
 };
 
 export default function Lema({
@@ -31,6 +35,7 @@ export default function Lema({
       case "welcome":
         return welcome;
 
+      case "happy":
       case "supportive":
         return supportive;
 
