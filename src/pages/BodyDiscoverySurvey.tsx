@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { API_BASE } from "@/config/api";
 import { type ConcernsMap } from "@/components/survey/BodyMap";
 import { BodyImageMap } from "@/components/survey/BodyImageMap";
 import { BodyTypePicker, type BodyType } from "@/components/survey/BodyTypePicker";
@@ -364,13 +365,13 @@ monthlyPrice,
       }
     );
 
-    const response = await fetch(
-  "http://localhost:5001/api/research",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+const response = await fetch(
+  `${API_BASE}/api/research`,
+  {
+    method: "POST",
+    body: formData,
+  }
+);
 
     if (!response.ok) {
       const body =
