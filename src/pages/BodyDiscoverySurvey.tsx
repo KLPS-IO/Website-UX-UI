@@ -84,6 +84,28 @@ const SOLUTION_ICONS: Record<string, typeof Ban> = {
   Other: MoreHorizontal,
 };
 
+const MONEY_SPENT_OPTIONS = [
+  "Apps",
+  "Wearables",
+  "Supplements",
+  "Medication",
+  "Private healthcare",
+  "Coaching or nutrition support",
+  "Clothing or shapewear",
+  "Other",
+];
+
+const DESIRED_INSIGHT_OPTIONS = [
+  "Bloating triggers",
+  "Cycle-related patterns",
+  "Weight or body changes",
+  "Digestive patterns",
+  "Energy and wellbeing",
+  "Clothing fit changes",
+  "Personal baseline changes",
+  "Other",
+];
+
 function Stepper({ step }: { step: Step }) {
   const items = [
     { n: 1, label: "Body map" },
@@ -230,6 +252,11 @@ function BodyDiscoverySurvey() {
   ] = useState("");
 
   const [
+    spentMoneyOn,
+    setSpentMoneyOn
+  ] = useState<string[]>([]);
+
+  const [
     wouldUse,
     setWouldUse
   ] = useState("");
@@ -245,12 +272,36 @@ function BodyDiscoverySurvey() {
     setMonthlyPrice
   ] = useState("");
 
+  const [
+    desiredInsights,
+    setDesiredInsights
+  ] = useState<string[]>([]);
+
+  const [
+    otherInsight,
+    setOtherInsight
+  ] = useState("");
+
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
   const toggleSolution = (s: string) =>
     setSolutions((cur) =>
       cur.includes(s) ? cur.filter((x) => x !== s) : [...cur, s],
+    );
+
+  const toggleSpentMoneyOn = (value: string) =>
+    setSpentMoneyOn((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value],
+    );
+
+  const toggleDesiredInsight = (value: string) =>
+    setDesiredInsights((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value],
     );
 
 const handleSelectArea = (a: BodyArea) => {
@@ -334,13 +385,30 @@ ageRange,
 employmentStatus,
 occupation,
 lifeStage,
-incomeBand,
-challengeFrequency,
-confidenceLevel,
-spentMoney,
-wouldUse,
-wouldPay,
-monthlyPrice,
+        incomeBand,
+        challengeFrequency,
+        confidenceLevel,
+        spentMoney,
+        spentMoneyOn,
+        wouldUse,
+        wouldPay,
+        monthlyPrice,
+        desiredInsights,
+        otherInsight,
+
+        age_range: ageRange,
+        employment_status: employmentStatus,
+        life_stage: lifeStage,
+        income_band: incomeBand,
+        challenge_frequency: challengeFrequency,
+        confidence_level: confidenceLevel,
+        spent_money: spentMoney,
+        spent_money_on: spentMoneyOn,
+        would_use: wouldUse,
+        would_pay: wouldPay,
+        monthly_price: monthlyPrice,
+        desired_insights: desiredInsights,
+        other_insight: otherInsight,
 
         voiceRecordings: voiceRecordings.map(
           (recording) => ({
@@ -918,6 +986,30 @@ Have you spent money trying to understand, manage, or improve changes in your bo
       <option value="yes">Yes</option>
       <option value="no">No</option>
     </select>
+
+    {spentMoney === "yes" && (
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        {MONEY_SPENT_OPTIONS.map((option) => {
+          const selected = spentMoneyOn.includes(option);
+
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => toggleSpentMoneyOn(option)}
+              className={cn(
+                "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
+                selected
+                  ? "border-petal bg-blush/40 text-plum"
+                  : "border-border bg-white text-foreground hover:bg-secondary/40",
+              )}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    )}
   </div>
 
   {/* PRODUCT VALIDATION */}
@@ -1003,6 +1095,49 @@ Have you spent money trying to understand, manage, or improve changes in your bo
         £200+
       </option>
     </select>
+  </div>
+
+  {/* DESIRED INSIGHTS */}
+
+  <div>
+    <label className="block text-sm font-medium text-plum mb-2">
+      What insights would feel most useful?
+    </label>
+
+    <div className="grid grid-cols-2 gap-2">
+      {DESIRED_INSIGHT_OPTIONS.map((option) => {
+        const selected = desiredInsights.includes(option);
+
+        return (
+          <button
+            key={option}
+            type="button"
+            onClick={() => toggleDesiredInsight(option)}
+            className={cn(
+              "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
+              selected
+                ? "border-petal bg-blush/40 text-plum"
+                : "border-border bg-white text-foreground hover:bg-secondary/40",
+            )}
+          >
+            {option}
+          </button>
+        );
+      })}
+    </div>
+
+    {desiredInsights.includes("Other") && (
+      <textarea
+        value={otherInsight}
+        onChange={(e) =>
+          setOtherInsight(e.target.value)
+        }
+        placeholder="What would you want to understand?"
+        rows={3}
+        maxLength={500}
+        className="mt-3 w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm resize-none"
+      />
+    )}
   </div>
 
   {/* PRIZE DRAW */}

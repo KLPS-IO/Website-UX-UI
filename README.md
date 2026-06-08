@@ -8,8 +8,9 @@ React + Vite frontend for the KLPS public site, beta experience, Innovation Lab,
 - Vite
 - React Router DOM
 - Tailwind CSS
-- Cloudflare Pages Functions for survey submission
-- Cloudflare D1/KV/R2 bindings for survey data and voice recordings
+- Railway Express backend for survey submission
+- PostgreSQL for survey data
+- Cloudflare R2 for voice recordings
 
 ## Active Routes
 
@@ -21,7 +22,18 @@ React + Vite frontend for the KLPS public site, beta experience, Innovation Lab,
 - `/beta-dashboard/*` - beta dashboard experience
 
 ## Survey Storage
-Removed 
+
+The Body Discovery survey posts multipart form data to:
+
+```text
+${VITE_API_BASE_URL || "https://klps-lema-production.up.railway.app"}/api/research
+```
+
+Voice recordings are uploaded by the backend to Cloudflare R2. Structured questionnaire
+data should be inserted into PostgreSQL by the same backend request.
+
+See `docs/research-platform-audit.md` for the current research pipeline audit and
+`database/research_analytics.sql` for investor-safe analytics views.
 
 ## Development
 

@@ -1,2 +1,5 @@
-export const API_BASE =
-  "https://klps-lema-production.up.railway.app";
+const configuredApiBase = import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE = (
+  configuredApiBase || "https://klps-lema-production.up.railway.app"
+).replace(/\/$/, "");
