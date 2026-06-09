@@ -55,6 +55,7 @@ export const GENERAL_CONCERNS = [
 ];
 
 export const FREQUENCY_OPTIONS = [
+  "Rarely",
   "Daily",
   "Weekly",
   "Monthly",

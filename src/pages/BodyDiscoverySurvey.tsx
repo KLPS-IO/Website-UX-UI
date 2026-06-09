@@ -2,7 +2,10 @@ import { useState } from "react";
 import { API_BASE } from "@/config/api";
 import { type ConcernsMap } from "@/components/survey/BodyMap";
 import { BodyImageMap } from "@/components/survey/BodyImageMap";
-import { BodyTypePicker, type BodyType } from "@/components/survey/BodyTypePicker";
+import {
+  BodyTypePicker,
+  type BodyType,
+} from "@/components/survey/BodyTypePicker";
 import {
   PromptedVoiceFlow,
   type VoiceRecordingEntry,
@@ -96,13 +99,27 @@ const MONEY_SPENT_OPTIONS = [
 ];
 
 const DESIRED_INSIGHT_OPTIONS = [
-  "Bloating triggers",
-  "Cycle-related patterns",
-  "Weight or body changes",
-  "Digestive patterns",
-  "Energy and wellbeing",
-  "Clothing fit changes",
-  "Personal baseline changes",
+  "Trigger detection",
+  "Cycle understanding",
+  "Food and nutrition insights",
+  "Habits affecting my symptoms",
+  "Patterns I might be missing",
+  "Changes in my body over time",
+  "Improve my wellbeing",
+  "Personal baseline and what's normal for me",
+  "Something else",
+];
+
+const TRUSTED_SOURCE_OPTIONS = [
+  "My GP or doctor",
+  "Specialist clinician",
+  "Google search/AI answers",
+  "Social media creators",
+  "Friends or family",
+  "Health apps",
+  "Online communities",
+  "Wearables",
+  "I don't trust any source consistently",
   "Other",
 ];
 
@@ -151,13 +168,7 @@ function Stepper({ step }: { step: Step }) {
   );
 }
 
-function TopBar({
-  step,
-  onBack,
-}: {
-  step: Step;
-  onBack?: () => void;
-}) {
+function TopBar({ step, onBack }: { step: Step; onBack?: () => void }) {
   return (
     <div className="flex items-center justify-between gap-4 mb-6 sm:mb-10">
       <div className="flex items-center gap-3">
@@ -185,7 +196,6 @@ function TopBar({
         Back to Home
       </a>
     </div>
-    
   );
 }
 
@@ -196,7 +206,17 @@ function BodyDiscoverySurvey() {
   const [bodyType, setBodyType] = useState<BodyType | null>(null);
   const [areas, setAreas] = useState<BodyArea[]>([]);
   const [concerns, setConcerns] = useState<ConcernsMap>({});
-  const [frequency, setFrequency] = useState<string>("");
+  const [bodyAreaResponses, setBodyAreaResponses] = useState<
+    Partial<
+      Record<
+        BodyArea,
+        {
+          concerns: string[];
+          frequency: string[];
+        }
+      >
+    >
+  >({});
   const [solutions, setSolutions] = useState<string[]>([]);
   const [activePanelArea, setActivePanelArea] = useState<BodyArea>("tummy");
 
@@ -206,81 +226,42 @@ function BodyDiscoverySurvey() {
   );
 
   const [otherResponses, setOtherResponses] = useState<
-  Partial<Record<BodyArea, string>>
->({});
+    Partial<Record<BodyArea, string>>
+  >({});
 
-    // Page 3 state
+  // Page 3 state
 
   const [email, setEmail] = useState("");
 
-  const [ageRange, setAgeRange] =
-    useState("");
+  const [ageRange, setAgeRange] = useState("");
 
-  const [
-    employmentStatus,
-    setEmploymentStatus
-  ] = useState("");
+  const [employmentStatus, setEmploymentStatus] = useState("");
 
-  const [
-    occupation,
-    setOccupation
-  ] = useState("");
+  const [occupation, setOccupation] = useState("");
 
-  const [
-    lifeStage,
-    setLifeStage
-  ] = useState("");
+  const [lifeStage, setLifeStage] = useState("");
 
-  const [
-    incomeBand,
-    setIncomeBand
-  ] = useState("");
+  const [incomeBand, setIncomeBand] = useState("");
 
-  const [
-    challengeFrequency,
-    setChallengeFrequency
-  ] = useState("");
+  const [challengeFrequency, setChallengeFrequency] = useState("");
 
-  const [
-    confidenceLevel,
-    setConfidenceLevel
-  ] = useState("");
+  const [confidenceLevel, setConfidenceLevel] = useState("");
 
-  const [
-    spentMoney,
-    setSpentMoney
-  ] = useState("");
+  const [spentMoney, setSpentMoney] = useState("");
 
-  const [
-    spentMoneyOn,
-    setSpentMoneyOn
-  ] = useState<string[]>([]);
+  const [spentMoneyOn, setSpentMoneyOn] = useState<string[]>([]);
 
-  const [
-    wouldUse,
-    setWouldUse
-  ] = useState("");
+  const [wouldUse, setWouldUse] = useState("");
 
+  const [wouldPay, setWouldPay] = useState("");
 
-  const [
-    wouldPay,
-    setWouldPay
-  ] = useState("");
+  const [monthlyPrice, setMonthlyPrice] = useState("");
 
-  const [
-    monthlyPrice,
-    setMonthlyPrice
-  ] = useState("");
+  const [desiredInsights, setDesiredInsights] = useState<string[]>([]);
 
-  const [
-    desiredInsights,
-    setDesiredInsights
-  ] = useState<string[]>([]);
+  const [otherInsight, setOtherInsight] = useState("");
 
-  const [
-    otherInsight,
-    setOtherInsight
-  ] = useState("");
+  const [trustedSource, setTrustedSource] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -304,46 +285,60 @@ function BodyDiscoverySurvey() {
         : [...current, value],
     );
 
-const handleSelectArea = (a: BodyArea) => {
-  if (areas.includes(a)) {
-    const remainingAreas = areas.filter((area) => area !== a);
+  const handleSelectArea = (a: BodyArea) => {
+    if (areas.includes(a)) {
+      const remainingAreas = areas.filter((area) => area !== a);
 
-    setAreas(remainingAreas);
+      setAreas(remainingAreas);
 
-    // If user deselected the active panel area,
-    // move panel to another selected area
-    if (activePanelArea === a) {
-      setActivePanelArea(
-        remainingAreas.length > 0
-          ? remainingAreas[remainingAreas.length - 1]
-          : "tummy"
-      );
+      // If user deselected the active panel area,
+      // move panel to another selected area
+      if (activePanelArea === a) {
+        setActivePanelArea(
+          remainingAreas.length > 0
+            ? remainingAreas[remainingAreas.length - 1]
+            : "tummy",
+        );
+      }
+
+      return;
     }
 
-    return;
-  }
+    // Select area
+    setAreas((current) => [...current, a]);
 
-  // Select area
-  setAreas((current) => [...current, a]);
+    setConcerns((current) => ({
+      ...current,
+      [a]: current[a] ?? [],
+    }));
 
-  setConcerns((current) => ({
-    ...current,
-    [a]: current[a] ?? [],
-  }));
-
-  setActivePanelArea(a);
-};
+    setActivePanelArea(a);
+  };
 
   const activeAreaLabel =
     BODY_AREAS.find((b) => b.id === activePanelArea)?.label ?? "Tummy / Waist";
-  const activePicked = concerns[activePanelArea] ?? [];
+  const activePicked = bodyAreaResponses[activePanelArea]?.concerns ?? [];
 
   const togglePanelConcern = (c: string) => {
     const next = activePicked.includes(c)
       ? activePicked.filter((x) => x !== c)
       : [...activePicked, c];
-    const merged = { ...concerns, [activePanelArea]: next };
+
+    setBodyAreaResponses((current) => ({
+      ...current,
+      [activePanelArea]: {
+        concerns: next,
+        frequency: current[activePanelArea]?.frequency ?? [],
+      },
+    }));
+
+    const merged = {
+      ...concerns,
+      [activePanelArea]: next,
+    };
+
     setConcerns(merged);
+
     if (!areas.includes(activePanelArea)) {
       setAreas([...areas, activePanelArea]);
     }
@@ -351,129 +346,114 @@ const handleSelectArea = (a: BodyArea) => {
 
   const canContinue1 = areas.length > 0;
 
-const submitAll = async () => {
-  setFormError(null);
+  const submitAll = async () => {
+    setFormError(null);
 
-  // const parsed = contactSchema.safeParse({
-  //   email,
-  // });
+    // const parsed = contactSchema.safeParse({
+    //   email,
+    // });
 
-  // if (!parsed.success) {
-  //   setFormError(
-  //     parsed.error.issues[0]?.message ??
-  //       "Please check your details"
-  //   );
-  //   return;
-  // }
+    // if (!parsed.success) {
+    //   setFormError(
+    //     parsed.error.issues[0]?.message ??
+    //       "Please check your details"
+    //   );
+    //   return;
+    // }
 
-  setSubmitting(true);
+    setSubmitting(true);
 
-  try {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    formData.append(
-      "payload",
-      JSON.stringify({
-        bodyAreas: areas,
-        concerns,
-        otherResponses,
-        frequency: frequency || null,
-        currentSolutions: solutions,
+      formData.append(
+        "payload",
+        JSON.stringify({
+          bodyAreas: bodyAreaResponses,
+          concerns,
+          otherResponses,
+          currentSolutions: solutions,
 
-email,
-ageRange,
-employmentStatus,
-occupation,
-lifeStage,
-        incomeBand,
-        challengeFrequency,
-        confidenceLevel,
-        spentMoney,
-        spentMoneyOn,
-        wouldUse,
-        wouldPay,
-        monthlyPrice,
-        desiredInsights,
-        otherInsight,
+          email,
+          ageRange,
+          employmentStatus,
+          occupation,
+          lifeStage,
+          incomeBand,
+          challengeFrequency,
+          confidenceLevel,
+          spentMoney,
+          spentMoneyOn,
+          wouldUse,
+          wouldPay,
+          monthlyPrice,
+          desiredInsights,
+          trustedSource,
+          otherInsight,
 
-        age_range: ageRange,
-        employment_status: employmentStatus,
-        life_stage: lifeStage,
-        income_band: incomeBand,
-        challenge_frequency: challengeFrequency,
-        confidence_level: confidenceLevel,
-        spent_money: spentMoney,
-        spent_money_on: spentMoneyOn,
-        would_use: wouldUse,
-        would_pay: wouldPay,
-        monthly_price: monthlyPrice,
-        desired_insights: desiredInsights,
-        other_insight: otherInsight,
+          age_range: ageRange,
+          employment_status: employmentStatus,
+          life_stage: lifeStage,
+          income_band: incomeBand,
+          challenge_frequency: challengeFrequency,
+          confidence_level: confidenceLevel,
+          spent_money: spentMoney,
+          spent_money_on: spentMoneyOn,
+          would_use: wouldUse,
+          would_pay: wouldPay,
+          monthly_price: monthlyPrice,
+          desired_insights: desiredInsights,
+          trusted_source: trustedSource,
+          other_insight: otherInsight,
 
-        voiceRecordings: voiceRecordings.map(
-          (recording) => ({
-            questionKey:
-              recording.questionKey,
-            questionText:
-              recording.questionText,
-            durationSeconds:
-              recording.durationSeconds,
-          })
-        ),
-      })
-    );
+          voiceRecordings: voiceRecordings.map((recording) => ({
+            questionKey: recording.questionKey,
+            questionText: recording.questionText,
+            durationSeconds: recording.durationSeconds,
+          })),
+        }),
+      );
 
-    voiceRecordings.forEach(
-      (recording, index) => {
+      voiceRecordings.forEach((recording, index) => {
         formData.append(
           `voice_${index}`,
           recording.blob,
-          `${recording.questionKey}.webm`
+          `${recording.questionKey}.webm`,
         );
+      });
+
+      const response = await fetch(`${API_BASE}/api/research`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+
+        throw new Error(body?.error ?? "Survey submission failed.");
       }
-    );
 
-const response = await fetch(
-  `${API_BASE}/api/research`,
-  {
-    method: "POST",
-    body: formData,
-  }
-);
+      setStep(4);
+    } catch (e) {
+      console.error(e);
 
-    if (!response.ok) {
-      const body =
-        await response
-          .json()
-          .catch(() => null);
-
-      throw new Error(
-        body?.error ??
-          "Survey submission failed."
-      );
+      setFormError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
-
-    setStep(4);
-  } catch (e) {
-    console.error(e);
-
-    setFormError(
-      "Something went wrong. Please try again."
-    );
-  } finally {
-    setSubmitting(false);
-  }
-};
+  };
 
   // Footer
-    const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
 
   return (
     <main className="survey-theme min-h-screen bg-background px-4 sm:px-8 py-6 sm:py-10">
       <div className="mx-auto w-full max-w-6xl">
         <TopBar
           step={step}
-          onBack={step > 1 && step < 4 ? () => setStep((step - 1) as Step) : undefined}
+          onBack={
+            step > 1 && step < 4 ? () => setStep((step - 1) as Step) : undefined
+          }
         />
 
         {/* STEP 1 */}
@@ -483,16 +463,16 @@ const response = await fetch(
               <h1 className="font-display text-4xl sm:text-5xl text-plum leading-[1.05]">
                 Choose the body that
                 <br />
-                feels most like <span className="text-gradient italic pr-1 ">you</span>
+                feels most like{" "}
+                <span className="text-gradient italic pr-1 ">you</span>
               </h1>
               <p className="mt-4 text-sm text-muted-foreground">
-                There's no right answer — just pick the one you identify with most.
+                There's no right answer — just pick the one you identify with
+                most.
               </p>
             </div>
             <BodyTypePicker selected={bodyType} onSelect={setBodyType} />
-            <p className="text-center font-display italic text-orchid text-sm mt-8">
-    
-            </p>
+            <p className="text-center font-display italic text-orchid text-sm mt-8"></p>
           </section>
         )}
 
@@ -505,14 +485,15 @@ const response = await fetch(
                   <h1 className="font-display text-4xl sm:text-5xl text-plum leading-[1.05]">
                     Your body,
                     <br />
-                    your <span className="text-gradient italic pr-2 ">story</span>
+                    your{" "}
+                    <span className="text-gradient italic pr-2 ">story</span>
                   </h1>
                 </div>
                 <div className="flex flex-col gap-3">
-                  <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center"> 
-                  </div>
+                  <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center"></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Tap any area, and answer concerns below before tapping another area. Answers are saved along the way.
+                    Tap any area, and answer concerns below before tapping
+                    another area. Answers are saved along the way.
                   </p>
                 </div>
                 <button
@@ -525,7 +506,9 @@ const response = await fetch(
                   <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center">
                     <ShieldCheck className="h-4 w-4 text-orchid" />
                   </div>
-                  <p className="text-sm font-medium text-plum">A safe, private space</p>
+                  <p className="text-sm font-medium text-plum">
+                    A safe, private space
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Your story is always confidential.
                   </p>
@@ -540,19 +523,14 @@ const response = await fetch(
                   active={activePanelArea}
                   onSelectArea={handleSelectArea}
                 />
-                <p className="text-center font-display italic text-orchid text-sm mt-4">
-        
-                </p>
+                <p className="text-center font-display italic text-orchid text-sm mt-4"></p>
               </div>
-
 
               {/* Right concern panel */}
               <div className="lg:col-span-4">
                 <div className="rounded-3xl bg-white/85 backdrop-blur p-5 sm:p-6 shadow-soft border border-border sticky top-6">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="h-9 w-9 rounded-full bg-blush/60 flex items-center justify-center shrink-0">
-        
-                    </div>
+                    <div className="h-9 w-9 rounded-full bg-blush/60 flex items-center justify-center shrink-0"></div>
                     <div>
                       <h3 className="font-display text-xl text-plum leading-tight">
                         {activeAreaLabel}
@@ -595,23 +573,25 @@ const response = await fetch(
                       );
                     })}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-border">{activePicked.includes("Other") && (
-  <div className="mt-3">
-    <textarea
-      value={otherResponses[activePanelArea] ?? ""}
-      onChange={(e) =>
-        setOtherResponses((current) => ({
-          ...current,
-          [activePanelArea]: e.target.value,
-        }))
-      }
-      placeholder="What have you noticed?"
-      rows={4}
-      maxLength={500}
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm resize-none"
-    />
-  </div>
-)}</div>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    {activePicked.includes("Other") && (
+                      <div className="mt-3">
+                        <textarea
+                          value={otherResponses[activePanelArea] ?? ""}
+                          onChange={(e) =>
+                            setOtherResponses((current) => ({
+                              ...current,
+                              [activePanelArea]: e.target.value,
+                            }))
+                          }
+                          placeholder="What have you noticed?"
+                          rows={4}
+                          maxLength={500}
+                          className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm resize-none"
+                        />
+                      </div>
+                    )}
+                  </div>
                   {/* <button
                     onClick={() => {
                       // ensure area is in selected
@@ -635,17 +615,39 @@ const response = await fetch(
                     <CalendarDays className="h-4 w-4 text-orchid" />
                   </div>
                   <h3 className="text-sm font-semibold text-plum">
-                    How often do these concerns impact your confidence, comfort, or daily life?
+                    How often do these concerns impact your confidence, comfort,
+                    or daily life?
                   </h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {FREQUENCY_OPTIONS.map((f) => (
                     <button
                       key={f}
-                      onClick={() => setFrequency(f)}
+                      onClick={() =>
+                        setBodyAreaResponses((current) => {
+                          const existing = current[activePanelArea] || {
+                            concerns: [],
+                            frequency: [],
+                          };
+
+                          const frequencies = existing.frequency || [];
+
+                          return {
+                            ...current,
+                            [activePanelArea]: {
+                              ...existing,
+                              frequency: frequencies.includes(f)
+                                ? frequencies.filter((x) => x !== f)
+                                : [...frequencies, f],
+                            },
+                          };
+                        })
+                      }
                       className={cn(
                         "rounded-2xl px-4 py-2.5 text-xs sm:text-sm transition-smooth border min-w-[72px] text-center",
-                        frequency === f
+                        bodyAreaResponses[activePanelArea]?.frequency?.includes(
+                          f,
+                        )
                           ? "bg-gradient-primary text-primary-foreground border-transparent shadow-soft"
                           : "bg-white border-border hover:bg-secondary/40 text-foreground",
                       )}
@@ -706,31 +708,31 @@ const response = await fetch(
           </section>
         )}
 
-{/* STEP 2 */}
-{step === 2 && (
-  <section className="animate-float-in max-w-3xl mx-auto">
-    <div className="text-center mb-6">
-      <h2 className="font-display text-3xl sm:text-4xl text-plum">
-        Your voice matters{" "}
-        <Heart className="inline h-5 w-5 text-petal" />
-      </h2>
+        {/* STEP 2 */}
+        {step === 2 && (
+          <section className="animate-float-in max-w-3xl mx-auto">
+            <div className="text-center mb-6">
+              <h2 className="font-display text-3xl sm:text-4xl text-plum">
+                Your voice matters{" "}
+                <Heart className="inline h-5 w-5 text-petal" />
+              </h2>
 
-      <p className="mt-2 text-muted-foreground text-sm">
-        Your perspective is the most important part of this research.
-        <br />
-        We'd love to hear your experience in your own words.
-      </p>
-    </div>
+              <p className="mt-2 text-muted-foreground text-sm">
+                Your perspective is the most important part of this research.
+                <br />
+                We'd love to hear your experience in your own words.
+              </p>
+            </div>
 
-    <PromptedVoiceFlow
-      prompts={VOICE_PROMPTS}
-      onComplete={(recordings) => {
-        setVoiceRecordings(recordings);
-        setStep(3);
-      }}
-    />
-  </section>
-)}
+            <PromptedVoiceFlow
+              prompts={VOICE_PROMPTS}
+              onComplete={(recordings) => {
+                setVoiceRecordings(recordings);
+                setStep(3);
+              }}
+            />
+          </section>
+        )}
 
         {/* STEP 3 */}
         {step === 3 && (
@@ -745,436 +747,386 @@ const response = await fetch(
               <h2 className="font-display text-3xl sm:text-4xl text-plum">
                 Thank you
                 <br />
-                <span className="italic text-gradient pr-2">for sharing your story</span>{" "}
+                <span className="italic text-gradient pr-2">
+                  for sharing your story
+                </span>{" "}
                 <Heart className="inline h-5 w-5 text-petal" />
               </h2>
               <p className="mt-3 text-sm text-muted-foreground">
-                You're helping us understand how women's bodies change and what support
-                is truly needed.
+                You're helping us understand how women's bodies change and what
+                support is truly needed.
               </p>
             </div>
 
-<div className="rounded-3xl bg-white/90 backdrop-blur p-6 shadow-soft border border-border space-y-5">
+            <div className="rounded-3xl bg-white/90 backdrop-blur p-6 shadow-soft border border-border space-y-5">
+              <div className="text-center">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blush/60 mb-2">
+                  <Gift className="h-4 w-4 text-orchid" />
+                </div>
 
-  <div className="text-center">
-    <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blush/60 mb-2">
-      <Gift className="h-4 w-4 text-orchid" />
-    </div>
+                <h3 className="font-display text-xl text-plum">
+                  Final questions
+                </h3>
 
-    <h3 className="font-display text-xl text-plum">
-      Final questions
-    </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  These answers help us understand who experiences these
+                  challenges and what support women need most.
+                </p>
+              </div>
 
-    <p className="text-xs text-muted-foreground mt-1">
-      These answers help us understand who experiences these challenges and
-      what support women need most.
-    </p>
-  </div>
+              {/* AGE */}
 
-  {/* AGE */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  Age range
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      Age range
-    </label>
+                <select
+                  value={ageRange}
+                  onChange={(e) => setAgeRange(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="under_18">Under 18</option>
+                  <option value="18_24">18 to 24</option>
+                  <option value="25_34">25 to 34</option>
+                  <option value="35_44">35 to 44</option>
+                  <option value="45_54">45 to 54</option>
+                  <option value="55_plus">55+</option>
+                </select>
+              </div>
 
-    <select
-      value={ageRange}
-      onChange={(e) => setAgeRange(e.target.value)}
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="under_18">Under 18</option>
-      <option value="18_24">18 to 24</option>
-      <option value="25_34">25 to 34</option>
-      <option value="35_44">35 to 44</option>
-      <option value="45_54">45 to 54</option>
-      <option value="55_plus">55+</option>
-    </select>
-  </div>
+              {/* EMPLOYMENT */}
 
-  {/* EMPLOYMENT */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  Employment status
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      Employment status
-    </label>
+                <select
+                  value={employmentStatus}
+                  onChange={(e) => setEmploymentStatus(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="student">Student</option>
+                  <option value="employed_full_time">Employed full-time</option>
+                  <option value="employed_part_time">Employed part-time</option>
+                  <option value="self_employed">Self-employed</option>
+                  <option value="business_owner">Business owner</option>
+                  <option value="not_working">Not currently working</option>
+                  <option value="retired">Retired</option>
+                </select>
+              </div>
 
-    <select
-      value={employmentStatus}
-      onChange={(e) =>
-        setEmploymentStatus(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="student">Student</option>
-      <option value="employed_full_time">
-        Employed full-time
-      </option>
-      <option value="employed_part_time">
-        Employed part-time
-      </option>
-      <option value="self_employed">
-        Self-employed
-      </option>
-      <option value="business_owner">
-        Business owner
-      </option>
-      <option value="not_working">
-        Not currently working
-      </option>
-      <option value="retired">
-        Retired
-      </option>
-    </select>
-  </div>
+              {/* OCCUPATION */}
 
-  {/* OCCUPATION */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-1.5">
+                  Occupation
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-1.5">
-      Occupation
-    </label>
+                <input
+                  value={occupation}
+                  onChange={(e) => setOccupation(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                  placeholder="e.g. Nurse, Teacher, Accountant"
+                />
+              </div>
 
-    <input
-      value={occupation}
-      onChange={(e) =>
-        setOccupation(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-      placeholder="e.g. Nurse, Teacher, Accountant"
-    />
-  </div>
+              {/* LIFE STAGE */}
 
-  {/* LIFE STAGE */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  Which best describes you?
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      Which best describes you?
-    </label>
+                <select
+                  value={lifeStage}
+                  onChange={(e) => setLifeStage(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="no_children">No children</option>
+                  <option value="pregnant">Pregnant</option>
+                  <option value="new_mother">New mother</option>
+                  <option value="parent">Parent</option>
+                  <option value="perimenopausal">Perimenopausal</option>
+                  <option value="menopausal">Menopausal</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
 
-    <select
-      value={lifeStage}
-      onChange={(e) =>
-        setLifeStage(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="no_children">
-        No children
-      </option>
-      <option value="pregnant">
-        Pregnant
-      </option>
-      <option value="new_mother">
-        New mother
-      </option>
-      <option value="parent">
-        Parent
-      </option>
-      <option value="perimenopausal">
-        Perimenopausal
-      </option>
-      <option value="menopausal">
-        Menopausal
-      </option>
-      <option value="prefer_not_to_say">
-        Prefer not to say
-      </option>
-    </select>
-  </div>
+              {/* INCOME */}
 
-  {/* INCOME */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  Income band (optional)
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      Income band (optional)
-    </label>
+                <select
+                  value={incomeBand}
+                  onChange={(e) => setIncomeBand(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="under_25k">Under £25k</option>
+                  <option value="25_40k">£25k to £40k</option>
+                  <option value="40_60k">£40k to £60k</option>
+                  <option value="60_100k">£60k to £100k</option>
+                  <option value="100k_plus">£100k+</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
 
-    <select
-      value={incomeBand}
-      onChange={(e) =>
-        setIncomeBand(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="under_25k">
-        Under £25k
-      </option>
-      <option value="25_40k">
-        £25k to £40k
-      </option>
-      <option value="40_60k">
-        £40k to £60k
-      </option>
-      <option value="60_100k">
-        £60k to £100k
-      </option>
-      <option value="100k_plus">
-        £100k+
-      </option>
-      <option value="prefer_not_to_say">
-        Prefer not to say
-      </option>
-    </select>
-  </div>
+              {/* PROBLEM FREQUENCY */}
 
-  {/* PROBLEM FREQUENCY */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  How often do you track what's happening with your body?
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      How often do you track what's happening with your body?
-    </label>
+                <select
+                  value={challengeFrequency}
+                  onChange={(e) => setChallengeFrequency(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="occasionally">Occasionally</option>
+                </select>
+              </div>
 
-    <select
-      value={challengeFrequency}
-      onChange={(e) =>
-        setChallengeFrequency(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="daily">Daily</option>
-      <option value="weekly">Weekly</option>
-      <option value="monthly">Monthly</option>
-      <option value="occasionally">
-        Occasionally
-      </option>
-    </select>
-  </div>
+              {/* UNDERSTANDING */}
 
-  {/* UNDERSTANDING */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  How confident do you feel understanding what's happening in
+                  your body?
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      How confident do you feel understanding what's happening in your body?
-    </label>
+                <select
+                  value={confidenceLevel}
+                  onChange={(e) => setConfidenceLevel(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="1">1 - Not confident</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5 - Very confident</option>
+                </select>
+              </div>
 
-    <select
-      value={confidenceLevel}
-      onChange={(e) =>
-        setConfidenceLevel(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="1">1 - Not confident</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-      <option value="5">5 - Very confident</option>
-    </select>
-  </div>
+              {/* MONEY SPENT */}
 
-  {/* MONEY SPENT */}
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  Have you spent money trying to understand, manage, or improve
+                  changes in your body, health, weight, energy, or
+                  wellbeing?{" "}
+                </label>
 
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-Have you spent money trying to understand, manage, or improve changes in your body, health, weight, energy, or wellbeing?    </label>
+                <select
+                  value={spentMoney}
+                  onChange={(e) => setSpentMoney(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                </select>
 
-    <select
-      value={spentMoney}
-      onChange={(e) =>
-        setSpentMoney(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="yes">Yes</option>
-      <option value="no">No</option>
-    </select>
+                {spentMoney === "yes" && (
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {MONEY_SPENT_OPTIONS.map((option) => {
+                      const selected = spentMoneyOn.includes(option);
 
-    {spentMoney === "yes" && (
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        {MONEY_SPENT_OPTIONS.map((option) => {
-          const selected = spentMoneyOn.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          type="button"
+                          onClick={() => toggleSpentMoneyOn(option)}
+                          className={cn(
+                            "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
+                            selected
+                              ? "border-petal bg-blush/40 text-plum"
+                              : "border-border bg-white text-foreground hover:bg-secondary/40",
+                          )}
+                        >
+                          {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-          return (
-            <button
-              key={option}
-              type="button"
-              onClick={() => toggleSpentMoneyOn(option)}
-              className={cn(
-                "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
-                selected
-                  ? "border-petal bg-blush/40 text-plum"
-                  : "border-border bg-white text-foreground hover:bg-secondary/40",
+              {/* PRODUCT VALIDATION */}
+
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  Would you use a tool that helped explain changes happening in
+                  your body?
+                </label>
+
+                <select
+                  value={wouldUse}
+                  onChange={(e) => setWouldUse(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="definitely">Definitely</option>
+                  <option value="probably">Probably</option>
+                  <option value="maybe">Maybe</option>
+                  <option value="unlikely">Unlikely</option>
+                </select>
+              </div>
+
+              {/* PAY */}
+
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  If a solution gave you insights into your body, would you
+                  consider paying for it? <br />
+                  <span className="italic">
+                    i.e. a subscription for an app or wearable device.
+                  </span>
+                </label>
+
+                <select
+                  value={wouldPay}
+                  onChange={(e) => setWouldPay(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="yes">Yes</option>
+                  <option value="maybe">Maybe</option>
+                  <option value="no">No</option>
+                </select>
+              </div>
+
+              {/* PRICE */}
+
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  What would feel is a reasonable price bracket?
+                </label>
+
+                <select
+                  value={monthlyPrice}
+                  onChange={(e) => setMonthlyPrice(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                >
+                  <option value="">Select</option>
+                  <option value="under_20">Under £20</option>
+                  <option value="20_50">£20 to £50</option>
+                  <option value="50_100">£50 to £100</option>
+                  <option value="100_200">£100 to £200</option>
+                  <option value="20_plus">£200+</option>
+                </select>
+              </div>
+
+              {/* DESIRED INSIGHTS */}
+
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  What insights would feel most useful?
+                </label>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {DESIRED_INSIGHT_OPTIONS.map((option) => {
+                    const selected = desiredInsights.includes(option);
+
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => toggleDesiredInsight(option)}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
+                          selected
+                            ? "border-petal bg-blush/40 text-plum"
+                            : "border-border bg-white text-foreground hover:bg-secondary/40",
+                        )}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {desiredInsights.includes("Something else") && (
+                  <textarea
+                    value={otherInsight}
+                    onChange={(e) => setOtherInsight(e.target.value)}
+                    placeholder="What would you want to understand?"
+                    rows={3}
+                    maxLength={500}
+                    className="mt-3 w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm resize-none"
+                  />
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-plum mb-2">
+                  Who do you currently trust most for health insights?
+                </label>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {TRUSTED_SOURCE_OPTIONS.map((option) => {
+                    const selected = trustedSource === option;
+
+                    return (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setTrustedSource(option)}
+                        className={cn(
+                          "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
+                          selected
+                            ? "border-petal bg-blush/40 text-plum"
+                            : "border-border bg-white text-foreground hover:bg-secondary/40",
+                        )}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* PRIZE DRAW */}
+
+              <div className="border-t pt-4">
+                <p className="text-sm font-medium text-plum mb-3 italic">
+                  (Optional)
+                </p>
+
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email address"
+                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                />
+              </div>
+
+              {formError && (
+                <p className="text-sm text-destructive">{formError}</p>
               )}
-            >
-              {option}
-            </button>
-          );
-        })}
-      </div>
-    )}
-  </div>
 
-  {/* PRODUCT VALIDATION */}
-
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      Would you use a tool that helped explain changes happening in your body?
-    </label>
-
-    <select
-      value={wouldUse}
-      onChange={(e) =>
-        setWouldUse(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="definitely">
-        Definitely
-      </option>
-      <option value="probably">
-        Probably
-      </option>
-      <option value="maybe">
-        Maybe
-      </option>
-      <option value="unlikely">
-        Unlikely
-      </option>
-    </select>
-  </div>
-
-  {/* PAY */}
-
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      If a solution gave you insights into your body, would you consider paying for it? <br />
-      <span className="italic">i.e. a subscription for an app or wearable device.</span>
-    </label>
-
-    <select
-      value={wouldPay}
-      onChange={(e) =>
-        setWouldPay(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="yes">Yes</option>
-      <option value="maybe">Maybe</option>
-      <option value="no">No</option>
-    </select>
-  </div>
-
-  {/* PRICE */}
-
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      What would feel is a reasonable price bracket?
-    </label>
-
-    <select
-      value={monthlyPrice}
-      onChange={(e) =>
-        setMonthlyPrice(e.target.value)
-      }
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    >
-      <option value="">Select</option>
-      <option value="under_20">
-        Under £20
-      </option>
-      <option value="20_50">
-        £20 to £50
-      </option>
-      <option value="50_100">
-        £50 to £100
-      </option>
-      <option value="100_200">
-        £100 to £200
-      </option>
-      <option value="20_plus">
-        £200+
-      </option>
-    </select>
-  </div>
-
-  {/* DESIRED INSIGHTS */}
-
-  <div>
-    <label className="block text-sm font-medium text-plum mb-2">
-      What insights would feel most useful?
-    </label>
-
-    <div className="grid grid-cols-2 gap-2">
-      {DESIRED_INSIGHT_OPTIONS.map((option) => {
-        const selected = desiredInsights.includes(option);
-
-        return (
-          <button
-            key={option}
-            type="button"
-            onClick={() => toggleDesiredInsight(option)}
-            className={cn(
-              "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
-              selected
-                ? "border-petal bg-blush/40 text-plum"
-                : "border-border bg-white text-foreground hover:bg-secondary/40",
-            )}
-          >
-            {option}
-          </button>
-        );
-      })}
-    </div>
-
-    {desiredInsights.includes("Other") && (
-      <textarea
-        value={otherInsight}
-        onChange={(e) =>
-          setOtherInsight(e.target.value)
-        }
-        placeholder="What would you want to understand?"
-        rows={3}
-        maxLength={500}
-        className="mt-3 w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm resize-none"
-      />
-    )}
-  </div>
-
-  {/* PRIZE DRAW */}
-
-  <div className="border-t pt-4">
-    <p className="text-sm font-medium text-plum mb-3 italic">
-      (Optional)
-    </p>
-
-    <input
-      type="email"
-      value={email}
-      onChange={(e) =>
-        setEmail(e.target.value)
-      }
-      placeholder="Email address"
-      className="w-full rounded-2xl border border-border bg-white px-4 py-3"
-    />
-  </div>
-
-  {formError && (
-    <p className="text-sm text-destructive">
-      {formError}
-    </p>
-  )}
-
-  <button
-    disabled={submitting}
-    onClick={submitAll}
-    className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-primary text-primary-foreground px-7 py-3.5 font-medium"
-  >
-    {submitting
-      ? "Submitting..."
-      : "Submit survey"}
-  </button>
-
-</div>
+              <button
+                disabled={submitting}
+                onClick={submitAll}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-primary text-primary-foreground px-7 py-3.5 font-medium"
+              >
+                {submitting ? "Submitting..." : "Submit survey"}
+              </button>
+            </div>
 
             <p className="text-center text-[11px] text-muted-foreground mt-4 inline-flex items-center justify-center gap-1.5 w-full">
               <ShieldCheck className="h-3 w-3" />
@@ -1198,16 +1150,20 @@ Have you spent money trying to understand, manage, or improve changes in your bo
             <div className="mx-auto mb-6 inline-flex h-24 w-24 items-center justify-center rounded-full bg-gradient-primary text-primary-foreground shadow-glow">
               <Heart className="h-10 w-10" fill="currentColor" />
             </div>
-            <h2 className="font-display text-4xl text-plum">You're wonderful</h2>
+            <h2 className="font-display text-4xl text-plum">
+              You're wonderful
+            </h2>
             <p className="mt-3 text-muted-foreground">
-              Thank you for sharing. Your story will help shape something kinder,
-              smarter and made for women like you.
+              Thank you for sharing. Your story will help shape something
+              kinder, smarter and made for women like you.
             </p>
           </section>
         )}
 
         <footer className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
-          <p>&copy; {currentYear} All rights reserved. Made with &hearts; by KLPS Ltd.&nbsp; 
+          <p>
+            &copy; {currentYear} All rights reserved. Made with &hearts; by KLPS
+            Ltd.&nbsp;
           </p>
         </footer>
       </div>
