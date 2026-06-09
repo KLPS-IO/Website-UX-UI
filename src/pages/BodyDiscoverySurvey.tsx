@@ -261,7 +261,7 @@ function BodyDiscoverySurvey() {
 
   const [otherInsight, setOtherInsight] = useState("");
 
-  const [trustedSource, setTrustedSource] = useState("");
+  const [trustedSource, setTrustedSource] = useState<string[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -280,6 +280,13 @@ function BodyDiscoverySurvey() {
 
   const toggleDesiredInsight = (value: string) =>
     setDesiredInsights((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value],
+    );
+
+  const toggleTrustedSource = (value: string) =>
+    setTrustedSource((current) =>
       current.includes(value)
         ? current.filter((item) => item !== value)
         : [...current, value],
@@ -1073,18 +1080,18 @@ function BodyDiscoverySurvey() {
 
               <div>
                 <label className="block text-sm font-medium text-plum mb-2">
-                  Who do you currently trust most for health insights?
+                  Which sources do you trust for understanding changes in your body? (Select all that apply)
                 </label>
 
                 <div className="grid grid-cols-2 gap-2">
                   {TRUSTED_SOURCE_OPTIONS.map((option) => {
-                    const selected = trustedSource === option;
+                    const selected = trustedSource.includes(option);
 
                     return (
                       <button
                         key={option}
                         type="button"
-                        onClick={() => setTrustedSource(option)}
+                        onClick={() => toggleTrustedSource(option)}
                         className={cn(
                           "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
                           selected
