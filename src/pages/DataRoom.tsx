@@ -1127,7 +1127,7 @@ const DataRoom = () => {
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-                Early customer discovery indicates a strong demand for non-invaive
+                Early customer discovery indicates a strong demand for non-invasive
                 personalised body intelligence.
               </p>
 
