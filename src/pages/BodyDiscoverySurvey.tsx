@@ -500,9 +500,9 @@ function BodyDiscoverySurvey() {
                   <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center"></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     - Tap an area of concern below. <br /> - Tap one area at a
-                    time, select concerns in the panel below/at the side as they
+                    time, select concerns in the panel below/at the side of your screen as they
                     change with each area.
-                    <br /> - You can always go back and edit your selections
+                    <br /> - You can always edit your selections
                     before moving on through the questionnaire.
                   </p>
                 </div>
