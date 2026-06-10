@@ -70,7 +70,7 @@ export const CURRENT_SOLUTIONS = [
   "Supplements",
   "Medication",
   "Exercise",
-  "Wearables",
+  "Wearable Devices",
   "Measuring",
   "Taking photos",
   "Loose clothing",

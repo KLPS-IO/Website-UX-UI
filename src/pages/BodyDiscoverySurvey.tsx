@@ -89,7 +89,7 @@ const SOLUTION_ICONS: Record<string, typeof Ban> = {
 
 const MONEY_SPENT_OPTIONS = [
   "Apps",
-  "Wearables",
+  "Wearable Devices",
   "Supplements",
   "Medication",
   "Private healthcare",
@@ -118,7 +118,7 @@ const TRUSTED_SOURCE_OPTIONS = [
   "Friends or family",
   "Health apps",
   "Online communities",
-  "Wearables",
+  "Wearable Devices",
   "I don't trust any source consistently",
   "Other",
 ];
