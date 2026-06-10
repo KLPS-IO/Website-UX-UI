@@ -93,6 +93,7 @@ const MONEY_SPENT_OPTIONS = [
   "Supplements",
   "Medication",
   "Private healthcare",
+  "Gym membership/Personal trainer",
   "Coaching or nutrition support",
   "Clothing or shapewear",
   "Other",
@@ -221,6 +222,8 @@ function BodyDiscoverySurvey() {
   const [activePanelArea, setActivePanelArea] = useState<BodyArea>("tummy");
 
   // Page 2 state
+
+  const [otherSpendCategory, setOtherSpendCategory] = useState("");
   const [voiceRecordings, setVoiceRecordings] = useState<VoiceRecordingEntry[]>(
     [],
   );
@@ -500,10 +503,10 @@ function BodyDiscoverySurvey() {
                   <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center"></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     - Tap an area of concern below. <br /> - Tap one area at a
-                    time, select concerns in the panel below/at the side of your screen as they
-                    change with each area.
-                    <br /> - You can always edit your selections
-                    before moving on through the questionnaire.
+                    time, select concerns in the panel below/at the side of your
+                    screen as they change with each area.
+                    <br /> - You can always edit your selections before moving
+                    on through the questionnaire.
                   </p>
                 </div>
                 <button
@@ -951,27 +954,39 @@ function BodyDiscoverySurvey() {
                 </select>
 
                 {spentMoney === "yes" && (
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {MONEY_SPENT_OPTIONS.map((option) => {
-                      const selected = spentMoneyOn.includes(option);
+                  <>
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {MONEY_SPENT_OPTIONS.map((option) => {
+                        const selected = spentMoneyOn.includes(option);
 
-                      return (
-                        <button
-                          key={option}
-                          type="button"
-                          onClick={() => toggleSpentMoneyOn(option)}
-                          className={cn(
-                            "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
-                            selected
-                              ? "border-petal bg-blush/40 text-plum"
-                              : "border-border bg-white text-foreground hover:bg-secondary/40",
-                          )}
-                        >
-                          {option}
-                        </button>
-                      );
-                    })}
-                  </div>
+                        return (
+                          <button
+                            key={option}
+                            type="button"
+                            onClick={() => toggleSpentMoneyOn(option)}
+                            className={cn(
+                              "rounded-2xl border px-3 py-2.5 text-left text-xs transition-smooth",
+                              selected
+                                ? "border-petal bg-blush/40 text-plum"
+                                : "border-border bg-white text-foreground hover:bg-secondary/40",
+                            )}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {spentMoneyOn.includes("Other") && (
+                      <input
+                        type="text"
+                        value={otherSpendCategory}
+                        onChange={(e) => setOtherSpendCategory(e.target.value)}
+                        placeholder="What have you spent money on?"
+                        className="mt-3 w-full rounded-2xl border border-border bg-white px-4 py-3"
+                      />
+                    )}
+                  </>
                 )}
               </div>
 
