@@ -499,8 +499,7 @@ function BodyDiscoverySurvey() {
                 <div className="flex flex-col gap-3">
                   <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center"></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Tap any area, and answer concerns below before tapping
-                    another area. Answers are saved along the way.
+                    Tap an area of concern below. <br /> Tap one area at a time, select concerns below, before tapping a new area,<br /> as concerns below change with each area.<br /> You can always go back and edit your selections before moving on through the questionnaire.
                   </p>
                 </div>
                 <button
