@@ -191,7 +191,7 @@ function TopBar({ step, onBack }: { step: Step; onBack?: () => void }) {
       <Stepper step={step} />
       <a
         href="https://klps.co.uk"
-        className="rounded-full border border-border bg-white/[0.03] px-4 py-1.5 text-m font-medium text-foreground transition-colors hover:bg-white/[0.08]"
+        className="whitespace-nowrap rounded-full border border-border bg-white/[0.03] px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.08]"
       >
         Back to Home
       </a>
@@ -499,7 +499,11 @@ function BodyDiscoverySurvey() {
                 <div className="flex flex-col gap-3">
                   <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center"></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    - Tap an area of concern below. <br /> - Tap one area at a time, select concerns in the panel below/at the side as they change with each area.<br /> - You can always go back and edit your selections before moving on through the questionnaire.
+                    - Tap an area of concern below. <br /> - Tap one area at a
+                    time, select concerns in the panel below/at the side as they
+                    change with each area.
+                    <br /> - You can always go back and edit your selections
+                    before moving on through the questionnaire.
                   </p>
                 </div>
                 <button
@@ -1079,7 +1083,8 @@ function BodyDiscoverySurvey() {
 
               <div>
                 <label className="block text-sm font-medium text-plum mb-2">
-                  Which sources do you trust for understanding changes in your body? (Select all that apply)
+                  Which sources do you trust for understanding changes in your
+                  body? (Select all that apply)
                 </label>
 
                 <div className="grid grid-cols-2 gap-2">
