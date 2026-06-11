@@ -255,6 +255,8 @@ function BodyDiscoverySurvey() {
 
   const [otherSpentMoney, setOtherSpentMoney] = useState("");
 
+  const [otherTrustedSource, setOtherTrustedSource] = useState("");
+
   const [wouldUse, setWouldUse] = useState("");
 
   const [wouldPay, setWouldPay] = useState("");
@@ -400,7 +402,12 @@ function BodyDiscoverySurvey() {
           wouldPay,
           monthlyPrice,
           desiredInsights,
-          trustedSource,
+          trustedSource: [
+            ...trustedSource.filter((s) => s !== "Other"),
+            ...(otherTrustedSource.trim()
+              ? [`Other: ${otherTrustedSource.trim()}`]
+              : []),
+          ],
           otherInsight,
 
           age_range: ageRange,
@@ -416,7 +423,6 @@ function BodyDiscoverySurvey() {
           would_pay: wouldPay,
           monthly_price: monthlyPrice,
           desired_insights: desiredInsights,
-          trusted_source: trustedSource,
           other_insight: otherInsight,
 
           voiceRecordings: voiceRecordings.map((recording) => ({
@@ -1129,6 +1135,15 @@ function BodyDiscoverySurvey() {
                     );
                   })}
                 </div>
+                {trustedSource.includes("Other") && (
+                  <input
+                    type="text"
+                    value={otherTrustedSource}
+                    onChange={(e) => setOtherTrustedSource(e.target.value)}
+                    placeholder="Please specify"
+                    className="mt-3 w-full rounded-2xl border border-border bg-white px-4 py-3"
+                  />
+                )}
               </div>
 
               {/* PRIZE DRAW */}
