@@ -269,6 +269,10 @@ function BodyDiscoverySurvey() {
 
   const [trustedSource, setTrustedSource] = useState<string[]>([]);
 
+  const [showMissingAnswersModal, setShowMissingAnswersModal] = useState(false);
+
+  const [missingQuestions, setMissingQuestions] = useState<string[]>([]);
+
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -463,6 +467,26 @@ function BodyDiscoverySurvey() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleSubmitAttempt = () => {
+    const missing: string[] = [];
+
+    if (!wouldPay) {
+      missing.push("Would you pay for a solution like this?");
+    }
+
+    if ((wouldPay === "yes" || wouldPay === "maybe") && !monthlyPrice) {
+      missing.push("What price feels reasonable?");
+    }
+
+    if (missing.length > 0) {
+      setMissingQuestions(missing);
+      setShowMissingAnswersModal(true);
+      return;
+    }
+
+    submitAll();
   };
 
   // Footer
@@ -1168,7 +1192,7 @@ function BodyDiscoverySurvey() {
 
               <button
                 disabled={submitting}
-                onClick={submitAll}
+                onClick={handleSubmitAttempt}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-primary text-primary-foreground px-7 py-3.5 font-medium"
               >
                 {submitting ? "Submitting..." : "Submit survey"}
