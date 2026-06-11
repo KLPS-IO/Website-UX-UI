@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { VoiceRecorder } from "@/components/survey/VoiceRecord";
-import {
-  ArrowRight,
-  Check,
-  SkipForward,
-  Sparkles,
-} from "lucide-react";
+import { ArrowRight, Check, SkipForward, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export type VoicePrompt = {
@@ -16,48 +11,39 @@ export type VoicePrompt = {
 export type VoiceRecordingEntry = {
   questionKey: string;
   questionText: string;
-  blob: Blob;
+  blob?: Blob;
   durationSeconds: number;
+  typedResponse?: string;
 };
 
 interface Props {
   prompts: VoicePrompt[];
-  onComplete: (
-    recordings: VoiceRecordingEntry[]
-  ) => void;
+  onComplete: (recordings: VoiceRecordingEntry[]) => void;
 }
 
-export function PromptedVoiceFlow({
-  prompts,
-  onComplete,
-}: Props) {
+export function PromptedVoiceFlow({ prompts, onComplete }: Props) {
   const [index, setIndex] = useState(0);
 
-  const [blob, setBlob] =
-    useState<Blob | null>(null);
+  const [blob, setBlob] = useState<Blob | null>(null);
 
-  const [durationSeconds, setDurationSeconds] =
-    useState(0);
+  const [durationSeconds, setDurationSeconds] = useState(0);
 
-  const [recordings, setRecordings] =
-    useState<VoiceRecordingEntry[]>([]);
+  const [typedResponse, setTypedResponse] = useState("");
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [recordings, setRecordings] = useState<VoiceRecordingEntry[]>([]);
 
-  const [recorderKey, setRecorderKey] =
-    useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  const [recorderKey, setRecorderKey] = useState(0);
 
   const currentPrompt = prompts[index];
 
-  const isLast =
-    index >= prompts.length - 1;
+  const isLast = index >= prompts.length - 1;
 
-  const advance = (
-    next: VoiceRecordingEntry[]
-  ) => {
+  const advance = (next: VoiceRecordingEntry[]) => {
     setBlob(null);
     setDurationSeconds(0);
+    setTypedResponse("");
     setRecorderKey((k) => k + 1);
 
     if (isLast) {
@@ -68,30 +54,20 @@ export function PromptedVoiceFlow({
   };
 
   const saveAndNext = () => {
-    if (!blob) {
-      setError(
-        "Please record an answer first."
-      );
+    if (!blob && !typedResponse.trim()) {
+      setError("Please record or type your answer.");
       return;
     }
 
-    const nextRecording: VoiceRecordingEntry =
-      {
-        questionKey:
-          currentPrompt.key,
+    const nextRecording: VoiceRecordingEntry = {
+      questionKey: currentPrompt.key,
+      questionText: currentPrompt.text,
+      blob,
+      durationSeconds,
+      typedResponse,
+    };
 
-        questionText:
-          currentPrompt.text,
-
-        blob,
-
-        durationSeconds,
-      };
-
-    const next = [
-      ...recordings,
-      nextRecording,
-    ];
+    const next = [...recordings, nextRecording];
 
     setRecordings(next);
     setError(null);
@@ -115,16 +91,15 @@ export function PromptedVoiceFlow({
               i < index
                 ? "w-2 bg-orchid"
                 : i === index
-                ? "w-8 bg-gradient-primary"
-                : "w-2 bg-border"
+                  ? "w-8 bg-gradient-primary"
+                  : "w-2 bg-border",
             )}
           />
         ))}
       </div>
 
       <div className="text-center text-xs text-muted-foreground">
-        Question {index + 1} of{" "}
-        {prompts.length}
+        Question {index + 1} of {prompts.length}
       </div>
 
       {/* Prompt */}
@@ -138,22 +113,27 @@ export function PromptedVoiceFlow({
 
       <VoiceRecorder
         key={recorderKey}
-        onChange={(
-          blob,
-          duration
-        ) => {
+        onChange={(blob, duration) => {
           setBlob(blob);
-          setDurationSeconds(
-            duration
-          );
+          setDurationSeconds(duration);
         }}
       />
-
-      {error && (
-        <p className="text-sm text-destructive text-center">
-          {error}
+      <div className="rounded-3xl border border-border bg-white p-4">
+        <p className="mb-3 text-sm text-muted-foreground">
+          Prefer not to record? Type your answer below.
         </p>
-      )}
+
+        <textarea
+          value={typedResponse}
+          onChange={(e) => setTypedResponse(e.target.value)}
+          placeholder="Share your thoughts here..."
+          rows={5}
+          maxLength={2000}
+          className="w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm resize-none"
+        />
+      </div>
+
+      {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
       <div className="flex items-center justify-between gap-3">
         <button
@@ -166,7 +146,7 @@ export function PromptedVoiceFlow({
 
         <button
           onClick={saveAndNext}
-          disabled={!blob}
+          disabled={!blob && !typedResponse.trim()}
           className="inline-flex items-center gap-2 rounded-full bg-gradient-primary text-primary-foreground px-7 py-3 font-medium shadow-soft transition-smooth hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
         >
           {isLast ? (
@@ -184,10 +164,10 @@ export function PromptedVoiceFlow({
       </div>
 
       {recordings.length > 0 && (
-  <p className="text-center text-xs text-muted-foreground">
-    ✓ Progress: {recordings.length} / {prompts.length} questions completed
-  </p>
-)}
+        <p className="text-center text-xs text-muted-foreground">
+          ✓ Progress: {recordings.length} / {prompts.length} questions completed
+        </p>
+      )}
     </div>
   );
 }

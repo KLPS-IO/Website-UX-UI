@@ -223,7 +223,6 @@ function BodyDiscoverySurvey() {
 
   // Page 2 state
 
-  const [otherSpendCategory, setOtherSpendCategory] = useState("");
   const [voiceRecordings, setVoiceRecordings] = useState<VoiceRecordingEntry[]>(
     [],
   );
@@ -253,6 +252,8 @@ function BodyDiscoverySurvey() {
   const [spentMoney, setSpentMoney] = useState("");
 
   const [spentMoneyOn, setSpentMoneyOn] = useState<string[]>([]);
+
+  const [otherSpentMoney, setOtherSpentMoney] = useState("");
 
   const [wouldUse, setWouldUse] = useState("");
 
@@ -394,6 +395,7 @@ function BodyDiscoverySurvey() {
           confidenceLevel,
           spentMoney,
           spentMoneyOn,
+          otherSpentMoney,
           wouldUse,
           wouldPay,
           monthlyPrice,
@@ -409,6 +411,7 @@ function BodyDiscoverySurvey() {
           confidence_level: confidenceLevel,
           spent_money: spentMoney,
           spent_money_on: spentMoneyOn,
+          other_spent_money: otherSpentMoney,
           would_use: wouldUse,
           would_pay: wouldPay,
           monthly_price: monthlyPrice,
@@ -980,8 +983,8 @@ function BodyDiscoverySurvey() {
                     {spentMoneyOn.includes("Other") && (
                       <input
                         type="text"
-                        value={otherSpendCategory}
-                        onChange={(e) => setOtherSpendCategory(e.target.value)}
+                        value={otherSpentMoney}
+                        onChange={(e) => setOtherSpentMoney(e.target.value)}
                         placeholder="What have you spent money on?"
                         className="mt-3 w-full rounded-2xl border border-border bg-white px-4 py-3"
                       />
