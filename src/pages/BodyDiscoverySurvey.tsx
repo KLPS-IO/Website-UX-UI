@@ -422,7 +422,7 @@ function BodyDiscoverySurvey() {
           voiceRecordings: voiceRecordings.map((recording) => ({
             questionKey: recording.questionKey,
             questionText: recording.questionText,
-            typedResponse: recording.typedResponse ?? null,
+            typedResponse: recording.typedResponse,
             durationSeconds: recording.durationSeconds,
           })),
         }),
