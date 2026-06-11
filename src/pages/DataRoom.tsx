@@ -1127,8 +1127,8 @@ const DataRoom = () => {
               </h3>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-                Early customer discovery indicates a strong demand for non-invasive
-                personalised body intelligence.
+                Early customer discovery indicates a strong demand for
+                non-invasive personalised body intelligence.
               </p>
 
               <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -1152,10 +1152,16 @@ const DataRoom = () => {
 
                 <div className="rounded-lg border border-border bg-white/[0.02] p-4">
                   <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                    WOULD PAY '{topPriceLabel || "NO DATA"}'
+                    Most Popular Price Point
                   </div>
+
                   <div className="mt-2 text-3xl font-light">
-                    {metrics?.topPricePointCount ?? 0}
+                    {topPriceLabel || "No data"}
+                  </div>
+
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {metrics?.topPricePointCount ?? 0} of{" "}
+                    {metrics?.participants ?? 0} responses
                   </div>
                 </div>
               </div>
