@@ -62,7 +62,7 @@ export function PromptedVoiceFlow({ prompts, onComplete }: Props) {
     const nextRecording: VoiceRecordingEntry = {
       questionKey: currentPrompt.key,
       questionText: currentPrompt.text,
-      blob,
+      blob: blob ?? undefined,
       durationSeconds,
       typedResponse,
     };

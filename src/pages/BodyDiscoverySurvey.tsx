@@ -422,17 +422,20 @@ function BodyDiscoverySurvey() {
           voiceRecordings: voiceRecordings.map((recording) => ({
             questionKey: recording.questionKey,
             questionText: recording.questionText,
+            typedResponse: recording.typedResponse ?? null,
             durationSeconds: recording.durationSeconds,
           })),
         }),
       );
 
       voiceRecordings.forEach((recording, index) => {
-        formData.append(
-          `voice_${index}`,
-          recording.blob,
-          `${recording.questionKey}.webm`,
-        );
+        if (recording.blob) {
+          formData.append(
+            `voice_${index}`,
+            recording.blob,
+            `${recording.questionKey}.webm`,
+          );
+        }
       });
 
       const response = await fetch(`${API_BASE}/api/research`, {
