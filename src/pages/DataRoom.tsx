@@ -80,7 +80,13 @@ type ResearchMetrics = {
   topConcernPercent: number;
 
   spentMoneyPercent: number;
-  wouldPayPercent: number;
+
+  yesCount: number;
+  maybeCount: number;
+  noCount: number;
+
+  commercialInterestCount: number;
+  commercialInterestPercent: number;
 
   topPricePoint?: string;
   topPricePointCount?: number;
@@ -1218,15 +1224,25 @@ const DataRoom = () => {
 
                   <div className="rounded-lg border border-border bg-white/[0.02] p-5">
                     <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-                      Commercial Signal
+                      Commercial Interest
                     </div>
-
+                    {metrics?.commercialInterestPercent ?? 0}%
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">
                       <span className="font-medium text-foreground">
-                        {Math.round(Number(metrics?.wouldPayPercent ?? 0))}%{" "}
-                        <br />
-                      </span>{" "}
-                      Would pay for a personalised solution.
+                        {metrics?.yesCount ?? 0} Yes
+                      </span>
+                      {" • "}
+                      <span className="font-medium text-foreground">
+                        {metrics?.maybeCount ?? 0} Maybe
+                      </span>
+                      {" • "}
+                      <span className="font-medium text-foreground">
+                        {metrics?.noCount ?? 0} No
+                      </span>
+                      <br />
+                      {metrics?.commercialInterestCount ?? 0} of{" "}
+                      {metrics?.participants ?? 0} respondents said Yes or
+                      Maybe.
                     </p>
                   </div>
                 </div>
