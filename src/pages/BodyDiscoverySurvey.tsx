@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { API_BASE } from "@/config/api";
 import { type ConcernsMap } from "@/components/survey/BodyMap";
 import { BodyImageMap } from "@/components/survey/BodyImageMap";
@@ -273,6 +273,8 @@ function BodyDiscoverySurvey() {
 
   const [missingQuestions, setMissingQuestions] = useState<string[]>([]);
 
+  const isMissing = (question: string) => missingQuestions.includes(question);
+
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -386,6 +388,7 @@ function BodyDiscoverySurvey() {
       formData.append(
         "payload",
         JSON.stringify({
+          bodyType,
           bodyAreas: bodyAreaResponses,
           concerns,
           otherResponses,
@@ -468,6 +471,8 @@ function BodyDiscoverySurvey() {
       setSubmitting(false);
     }
   };
+  const wouldPayRef = useRef<HTMLDivElement>(null);
+  const priceRef = useRef<HTMLDivElement>(null);
 
   const handleSubmitAttempt = () => {
     const missing: string[] = [];
@@ -1049,19 +1054,32 @@ function BodyDiscoverySurvey() {
 
               {/* PAY */}
 
-              <div>
+              <div ref={wouldPayRef}>
                 <label className="block text-sm font-medium text-plum mb-2">
                   If a solution gave you insights into your body, would you
-                  consider paying for it? <br />
-                  <span className="italic">
-                    i.e. a subscription for an app or wearable device.
-                  </span>
+                  consider paying for it?
+                  {isMissing("Would you pay for a solution like this?") && (
+                    <span className="ml-1 text-red-500">*</span>
+                  )}
                 </label>
 
                 <select
                   value={wouldPay}
-                  onChange={(e) => setWouldPay(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                  onChange={(e) => {
+                    setWouldPay(e.target.value);
+
+                    setMissingQuestions((current) =>
+                      current.filter(
+                        (q) => q !== "Would you pay for a solution like this?",
+                      ),
+                    );
+                  }}
+                  className={cn(
+                    "w-full rounded-2xl border bg-white px-4 py-3",
+                    isMissing("Would you pay for a solution like this?")
+                      ? "border-red-500"
+                      : "border-border",
+                  )}
                 >
                   <option value="">Select</option>
                   <option value="yes">Yes</option>
@@ -1072,15 +1090,31 @@ function BodyDiscoverySurvey() {
 
               {/* PRICE */}
 
-              <div>
+              <div ref={priceRef}>
                 <label className="block text-sm font-medium text-plum mb-2">
                   What would feel is a reasonable price bracket?
+                  {isMissing("What price feels reasonable?") && (
+                    <span className="ml-1 text-red-500">*</span>
+                  )}
                 </label>
 
                 <select
                   value={monthlyPrice}
-                  onChange={(e) => setMonthlyPrice(e.target.value)}
-                  className="w-full rounded-2xl border border-border bg-white px-4 py-3"
+                  onChange={(e) => {
+                    setMonthlyPrice(e.target.value);
+
+                    setMissingQuestions((current) =>
+                      current.filter(
+                        (q) => q !== "What price feels reasonable?",
+                      ),
+                    );
+                  }}
+                  className={cn(
+                    "w-full rounded-2xl border bg-white px-4 py-3",
+                    isMissing("What price feels reasonable?")
+                      ? "border-red-500"
+                      : "border-border",
+                  )}
                 >
                   <option value="">Select</option>
                   <option value="under_20">Under £20</option>
@@ -1198,6 +1232,70 @@ function BodyDiscoverySurvey() {
                 {submitting ? "Submitting..." : "Submit survey"}
               </button>
             </div>
+            {showMissingAnswersModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                <div className="max-w-md rounded-3xl bg-white p-6 shadow-xl">
+                  <h3 className="text-lg font-semibold text-plum">
+                    You haven't answered:
+                  </h3>
+
+                  <ul className="mt-4 space-y-2 text-sm">
+                    {missingQuestions.map((question) => (
+                      <li key={question}>• {question}</li>
+                    ))}
+                  </ul>
+
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    These answers help us understand whether a solution is
+                    commercially viable.
+                  </p>
+
+                  <div className="mt-6 flex gap-3">
+                    <button
+                      onClick={() => {
+                        setShowMissingAnswersModal(false);
+
+                        if (
+                          missingQuestions.includes(
+                            "Would you pay for a solution like this?",
+                          )
+                        ) {
+                          wouldPayRef.current?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
+                          return;
+                        }
+
+                        if (
+                          missingQuestions.includes(
+                            "What price feels reasonable?",
+                          )
+                        ) {
+                          priceRef.current?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "center",
+                          });
+                        }
+                      }}
+                      className="flex-1 rounded-full border border-border px-4 py-3"
+                    >
+                      Go back
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setShowMissingAnswersModal(false);
+                        submitAll();
+                      }}
+                      className="flex-1 rounded-full bg-gradient-primary px-4 py-3 text-primary-foreground"
+                    >
+                      Submit anyway
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <p className="text-center text-[11px] text-muted-foreground mt-4 inline-flex items-center justify-center gap-1.5 w-full">
               <ShieldCheck className="h-3 w-3" />
