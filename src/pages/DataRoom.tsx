@@ -1244,10 +1244,10 @@ const DataRoom = () => {
                       <br />
                       {metrics?.commercialInterestCount ?? 0} of{" "}
                       {metrics?.participants ?? 0}  */}
-                      of respondents said Yes or Maybe when asked 'If a solution
+                      of respondents answered 'Yes' or 'Maybe' when asked 'If a solution
                       gave you insights into your body, would you consider
-                      paying for it? i.e. a subscription for an app or wearable
-                      device'. .
+                      paying for it? <br /> i.e. a subscription for an app or wearable
+                      device'.
                     </p>
                   </div>
                 </div>
