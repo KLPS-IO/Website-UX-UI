@@ -106,7 +106,7 @@ const InnovationLab = () => {
 
           <div className="flex shrink-0 items-center gap-3">
             <span className="hidden rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[10px] font-mono uppercase tracking-[0.2em] text-accent sm:inline-flex">
-              Series A - Open
+              Pre-Seed - Open
             </span>
             <a
               href="https://klps.co.uk"
