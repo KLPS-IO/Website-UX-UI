@@ -1226,9 +1226,11 @@ const DataRoom = () => {
                     <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
                       Commercial Interest
                     </div>
-                    {metrics?.commercialInterestPercent ?? 0}%
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">
                       <span className="font-medium text-foreground">
+                        {metrics?.commercialInterestPercent ?? 0}% <br />
+                      </span>
+                      {/* <span className="font-medium text-foreground">
                         {metrics?.yesCount ?? 0} Yes
                       </span>
                       {" • "}
@@ -1241,8 +1243,11 @@ const DataRoom = () => {
                       </span>
                       <br />
                       {metrics?.commercialInterestCount ?? 0} of{" "}
-                      {metrics?.participants ?? 0} respondents said Yes or
-                      Maybe.
+                      {metrics?.participants ?? 0}  */}
+                      of respondents said Yes or Maybe when asked 'If a solution
+                      gave you insights into your body, would you consider
+                      paying for it? i.e. a subscription for an app or wearable
+                      device'. .
                     </p>
                   </div>
                 </div>
