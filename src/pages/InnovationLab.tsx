@@ -170,8 +170,7 @@ const InnovationLab = () => {
               ]}
             />
               <p className="mt-8 max-w-xl text-lg text-muted-foreground">
-                Proprietary conductive polymers integrated into medical-grade textiles.
-                KPLS is building the sensory layer for human-computer interaction.
+                Everything in this room is built on customer discovery, technical validation and measurable demand.
               </p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
@@ -293,8 +292,8 @@ const InnovationLab = () => {
         <Section
           className="scroll-mt-20"
           eyebrow="Data room"
-          title="Where to begin."
-          description="Each surface mirrors a chapter of our investor narrative."
+          title="What we've learned so far."
+          description="Real customer voices, emerging patterns and the opportunity we're building towards."
         >
           <div id="ecosystem" className="grid scroll-mt-24 grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
             {quickNav.map((item) => (
