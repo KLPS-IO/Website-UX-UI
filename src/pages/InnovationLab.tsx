@@ -3,7 +3,10 @@ import heroImg from "@/assets/hero-textile.jpg";
 import sensorImg from "@/assets/sensor-mesh.jpg";
 import polymerImg from "@/assets/polymer-lab.jpg";
 import dcLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
+import createch from "@/assets/createch-logo.png";
 import niyoLogo from "@/assets/niyo-group-logo-l.png";
+import ffrLogo from "@/assets/ffr-logo.jpg";
+import bfflogo from "@/assets/bff-logo.webp";
 import { Section, StatCard } from "@/components/Section";
 import { AnimatedHeadline } from "@/components/AnimatedHeadline";
 
@@ -24,9 +27,24 @@ const companyWins = [
     detail: "Working across innovation, industry access, and emerging technology pathways.",
   },
   {
+    logo: createch,
+    name: "Createch",
+    detail: "Pioneering the future of creative technology and digital experiences.",
+  },
+  {
+    logo: ffrLogo,
+    name: "Female Founder Rise",
+    detail: "Helping early-stage to growth-stage founders build profitable businesses and secure investment",
+  },
+  {
     logo: niyoLogo,
     name: "Niyo Group",
-    detail: "Collaborating around inclusive product ecosystems and community-led growth.",
+    detail: "Empowering ambitious females through technology, education, and innovative enterprise",
+  },
+  {
+    logo: bfflogo,
+    name: "BFF",
+    detail: "Supporting black female entrepreneurs and women-led tech ventures",
   },
 ];
 
@@ -201,7 +219,7 @@ const InnovationLab = () => {
                     </div>
                     <div>
                       <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-                        Partner Momentum
+                        Accelerator Momentum
                       </div>
                       <h3 className="mt-2 text-xl font-light tracking-tight text-foreground">
                         {win.name}
