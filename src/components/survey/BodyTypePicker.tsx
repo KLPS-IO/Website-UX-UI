@@ -12,9 +12,9 @@ export const BODY_TYPE_IMAGES: Record<BodyType, string> = {
 };
 
 const OPTIONS: { id: BodyType; label: string; src: string }[] = [
-  { id: "slim", label: "Slender", src: slim },
-  { id: "mid", label: "Curvy", src: mid },
-  { id: "curvy", label: "Full", src: curvy },
+  { id: "slim", label: "Slim Figure", src: slim },
+  { id: "mid", label: "Medium Figure", src: mid },
+  { id: "curvy", label: "Full Figure", src: curvy },
 ];
 
 export function BodyTypePicker({

@@ -205,6 +205,7 @@ function BodyDiscoverySurvey() {
 
   // Page 1 state
   const [bodyType, setBodyType] = useState<BodyType | null>(null);
+  const [bodyShape, setBodyShape] = useState("");
   const [areas, setAreas] = useState<BodyArea[]>([]);
   const [concerns, setConcerns] = useState<ConcernsMap>({});
   const [bodyAreaResponses, setBodyAreaResponses] = useState<
@@ -389,6 +390,8 @@ function BodyDiscoverySurvey() {
         "payload",
         JSON.stringify({
           bodyType,
+          bodyShape,
+          otherBodyType: bodyShape || null,
           bodyAreas: bodyAreaResponses,
           concerns,
           otherResponses,
@@ -510,20 +513,48 @@ function BodyDiscoverySurvey() {
         {/* STEP 1 */}
         {step === 1 && !bodyType && (
           <section className="animate-float-in max-w-3xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="font-display text-4xl sm:text-5xl text-plum leading-[1.05]">
-                Choose the body that
-                <br />
-                feels most like{" "}
-                <span className="text-gradient italic pr-1 ">you</span>
-              </h1>
-              <p className="mt-4 text-sm text-muted-foreground">
-                There's no right answer — just pick the one you identify with
-                most.
-              </p>
-            </div>
             <BodyTypePicker selected={bodyType} onSelect={setBodyType} />
-            <p className="text-center font-display italic text-orchid text-sm mt-8"></p>
+
+            <div className="mt-8 max-w-md mx-auto">
+              <label className="block text-sm font-medium text-plum mb-2">
+                If you don't see yourself in the options above, choose from the
+                options below to tell us more about your body shape, then click
+                the closest match above to continue. (Optional)
+              </label>
+              <div className="relative">
+                <select
+                  value={bodyShape}
+                  onChange={(e) => setBodyShape(e.target.value)}
+                  className="w-full rounded-2xl border border-border bg-white px-4 pr-12 py-3 appearance-none"
+                >
+                  <option value="">Select body shape</option>
+                  <option value="pear">Pear</option>
+                  <option value="hourglass">Hourglass</option>
+                  <option value="rectangle">Rectangle</option>
+                  <option value="apple">Apple</option>
+                  <option value="inverted_triangle">Inverted Triangle</option>
+                  <option value="athletic">Athletic</option>
+                  <option value="petite">Petite</option>
+                  <option value="not_sure">Not sure</option>
+                </select>
+
+                <div className="pointer-events-none absolute inset-y-0 right-5 flex items-center">
+                  <svg
+                    className="h-5 w-5 text-plum"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </section>
         )}
 
