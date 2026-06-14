@@ -198,8 +198,8 @@ const InnovationLab = () => {
                     Built with momentum
                   </div>
                   <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                    Active work with ecosystem partners supporting KPLS across technology,
-                    venture readiness, and market access.
+                    Working with leading ecosystem partners to accelerate technology development, 
+                    venture readiness, and commercial growth.
                   </p>
                 </div>
 
