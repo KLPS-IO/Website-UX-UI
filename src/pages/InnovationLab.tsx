@@ -52,23 +52,23 @@ const pillars = [
   {
     img: heroImg,
     code: "K-01",
-    title: "Bio-Integrated Circuits",
-    desc: "Stretchable electronics embedded directly into elastic warp-knitted structures.",
-    tags: ["Patent Pending", "TRL 7"],
+    title: "Conductive Textile Platform",
+    desc: "Development of soft, conductive textile architectures designed to support future wearable sensing applications.",
+    tags: ["Patent Pending", "R&D Programme"],
   },
   {
     img: sensorImg,
     code: "K-04",
-    title: "FemTech Core",
+    title: "Women's Body Intelligence Engine",
     desc: "Continuous, non-invasive monitoring of female-specific health biomarkers via intelligent waistbands.",
-    tags: ["FDA Path", "IP Granted"],
+    tags: ["Materials Research", "IP Granted"],
   },
   {
     img: polymerImg,
     code: "K-07",
-    title: "Hybrid Nanofibers",
-    desc: "Wash-stable conductive coatings derived from a proprietary polymer synthesis protocol.",
-    tags: ["Proprietary", "Wash-Stable"],
+    title: "Smart Textile Materials",
+    desc: "Exploration of durable conductive materials and manufacturing approaches suitable for everyday wearable products.",
+    tags: ["Customer Validated", "Prototype Stage"],
   },
 ];
 
@@ -238,8 +238,8 @@ const InnovationLab = () => {
         <Section
           className="scroll-mt-20 pb-0"
           eyebrow="Core technology"
-          title="A new sensory layer, woven into life."
-          description="KPLS combines conductive textile science, embedded biometrics, and human-centred design - engineered for the next decade of wearable interfaces."
+          title="Building the future of body intelligence."
+          description="KLPS is developing wearable technologies that help women/girls better understand their bodies through non-invasive sensing, intelligent textiles and personalised insights."
         >
           <div id="lab" className="grid scroll-mt-24 grid-cols-1 gap-6 md:grid-cols-3">
             {pillars.map((card) => (
