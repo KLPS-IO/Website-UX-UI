@@ -1029,251 +1029,258 @@ const DataRoom = () => {
       </PageHeader>
 
       <Section>
-        <aside className="space-y-6 lg:col-span-4">
-          <div className="glass rounded-lg p-6">
-            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              Secure Session
-            </div>
-            <div className="mt-3 break-all text-sm text-foreground">
-              {user.email}
-            </div>
-            <div className="mt-2 text-xs capitalize text-muted-foreground">
-              {user.role || (isAdmin ? "admin" : "authorised_user")}
-            </div>
-            <button
-              onClick={logout}
-              className="mt-5 rounded-full border border-border px-4 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              Sign out
-            </button>
-          </div>
-
-          {isAdmin && (
-            <form onSubmit={authorizeUser} className="glass rounded-lg p-6">
-              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                Founder Authorisation
-              </div>
-              <p className="mt-3 text-xs leading-6 text-muted-foreground">
-                Authorised users are created server-side. Email alone cannot
-                bypass this gate.
-              </p>
-              <input
-                type="email"
-                value={newUserEmail}
-                onChange={(event) => setNewUserEmail(event.target.value)}
-                className="mt-4 w-full rounded-md border border-border bg-white/[0.04] px-3 py-2 text-sm outline-none focus:border-accent"
-                placeholder="new.user@example.com"
-              />
-              <button className="mt-3 w-full rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground">
-                Authorise user
-              </button>
-              {adminMessage && (
-                <p className="mt-3 text-xs text-accent">{adminMessage}</p>
-              )}
-            </form>
-          )}
-
-          {isAdmin && (
+        <div className="grid gap-8 lg:grid-cols-12">
+          <aside className="space-y-6 lg:col-span-4">
             <div className="glass rounded-lg p-6">
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                Server Access Log
+                Secure Session
               </div>
-              <ul className="mt-4 space-y-3 text-xs">
-                {logs.slice(0, 8).map((log, index) => (
-                  <li
-                    key={log.id || `${log.timestamp || log.at}-${index}`}
-                    className="border-b border-border pb-3 last:border-0 last:pb-0"
-                  >
-                    <div className="text-foreground">
-                      {log.detail || log.event_type || log.eventType}
-                    </div>
-                    <div className="mt-1 text-muted-foreground">
-                      {log.email} ·{" "}
-                      {new Date(
-                        log.timestamp || log.at || Date.now(),
-                      ).toLocaleString()}
-                    </div>
+              <div className="mt-3 break-all text-sm text-foreground">
+                {user.email}
+              </div>
+              <div className="mt-2 text-xs capitalize text-muted-foreground">
+                {user.role || (isAdmin ? "admin" : "authorised_user")}
+              </div>
+              <button
+                onClick={logout}
+                className="mt-5 rounded-full border border-border px-4 py-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Sign out
+              </button>
+            </div>
+
+            {isAdmin && (
+              <form onSubmit={authorizeUser} className="glass rounded-lg p-6">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Founder Authorisation
+                </div>
+                <p className="mt-3 text-xs leading-6 text-muted-foreground">
+                  Authorised users are created server-side. Email alone cannot
+                  bypass this gate.
+                </p>
+                <input
+                  type="email"
+                  value={newUserEmail}
+                  onChange={(event) => setNewUserEmail(event.target.value)}
+                  className="mt-4 w-full rounded-md border border-border bg-white/[0.04] px-3 py-2 text-sm outline-none focus:border-accent"
+                  placeholder="new.user@example.com"
+                />
+                <button className="mt-3 w-full rounded-full bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground">
+                  Authorise user
+                </button>
+                {adminMessage && (
+                  <p className="mt-3 text-xs text-accent">{adminMessage}</p>
+                )}
+              </form>
+            )}
+
+            {isAdmin && (
+              <div className="glass rounded-lg p-6">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  Server Access Log
+                </div>
+                <ul className="mt-4 space-y-3 text-xs">
+                  {logs.slice(0, 8).map((log, index) => (
+                    <li
+                      key={log.id || `${log.timestamp || log.at}-${index}`}
+                      className="border-b border-border pb-3 last:border-0 last:pb-0"
+                    >
+                      <div className="text-foreground">
+                        {log.detail || log.event_type || log.eventType}
+                      </div>
+                      <div className="mt-1 text-muted-foreground">
+                        {log.email} ·{" "}
+                        {new Date(
+                          log.timestamp || log.at || Date.now(),
+                        ).toLocaleString()}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="glass rounded-lg p-6">
+              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                Categories
+              </div>
+              <ul className="mt-4 space-y-1 text-sm">
+                {categories.map((category) => (
+                  <li key={category}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory(category)}
+                      className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                        activeCategory === category
+                          ? "bg-white/5 text-foreground"
+                          : "text-muted-foreground hover:bg-white/[0.03] hover:text-foreground"
+                      }`}
+                    >
+                      <span>{category}</span>
+                      <span className="font-mono text-[10px]">
+                        {categoryCounts[category]}
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ul>
             </div>
-          )}
+          </aside>
 
-          <div className="glass rounded-lg p-6">
-            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              Categories
-            </div>
-            <ul className="mt-4 space-y-1 text-sm">
-              {categories.map((category) => (
-                <li key={category}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveCategory(category)}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
-                      activeCategory === category
-                        ? "bg-white/5 text-foreground"
-                        : "text-muted-foreground hover:bg-white/[0.03] hover:text-foreground"
-                    }`}
-                  >
-                    <span>{category}</span>
-                    <span className="font-mono text-[10px]">
-                      {categoryCounts[category]}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-
-        <div className="lg:col-span-8">
-          <div className="glass rounded-lg p-6 mb-6">
-            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-              Research Intelligence
-            </div>
-
-            <h3 className="mt-3 text-2xl font-light tracking-tight text-foreground">
-              Live Customer Discovery - Shaping Product Strategy.
-            </h3>
-
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-              Early customer discovery indicates a strong demand for
-              non-invasive personalised body intelligence.
-            </p>
-
-            <div className="mt-6 grid gap-4 md:grid-cols-3">
-              <div className="rounded-lg border border-border bg-white/[0.02] p-4">
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Survey Participants
-                </div>
-                <div className="mt-2 text-3xl font-light">
-                  {metrics?.participants ?? 0}
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-border bg-white/[0.02] p-4">
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Customer Interviews
-                </div>
-                <div className="mt-2 text-3xl font-light">
-                  {metrics?.voiceRecordings ?? 0}
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-border bg-white/[0.02] p-4">
-                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                  Most Popular Price Point
-                </div>
-
-                <div className="mt-2 text-3xl font-light">
-                  {topPriceLabel || "No data"}
-                </div>
-
-                <div className="mt-1 text-sm text-muted-foreground">
-                  {metrics?.topPricePointCount ?? 0} of{" "}
-                  {metrics?.participants ?? 0} responses
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-lg border border-accent/20 bg-accent/5 p-5">
+          <div className="lg:col-span-8">
+            <div className="glass rounded-lg p-6 mb-6">
               <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-                CUSTOMER VALIDATION
+                Research Intelligence
               </div>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className="rounded-lg border border-border bg-white/[0.02] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-                    Problem Validation
+              <h3 className="mt-3 text-2xl font-light tracking-tight text-foreground">
+                Live Customer Discovery - Shaping Product Strategy.
+              </h3>
+
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+                Early customer discovery indicates a strong demand for
+                non-invasive personalised body intelligence.
+              </p>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-3">
+                <div className="rounded-lg border border-border bg-white/[0.02] p-4">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    Survey Participants
+                  </div>
+                  <div className="mt-2 text-3xl font-light">
+                    {metrics?.participants ?? 0}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border bg-white/[0.02] p-4">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    Customer Interviews
+                  </div>
+                  <div className="mt-2 text-3xl font-light">
+                    {metrics?.voiceRecordings ?? 0}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-border bg-white/[0.02] p-4">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    Most Popular Price Point
                   </div>
 
-                  <div className="mt-3">
-                    <p className="text-sm leading-7 text-muted-foreground">
+                  <div className="mt-2 text-3xl font-light">
+                    {topPriceLabel || "No data"}
+                  </div>
+
+                  <div className="mt-1 text-sm text-muted-foreground">
+                    {metrics?.topPricePointCount ?? 0} of{" "}
+                    {metrics?.participants ?? 0} responses
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-lg border border-accent/20 bg-accent/5 p-5">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                  CUSTOMER VALIDATION
+                </div>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-lg border border-border bg-white/[0.02] p-5">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                      Problem Validation
+                    </div>
+
+                    <div className="mt-3">
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        <span className="font-medium text-foreground">
+                          {Math.round(Number(metrics?.topConcernPercent ?? 0))}%
+                          <br />
+                        </span>
+                        Of participants report {""}
+                        <span className="font-medium text-foreground">
+                          '{metrics?.topConcern}'
+                        </span>{" "}
+                        as a recurring concern.{" "}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-border bg-white/[0.02] p-5">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                      Market Demand
+                    </div>
+
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
                       <span className="font-medium text-foreground">
-                        {Math.round(Number(metrics?.topConcernPercent ?? 0))}%
+                        {Math.round(Number(metrics?.spentMoneyPercent ?? 0))}%{" "}
                         <br />
                       </span>{" "}
-                      Of participants report{" "}
-                      <span className="font-medium text-foreground">
-                        '{metrics?.topConcern ?? "No data"}'{" "}
-                      </span>
-                      as a recurring concern.
+                      Have already spent money trying to solve the problem.
                     </p>
                   </div>
-                </div>
 
-                <div className="rounded-lg border border-border bg-white/[0.02] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-                    Market Demand
+                  <div className="rounded-lg border border-border bg-white/[0.02] p-5">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                      Product Opportunity
+                    </div>
+
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      <span className="font-medium text-foreground">
+                        Top Insight Requested
+                        <br /> '
+                        {metrics?.topDesiredInsights?.[0]?.value ?? "No data"}'
+                      </span>{" "}
+                      is the most requested insight by participants.
+                    </p>
                   </div>
 
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {Math.round(Number(metrics?.spentMoneyPercent ?? 0))}%{" "}
+                  <div className="rounded-lg border border-border bg-white/[0.02] p-5">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                      Commercial Interest
+                    </div>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      <span className="font-medium text-foreground">
+                        {metrics?.commercialInterestPercent ?? 0}% <br />
+                      </span>
+                      Respondents answered 'Yes' or 'Maybe' when asked{" "}
+                      <span className="font-bold italic text-foreground">
+                        'If a solution gave you insights into your body, would
+                        you consider paying for it?'
+                      </span>
                       <br />
-                    </span>{" "}
-                    Have already spent money trying to solve the problem.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-border bg-white/[0.02] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-                    Product Opportunity
+                      <span className="italic">
+                        i.e. a subscription for an app or wearable device
+                      </span>
+                      .
+                    </p>
+                  </div>
+                  <div className="mt-4">
+                    <p className="mb-2 text-sm font-medium text-foreground">
+                      Top Concerns Reported :
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {metrics?.topConcerns?.slice(0, 5).map((concern) => (
+                        <span
+                          key={concern.value}
+                          className="rounded-full border border-border px-3 py-1 text-xs"
+                        >
+                          {concern.value} · {concern.count}
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      Top Insight Requested
-                      <br /> '
-                      {metrics?.topDesiredInsights?.[0]?.value ?? "No data"}'
-                    </span>{" "}
-                    is the most requested insight by participants.
-                  </p>
-                </div>
-
-                <div className="rounded-lg border border-border bg-white/[0.02] p-5">
-                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-                    Commercial Interest
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    Top Insights Requested :{" "}
+                    {metrics?.topDesiredInsights
+                      ?.slice(0, 4)
+                      ?.map((insight: InsightMetric) => (
+                        <span
+                          key={insight.value}
+                          className="rounded-full border border-border px-3 py-1 text-xs"
+                        >
+                          {insight.value}
+                        </span>
+                      ))}
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {metrics?.commercialInterestPercent ?? 0}% <br />
-                    </span>
-                    Respondents answered 'Yes' or 'Maybe' when asked{" "}
-                    <span className="font-bold italic text-foreground">
-                      'If a solution gave you insights into your body, would you
-                      consider paying for it?'
-                    </span>
-                    <br />
-                    <span className="italic">
-                      i.e. a subscription for an app or wearable device
-                    </span>
-                    .
-                  </p>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                 Top Concerns Reported : {" "}
-                    {metrics?.topConcerns?.slice(0, 5).map((concern) => (
-                      <span
-                        key={concern.value}
-                        className="rounded-full border border-border px-3 py-3 pr-5 text-xs"
-                      >
-                        {concern.value} · {concern.count}
-                      </span>
-                    ))}
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  Top Insights Requested :{" "}
-                  {metrics?.topDesiredInsights
-                    ?.slice(0, 4)
-                    ?.map((insight: InsightMetric) => (
-                      <span
-                        key={insight.value}
-                        className="rounded-full border border-border px-3 py-1 text-xs"
-                      >
-                        {insight.value}
-                      </span>
-                    ))}
                 </div>
               </div>
             </div>
