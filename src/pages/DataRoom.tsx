@@ -1192,8 +1192,8 @@ const DataRoom = () => {
                       <span className="font-medium text-foreground">
                         {Math.round(Number(metrics?.topConcernPercent ?? 0))}%
                         <br />
-                      </span>
-                      Of participants report {" "}
+                      </span>{" "}
+                      Of participants report{" "}
                       <span className="font-medium text-foreground">
                         '{metrics?.topConcern ?? "No data"}'{" "}
                       </span>
@@ -1251,18 +1251,16 @@ const DataRoom = () => {
                     .
                   </p>
                 </div>
-                <div className="mt-4">
-                  <p>Top Concerns Reported:</p>
-                  <div>
-                    {metrics?.topConcerns?.slice(0, 5)?.map((concern) => (
+                <div className="mt-4 flex flex-wrap gap-2">
+                 Top Concerns Reported : {" "}
+                    {metrics?.topConcerns?.slice(0, 5).map((concern) => (
                       <span
                         key={concern.value}
-                        className="rounded-full border border-border px-3 py-1 text-xs"
+                        className="rounded-full border border-border px-3 py-3 pr-5 text-xs"
                       >
-                        {concern.value}
+                        {concern.value} · {concern.count}
                       </span>
                     ))}
-                  </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   Top Insights Requested :{" "}
