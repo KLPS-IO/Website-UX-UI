@@ -3,7 +3,7 @@ import heroImg from "@/assets/hero-textile.jpg";
 import sensorImg from "@/assets/sensor-mesh.jpg";
 import polymerImg from "@/assets/polymer-lab.jpg";
 import dcLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
-import createch from "@/assets/createch-logo.png";
+import createch from "@/assets/ctf-logo.png"
 import niyoLogo from "@/assets/niyo-group-logo-l.png";
 import ffrLogo from "@/assets/ffr-logo.jpg";
 import bfflogo from "@/assets/bff-logo.webp";
