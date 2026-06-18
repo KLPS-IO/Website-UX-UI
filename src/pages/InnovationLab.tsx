@@ -3,13 +3,14 @@ import heroImg from "@/assets/hero-textile.jpg";
 import sensorImg from "@/assets/sensor-mesh.jpg";
 import polymerImg from "@/assets/polymer-lab.jpg";
 import dcLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
-import createch from "@/assets/ctf-logo.png"
+import createch from "@/assets/ctf-logo.png";
 import niyoLogo from "@/assets/niyo-group-logo-l.png";
 import ffrLogo from "@/assets/ffr-logo.jpg";
 import bfflogo from "@/assets/bff-logo.webp";
+import bel from "@/assets/barclays-eagle-labs-logo.png";
+import wmca from "@/assets/wmca.webp";
 import { Section, StatCard } from "@/components/Section";
 import { AnimatedHeadline } from "@/components/AnimatedHeadline";
-
 const navItems = [
   { href: "#overview", label: "Overview" },
   { href: "#founder", label: "Founder" },
@@ -24,22 +25,26 @@ const companyWins = [
   {
     logo: dcLogo,
     name: "Digital Catapult",
-    detail: "Working across innovation, industry access, and emerging technology pathways.",
+    detail:
+      "Working across innovation, industry access, and emerging technology pathways.",
   },
   {
     logo: createch,
     name: "Createch",
-    detail: "Pioneering the future of creative technology and digital experiences.",
+    detail:
+      "Pioneering the future of creative technology and digital experiences.",
   },
   {
     logo: ffrLogo,
     name: "Female Founder Rise",
-    detail: "Helping early-stage to growth-stage founders build profitable businesses and secure investment",
+    detail:
+      "Helping early-stage to growth-stage founders build profitable businesses and secure investment",
   },
   {
     logo: niyoLogo,
     name: "Niyo Group",
-    detail: "Empowering ambitious females through technology, education, and innovative enterprise",
+    detail:
+      "Empowering ambitious females through technology, education, and innovative enterprise",
   },
   {
     logo: bfflogo,
@@ -72,16 +77,56 @@ const pillars = [
   },
 ];
 
-const quickNav = [
-  { href: "/data-room", title: "Founder Dashboard", desc: "Vision, milestones, accelerators, press." },
-  { href: "/data-room", title: "Investor Data Room", desc: "Deck, financials, cap table, NDA flow." },
-  { href: "#lab", title: "IP & R&D Lab", desc: "Patents, prototypes, materials, roadmap." },
-  { href: "#ecosystem", title: "Product Ecosystem", desc: "Smart underwear, textile systems, AI." },
-  { href: "#funding", title: "Funding & Growth", desc: "Ask, use of funds, TAM/SAM/SOM." },
-  { href: "#vault", title: "Secure File Vault", desc: "Permissioned files, activity logs." },
+const partnerLogos = [
+  { partnerlogo: bel },
+  { partnerlogo: wmca },
+  { partnerlogo: ffrLogo },
+  { partnerlogo: niyoLogo },
+  { partnerlogo: bfflogo },
 ];
 
-const NavLink = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => {
+const quickNav = [
+  {
+    href: "/data-room",
+    title: "Founder Dashboard",
+    desc: "Vision, milestones, accelerators, press.",
+  },
+  {
+    href: "/data-room",
+    title: "Investor Data Room",
+    desc: "Deck, financials, cap table, NDA flow.",
+  },
+  {
+    href: "#lab",
+    title: "IP & R&D Lab",
+    desc: "Patents, prototypes, materials, roadmap.",
+  },
+  {
+    href: "#ecosystem",
+    title: "Product Ecosystem",
+    desc: "Smart underwear, textile systems, AI.",
+  },
+  {
+    href: "#funding",
+    title: "Funding & Growth",
+    desc: "Ask, use of funds, TAM/SAM/SOM.",
+  },
+  {
+    href: "#vault",
+    title: "Secure File Vault",
+    desc: "Permissioned files, activity logs.",
+  },
+];
+
+const NavLink = ({
+  href,
+  children,
+  className = "",
+}: {
+  href: string;
+  children: React.ReactNode;
+  className?: string;
+}) => {
   if (href.startsWith("/")) {
     return (
       <Link to={href} className={className}>
@@ -105,7 +150,9 @@ const InnovationLab = () => {
           <div className="flex min-w-0 items-center gap-8">
             <a href="https://klps.co.uk" className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-accent shadow-[0_0_12px_hsl(var(--accent))]" />
-              <span className="text-m font-semibold tracking-[0.35em] text-foreground">KPLS</span>
+              <span className="text-m font-semibold tracking-[0.35em] text-foreground">
+                KPLS
+              </span>
             </a>
             <nav className="hidden items-center gap-1 lg:flex">
               {navItems.map((item, index) => (
@@ -113,7 +160,9 @@ const InnovationLab = () => {
                   key={item.label}
                   href={item.href}
                   className={`rounded-full px-3 py-1.5 text-m font-medium tracking-wide transition-colors ${
-                    index === 0 ? "bg-white/5 text-foreground" : "text-muted-foreground hover:text-foreground"
+                    index === 0
+                      ? "bg-white/5 text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {item.label}
@@ -161,16 +210,17 @@ const InnovationLab = () => {
                 <span className="size-1 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--accent))]" />
                 Next-generation wearable infrastructure
               </div>
-            <AnimatedHeadline
-              className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-7xl"
-              lines={[
-                { text: "ENGINEERING", italic: true},
-                { text: "the future of", italic: true},
-                { text: "INTELLIGENT TEXTILES.", italic: true, muted: true },
-              ]}
-            />
+              <AnimatedHeadline
+                className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-7xl"
+                lines={[
+                  { text: "ENGINEERING", italic: true },
+                  { text: "the future of", italic: true },
+                  { text: "INTELLIGENT TEXTILES.", italic: true, muted: true },
+                ]}
+              />
               <p className="mt-8 max-w-xl text-lg text-muted-foreground">
-                Everything in this room is built on customer discovery, technical validation and measurable demand.
+                Everything in this room is built on customer discovery,
+                technical validation and measurable demand.
               </p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <Link
@@ -198,8 +248,9 @@ const InnovationLab = () => {
                     Built with momentum
                   </div>
                   <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                   Selected by leading accelerator and innovation programmes supporting 
-                   KLPS's technology development, venture readiness, and commercial growth.
+                    Selected by leading accelerator and innovation programmes
+                    supporting KLPS's technology development, venture readiness,
+                    and commercial growth.
                   </p>
                 </div>
 
@@ -230,6 +281,27 @@ const InnovationLab = () => {
                   </article>
                 ))}
               </div>
+              <p className="font-mono text-[10px] py-30 uppercase tracking-[0.2em] text-accent">
+                Sponsored By:
+              </p>
+              <div className="overflow-hidden border-t border-border bg-obsidian py-8">
+                <div className="flex animate-marquee items-center gap-24 max-w-full">
+                  {[bel, wmca, bel, wmca, bel, wmca, bel, wmca].map(
+                    (partnerLogo, index) => (
+                      <div
+                        key={index}
+                        className="flex min-w-[300px] items-center justify-center"
+                      >
+                        <img
+                          src={partnerLogo}
+                          alt=""
+                          className="h-auto max-h-16 max-w-[240px] object-contain"
+                        />
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -240,7 +312,10 @@ const InnovationLab = () => {
           title="Building the future of body intelligence."
           description="KLPS is developing wearable technologies that help women/girls better understand their bodies through non-invasive sensing, intelligent textiles and personalised insights."
         >
-          <div id="lab" className="grid scroll-mt-24 grid-cols-1 gap-6 md:grid-cols-3">
+          <div
+            id="lab"
+            className="grid scroll-mt-24 grid-cols-1 gap-6 md:grid-cols-3"
+          >
             {pillars.map((card) => (
               <article
                 key={card.code}
@@ -258,8 +333,12 @@ const InnovationLab = () => {
                   <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
                     Project {card.code}
                   </div>
-                  <h3 className="mt-2 text-lg font-medium text-foreground">{card.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{card.desc}</p>
+                  <h3 className="mt-2 text-lg font-medium text-foreground">
+                    {card.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {card.desc}
+                  </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {card.tags.map((tag) => (
                       <span
@@ -295,7 +374,10 @@ const InnovationLab = () => {
           title="What we've learned so far."
           description="Real customer voices, emerging patterns and the opportunity we're building towards."
         >
-          <div id="ecosystem" className="grid scroll-mt-24 grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3">
+          <div
+            id="ecosystem"
+            className="grid scroll-mt-24 grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border md:grid-cols-2 lg:grid-cols-3"
+          >
             {quickNav.map((item) => (
               <NavLink
                 key={item.title}
@@ -304,8 +386,12 @@ const InnovationLab = () => {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="text-lg font-medium text-foreground">{item.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{item.desc}</p>
+                    <h3 className="text-lg font-medium text-foreground">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {item.desc}
+                    </p>
                   </div>
                   <span className="text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-accent">
                     →
@@ -324,16 +410,26 @@ const InnovationLab = () => {
           <div>
             <div className="text-sm font-semibold tracking-[0.3em]">KPLS</div>
             <p className="mt-2 max-w-md text-m text-muted-foreground">
-              Confidential investor data room. All materials subject to NDA.
-              © {new Date().getFullYear()} KPLS Ltd.
+              Confidential investor data room. All materials subject to NDA. ©{" "}
+              {new Date().getFullYear()} KPLS Ltd.
             </p>
           </div>
           <div className="flex flex-wrap gap-6 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-            <a className="hover:text-foreground" href="https://klps.co.uk">Back to Home</a>
-            <a className="hover:text-foreground" href="#overview">NDA Terms</a>
-            <a className="hover:text-foreground" href="#overview">Privacy</a>
-            <a className="hover:text-foreground" href="#overview">Security</a>
-            <a className="hover:text-foreground" href="#overview">Contact</a>
+            <a className="hover:text-foreground" href="https://klps.co.uk">
+              Back to Home
+            </a>
+            <a className="hover:text-foreground" href="#overview">
+              NDA Terms
+            </a>
+            <a className="hover:text-foreground" href="#overview">
+              Privacy
+            </a>
+            <a className="hover:text-foreground" href="#overview">
+              Security
+            </a>
+            <a className="hover:text-foreground" href="#overview">
+              Contact
+            </a>
           </div>
         </div>
       </footer>

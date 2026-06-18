@@ -574,7 +574,7 @@ function BodyDiscoverySurvey() {
                 <div className="flex flex-col gap-3">
                   <div className="h-10 w-10 rounded-full bg-blush/60 flex items-center justify-center"></div>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    - Tap an area of concern below. <br /> - Tap one area at a
+                    - Tap an area where you'd like more insight into the changes, patterns, or experiences you're noticing. <br /> - Tap one area at a
                     time, select concerns in the panel below/at the side of your
                     screen as they change with each area.
                     <br /> - You can always edit your selections before moving
@@ -700,7 +700,7 @@ function BodyDiscoverySurvey() {
                     <CalendarDays className="h-4 w-4 text-orchid" />
                   </div>
                   <h3 className="text-sm font-semibold text-plum">
-                    How often do these concerns impact your confidence, comfort,
+                    How often do these experiences impact your confidence, comfort,
                     or daily life?
                   </h3>
                 </div>
