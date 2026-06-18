@@ -700,8 +700,7 @@ function BodyDiscoverySurvey() {
                     <CalendarDays className="h-4 w-4 text-orchid" />
                   </div>
                   <h3 className="text-sm font-semibold text-plum">
-                    How often do these experiences impact your confidence, comfort,
-                    or daily life?
+                    How often do these changes or experiences affect your confidence, comfort, or daily life?
                   </h3>
                 </div>
                 <div className="flex flex-wrap gap-2">

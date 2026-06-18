@@ -80,7 +80,7 @@ export const CURRENT_SOLUTIONS = [
 export const VOICE_PROMPTS = [
   {
     key: "frustration",
-    text: "What do you wish you understood better about the changes happening in your body?"
+    text: "What would you like more insight into when it comes to your body?"
   },
   {
     key: "impact",
