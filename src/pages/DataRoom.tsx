@@ -1026,6 +1026,14 @@ const DataRoom = () => {
         >
           Return to Innovation Lab
         </Link>
+
+        <Link
+          to="/pitch-deck"
+          className="inline-flex rounded-full border border-border bg-white/[0.03] ml-5 px-5 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-white/[0.08]"
+        >
+          Pitch Deck
+        </Link>
+
       </PageHeader>
 
       <Section>

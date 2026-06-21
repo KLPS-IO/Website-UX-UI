@@ -12,20 +12,21 @@ import { BodyScanPage } from "./components/BodyScanPage";
 import ChatLema from "./pages/ChatLema";
 import { StatsPage } from "./components/StatsPage";
 import { ProfilePage } from "./components/ProfilePage";
-import Summary from '@/pages/Summary';
-import CheckIn from '@/pages/CheckIn';
-import Goals from '@/pages/Goals';
-import Progress from '@/pages/Progress';
-import Streaks from '@/pages/Streaks';
-import Rewards from '@/pages/Rewards';
-import Avatar from '@/pages/Avatar';
-import Profile from '@/pages/Profile';
-import FounderDashboard from '@/pages/FounderDashboard';
-import InvestorDashboard from '@/pages/InvestorDashboard';
-import FounderRoute from '@/components/FounderRoute';
-import DataRoom from '@/pages/DataRoom';
-import InnovationLab from '@/pages/InnovationLab';
-import BodyDiscoverySurvey from '@/pages/BodyDiscoverySurvey';
+import Summary from "@/pages/Summary";
+import CheckIn from "@/pages/CheckIn";
+import Goals from "@/pages/Goals";
+import Progress from "@/pages/Progress";
+import Streaks from "@/pages/Streaks";
+import Rewards from "@/pages/Rewards";
+import Avatar from "@/pages/Avatar";
+import Profile from "@/pages/Profile";
+import FounderDashboard from "@/pages/FounderDashboard";
+import InvestorDashboard from "@/pages/InvestorDashboard";
+import FounderRoute from "@/components/FounderRoute";
+import DataRoom from "@/pages/DataRoom";
+import InnovationLab from "@/pages/InnovationLab";
+import { SlideDeck } from "./components/SlideDeck";
+import BodyDiscoverySurvey from "@/pages/BodyDiscoverySurvey";
 
 const queryClient = new QueryClient();
 
@@ -39,13 +40,14 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
+          <Route path="/pitch-deck" element={<SlideDeck />} />
           <Route path="/data-room" element={<DataRoom />} />
           <Route path="/beta-login" element={<BetaLogin />} />
           <Route path="/beta-dashboard" element={<DashboardLayout />}>
             <Route index element={<BetaDashboard />} />
             <Route path="bodyscan" element={<BodyScanPage />} />
-            <Route path="chat" element={< ChatLema />} />
-            <Route path="stats" element={< StatsPage />} />
+            <Route path="chat" element={<ChatLema />} />
+            <Route path="stats" element={<StatsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="summary" element={<Summary />} />
             <Route path="check-in" element={<CheckIn />} />
@@ -71,7 +73,6 @@ const App = () => (
                 </FounderRoute>
               }
             />
-
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
