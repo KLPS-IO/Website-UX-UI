@@ -6,6 +6,8 @@ import blobRing from "@/assets/blob-ring.png";
 
 const TOTAL = 13;
 
+// const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
+
 // ----- helpers -----
 function BlobDecor({ variant = "all" }: { variant?: "all" | "top" | "minimal" }) {
   return (
@@ -154,6 +156,7 @@ function Slide02() {
           { label: "Pelvic region", pct: "No mass-market sensor" },
           { label: "Core body zones", pct: "Under-measured" },
         ].map((row) => (
+            
           <div key={row.label} className="stat-card" style={{ padding: 36 }}>
             <div style={{ fontSize: 30, fontWeight: 700, color: "var(--brand-ink)" }}>{row.label}</div>
             <div style={{ fontSize: 22, color: "var(--brand-magenta)", marginTop: 8, fontWeight: 600 }}>

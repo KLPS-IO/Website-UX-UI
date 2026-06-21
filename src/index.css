@@ -391,14 +391,14 @@ All colors MUST be HSL.
 :root {
   --radius: 0.875rem;
 
-  --background: oklch(1 0 0);
+  /* --background: oklch(1 0 0); */
   --foreground: oklch(0.16 0.02 280);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.16 0.02 280);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.16 0.02 280);
   --primary: oklch(0.55 0.30 320);
-  --primary-foreground: oklch(0.99 0 0);
+  /* --primary-foreground: oklch(0.99 0 0); */
   --secondary: oklch(0.96 0.02 320);
   --secondary-foreground: oklch(0.2 0.05 300);
   --muted: oklch(0.97 0.01 300);
