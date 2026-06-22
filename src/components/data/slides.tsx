@@ -9,7 +9,11 @@ const TOTAL = 13;
 // const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
 
 // ----- helpers -----
-function BlobDecor({ variant = "all" }: { variant?: "all" | "top" | "minimal" }) {
+function BlobDecor({
+  variant = "all",
+}: {
+  variant?: "all" | "top" | "minimal";
+}) {
   return (
     <>
       {(variant === "all" || variant === "top") && (
@@ -43,7 +47,13 @@ function BlobDecor({ variant = "all" }: { variant?: "all" | "top" | "minimal" })
 // ----- 01: Cover -----
 function Slide01() {
   return (
-    <SlideFrame variant="split" pageNumber={1} pageTotal={TOTAL} showLogo={false} showWatermark>
+    <SlideFrame
+      variant="split"
+      pageNumber={1}
+      pageTotal={TOTAL}
+      showLogo={false}
+      showWatermark
+    >
       <BlobDecor />
       <div
         style={{
@@ -54,7 +64,9 @@ function Slide01() {
         }}
       >
         <div style={{ marginBottom: 56 }}>
-          <div style={{ display: "inline-flex", alignItems: "baseline", gap: 18 }}>
+          <div
+            style={{ display: "inline-flex", alignItems: "baseline", gap: 18 }}
+          >
             <span
               style={{
                 display: "inline-block",
@@ -80,19 +92,33 @@ function Slide01() {
                 K
               </span>
             </span>
-            <span style={{ fontWeight: 900, fontSize: 64, letterSpacing: "-0.04em" }}>KLPS</span>
-            <span style={{ fontSize: 32, color: "var(--muted-foreground)" }}>technology</span>
+            <span
+              style={{
+                fontWeight: 900,
+                fontSize: 64,
+                letterSpacing: "-0.04em",
+              }}
+            >
+              KLPS
+            </span>
+            <span style={{ fontSize: 32, color: "var(--muted-foreground)" }}>
+              technology
+            </span>
           </div>
         </div>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 24 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 24 }}
+        >
           Investor Pitch · 2026
         </div>
-        <h1 className="slide-title-xl" style={{ color: "var(--brand-ink)" }}>
-          A <span className="brand-text">£165 Billion</span>
+        <h1
+          className="slide-title-xl"
+          style={{ color: "var(--brand-ink)", marginRight: "50px" }}
+        >
+          <span className="brand-text">Femtech</span>
           <br />
-          opportunity in
-          <br />
-          women's health.
+          <p className=""> Insights Underwear. </p>
         </h1>
       </div>
 
@@ -104,8 +130,14 @@ function Slide01() {
           color: "white",
         }}
       >
-        <div style={{ fontWeight: 700, fontSize: 36, letterSpacing: "-0.02em" }}>Emma Mendez</div>
-        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>Founder &amp; CEO</div>
+        <div
+          style={{ fontWeight: 700, fontSize: 36, letterSpacing: "-0.02em" }}
+        >
+          Emma Mendez
+        </div>
+        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>
+          Founder &amp; CEO
+        </div>
       </div>
       <div
         style={{
@@ -117,27 +149,48 @@ function Slide01() {
         }}
       >
         <div style={{ fontSize: 22, opacity: 0.9 }}>emmamendez@klps.co.uk</div>
-        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>klps.co.uk</div>
+        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>
+          klps.co.uk
+        </div>
       </div>
     </SlideFrame>
   );
 }
 
 // ----- 02: The Problem -----
-function Slide02() {
+function Slide02({ metrics }: { metrics?: SlideMetrics }) {
+  const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
+  
   return (
     <SlideFrame variant="white" pageNumber={2} pageTotal={TOTAL}>
-      <img src={blobPink} alt="" className="blob" style={{ top: -120, right: -80, width: 520, opacity: 0.55 }} />
+      <img
+        src={blobPink}
+        alt=""
+        className="blob"
+        style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 900 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           01 · The Problem
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", marginBottom: 48 }}>
-          Most wearables<br />measure from the <span className="brand-text">wrist.</span>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginBottom: 48 }}
+        >
+          Most wearables
+          <br />
+          measure from the <span className="brand-text">wrist.</span>
         </h2>
-        <p className="slide-body-lg" style={{ color: "oklch(0.35 0.03 290)", maxWidth: 940 }}>
-          Women's bodies are not wrists. Meaningful physiological signals occur in the abdomen,
-          pelvic region and core body zones — and remain under-measured today.
+        <p
+          className="slide-body-lg"
+          style={{ color: "oklch(0.35 0.03 290)", maxWidth: 940 }}
+        >
+          Women's bodies are not wrists. Meaningful physiological signals occur
+          in the abdomen, pelvic region and core body zones - and remain
+          under-measured today.
         </p>
       </div>
 
@@ -152,14 +205,42 @@ function Slide02() {
         }}
       >
         {[
-          { label: "Abdominal signals", pct: "Largely ignored" },
-          { label: "Pelvic region", pct: "No mass-market sensor" },
-          { label: "Core body zones", pct: "Under-measured" },
+          {
+            label: `${tummyInTen} in 10 women`,
+            pct: "selected the abdominal region as an area where they want more insight",
+          },
+          {
+            label: `${metrics?.topConcernPercent ?? 0}%`,
+            pct: "report bloating as a recurring experience",
+          },
+          {
+            label: `${metrics?.commercialInterestPercent ?? 0}%`,
+            pct: "would consider paying for personalised body insights",
+          },
         ].map((row) => (
-            
-          <div key={row.label} className="stat-card" style={{ padding: 36 }}>
-            <div style={{ fontSize: 30, fontWeight: 700, color: "var(--brand-ink)" }}>{row.label}</div>
-            <div style={{ fontSize: 22, color: "var(--brand-magenta)", marginTop: 8, fontWeight: 600 }}>
+          <div
+            key={`${row.label}-${row.pct}`}
+            className="stat-card"
+            style={{ padding: 36 }}
+          >
+            {" "}
+            <div
+              style={{
+                fontSize: 30,
+                fontWeight: 700,
+                color: "var(--brand-ink)",
+              }}
+            >
+              {row.label}
+            </div>
+            <div
+              style={{
+                fontSize: 22,
+                color: "var(--brand-magenta)",
+                marginTop: 8,
+                fontWeight: 600,
+              }}
+            >
               {row.pct}
             </div>
           </div>
@@ -173,14 +254,28 @@ function Slide02() {
 function Slide03() {
   return (
     <SlideFrame variant="soft" pageNumber={3} pageTotal={TOTAL}>
-      <img src={blobSpiral} alt="" className="blob" style={{ bottom: -120, left: -120, width: 520, opacity: 0.8 }} />
+      <img
+        src={blobSpiral}
+        alt=""
+        className="blob"
+        style={{ bottom: -120, left: -120, width: 520, opacity: 0.8 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           02 · The Gap
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", maxWidth: 1400 }}>
-          We have tracking devices.<br />
-          <span className="brand-text">They just don't track what matters.</span>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", maxWidth: 1400 }}
+        >
+          We have tracking devices.
+          <br />
+          <span className="brand-text">
+            They just don't track what matters.
+          </span>
         </h2>
 
         <div
@@ -192,15 +287,29 @@ function Slide03() {
           }}
         >
           <div className="stat-card">
-            <div className="slide-kicker" style={{ color: "var(--brand-violet)", marginBottom: 16 }}>
+            <div
+              className="slide-kicker"
+              style={{ color: "var(--brand-violet)", marginBottom: 16 }}
+            >
               Today
             </div>
-            <div style={{ fontSize: 36, fontWeight: 700, lineHeight: 1.25, color: "var(--brand-ink)" }}>
-              WHOOP. Apple Watch. Oura. Flo.<br />
+            <div
+              style={{
+                fontSize: 36,
+                fontWeight: 700,
+                lineHeight: 1.25,
+                color: "var(--brand-ink)",
+              }}
+            >
+              WHOOP. Apple Watch. Oura. Flo.
+              <br />
               All worn on the wrist, the finger, or the phone.
             </div>
           </div>
-          <div className="stat-card" style={{ background: "var(--brand-gradient)", color: "white" }}>
+          <div
+            className="stat-card"
+            style={{ background: "var(--brand-gradient)", color: "white" }}
+          >
             <div
               className="slide-kicker"
               style={{ color: "rgba(255,255,255,0.85)", marginBottom: 16 }}
@@ -208,7 +317,8 @@ function Slide03() {
               KLPS
             </div>
             <div style={{ fontSize: 36, fontWeight: 700, lineHeight: 1.25 }}>
-              Sensing embedded into garments.<br />
+              Sensing embedded into garments.
+              <br />
               Passive monitoring. No behaviour change.
             </div>
           </div>
@@ -221,19 +331,46 @@ function Slide03() {
 // ----- 04: How it works -----
 function Slide04() {
   const steps = [
-    { n: "01", t: "Garment", d: "Everyday underwear holds sensing materials close to the body." },
-    { n: "02", t: "Conductive textile", d: "Stretch fabric, sensor patch and conductive thread carry signals." },
-    { n: "03", t: "Microcontroller", d: "An on-board Arduino reads signals and converts to data." },
-    { n: "04", t: "Insight layer", d: "Signal → Memory → Insight. Structured behavioural intelligence." },
+    {
+      n: "01",
+      t: "Garment",
+      d: "Everyday underwear holds sensing materials close to the body.",
+    },
+    {
+      n: "02",
+      t: "Conductive textile",
+      d: "Stretch fabric, sensor patch and conductive thread carry signals.",
+    },
+    {
+      n: "03",
+      t: "Microcontroller",
+      d: "An on-board Arduino reads signals and converts to data.",
+    },
+    {
+      n: "04",
+      t: "Insight layer",
+      d: "Signal → Memory → Insight. Structured behavioural intelligence.",
+    },
   ];
   return (
     <SlideFrame variant="white" pageNumber={4} pageTotal={TOTAL}>
-      <img src={blobRing} alt="" className="blob" style={{ top: -160, right: -120, width: 520, opacity: 0.7 }} />
+      <img
+        src={blobRing}
+        alt=""
+        className="blob"
+        style={{ top: -160, right: -120, width: 520, opacity: 0.7 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           03 · How it works
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", maxWidth: 1400 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", maxWidth: 1400 }}
+        >
           A <span className="brand-text">garment</span> that listens.
         </h2>
         <div
@@ -267,10 +404,25 @@ function Slide04() {
               >
                 {s.n}
               </div>
-              <div style={{ fontSize: 34, fontWeight: 800, color: "var(--brand-ink)", marginBottom: 16 }}>
+              <div
+                style={{
+                  fontSize: 34,
+                  fontWeight: 800,
+                  color: "var(--brand-ink)",
+                  marginBottom: 16,
+                }}
+              >
                 {s.t}
               </div>
-              <div style={{ fontSize: 22, lineHeight: 1.4, color: "oklch(0.4 0.03 290)" }}>{s.d}</div>
+              <div
+                style={{
+                  fontSize: 22,
+                  lineHeight: 1.4,
+                  color: "oklch(0.4 0.03 290)",
+                }}
+              >
+                {s.d}
+              </div>
             </div>
           ))}
         </div>
@@ -300,11 +452,17 @@ function Slide04() {
 function Slide05() {
   return (
     <SlideFrame variant="white" pageNumber={5} pageTotal={TOTAL}>
-      <div style={{ position: "absolute", top: 220, left: 110, width: 880 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+      <div style={{ position: "absolute", top: 180, left: 110, width: 880 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           04 · Market Opportunity
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", marginBottom: 64 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginBottom: 0 }}
+        >
           A category-defining market.
         </h2>
 
@@ -312,15 +470,19 @@ function Slide05() {
           {[
             { tag: "TAM", value: "£165B", label: "Femtech in the next decade" },
             { tag: "SAM", value: "£46B", label: "Femtech wearables" },
-            { tag: "SOM", value: "£180m – £240m", label: "Premium early adopters + pilots (5 yrs)" },
+            {
+              tag: "SOM",
+              value: "£180m – £240m",
+              label: "Premium early adopters + pilots (5 yrs)",
+            },
           ].map((m) => (
             <div
               key={m.tag}
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 32,
-                padding: "28px 0",
+                gap: 30,
+                padding: "10px 0",
                 borderBottom: "1px solid oklch(0.9 0.02 320)",
               }}
             >
@@ -336,16 +498,34 @@ function Slide05() {
                 {m.tag}
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 56, fontWeight: 800, color: "var(--brand-ink)", letterSpacing: "-0.03em" }}>
+                <div
+                  style={{
+                    fontSize: 56,
+                    fontWeight: 800,
+                    color: "var(--brand-ink)",
+                    letterSpacing: "-0.03em",
+                  }}
+                >
                   {m.value}
                 </div>
-                <div style={{ fontSize: 24, color: "oklch(0.4 0.03 290)", marginTop: 4 }}>{m.label}</div>
+                <div
+                  style={{
+                    fontSize: 24,
+                    color: "oklch(0.4 0.03 290)",
+                    marginTop: 4,
+                  }}
+                >
+                  {m.label}
+                </div>
               </div>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 32, fontSize: 18, color: "oklch(0.45 0.02 290)" }}>
-          Sources: McKinsey Femtech Outlook 2024 · Smart Textiles Market Report 2023 · Graphene Market UK Forecast 2025.
+        <div
+          style={{ marginTop: 32, fontSize: 18, color: "oklch(0.45 0.02 290)" }}
+        >
+          Sources: McKinsey Femtech Outlook 2024 · Smart Textiles Market Report
+          2023 · Graphene Market UK Forecast 2025.
         </div>
       </div>
 
@@ -396,12 +576,23 @@ function Slide06() {
   ];
   return (
     <SlideFrame variant="white" pageNumber={6} pageTotal={TOTAL}>
-      <img src={blobPink} alt="" className="blob" style={{ top: -120, right: -100, width: 460, opacity: 0.55 }} />
+      <img
+        src={blobPink}
+        alt=""
+        className="blob"
+        style={{ top: -120, right: -100, width: 460, opacity: 0.55 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           05 · Landscape
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", marginBottom: 56 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginBottom: 56 }}
+        >
           No one is doing this.
         </h2>
         <div
@@ -422,7 +613,15 @@ function Slide06() {
                 boxShadow: "0 18px 40px -28px oklch(0.55 0.30 320 / 0.2)",
               }}
             >
-              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--brand-magenta)", marginBottom: 14, letterSpacing: "0.04em" }}>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: "var(--brand-magenta)",
+                  marginBottom: 14,
+                  letterSpacing: "0.04em",
+                }}
+              >
                 {g.h}
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
@@ -454,8 +653,9 @@ function Slide06() {
             lineHeight: 1.35,
           }}
         >
-          Apps predict. Trackers measure narrow signals. Absorbent fabrics solve a different problem.
-          KLPS sits in a white space: sensing-grade intimate garments.
+          Apps predict. Trackers measure narrow signals. Absorbent fabrics solve
+          a different problem. KLPS sits in a white space: sensing-grade
+          intimate garments.
         </div>
       </div>
     </SlideFrame>
@@ -471,13 +671,30 @@ function Slide07() {
     { v: "75%", l: "Day-2 retention" },
   ];
   return (
-    <SlideFrame variant="gradient" pageNumber={7} pageTotal={TOTAL} logoLight footerLight>
-      <img src={blobRing} alt="" className="blob" style={{ bottom: -180, left: -80, width: 520, opacity: 0.6 }} />
+    <SlideFrame
+      variant="gradient"
+      pageNumber={7}
+      pageTotal={TOTAL}
+      logoLight
+      footerLight
+    >
+      <img
+        src={blobRing}
+        alt=""
+        className="blob"
+        style={{ bottom: -180, left: -80, width: 520, opacity: 0.6 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "rgba(255,255,255,0.8)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "rgba(255,255,255,0.8)", marginBottom: 28 }}
+        >
           06 · Traction
         </div>
-        <h2 className="slide-title" style={{ color: "white", marginBottom: 80, maxWidth: 1500 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "white", marginBottom: 80, maxWidth: 1500 }}
+        >
           Live behavioural signals — already flowing.
         </h2>
         <div
@@ -500,14 +717,37 @@ function Slide07() {
                 minHeight: 280,
               }}
             >
-              <div style={{ fontSize: 96, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1 }}>
+              <div
+                style={{
+                  fontSize: 96,
+                  fontWeight: 800,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1,
+                }}
+              >
                 {s.v}
               </div>
-              <div style={{ fontSize: 22, opacity: 0.85, marginTop: 24, lineHeight: 1.35 }}>{s.l}</div>
+              <div
+                style={{
+                  fontSize: 22,
+                  opacity: 0.85,
+                  marginTop: 24,
+                  lineHeight: 1.35,
+                }}
+              >
+                {s.l}
+              </div>
             </div>
           ))}
         </div>
-        <div style={{ marginTop: 56, fontSize: 30, color: "rgba(255,255,255,0.9)", maxWidth: 1400 }}>
+        <div
+          style={{
+            marginTop: 56,
+            fontSize: 30,
+            color: "rgba(255,255,255,0.9)",
+            maxWidth: 1400,
+          }}
+        >
           Confirming early engagement momentum from day one.
         </div>
       </div>
@@ -519,19 +759,40 @@ function Slide07() {
 function Slide08() {
   return (
     <SlideFrame variant="white" pageNumber={8} pageTotal={TOTAL}>
-      <img src={blobSpiral} alt="" className="blob" style={{ top: -100, right: -100, width: 460, opacity: 0.7 }} />
+      <img
+        src={blobSpiral}
+        alt=""
+        className="blob"
+        style={{ top: -100, right: -100, width: 460, opacity: 0.7 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           07 · Business Model
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", marginBottom: 24 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginBottom: 24 }}
+        >
           Hardware <span className="brand-text">+</span> Intelligence.
         </h2>
-        <p className="slide-body-lg" style={{ color: "oklch(0.4 0.03 290)", maxWidth: 1300, marginBottom: 64 }}>
-          A hybrid model: a premium physical product that fuels a high-margin recurring insight layer.
+        <p
+          className="slide-body-lg"
+          style={{
+            color: "oklch(0.4 0.03 290)",
+            maxWidth: 1300,
+            marginBottom: 64,
+          }}
+        >
+          A hybrid model: a premium physical product that fuels a high-margin
+          recurring insight layer.
         </p>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}>
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}
+        >
           <div
             style={{
               padding: 44,
@@ -540,16 +801,46 @@ function Slide08() {
               minHeight: 320,
             }}
           >
-            <div style={{ fontSize: 22, letterSpacing: "0.18em", fontWeight: 800, color: "var(--brand-magenta)" }}>
+            <div
+              style={{
+                fontSize: 22,
+                letterSpacing: "0.18em",
+                fontWeight: 800,
+                color: "var(--brand-magenta)",
+              }}
+            >
               REVENUE STREAM · 01
             </div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: "var(--brand-ink)", marginTop: 16 }}>
+            <div
+              style={{
+                fontSize: 40,
+                fontWeight: 800,
+                color: "var(--brand-ink)",
+                marginTop: 16,
+              }}
+            >
               Smart Garment Sales
             </div>
-            <div style={{ fontSize: 88, fontWeight: 800, letterSpacing: "-0.04em", color: "var(--brand-ink)", marginTop: 24 }}>
+            <div
+              style={{
+                fontSize: 88,
+                fontWeight: 800,
+                letterSpacing: "-0.04em",
+                color: "var(--brand-ink)",
+                marginTop: 24,
+              }}
+            >
               £65 – £95
             </div>
-            <div style={{ fontSize: 22, color: "oklch(0.4 0.03 290)", marginTop: 4 }}>per garment</div>
+            <div
+              style={{
+                fontSize: 22,
+                color: "oklch(0.4 0.03 290)",
+                marginTop: 4,
+              }}
+            >
+              per garment
+            </div>
           </div>
           <div
             style={{
@@ -560,37 +851,57 @@ function Slide08() {
               minHeight: 320,
             }}
           >
-            <div style={{ fontSize: 22, letterSpacing: "0.18em", fontWeight: 800, opacity: 0.85 }}>
+            <div
+              style={{
+                fontSize: 22,
+                letterSpacing: "0.18em",
+                fontWeight: 800,
+                opacity: 0.85,
+              }}
+            >
               REVENUE STREAM · 02
             </div>
             <div style={{ fontSize: 40, fontWeight: 800, marginTop: 16 }}>
               Insight Subscription
             </div>
-            <div style={{ fontSize: 88, fontWeight: 800, letterSpacing: "-0.04em", marginTop: 24 }}>
+            <div
+              style={{
+                fontSize: 88,
+                fontWeight: 800,
+                letterSpacing: "-0.04em",
+                marginTop: 24,
+              }}
+            >
               £4 – £9
             </div>
-            <div style={{ fontSize: 22, opacity: 0.85, marginTop: 4 }}>per user / month</div>
+            <div style={{ fontSize: 22, opacity: 0.85, marginTop: 4 }}>
+              per user / month
+            </div>
           </div>
         </div>
 
-        <div style={{ marginTop: 40, display: "flex", gap: 16, flexWrap: "wrap" }}>
-          {["Research collaborations", "Healthcare partnerships", "Institutional licensing"].map(
-            (t) => (
-              <span
-                key={t}
-                style={{
-                  padding: "14px 28px",
-                  borderRadius: 9999,
-                  border: "1px solid oklch(0.85 0.04 320)",
-                  fontSize: 22,
-                  color: "var(--brand-ink)",
-                  fontWeight: 600,
-                }}
-              >
-                + {t}
-              </span>
-            )
-          )}
+        <div
+          style={{ marginTop: 40, display: "flex", gap: 16, flexWrap: "wrap" }}
+        >
+          {[
+            "Research collaborations",
+            "Healthcare partnerships",
+            "Institutional licensing",
+          ].map((t) => (
+            <span
+              key={t}
+              style={{
+                padding: "14px 28px",
+                borderRadius: 9999,
+                border: "1px solid oklch(0.85 0.04 320)",
+                fontSize: 22,
+                color: "var(--brand-ink)",
+                fontWeight: 600,
+              }}
+            >
+              + {t}
+            </span>
+          ))}
         </div>
       </div>
     </SlideFrame>
@@ -600,21 +911,46 @@ function Slide08() {
 // ----- 09: GTM -----
 function Slide09() {
   const phases = [
-    { p: "Phase 1", t: "Early testers & waitlist onboarding", d: "Underway today." },
-    { p: "Phase 2", t: "Community-driven growth", d: "Ambassador & referral loops." },
+    {
+      p: "Phase 1",
+      t: "Early testers & waitlist onboarding",
+      d: "Underway today.",
+    },
+    {
+      p: "Phase 2",
+      t: "Community-driven growth",
+      d: "Ambassador & referral loops.",
+    },
     { p: "Phase 3", t: "Commercial pilot launches", d: "Premium D2C release." },
-    { p: "Phase 4", t: "Retail & institutional partnerships", d: "Healthcare and research deals." },
+    {
+      p: "Phase 4",
+      t: "Retail & institutional partnerships",
+      d: "Healthcare and research deals.",
+    },
   ];
   return (
     <SlideFrame variant="white" pageNumber={9} pageTotal={TOTAL}>
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           08 · Go-to-market
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", marginBottom: 80 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginBottom: 80 }}
+        >
           A staged path to scale.
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, position: "relative" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: 24,
+            position: "relative",
+          }}
+        >
           <div
             style={{
               position: "absolute",
@@ -646,13 +982,31 @@ function Slide09() {
               >
                 {i + 1}
               </div>
-              <div style={{ fontSize: 22, letterSpacing: "0.18em", fontWeight: 700, color: "var(--brand-magenta)", marginBottom: 12 }}>
+              <div
+                style={{
+                  fontSize: 22,
+                  letterSpacing: "0.18em",
+                  fontWeight: 700,
+                  color: "var(--brand-magenta)",
+                  marginBottom: 12,
+                }}
+              >
                 {ph.p.toUpperCase()}
               </div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: "var(--brand-ink)", lineHeight: 1.2, marginBottom: 12 }}>
+              <div
+                style={{
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: "var(--brand-ink)",
+                  lineHeight: 1.2,
+                  marginBottom: 12,
+                }}
+              >
                 {ph.t}
               </div>
-              <div style={{ fontSize: 22, color: "oklch(0.4 0.03 290)" }}>{ph.d}</div>
+              <div style={{ fontSize: 22, color: "oklch(0.4 0.03 290)" }}>
+                {ph.d}
+              </div>
             </div>
           ))}
         </div>
@@ -672,13 +1026,25 @@ function Slide10() {
   ];
   return (
     <SlideFrame variant="soft" pageNumber={10} pageTotal={TOTAL}>
-      <img src={blobRing} alt="" className="blob" style={{ top: -120, right: -120, width: 480, opacity: 0.7 }} />
+      <img
+        src={blobRing}
+        alt=""
+        className="blob"
+        style={{ top: -120, right: -120, width: 480, opacity: 0.7 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           09 · Roadmap · Next 12–24 months
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", marginBottom: 24 }}>
-          Building reliable behavioural<br />
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginBottom: 24 }}
+        >
+          Building reliable behavioural
+          <br />
           and physiological infrastructure.
         </h2>
         <div style={{ marginTop: 80, display: "grid", gap: 18 }}>
@@ -697,13 +1063,34 @@ function Slide10() {
                 boxShadow: "0 14px 40px -28px oklch(0.55 0.30 320 / 0.2)",
               }}
             >
-              <div style={{ fontSize: 28, fontWeight: 800, color: "var(--brand-magenta)" }}>
+              <div
+                style={{
+                  fontSize: 28,
+                  fontWeight: 800,
+                  color: "var(--brand-magenta)",
+                }}
+              >
                 0{i + 1}
               </div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--brand-violet)", letterSpacing: "0.06em" }}>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: "var(--brand-violet)",
+                  letterSpacing: "0.06em",
+                }}
+              >
                 {it.q.toUpperCase()}
               </div>
-              <div style={{ fontSize: 36, fontWeight: 700, color: "var(--brand-ink)" }}>{it.t}</div>
+              <div
+                style={{
+                  fontSize: 36,
+                  fontWeight: 700,
+                  color: "var(--brand-ink)",
+                }}
+              >
+                {it.t}
+              </div>
             </div>
           ))}
         </div>
@@ -733,15 +1120,32 @@ function Slide11() {
   ];
   return (
     <SlideFrame variant="white" pageNumber={11} pageTotal={TOTAL}>
-      <img src={blobPink} alt="" className="blob" style={{ top: -120, right: -80, width: 460, opacity: 0.55 }} />
+      <img
+        src={blobPink}
+        alt=""
+        className="blob"
+        style={{ top: -120, right: -80, width: 460, opacity: 0.55 }}
+      />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           10 · The Team
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", marginBottom: 72 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginBottom: 72 }}
+        >
           Builders behind the fabric.
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 32 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 32,
+          }}
+        >
           {team.map((m) => (
             <div
               key={m.n}
@@ -768,13 +1172,36 @@ function Slide11() {
               >
                 {m.n.charAt(0)}
               </div>
-              <div style={{ fontSize: 40, fontWeight: 800, color: "var(--brand-ink)", letterSpacing: "-0.02em" }}>
+              <div
+                style={{
+                  fontSize: 40,
+                  fontWeight: 800,
+                  color: "var(--brand-ink)",
+                  letterSpacing: "-0.02em",
+                }}
+              >
                 {m.n}
               </div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "var(--brand-magenta)", marginTop: 6, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              <div
+                style={{
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: "var(--brand-magenta)",
+                  marginTop: 6,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                }}
+              >
                 {m.r}
               </div>
-              <div style={{ fontSize: 24, lineHeight: 1.4, color: "oklch(0.35 0.03 290)", marginTop: 24 }}>
+              <div
+                style={{
+                  fontSize: 24,
+                  lineHeight: 1.4,
+                  color: "oklch(0.35 0.03 290)",
+                  marginTop: 24,
+                }}
+              >
                 {m.d}
               </div>
             </div>
@@ -788,7 +1215,13 @@ function Slide11() {
 // ----- 12: Vision -----
 function Slide12() {
   return (
-    <SlideFrame variant="gradient" pageNumber={12} pageTotal={TOTAL} logoLight footerLight>
+    <SlideFrame
+      variant="gradient"
+      pageNumber={12}
+      pageTotal={TOTAL}
+      logoLight
+      footerLight
+    >
       <BlobDecor variant="all" />
       <div
         style={{
@@ -801,7 +1234,10 @@ function Slide12() {
         }}
       >
         <div>
-          <div className="slide-kicker" style={{ color: "rgba(255,255,255,0.8)", marginBottom: 40 }}>
+          <div
+            className="slide-kicker"
+            style={{ color: "rgba(255,255,255,0.8)", marginBottom: 40 }}
+          >
             11 · Vision
           </div>
           <h2
@@ -814,9 +1250,11 @@ function Slide12() {
               marginBottom: 56,
             }}
           >
-            The future of health monitoring<br />
+            The future of health monitoring
+            <br />
             is not <span style={{ opacity: 0.5 }}>devices</span>.<br />
-            It is <em style={{ fontStyle: "italic", fontWeight: 800 }}>fabric.</em>
+            It is{" "}
+            <em style={{ fontStyle: "italic", fontWeight: 800 }}>fabric.</em>
           </h2>
           <p
             style={{
@@ -827,8 +1265,8 @@ function Slide12() {
               margin: "0 auto",
             }}
           >
-            KLPS is introducing a new category of wearable technology — starting in FemTech,
-            built for women's health intelligence.
+            KLPS is introducing a new category of wearable technology — starting
+            in FemTech, built for women's health intelligence.
           </p>
         </div>
       </div>
@@ -849,18 +1287,28 @@ function Slide13() {
           right: 900,
         }}
       >
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
           Let's talk
         </div>
         <h2 className="slide-title-xl" style={{ color: "var(--brand-ink)" }}>
-          Thank you<br />
+          Thank you
+          <br />
           for your <span className="brand-text">time.</span>
         </h2>
         <div style={{ marginTop: 80, display: "grid", gap: 18 }}>
-          <div style={{ fontSize: 32, fontWeight: 600, color: "var(--brand-ink)" }}>
+          <div
+            style={{ fontSize: 32, fontWeight: 600, color: "var(--brand-ink)" }}
+          >
             emmamendez@klps.co.uk
           </div>
-          <div style={{ fontSize: 32, fontWeight: 600, color: "var(--brand-ink)" }}>klps.co.uk</div>
+          <div
+            style={{ fontSize: 32, fontWeight: 600, color: "var(--brand-ink)" }}
+          >
+            klps.co.uk
+          </div>
         </div>
       </div>
       <div
@@ -872,21 +1320,37 @@ function Slide13() {
           color: "white",
         }}
       >
-        <div style={{ fontWeight: 700, fontSize: 36, letterSpacing: "-0.02em" }}>Emma Mendez</div>
-        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>Founder &amp; CEO · KLPS technology</div>
+        <div
+          style={{ fontWeight: 700, fontSize: 36, letterSpacing: "-0.02em" }}
+        >
+          Emma Mendez
+        </div>
+        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>
+          Founder &amp; CEO · KLPS technology
+        </div>
       </div>
     </SlideFrame>
   );
 }
 
+export interface SlideMetrics {
+  tummyPercent?: number;
+  topConcernPercent?: number;
+  commercialInterestPercent?: number;
+  [key: string]: unknown;
+}
+
 export interface SlideMeta {
   title: string;
-  render: () => ReactNode;
+  render: (metrics?: SlideMetrics) => ReactNode;
 }
 
 export const slides: SlideMeta[] = [
   { title: "Cover", render: () => <Slide01 /> },
-  { title: "The Problem", render: () => <Slide02 /> },
+  {
+    title: "The Problem",
+    render: (metrics) => <Slide02 metrics={metrics} />,
+  },
   { title: "The Gap", render: () => <Slide03 /> },
   { title: "How it works", render: () => <Slide04 /> },
   { title: "Market Opportunity", render: () => <Slide05 /> },

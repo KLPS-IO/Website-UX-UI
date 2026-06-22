@@ -13,12 +13,15 @@ export function SlideDeck() {
 
   const total = slides.length;
 
-  const go = useCallback((next: number) => {
-    setIndex((i) => {
-      const n = Math.max(0, Math.min(total - 1, next));
-      return n;
-    });
-  }, [total]);
+  const go = useCallback(
+    (next: number) => {
+      setIndex((i) => {
+        const n = Math.max(0, Math.min(total - 1, next));
+        return n;
+      });
+    },
+    [total],
+  );
 
   // keyboard
   useEffect(() => {
@@ -65,6 +68,17 @@ export function SlideDeck() {
     touchStartX.current = null;
   };
 
+  const [metrics, setMetrics] = useState<Record<string, unknown> | null>(null);
+
+  useEffect(() => {
+    fetch("/api/research/metrics")
+      .then((r) => r.json())
+      .then((data) => {
+        setMetrics(data);
+      })
+      .catch(console.error);
+  }, []);
+
   // PDF export
   const exportPdf = async () => {
     if (exporting) return;
@@ -72,7 +86,11 @@ export function SlideDeck() {
     try {
       const pool = exportPoolRef.current;
       if (!pool) return;
-      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [1920, 1080] });
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "px",
+        format: [1920, 1080],
+      });
       const nodes = pool.querySelectorAll<HTMLElement>("[data-export-slide]");
       for (let i = 0; i < nodes.length; i++) {
         const node = nodes[i];
@@ -104,17 +122,14 @@ export function SlideDeck() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <div
-          className="stage"
-          style={{ ["--scale" as never]: scale }}
-        >
+        <div className="stage" style={{ ["--scale" as never]: scale }}>
           <div
             className="track"
             style={{ transform: `translate3d(-${index * 100}%, 0, 0)` }}
           >
             {slides.map((s, i) => (
               <div key={i} style={{ flex: "0 0 100%", height: "100%" }}>
-                {s.render()}
+                {s.render(metrics)}{" "}
               </div>
             ))}
           </div>
@@ -132,13 +147,34 @@ export function SlideDeck() {
           color: "white",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 14, opacity: 0.8 }}>
-          <div style={{ fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 700 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            opacity: 0.8,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 13,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              fontWeight: 700,
+            }}
+          >
             KLPS · Pitch Deck
           </div>
-          <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.2)" }} />
+          <div
+            style={{
+              width: 1,
+              height: 16,
+              background: "rgba(255,255,255,0.2)",
+            }}
+          />
           <div style={{ fontSize: 13 }}>
-            {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")} ·{" "}
+            {String(index + 1).padStart(2, "0")} /{" "}
+            {String(total).padStart(2, "0")} ·{" "}
             <span style={{ opacity: 0.7 }}>{slides[index].title}</span>
           </div>
         </div>
@@ -152,7 +188,14 @@ export function SlideDeck() {
           >
             <ChevronLeft size={22} />
           </button>
-          <div style={{ display: "flex", gap: 6, alignItems: "center", padding: "0 6px" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 6,
+              alignItems: "center",
+              padding: "0 6px",
+            }}
+          >
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -176,7 +219,9 @@ export function SlideDeck() {
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
           <button
             className="nav-btn"
-            onClick={() => document.documentElement.requestFullscreen?.().catch(() => {})}
+            onClick={() =>
+              document.documentElement.requestFullscreen?.().catch(() => {})
+            }
             aria-label="Enter fullscreen"
             title="Fullscreen (F)"
           >
@@ -197,7 +242,7 @@ export function SlideDeck() {
             data-export-slide
             style={{ width: 1920, height: 1080, background: "white" }}
           >
-            {s.render()}
+            {s.render(metrics)}{" "}
           </div>
         ))}
       </div>
