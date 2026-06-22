@@ -118,7 +118,9 @@ function Slide01() {
         >
           <span className="brand-text">Femtech</span>
           <br />
-          <p className=""> Insights Underwear. </p>
+          <h1>
+            <span>Insights Underwear.</span>
+          </h1>{" "}
         </h1>
       </div>
 
@@ -160,7 +162,7 @@ function Slide01() {
 // ----- 02: The Problem -----
 function Slide02({ metrics }: { metrics?: SlideMetrics }) {
   const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
-  
+
   return (
     <SlideFrame variant="white" pageNumber={2} pageTotal={TOTAL}>
       <img
@@ -199,7 +201,8 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
           position: "absolute",
           right: 110,
           top: 260,
-          width: 620,
+          width: "30%",
+          minWidth: 420,
           display: "grid",
           gap: 24,
         }}

@@ -140,7 +140,6 @@ export function SlideDeck() {
                 fontSize: 12,
               }}
             >
-              {JSON.stringify(metrics, null, 2)}
             </pre>
             {slides.map((s, i) => (
               <div key={i} style={{ flex: "0 0 100%", height: "100%" }}>
