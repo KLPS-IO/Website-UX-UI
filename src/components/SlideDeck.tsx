@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Download, Maximize2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { slides } from "@/components/data/slides";
+import { API_BASE } from "@/config/api";
 
 export function SlideDeck() {
   const [index, setIndex] = useState(0);
@@ -71,7 +72,7 @@ export function SlideDeck() {
   const [metrics, setMetrics] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
-    fetch("/api/research/metrics")
+    fetch(`${API_BASE}/api/research/metrics`)
       .then((r) => r.json())
       .then((data) => {
         setMetrics(data);
@@ -127,6 +128,20 @@ export function SlideDeck() {
             className="track"
             style={{ transform: `translate3d(-${index * 100}%, 0, 0)` }}
           >
+            <pre
+              style={{
+                position: "fixed",
+                top: 10,
+                right: 10,
+                zIndex: 99999,
+                background: "black",
+                color: "lime",
+                padding: 10,
+                fontSize: 12,
+              }}
+            >
+              {JSON.stringify(metrics, null, 2)}
+            </pre>
             {slides.map((s, i) => (
               <div key={i} style={{ flex: "0 0 100%", height: "100%" }}>
                 {s.render(metrics)}{" "}
