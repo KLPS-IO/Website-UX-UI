@@ -664,3 +664,19 @@ All colors MUST be HSL.
   width: 1920px;
 }
 
+@keyframes pulseBig {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse-big {
+  display: inline-block;
+  animation: pulseBig 2s ease-in-out infinite;
+}

@@ -35,7 +35,7 @@ export function SlideFrame({
           : "");
   return (
     <section className={className}>
-      {showWatermark && <div className="watermark">CONFIDENTIAL — KLPS LTD</div>}
+      {/* {showWatermark && <div className="watermark">CONFIDENTIAL — KLPS LTD</div>} */}
       {showLogo && (
         <div className="absolute" style={{ top: 64, left: 80, zIndex: 5 }}>
           <Logo light={logoLight} />
@@ -46,7 +46,7 @@ export function SlideFrame({
         <div
           className="absolute slide-chrome"
           style={{
-            bottom: 48,
+            bottom: 10,
             left: 80,
             right: 80,
             display: "flex",
@@ -56,7 +56,7 @@ export function SlideFrame({
           }}
         >
           <span>KLPS.CO.UK</span>
-          <span>Confidential — For Authorised Recipient Only</span>
+          {/* <span>Confidential — For Authorised Recipient Only</span> */}
           {pageNumber && pageTotal ? (
             <span>
               {String(pageNumber).padStart(2, "0")} / {String(pageTotal).padStart(2, "0")}

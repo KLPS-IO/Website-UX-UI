@@ -1,8 +1,14 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { SlideFrame } from "@/components/SlideFrame";
 import blobPink from "@/assets/blob-pink.png";
 import blobSpiral from "@/assets/blob-spiral.png";
 import blobRing from "@/assets/blob-ring.png";
+import klpsVideo from "@/assets/klps.mp4";
+import headShot from "@/assets/headshot.jpg";
+import garmentAsset from "@/assets/garment.jpg";
+import textileAsset from "@/assets/textile.png";
+import mcuAsset from "@/assets/mcu.png";
+import insightAsset from "@/assets/insight.png";
 
 const TOTAL = 13;
 
@@ -60,7 +66,7 @@ function Slide01() {
           position: "absolute",
           top: 110,
           left: 110,
-          right: 900,
+          right: 600,
         }}
       >
         <div style={{ marginBottom: 56 }}>
@@ -116,12 +122,36 @@ function Slide01() {
           className="slide-title-xl"
           style={{ color: "var(--brand-ink)", marginRight: "50px" }}
         >
-          <span className="brand-text">Femtech</span>
+          <span className="brand-text pr-40">Continuous</span>
+          <span className="brand-text pr-40"> Signal Capture</span>
           <br />
-          <h1>
-            <span>Insights Underwear.</span>
-          </h1>{" "}
+          <p>
+            <span>Insights Underwear</span>
+          </p>{" "}
         </h1>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "40px",
+          }}
+        >
+          <div>{/* Your existing KLPS logo and title code */}</div>
+
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{
+              width: "500px",
+              borderRadius: "20px",
+            }}
+          >
+            <source src={klpsVideo} type="video/mp4" />
+          </video>
+        </div>
       </div>
 
       <div
@@ -182,17 +212,18 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 48 }}
         >
-          Most wearables
+          Uncomfortable
           <br />
-          measure from the <span className="brand-text">wrist.</span>
+          <span className="brand-text">WATCHES AND RINGS.</span>
         </h2>
         <p
           className="slide-body-lg"
           style={{ color: "oklch(0.35 0.03 290)", maxWidth: 940 }}
         >
-          Women's bodies are not wrists. Meaningful physiological signals occur
-          in the abdomen, pelvic region and core body zones - and remain
-          under-measured today.
+          - Womens Health Gap - <br />
+          Closing the gap could add approximately 2.5 additional healthy days
+          per woman per year and deliver $400 billion in annual global GDP by
+          2040.
         </p>
       </div>
 
@@ -210,15 +241,20 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
         {[
           {
             label: `${tummyInTen} in 10 women`,
-            pct: "selected the abdominal region as an area where they want more insight",
+            pct: "Want more insight into their abdominal health",
+          },
+          //   {
+          //     label: `${metrics?.topConcernPercent ?? 0}% of ${metrics?.participants ?? 0} women asked`,
+          //     pct: "Report 'Bloating' as a recurring experience",
+          //   },
+          {
+            label: `${metrics?.commercialInterestPercent ?? 0}% of ${metrics?.participants ?? 0} women asked`,
+            pct: "Would pay for personalised body insights",
           },
           {
-            label: `${metrics?.topConcernPercent ?? 0}%`,
-            pct: "report bloating as a recurring experience",
-          },
-          {
-            label: `${metrics?.commercialInterestPercent ?? 0}%`,
-            pct: "would consider paying for personalised body insights",
+            label: `$1 Trillion Boost: Addressing the women’s health gap boosts the global economy, improving health and quality of life for millions.
+         `,
+            pct: "The World Economic Forum and its Global Alliance for Women’s Health",
           },
         ].map((row) => (
           <div
@@ -238,7 +274,7 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
             </div>
             <div
               style={{
-                fontSize: 22,
+                fontSize: 27,
                 color: "var(--brand-magenta)",
                 marginTop: 8,
                 fontWeight: 600,
@@ -255,6 +291,30 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
 
 // ----- 03: What it feels like -----
 function Slide03() {
+  const team = [
+    {
+      n: "Emma Mendez.",
+      r: "Founder & CEO",
+      d: "Founder of KLPS technology.",
+      c: "Entrepreneur, Speaker, Software Engineer",
+      e: "Experience:",
+      f: "- Corporate Software Engineer",
+      g: "- Graphene Strategist",
+      h: "- Mother",
+      i: "- Lost 4st of weight",
+      j: "- Femtech",
+    },
+    // {
+    //   n: "Oyin A.",
+    //   r: "Advisor",
+    //   d: "Award-winning commercial leadership and deep community reach in women-in-tech.",
+    // },
+    // {
+    //   n: "Muneeb A.",
+    //   r: "Advisor",
+    //   d: "LLM systems, MVP development and computer vision pipelines at scale.",
+    // },
+  ];
   return (
     <SlideFrame variant="soft" pageNumber={3} pageTotal={TOTAL}>
       <img
@@ -268,20 +328,131 @@ function Slide03() {
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
-          02 · The Gap
+          02 · The Founder
+          <div
+            style={{ position: "absolute", top: 120, left: 110, right: 110 }}
+          >
+            <img
+              style={{
+                width: "300px",
+                borderRadius: "20px",
+              }}
+              src={headShot}
+            ></img>
+          </div>
+          <div
+            style={{
+              display: "contents",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: 32,
+            }}
+          >
+            {team.map((m) => (
+              <div
+                key={m.n}
+                style={{
+                  padding: 44,
+                  borderRadius: 28,
+                  background: "var(--brand-gradient-soft)",
+                  minHeight: 380,
+                  marginLeft: 500,
+                  marginTop: 25,
+                  paddingBottom: 70,
+                  paddingRight: 150,
+                }}
+              >
+                <div
+                  style={{
+                    width: 96,
+                    height: 96,
+                    borderRadius: 9999,
+                    background: "var(--brand-gradient)",
+                    color: "white",
+                    display: "grid",
+                    placeItems: "center",
+                    fontSize: 42,
+                    fontWeight: 800,
+                    marginBottom: 32,
+                  }}
+                >
+                  {m.n.charAt(0)}
+                </div>
+                <div
+                  style={{
+                    fontSize: 40,
+                    fontWeight: 800,
+                    color: "var(--brand-ink)",
+                    letterSpacing: "-0.02em",
+                    paddingRight: 150,
+                  }}
+                >
+                  {m.n}
+                </div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 700,
+                    color: "var(--brand-magenta)",
+                    marginTop: 9,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {m.r}
+                </div>
+                <div
+                  style={{
+                    fontSize: 24,
+                    lineHeight: 1.4,
+                    color: "oklch(0.35 0.03 290)",
+                    marginTop: 24,
+                  }}
+                >
+                  {m.d}
+                </div>
+                <div>{m.c}</div>
+                <div
+                  style={{
+                    fontSize: 35,
+                    fontWeight: 800,
+                    marginTop: 50,
+                    color: "var(--brand-ink)",
+                    letterSpacing: "-0.02em",
+                    paddingRight: 150,
+                  }}
+                >
+                  {m.e}
+                </div>
+                <div
+                  style={{
+                    fontSize: 35,
+                    fontWeight: 800,
+                    marginTop: 50,
+                    color: "var(--brand-magenta)",
+                    letterSpacing: "-0.02em",
+                    paddingRight: 150,
+                  }}
+                >
+                  <div>{m.f}</div>
+                  <div>{m.g}</div>
+                  <div>{m.h}</div>
+                  <div>{m.i}</div>
+                  <div>{m.j}</div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        <h2
+        {/* <h2
           className="slide-title"
           style={{ color: "var(--brand-ink)", maxWidth: 1400 }}
         >
-          We have tracking devices.
+          Tracking devices.
           <br />
-          <span className="brand-text">
-            They just don't track what matters.
-          </span>
-        </h2>
+          <span className="brand-text">Just don't track what matters.</span>
+        </h2> */}
 
-        <div
+        {/* <div
           style={{
             marginTop: 80,
             display: "grid",
@@ -325,117 +496,120 @@ function Slide03() {
               Passive monitoring. No behaviour change.
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </SlideFrame>
   );
 }
 
 // ----- 04: How it works -----
+
 function Slide04() {
   const steps = [
-    {
-      n: "01",
-      t: "Garment",
-      d: "Everyday underwear holds sensing materials close to the body.",
-    },
-    {
-      n: "02",
-      t: "Conductive textile",
-      d: "Stretch fabric, sensor patch and conductive thread carry signals.",
-    },
-    {
-      n: "03",
-      t: "Microcontroller",
-      d: "An on-board Arduino reads signals and converts to data.",
-    },
-    {
-      n: "04",
-      t: "Insight layer",
-      d: "Signal → Memory → Insight. Structured behavioural intelligence.",
-    },
+    { n: "01", t: "Garment", d: "Everyday underwear holds sensing materials close to the body.", img: garmentAsset },
+    { n: "02", t: "Conductive textile", d: "Stretch fabric, sensor patch and conductive thread carry signals.", img: textileAsset },
+    { n: "03", t: "Microcontroller", d: "An on-board Arduino reads signals and converts to data.", img: mcuAsset },
+    { n: "04", t: "Insight layer", d: "Signal → Memory → Insight. Structured behavioural intelligence.", img: insightAsset },
   ];
+  // Rotation: 0 → 1 → 2 → 3 → 0 (stop). Each step 5s, final garment 7s.
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    setActive(0);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    timers.push(setTimeout(() => setActive(1), 5000));
+    timers.push(setTimeout(() => setActive(2), 10000));
+    timers.push(setTimeout(() => setActive(3), 15000));
+    timers.push(setTimeout(() => setActive(0), 20000));
+    // stop after final 7s at garment — nothing scheduled.
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
     <SlideFrame variant="white" pageNumber={4} pageTotal={TOTAL}>
-      <img
-        src={blobRing}
-        alt=""
-        className="blob"
-        style={{ top: -160, right: -120, width: 520, opacity: 0.7 }}
-      />
-      <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
-        >
+      <img src={blobRing} alt="" className="blob" style={{ top: -160, right: -120, width: 520, opacity: 0.7 }} />
+      <div style={{ position: "absolute", top: 190, left: 110, right: 110 }}>
+        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
           03 · How it works
         </div>
-        <h2
-          className="slide-title"
-          style={{ color: "var(--brand-ink)", maxWidth: 1400 }}
-        >
+        <h2 className="slide-title" style={{ color: "var(--brand-ink)", maxWidth: 1400 }}>
           A <span className="brand-text">garment</span> that listens.
         </h2>
         <div
           style={{
-            marginTop: 80,
+            marginTop: 90,
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
             gap: 28,
           }}
         >
-          {steps.map((s) => (
-            <div
-              key={s.n}
-              style={{
-                padding: 36,
-                borderRadius: 28,
-                background: "white",
-                border: "1px solid oklch(0.92 0.02 320)",
-                boxShadow: "0 20px 50px -28px oklch(0.55 0.30 320 / 0.25)",
-                minHeight: 320,
-              }}
-            >
+          {steps.map((s, i) => {
+            const isActive = i === active;
+            return (
               <div
+                key={s.n}
                 style={{
-                  fontSize: 22,
-                  fontWeight: 800,
-                  letterSpacing: "0.18em",
-                  color: "var(--brand-magenta)",
-                  marginBottom: 16,
+                  padding: 28,
+                  borderRadius: 28,
+                  background: "white",
+                  border: isActive ? "2px solid var(--brand-magenta)" : "1px solid oklch(0.92 0.02 320)",
+                  boxShadow: isActive
+                    ? "0 28px 60px -10px oklch(0.55 0.30 320 / 0.45)"
+                    : "0 20px 50px -28px oklch(0.55 0.30 320 / 0.25)",
+                  minHeight: 480,
+                  transform: isActive ? "translateY(-80px)" : "none",
+                  transition: "all 600ms ease",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
-                {s.n}
+                <div
+                  style={{
+                    width: "100%",
+                    height: 200,
+                    borderRadius: 18,
+                    overflow: "hidden",
+                    background: "oklch(0.96 0.02 320)",
+                    marginBottom: 18,
+                  }}
+                >
+                  <img
+                    src={s.img}
+                    alt={s.t}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      transform: isActive ? "scale(1.05)" : "scale(2)",
+                      transition: "transform 1.2s ease",
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 800,
+                    letterSpacing: "0.18em",
+                    color: "var(--brand-magenta)",
+                    marginBottom: 10,
+                  }}
+                >
+                  {s.n}
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: "var(--brand-ink)", marginBottom: 10 }}>
+                  {s.t}
+                </div>
+                <div style={{ fontSize: 30, lineHeight: 1.4, color: "oklch(0.4 0.03 290)" }}>{s.d}</div>
               </div>
-              <div
-                style={{
-                  fontSize: 34,
-                  fontWeight: 800,
-                  color: "var(--brand-ink)",
-                  marginBottom: 16,
-                }}
-              >
-                {s.t}
-              </div>
-              <div
-                style={{
-                  fontSize: 22,
-                  lineHeight: 1.4,
-                  color: "oklch(0.4 0.03 290)",
-                }}
-              >
-                {s.d}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div
           style={{
-            marginTop: 56,
+            marginTop: 20,
             display: "inline-flex",
             alignItems: "center",
             gap: 24,
-            padding: "20px 36px",
+            padding: "10px 26px",
             borderRadius: 9999,
             background: "var(--brand-gradient)",
             color: "white",
@@ -450,6 +624,7 @@ function Slide04() {
     </SlideFrame>
   );
 }
+
 
 // ----- 05: Market Opportunity -----
 function Slide05() {
@@ -543,15 +718,15 @@ function Slide05() {
           placeItems: "center",
         }}
       >
-        <div className="tam-circles">
-          <div className="ring r1">£165B</div>
+        {/* <div className="tam-circles">
+          <div className="ring r1 ">£165B</div>
           <div className="ring r2">£46B</div>
           <div className="ring r3">
             £180m
             <br />
             £240m
           </div>
-        </div>
+        </div> */}
       </div>
     </SlideFrame>
   );
@@ -1106,7 +1281,7 @@ function Slide10() {
 function Slide11() {
   const team = [
     {
-      n: "Emma M.",
+      n: "Emma Mendez.",
       r: "Founder & CEO",
       d: "Founder of KLPS technology. Building the wearable category for women's health.",
     },

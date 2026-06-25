@@ -128,19 +128,6 @@ export function SlideDeck() {
             className="track"
             style={{ transform: `translate3d(-${index * 100}%, 0, 0)` }}
           >
-            <pre
-              style={{
-                position: "fixed",
-                top: 10,
-                right: 10,
-                zIndex: 99999,
-                background: "black",
-                color: "lime",
-                padding: 10,
-                fontSize: 12,
-              }}
-            >
-            </pre>
             {slides.map((s, i) => (
               <div key={i} style={{ flex: "0 0 100%", height: "100%" }}>
                 {s.render(metrics)}{" "}
