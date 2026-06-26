@@ -81,7 +81,7 @@ function Slide01() {
                 background: "var(--brand-gradient)",
                 borderRadius: 18,
                 position: "relative",
-                boxShadow: "0 16px 40px -12px oklch(0.55 0.30 320 / 0.55)",
+                boxShadow: "0 16px 40px -12px rgba(184, 0, 130, 0.55)",
               }}
             >
               <span
@@ -218,7 +218,7 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
         </h2>
         <p
           className="slide-body-lg"
-          style={{ color: "oklch(0.35 0.03 290)", maxWidth: 940 }}
+          style={{ color: "#4f4554", maxWidth: 940 }}
         >
           - Womens Health Gap - <br />
           Closing the gap could add approximately 2.5 additional healthy days
@@ -404,7 +404,7 @@ function Slide03() {
                   style={{
                     fontSize: 24,
                     lineHeight: 1.4,
-                    color: "oklch(0.35 0.03 290)",
+                    color: "#4f4554",
                     marginTop: 24,
                   }}
                 >
@@ -551,10 +551,10 @@ function Slide04() {
                   padding: 28,
                   borderRadius: 28,
                   background: "white",
-                  border: isActive ? "2px solid var(--brand-magenta)" : "1px solid oklch(0.92 0.02 320)",
+                  border: isActive ? "2px solid var(--brand-magenta)" : "1px solid #eadde8",
                   boxShadow: isActive
-                    ? "0 28px 60px -10px oklch(0.55 0.30 320 / 0.45)"
-                    : "0 20px 50px -28px oklch(0.55 0.30 320 / 0.25)",
+                    ? "0 28px 60px -10px rgba(184, 0, 130, 0.45)"
+                    : "0 20px 50px -28px rgba(184, 0, 130, 0.25)",
                   minHeight: 480,
                   transform: isActive ? "translateY(-80px)" : "none",
                   transition: "all 600ms ease",
@@ -568,7 +568,7 @@ function Slide04() {
                     height: 200,
                     borderRadius: 18,
                     overflow: "hidden",
-                    background: "oklch(0.96 0.02 320)",
+                    background: "#f8eef6",
                     marginBottom: 18,
                   }}
                 >
@@ -598,7 +598,7 @@ function Slide04() {
                 <div style={{ fontSize: 28, fontWeight: 800, color: "var(--brand-ink)", marginBottom: 10 }}>
                   {s.t}
                 </div>
-                <div style={{ fontSize: 30, lineHeight: 1.4, color: "oklch(0.4 0.03 290)" }}>{s.d}</div>
+                <div style={{ fontSize: 30, lineHeight: 1.4, color: "#5f5364" }}>{s.d}</div>
               </div>
             );
           })}
@@ -661,7 +661,7 @@ function Slide05() {
                 alignItems: "center",
                 gap: 30,
                 padding: "10px 0",
-                borderBottom: "1px solid oklch(0.9 0.02 320)",
+                borderBottom: "1px solid #e4d6e1",
               }}
             >
               <div
@@ -689,7 +689,7 @@ function Slide05() {
                 <div
                   style={{
                     fontSize: 24,
-                    color: "oklch(0.4 0.03 290)",
+                    color: "#5f5364",
                     marginTop: 4,
                   }}
                 >
@@ -700,7 +700,7 @@ function Slide05() {
           ))}
         </div>
         <div
-          style={{ marginTop: 32, fontSize: 18, color: "oklch(0.45 0.02 290)" }}
+          style={{ marginTop: 32, fontSize: 18, color: "#706876" }}
         >
           Sources: McKinsey Femtech Outlook 2024 · Smart Textiles Market Report
           2023 · Graphene Market UK Forecast 2025.
@@ -786,9 +786,9 @@ function Slide06() {
               style={{
                 padding: 40,
                 borderRadius: 28,
-                border: "1px solid oklch(0.92 0.02 320)",
+                border: "1px solid #eadde8",
                 background: "white",
-                boxShadow: "0 18px 40px -28px oklch(0.55 0.30 320 / 0.2)",
+                boxShadow: "0 18px 40px -28px rgba(184, 0, 130, 0.2)",
               }}
             >
               <div
@@ -809,7 +809,7 @@ function Slide06() {
                     style={{
                       padding: "10px 22px",
                       borderRadius: 9999,
-                      background: "oklch(0.96 0.02 320)",
+                      background: "#f8eef6",
                       color: "var(--brand-ink)",
                       fontWeight: 600,
                       fontSize: 24,
@@ -826,7 +826,7 @@ function Slide06() {
           style={{
             marginTop: 36,
             fontSize: 28,
-            color: "oklch(0.4 0.03 290)",
+            color: "#5f5364",
             maxWidth: 1500,
             lineHeight: 1.35,
           }}
@@ -959,7 +959,7 @@ function Slide08() {
         <p
           className="slide-body-lg"
           style={{
-            color: "oklch(0.4 0.03 290)",
+            color: "#5f5364",
             maxWidth: 1300,
             marginBottom: 64,
           }}
@@ -1013,7 +1013,7 @@ function Slide08() {
             <div
               style={{
                 fontSize: 22,
-                color: "oklch(0.4 0.03 290)",
+                color: "#5f5364",
                 marginTop: 4,
               }}
             >
@@ -1071,7 +1071,7 @@ function Slide08() {
               style={{
                 padding: "14px 28px",
                 borderRadius: 9999,
-                border: "1px solid oklch(0.85 0.04 320)",
+                border: "1px solid #d8bed4",
                 fontSize: 22,
                 color: "var(--brand-ink)",
                 fontWeight: 600,
@@ -1182,7 +1182,7 @@ function Slide09() {
               >
                 {ph.t}
               </div>
-              <div style={{ fontSize: 22, color: "oklch(0.4 0.03 290)" }}>
+              <div style={{ fontSize: 22, color: "#5f5364" }}>
                 {ph.d}
               </div>
             </div>
@@ -1238,7 +1238,7 @@ function Slide10() {
                 borderRadius: 24,
                 background: "rgba(255,255,255,0.7)",
                 border: "1px solid rgba(255,255,255,0.6)",
-                boxShadow: "0 14px 40px -28px oklch(0.55 0.30 320 / 0.2)",
+                boxShadow: "0 14px 40px -28px rgba(184, 0, 130, 0.2)",
               }}
             >
               <div
@@ -1376,7 +1376,7 @@ function Slide11() {
                 style={{
                   fontSize: 24,
                   lineHeight: 1.4,
-                  color: "oklch(0.35 0.03 290)",
+                  color: "#4f4554",
                   marginTop: 24,
                 }}
               >

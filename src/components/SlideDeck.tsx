@@ -9,6 +9,7 @@ export function SlideDeck() {
   const [index, setIndex] = useState(0);
   const [scale, setScale] = useState(1);
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
   const scalerRef = useRef<HTMLDivElement>(null);
   const exportPoolRef = useRef<HTMLDivElement>(null);
 
@@ -83,6 +84,7 @@ export function SlideDeck() {
   // PDF export
   const exportPdf = async () => {
     if (exporting) return;
+    setExportError("");
     setExporting(true);
     try {
       const pool = exportPoolRef.current;
@@ -108,7 +110,21 @@ export function SlideDeck() {
         if (i > 0) pdf.addPage([1920, 1080], "landscape");
         pdf.addImage(img, "JPEG", 0, 0, 1920, 1080);
       }
-      pdf.save("KLPS-pitch-deck.pdf");
+      const blobUrl = URL.createObjectURL(pdf.output("blob"));
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = "KLPS-pitch-deck.pdf";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (error) {
+      console.error("Could not export pitch deck PDF", error);
+      setExportError(
+        error instanceof Error
+          ? error.message
+          : "Could not export the pitch deck PDF.",
+      );
     } finally {
       setExporting(false);
     }
@@ -232,6 +248,20 @@ export function SlideDeck() {
             <Download size={16} />
             {exporting ? "Generating PDF…" : "Download PDF"}
           </button>
+          {exportError && (
+            <div
+              role="alert"
+              style={{
+                alignSelf: "center",
+                maxWidth: 260,
+                color: "rgba(255,255,255,0.82)",
+                fontSize: 12,
+                lineHeight: 1.35,
+              }}
+            >
+              Export failed: {exportError}
+            </div>
+          )}
         </div>
       </div>
 
