@@ -856,7 +856,9 @@ const DataRoom = () => {
     try {
       const metricsResponse = await fetch(`${API_BASE}/api/research/metrics`);
 
-      const metricsData = await metricsResponse.json();
+      const metricsData = await apiRequest<ResearchMetrics>([
+        "/api/research/metrics",
+      ]);
 
       setMetrics(metricsData);
     } catch (error) {
@@ -1033,7 +1035,6 @@ const DataRoom = () => {
         >
           Pitch Deck
         </Link>
-
       </PageHeader>
 
       <Section>
