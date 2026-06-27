@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SlideFrame } from "@/components/SlideFrame";
 import blobPink from "@/assets/blob-pink.png";
 import blobSpiral from "@/assets/blob-spiral.png";
@@ -589,19 +589,49 @@ function Slide04() {
   ];
   // Rotation: 0 → 1 → 2 → 3 → 0 (stop). Each step 5s, final garment 7s.
   const [active, setActive] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    setActive(0);
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    timers.push(setTimeout(() => setActive(1), 5000));
-    timers.push(setTimeout(() => setActive(2), 10000));
-    timers.push(setTimeout(() => setActive(3), 15000));
-    timers.push(setTimeout(() => setActive(0), 20000));
-    // stop after final 7s at garment — nothing scheduled.
-    return () => timers.forEach(clearTimeout);
+    const el = rootRef.current;
+    if (!el) return;
+    let timers: ReturnType<typeof setTimeout>[] = [];
+    const start = () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      setActive(0);
+      timers.push(setTimeout(() => setActive(1), 5000));
+      timers.push(setTimeout(() => setActive(2), 10000));
+      timers.push(setTimeout(() => setActive(3), 15000));
+      timers.push(setTimeout(() => setActive(0), 20000));
+    };
+    const stop = () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) start();
+          else stop();
+        }
+      },
+      { threshold: [0, 0.5, 1] },
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      stop();
+    };
   }, []);
 
   return (
     <SlideFrame variant="white" pageNumber={4} pageTotal={TOTAL}>
+      <div
+        ref={rootRef}
+        style={{ position: "absolute", inset: 0 }}
+        aria-hidden
+      />
+
       <img
         src={blobRing}
         alt=""
@@ -748,7 +778,22 @@ function Slide05() {
   const groups = [
     {
       h: "The Femtech market is projected to nearly triple from $39 billion in 2024 to $97 billion by 2030. Nobody has married non-invasive, sensing fabric with a goal-oriented women's platform.",
-      items: ["Flo", "Clue", "Glow", "Hexoskin", "Siren","Thinx", "Modibodi","Tempdrop", "Elvie", "Femsense", "Apple", "Fitbit", "Whoop", "Oura"],
+      items: [
+        "Flo",
+        "Clue",
+        "Glow",
+        "Hexoskin",
+        "Siren",
+        "Thinx",
+        "Modibodi",
+        "Tempdrop",
+        "Elvie",
+        "Femsense",
+        "Apple",
+        "Fitbit",
+        "Whoop",
+        "Oura",
+      ],
     },
     // {
     //   h: "Smart textiles — non-intimate",
