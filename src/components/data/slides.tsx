@@ -8,7 +8,10 @@ import headShot from "@/assets/headshot.jpg";
 import garmentAsset from "@/assets/garment.jpg";
 import textileAsset from "@/assets/textile.png";
 import mcuAsset from "@/assets/mcu.png";
-import insightAsset from "@/assets/insight.png";
+import insightAsset from "@/assets/insight.mp4";
+import { AnimatedHeadline } from "../AnimatedHeadline";
+import garmentVideo from "@/assets/garment.mp4";
+import grapheneVideo from "@/assets/graphene.mp4";
 
 const TOTAL = 13;
 
@@ -112,21 +115,21 @@ function Slide01() {
             </span>
           </div>
         </div>
-        <div
+        {/* <div
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 24 }}
         >
           Investor Pitch · 2026
-        </div>
+        </div> */}
         <h1
           className="slide-title-xl"
-          style={{ color: "var(--brand-ink)", marginRight: "50px" }}
+          style={{ color: "var(--brand-ink)", marginRight: "100px" }}
         >
-          <span className="brand-text pr-40">Continuous</span>
-          <span className="brand-text pr-40"> Signal Capture</span>
+          <span className="brand-text pr-40">New Category</span>
+          <span className="brand-text pr-40"> Of Wearables</span>
           <br />
           <p>
-            <span>Insights Underwear</span>
+            <span>Sensing Underwear</span>
           </p>{" "}
         </h1>
         <div
@@ -202,21 +205,70 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
         style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
       />
       <div style={{ position: "absolute", top: 220, left: 110, right: 900 }}>
-        <div
+        {/* <div
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
-          01 · The Problem
-        </div>
-        <h2
+          01
+        </div> */}
+
+        <AnimatedHeadline
+          className="text-balance text-5xl font-bold leading-[7.05] tracking-wide text-foreground md:text-5xl lg:text-5xl"
+          lines={[
+            {
+              text: "Insights",
+              italic: true,
+              brand: false,
+            },
+          ]}
+        />
+        <AnimatedHeadline
+          className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-6xl"
+          lines={[
+            {
+              text: "That Matter",
+              italic: true,
+              brand: false,
+            },
+          ]}
+        />
+        <AnimatedHeadline
+          className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-7xl"
+          lines={[
+            {
+              text: "Happen At",
+              italic: true,
+              brand: false,
+            },
+          ]}
+        />
+        <AnimatedHeadline
+          className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-8xl"
+          lines={[
+            {
+              text: "From Abdomen",
+              italic: true,
+              brand: true,
+            },
+          ]}
+        />
+        {/* <h2
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 48 }}
         >
-          Uncomfortable
+          Insights That Matter 
           <br />
-          <span className="brand-text">WATCHES AND RINGS.</span>
+          <span className="brand-text">At The Abdomen and Pelvis.</span>
+        </h2> */}
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", marginTop: 48 }}
+        >
+          NOT WRIST
+          <br />
+          <span className="brand-text">OR FINGER</span>
         </h2>
-        <p
+        {/* <p
           className="slide-body-lg"
           style={{ color: "#4f4554", maxWidth: 940 }}
         >
@@ -224,14 +276,14 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
           Closing the gap could add approximately 2.5 additional healthy days
           per woman per year and deliver $400 billion in annual global GDP by
           2040.
-        </p>
+        </p> */}
       </div>
 
       <div
         style={{
           position: "absolute",
-          right: 110,
-          top: 260,
+          right: 310,
+          top: 100,
           width: "30%",
           minWidth: 420,
           display: "grid",
@@ -274,7 +326,7 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
             </div>
             <div
               style={{
-                fontSize: 27,
+                fontSize: 37,
                 color: "var(--brand-magenta)",
                 marginTop: 8,
                 fontWeight: 600,
@@ -294,7 +346,7 @@ function Slide03() {
   const team = [
     {
       n: "Emma Mendez.",
-      r: "Founder & CEO",
+      //   r: "Founder & CEO",
       d: "Founder of KLPS technology.",
       c: "Entrepreneur, Speaker, Software Engineer",
       e: "Experience:",
@@ -328,7 +380,7 @@ function Slide03() {
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
-          02 · The Founder
+          Founder & CEO
           <div
             style={{ position: "absolute", top: 120, left: 110, right: 110 }}
           >
@@ -398,7 +450,7 @@ function Slide03() {
                     textTransform: "uppercase",
                   }}
                 >
-                  {m.r}
+                  {/* {m.r} */}
                 </div>
                 <div
                   style={{
@@ -506,10 +558,34 @@ function Slide03() {
 
 function Slide04() {
   const steps = [
-    { n: "01", t: "Garment", d: "Everyday underwear holds sensing materials close to the body.", img: garmentAsset },
-    { n: "02", t: "Conductive textile", d: "Stretch fabric, sensor patch and conductive thread carry signals.", img: textileAsset },
-    { n: "03", t: "Microcontroller", d: "An on-board Arduino reads signals and converts to data.", img: mcuAsset },
-    { n: "04", t: "Insight layer", d: "Signal → Memory → Insight. Structured behavioural intelligence.", img: insightAsset },
+    {
+      n: "01",
+      t: "Underwear",
+      d: "We Create Underwear",
+      media: garmentVideo,
+      type: "video",
+    },
+    {
+      n: "02",
+      t: "IP Fabric",
+      d: "Using Conductive Fabrics.",
+      media: grapheneVideo,
+      type: "video",
+    },
+    {
+      n: "03",
+      t: "Microcontroller",
+      d: "Our MVP Uses Aurdino Micro Controller",
+      media: mcuAsset,
+      type: "image",
+    },
+    {
+      n: "04",
+      t: "Insight layer",
+      d: "The Platform Is Our Moat, And The Hardest To Replicate.  ",
+      media: insightAsset,
+      type: "video",
+    },
   ];
   // Rotation: 0 → 1 → 2 → 3 → 0 (stop). Each step 5s, final garment 7s.
   const [active, setActive] = useState(0);
@@ -526,12 +602,23 @@ function Slide04() {
 
   return (
     <SlideFrame variant="white" pageNumber={4} pageTotal={TOTAL}>
-      <img src={blobRing} alt="" className="blob" style={{ top: -160, right: -120, width: 520, opacity: 0.7 }} />
+      <img
+        src={blobRing}
+        alt=""
+        className="blob"
+        style={{ top: -160, right: -120, width: 520, opacity: 0.7 }}
+      />
       <div style={{ position: "absolute", top: 190, left: 110, right: 110 }}>
-        <div className="slide-kicker" style={{ color: "var(--brand-magenta)", marginBottom: 28 }}>
-          03 · How it works
+        <div
+          className="slide-kicker"
+          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+        >
+          03 · Why This
         </div>
-        <h2 className="slide-title" style={{ color: "var(--brand-ink)", maxWidth: 1400 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "var(--brand-ink)", maxWidth: 1400 }}
+        >
           A <span className="brand-text">garment</span> that listens.
         </h2>
         <div
@@ -551,7 +638,9 @@ function Slide04() {
                   padding: 28,
                   borderRadius: 28,
                   background: "white",
-                  border: isActive ? "2px solid var(--brand-magenta)" : "1px solid #eadde8",
+                  border: isActive
+                    ? "2px solid var(--brand-magenta)"
+                    : "1px solid #eadde8",
                   boxShadow: isActive
                     ? "0 28px 60px -10px rgba(184, 0, 130, 0.45)"
                     : "0 20px 50px -28px rgba(184, 0, 130, 0.25)",
@@ -572,17 +661,35 @@ function Slide04() {
                     marginBottom: 18,
                   }}
                 >
-                  <img
-                    src={s.img}
-                    alt={s.t}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      transform: isActive ? "scale(1.05)" : "scale(2)",
-                      transition: "transform 1.2s ease",
-                    }}
-                  />
+                  {s.type === "video" ? (
+                    <video
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        transform: isActive ? "scale(1.05)" : "scale(2)",
+                        transition: "transform 1.2s ease",
+                      }}
+                    >
+                      <source src={s.media} type="video/mp4" />
+                    </video>
+                  ) : (
+                    <img
+                      src={s.media}
+                      alt={s.t}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        transform: isActive ? "scale(1.05)" : "scale(2)",
+                        transition: "transform 1.2s ease",
+                      }}
+                    />
+                  )}
                 </div>
                 <div
                   style={{
@@ -595,10 +702,21 @@ function Slide04() {
                 >
                   {s.n}
                 </div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: "var(--brand-ink)", marginBottom: 10 }}>
+                <div
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 800,
+                    color: "var(--brand-ink)",
+                    marginBottom: 10,
+                  }}
+                >
                   {s.t}
                 </div>
-                <div style={{ fontSize: 30, lineHeight: 1.4, color: "#5f5364" }}>{s.d}</div>
+                <div
+                  style={{ fontSize: 30, lineHeight: 1.4, color: "#5f5364" }}
+                >
+                  {s.d}
+                </div>
               </div>
             );
           })}
@@ -625,9 +743,26 @@ function Slide04() {
   );
 }
 
-
 // ----- 05: Market Opportunity -----
 function Slide05() {
+  const groups = [
+    {
+      h: "The Femtech market is projected to nearly triple from $39 billion in 2024 to $97 billion by 2030. Nobody has married non-invasive, sensing fabric with a goal-oriented women's platform.",
+      items: ["Flo", "Clue", "Glow", "Hexoskin", "Siren","Thinx", "Modibodi","Tempdrop", "Elvie", "Femsense", "Apple", "Fitbit", "Whoop", "Oura"],
+    },
+    // {
+    //   h: "Smart textiles — non-intimate",
+    //   items: ["Hexoskin", "Siren"],
+    // },
+    // {
+    //   h: "Absorbent fabrics, no sensing",
+    //   items: ["Thinx", "Modibodi"],
+    // },
+    // {
+    //   h: "Single-signal trackers",
+    //   items: ["Tempdrop", "Elvie", "Femsense"],
+    // },
+  ];
   return (
     <SlideFrame variant="white" pageNumber={5} pageTotal={TOTAL}>
       <div style={{ position: "absolute", top: 180, left: 110, width: 880 }}>
@@ -635,7 +770,7 @@ function Slide05() {
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
-          04 · Market Opportunity
+          The Opportunity
         </div>
         <h2
           className="slide-title"
@@ -643,8 +778,65 @@ function Slide05() {
         >
           A category-defining market.
         </h2>
+        <div>
+          {" "}
+          <div
+            style={{ position: "absolute", top: 320, left: 300, right: -210 }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: 28,
+              }}
+            >
+              {groups.map((g) => (
+                <div
+                  key={g.h}
+                  style={{
+                    padding: 10,
+                    marginRight: -700,
+                    borderRadius: 28,
+                    border: "1px solid #eadde8",
+                    background: "white",
+                    boxShadow: "0 18px 40px -28px rgba(184, 0, 130, 0.2)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 42,
+                      fontWeight: 700,
+                      color: "var(--brand-magenta)",
+                      marginBottom: 14,
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {g.h}
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+                    {g.items.map((i) => (
+                      <span
+                        key={i}
+                        style={{
+                          padding: "10px 22px",
+                          borderRadius: 9999,
+                          background: "#f8eef6",
+                          color: "var(--brand-ink)",
+                          fontWeight: 600,
+                          fontSize: 24,
+                        }}
+                      >
+                        {i}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-        <div style={{ display: "grid", gap: 28 }}>
+        {/* <div style={{ display: "grid", gap: 28 }}>
           {[
             { tag: "TAM", value: "£165B", label: "Femtech in the next decade" },
             { tag: "SAM", value: "£46B", label: "Femtech wearables" },
@@ -698,13 +890,11 @@ function Slide05() {
               </div>
             </div>
           ))}
-        </div>
-        <div
-          style={{ marginTop: 32, fontSize: 18, color: "#706876" }}
-        >
+        </div> */}
+        {/* <div style={{ marginTop: 32, fontSize: 18, color: "#706876" }}>
           Sources: McKinsey Femtech Outlook 2024 · Smart Textiles Market Report
           2023 · Graphene Market UK Forecast 2025.
-        </div>
+        </div> */}
       </div>
 
       <div
@@ -1182,9 +1372,7 @@ function Slide09() {
               >
                 {ph.t}
               </div>
-              <div style={{ fontSize: 22, color: "#5f5364" }}>
-                {ph.d}
-              </div>
+              <div style={{ fontSize: 22, color: "#5f5364" }}>{ph.d}</div>
             </div>
           ))}
         </div>

@@ -1,7 +1,11 @@
 import { useEffect, useRef } from "react";
 
 interface AnimatedHeadlineProps {
-  lines: { text: string; italic?: boolean; muted?: boolean }[];
+  lines: {
+    brand: boolean; text: string; italic?: boolean; muted?: boolean 
+}[];
+  brand?: boolean;
+
   className?: string;
 }
 
@@ -12,11 +16,13 @@ function WordParticles({
   delay,
   italic,
   muted,
+  brand,
 }: {
   word: string;
   delay: number;
   italic?: boolean;
   muted?: boolean;
+  brand?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -68,16 +74,20 @@ function WordParticles({
     const step = Math.max(3, Math.round(fontSizePx / 14));
     for (let y = 0; y < h; y += step) {
       for (let x = 0; x < w; x += step) {
-        const i = ((y * dpr | 0) * (w * dpr) + (x * dpr | 0)) * 4;
+        const i = (((y * dpr) | 0) * (w * dpr) + ((x * dpr) | 0)) * 4;
         if (img[i + 3] > 128) targets.push({ x, y });
       }
     }
 
     // Particles start scattered to the left in a wave field
     type P = {
-      tx: number; ty: number;
-      sx: number; sy: number;
-      phase: number; amp: number; freq: number;
+      tx: number;
+      ty: number;
+      sx: number;
+      sy: number;
+      phase: number;
+      amp: number;
+      freq: number;
     };
     // Wavelength: how the wave varies across X (spatial frequency)
     const wavelength = w * 1.2; // one full wave across ~1.2x word width
@@ -135,7 +145,10 @@ function WordParticles({
   return (
     <span
       ref={wrapRef}
-      className={`relative inline-block align-baseline ${italic ? "italic" : ""} ${muted ? "text-muted-foreground" : ""}`}
+      className={`relative inline-block align-baseline
+        ${italic ? "italic" : ""}
+        ${muted ? "text-muted-foreground" : ""}
+        ${brand ? "brand-text" : ""}`}
     >
       <span
         ref={textRef}
@@ -171,6 +184,7 @@ export function AnimatedHeadline({ lines, className }: AnimatedHeadlineProps) {
                     delay={delay}
                     italic={line.italic}
                     muted={line.muted}
+                    brand={line.brand}
                   />
                   {wi < words.length - 1 && " "}
                 </span>

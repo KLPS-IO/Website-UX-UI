@@ -73,7 +73,7 @@ export function SlideDeck() {
   const [metrics, setMetrics] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/research/metrics`)
+    fetch(`${API_BASE}/api/research/public/metrics`)
       .then((r) => r.json())
       .then((data) => {
         setMetrics(data);
