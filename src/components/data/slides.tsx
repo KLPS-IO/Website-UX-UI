@@ -776,7 +776,7 @@ function Slide05() {
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 0 }}
         >
-          A category-defining market.
+          A new category of wearables.
         </h2>
         <div>
           {" "}
