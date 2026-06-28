@@ -1579,7 +1579,7 @@ function Slide08() {
                 marginTop: 4,
               }}
             >
-              per garment
+              For 5 garments
             </div>
           </div>
           <div
