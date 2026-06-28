@@ -12,7 +12,14 @@ import insightAsset from "@/assets/insight.mp4";
 import { AnimatedHeadline } from "../AnimatedHeadline";
 import garmentVideo from "@/assets/garment.mp4";
 import grapheneVideo from "@/assets/graphene.mp4";
-
+import wireframeStatsAsset from "@/assets/wireframe-stats.jpeg";
+import wireframeScanAsset from "@/assets/wireframe-scan.jpeg";
+import wireframeCompositionAsset from "@/assets/wireframe-stats.jpeg";
+import niyoLogo from "@/assets/niyo-group-logo-l.png";
+import ffrLogo from "@/assets/ffr-logo.jpg";
+import ctfLogo from "@/assets/ctf-logo.png";
+import catapultLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
+import uom from "@/assets/uomlogo.jpg";
 const TOTAL = 13;
 
 // const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
@@ -247,7 +254,7 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
           lines={[
             {
               text: "From Abdomen",
-              italic: true,
+              italic: false,
               brand: true,
             },
           ]}
@@ -266,7 +273,7 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
         >
           NOT WRIST
           <br />
-          <span className="brand-text">OR FINGER</span>
+          <span>OR FINGER</span>
         </h2>
         {/* <p
           className="slide-body-lg"
@@ -967,108 +974,361 @@ function Slide05() {
   );
 }
 
-// ----- 06: Competitors -----
+// ----- 06: No one is doing this -----
 function Slide06() {
-  const groups = [
+  const frames = [
     {
-      h: "Cycle prediction apps",
-      items: ["Flo", "Clue", "Glow"],
+      img: wireframeStatsAsset,
+      label: "Tailored insights",
+      caption: "Personalised to each user's preferences and concerns.",
     },
     {
-      h: "Smart textiles — non-intimate",
-      items: ["Hexoskin", "Siren"],
+      img: wireframeScanAsset,
+      label: "A standard data set",
+      caption: "Consistent measurements captured the same way, every time.",
     },
     {
-      h: "Absorbent fabrics, no sensing",
-      items: ["Thinx", "Modibodi"],
-    },
-    {
-      h: "Single-signal trackers",
-      items: ["Tempdrop", "Elvie", "Femsense"],
+      img: wireframeCompositionAsset,
+      label: "Always-on signal",
+      caption: "BLE-synced underwear builds cumulative data over time.",
     },
   ];
+  const insights = [
+    "Bloating",
+    "Size / shape concerns",
+    "Appearance concerns",
+    "Weight fluctuations",
+    "Hormonal changes",
+  ];
+
+  const [active, setActive] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const start = () => {
+      if (interval) return;
+      setActive(0);
+      interval = setInterval(() => {
+        setActive((a) => (a + 1) % frames.length);
+      }, 4500);
+    };
+    const stop = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) start();
+          else stop();
+        }
+      },
+      { threshold: [0, 0.5, 1] },
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      stop();
+    };
+  }, [frames.length]);
+
+  const current = frames[active];
+
   return (
     <SlideFrame variant="white" pageNumber={6} pageTotal={TOTAL}>
+      <div
+        ref={rootRef}
+        style={{ position: "absolute", inset: 0 }}
+        aria-hidden
+      />
       <img
         src={blobPink}
         alt=""
         className="blob"
         style={{ top: -120, right: -100, width: 460, opacity: 0.55 }}
       />
-      <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
-        >
-          05 · Landscape
-        </div>
-        <h2
-          className="slide-title"
-          style={{ color: "var(--brand-ink)", marginBottom: 56 }}
-        >
-          No one is doing this.
-        </h2>
+      <img
+        src={blobRing}
+        alt=""
+        className="blob"
+        style={{ bottom: -180, left: -120, width: 460, opacity: 0.5 }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          top: 150,
+          left: 110,
+          right: 110,
+          bottom: 140,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 60,
+          alignItems: "stretch",
+        }}
+      >
+        {/* LEFT */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 28,
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            paddingRight: 30,
+            justifyContent: "flex-start",
           }}
         >
-          {groups.map((g) => (
+          {/* <div
+            className="slide-kicker"
+            style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+          >
+            05 · No one else is doing this
+          </div> */}
+          <h2
+            className="slide-title"
+            style={{
+              color: "var(--brand-ink)",
+              marginBottom: 36,
+              maxWidth: 60,
+              marginRight: 110,
+            }}
+          >
+            Insights that <span className="brand-text">matter</span>
+          </h2>
+          <p
+            style={{
+              fontSize: 26,
+              color: "oklch(0.4 0.03 290)",
+              lineHeight: 1.4,
+              maxWidth: 720,
+              marginBottom: 32,
+            }}
+          >
+            Our underwear connects to the software and produces insights
+            gathered from our platform, where the IP lives.{" "}
+          </p>
+          <div
+            style={{
+              fontSize: 20,
+              letterSpacing: "0.18em",
+              fontWeight: 800,
+              color: "var(--brand-magenta)",
+              textTransform: "uppercase",
+              marginBottom: 20,
+            }}
+          >
+            Top Insights Identified
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 12,
+              marginBottom: -10,
+              maxWidth: 760,
+            }}
+          >
             <div
-              key={g.h}
-              style={{
-                padding: 40,
-                borderRadius: 28,
-                border: "1px solid #eadde8",
-                background: "white",
-                boxShadow: "0 18px 40px -28px rgba(184, 0, 130, 0.2)",
-              }}
-            >
-              <div
+              className="slide-kicker"
+              style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+            ></div>
+            {insights.map((i) => (
+              <span
+                key={i}
                 style={{
+                  padding: "12px 22px",
+                  borderRadius: 9999,
+                  background: "oklch(0.96 0.02 320)",
+                  color: "var(--brand-ink)",
+                  fontWeight: 600,
                   fontSize: 22,
-                  fontWeight: 700,
-                  color: "var(--brand-magenta)",
-                  marginBottom: 14,
-                  letterSpacing: "0.04em",
+                  paddingLeft: 10,
+                  border: "1px solid oklch(0.9 0.03 320)",
+                  marginBottom: 10,
                 }}
               >
-                {g.h}
-              </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-                {g.items.map((i) => (
-                  <span
-                    key={i}
-                    style={{
-                      padding: "10px 22px",
-                      borderRadius: 9999,
-                      background: "#f8eef6",
-                      color: "var(--brand-ink)",
-                      fontWeight: 600,
-                      fontSize: 24,
-                    }}
-                  >
-                    {i}
-                  </span>
-                ))}
-              </div>
+                {i}
+              </span>
+            ))}
+          </div>
+
+          {/* Rotating caption */}
+          <div
+            key={active}
+            style={{
+              padding: 28,
+              borderRadius: 24,
+              background: "var(--brand-gradient-soft)",
+              border: "1px solid oklch(0.9 0.04 320)",
+              maxWidth: 720,
+              animation: "fade-in 500ms ease-out",
+              marginTop: 50,
+            }}
+          >
+            <div
+              style={{
+                fontSize: 20,
+                letterSpacing: "0.18em",
+                fontWeight: 800,
+                color: "var(--brand-magenta)",
+                textTransform: "uppercase",
+                marginBottom: 10,
+              }}
+            >
+              {String(active + 1).padStart(2, "0")} · {current.label}
             </div>
-          ))}
+            <div
+              style={{
+                fontSize: 26,
+                color: "var(--brand-ink)",
+                lineHeight: 1.35,
+                fontWeight: 500,
+              }}
+            >
+              {current.caption}
+            </div>
+          </div>
         </div>
+
+        {/* ARROW (overlaid SVG spanning both columns) */}
+        <svg
+          viewBox="0 0 800 600"
+          preserveAspectRatio="none"
+          style={{
+            position: "absolute",
+            left: "42%",
+            top: "38%",
+            width: 360,
+            height: 260,
+            pointerEvents: "none",
+            overflow: "visible",
+          }}
+          aria-hidden
+        >
+          <defs>
+            <linearGradient id="arrowGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="oklch(0.82 0.10 350)" />
+              <stop offset="100%" stopColor="oklch(0.55 0.30 320)" />
+            </linearGradient>
+            <marker
+              id="arrowHead"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+            >
+              <path d="M0,0 L10,5 L0,10 z" fill="oklch(0.55 0.30 320)" />
+            </marker>
+          </defs>
+          <path
+            d="M 20 300 C 250 100, 500 100, 760 280"
+            fill="none"
+            stroke="url(#arrowGrad)"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeDasharray="18 16"
+            markerEnd="url(#arrowHead)"
+            style={{ animation: "dash-flow 1.6s linear infinite" }}
+          />
+        </svg>
+
+        {/* RIGHT - phone wireframe */}
         <div
           style={{
-            marginTop: 36,
-            fontSize: 28,
-            color: "#5f5364",
-            maxWidth: 1500,
-            lineHeight: 1.35,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
           }}
         >
-          Apps predict. Trackers measure narrow signals. Absorbent fabrics solve
-          a different problem. KLPS sits in a white space: sensing-grade
-          intimate garments.
+          <div
+            style={{
+              position: "relative",
+              width: 360,
+              height: 720,
+              borderRadius: 56,
+              background:
+                "linear-gradient(160deg, oklch(0.18 0.04 290), oklch(0.12 0.02 280))",
+              padding: 14,
+              boxShadow:
+                "0 60px 120px -30px oklch(0.55 0.30 320 / 0.55), 0 0 0 2px oklch(0.55 0.30 320 / 0.25)",
+            }}
+          >
+            {/* notch */}
+            <div
+              style={{
+                position: "absolute",
+                top: 18,
+                left: "50%",
+                transform: "translateX(-50%)",
+                width: 120,
+                height: 22,
+                borderRadius: 14,
+                background: "#000",
+                zIndex: 2,
+              }}
+            />
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                borderRadius: 44,
+                overflow: "hidden",
+                background: "white",
+                position: "relative",
+              }}
+            >
+              {frames.map((f, i) => (
+                <img
+                  key={i}
+                  src={f.img}
+                  alt={f.label}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    objectPosition: "top center",
+                    opacity: i === active ? 1 : 0,
+                    transform: i === active ? "scale(1)" : "scale(1.04)",
+                    transition: "opacity 700ms ease, transform 900ms ease",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* dots */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: -40,
+              display: "flex",
+              gap: 10,
+            }}
+          >
+            {frames.map((_, i) => (
+              <span
+                key={i}
+                style={{
+                  width: i === active ? 32 : 10,
+                  height: 10,
+                  borderRadius: 9999,
+                  background:
+                    i === active
+                      ? "var(--brand-magenta)"
+                      : "oklch(0.85 0.04 320)",
+                  transition: "all 400ms ease",
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </SlideFrame>
@@ -1077,11 +1337,39 @@ function Slide06() {
 
 // ----- 07: Traction -----
 function Slide07() {
-  const stats = [
-    { v: "12", l: "Users onboarded" },
-    { v: "25+", l: "Completed sessions" },
-    { v: "127", l: "Behavioural signals captured" },
-    { v: "75%", l: "Day-2 retention" },
+  type Stat = {
+    v: string;
+    l: string;
+    alt?: string;
+    logo?: string;
+    logos?: string[];
+  };
+
+  const stats: Stat[] = [
+    {
+      v: "UoM Henry Royce Institute",
+      l: "",
+      logo: uom,
+      alt: "University of Manchester Henry Royce Institute",
+    },
+    {
+      v: "CreaTech. Digital Catapult",
+      l: "",
+      logos: [ctfLogo, catapultLogo],
+      alt: "CreaTech Frontiers",
+    },
+    {
+      v: "Female Founders Rise",
+      l: "",
+      logo: ffrLogo,
+      alt: "Female Founders Rise",
+    },
+    {
+      v: "Niyo Enterprise",
+      l: "",
+      logo: niyoLogo,
+      alt: "Niyo Enterprise",
+    },
   ];
   return (
     <SlideFrame
@@ -1097,18 +1385,16 @@ function Slide07() {
         className="blob"
         style={{ bottom: -180, left: -80, width: 520, opacity: 0.6 }}
       />
-      <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
+      <div style={{ position: "absolute", top: 220, left: 50, right: 110 }}>
         <div
           className="slide-kicker"
           style={{ color: "rgba(255,255,255,0.8)", marginBottom: 28 }}
-        >
-          06 · Traction
-        </div>
+        ></div>
         <h2
           className="slide-title"
           style={{ color: "white", marginBottom: 80, maxWidth: 1500 }}
         >
-          Live behavioural signals — already flowing.
+          Traction
         </h2>
         <div
           style={{
@@ -1121,18 +1407,19 @@ function Slide07() {
             <div
               key={s.l}
               style={{
+                position: "relative",
                 padding: 44,
                 borderRadius: 28,
                 background: "rgba(255,255,255,0.12)",
                 border: "1px solid rgba(255,255,255,0.18)",
                 backdropFilter: "blur(12px)",
                 color: "white",
-                minHeight: 280,
+                minHeight: 480,
               }}
             >
               <div
                 style={{
-                  fontSize: 96,
+                  fontSize: 76,
                   fontWeight: 800,
                   letterSpacing: "-0.04em",
                   lineHeight: 1,
@@ -1142,13 +1429,55 @@ function Slide07() {
               </div>
               <div
                 style={{
-                  fontSize: 22,
-                  opacity: 0.85,
-                  marginTop: 24,
-                  lineHeight: 1.35,
+                  position: "absolute",
+                  bottom: 24,
+                  right: 50,
+                  width: 205,
+                  height: 100,
+                  borderRadius: 16,
+                  background: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+                  overflow: "hidden",
                 }}
               >
-                {s.l}
+                {s.logos ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-evenly",
+                      width: "100%",
+                      height: "100%",
+                      gap: 8,
+                    }}
+                  >
+                    {s.logos.map((logo, index) => (
+                      <img
+                        key={index}
+                        src={logo}
+                        alt={s.alt}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <img
+                    src={s.logo}
+                    alt={s.alt}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                )}
               </div>
             </div>
           ))}
@@ -1160,9 +1489,7 @@ function Slide07() {
             color: "rgba(255,255,255,0.9)",
             maxWidth: 1400,
           }}
-        >
-          Confirming early engagement momentum from day one.
-        </div>
+        ></div>
       </div>
     </SlideFrame>
   );
