@@ -784,7 +784,7 @@ function Slide04() {
 function Slide05() {
   const groups = [
     {
-      h: "The Femtech market is projected to nearly triple from $39 billion in 2024 to $97 billion by 2030. Nobody has married non-invasive, sensing fabric with a goal-oriented women's platform.",
+      h: "Femtech $97 billion by 2030. No company has married non-invasive, sensing fabric with a goal-oriented women's platform.",
       items: [
         "Flo",
         "Clue",
@@ -1523,7 +1523,7 @@ function Slide08() {
           style={{
             color: "#5f5364",
             maxWidth: 1300,
-            marginBottom: 64,
+            marginBottom: 34,
           }}
         >
           A hybrid model: a premium physical product that fuels a high-margin
@@ -1570,7 +1570,7 @@ function Slide08() {
                 marginTop: 24,
               }}
             >
-              £65 – £95
+              £120 – £140
             </div>
             <div
               style={{
@@ -1579,7 +1579,7 @@ function Slide08() {
                 marginTop: 4,
               }}
             >
-              For 5 garments
+              For 5-7 garments
             </div>
           </div>
           <div
@@ -1602,7 +1602,7 @@ function Slide08() {
               REVENUE STREAM · 02
             </div>
             <div style={{ fontSize: 40, fontWeight: 800, marginTop: 16 }}>
-              Insight Subscription
+              Insight Subscription Tier Model
             </div>
             <div
               style={{
@@ -1621,10 +1621,10 @@ function Slide08() {
         </div>
 
         <div
-          style={{ marginTop: 40, display: "flex", gap: 16, flexWrap: "wrap" }}
+          style={{ marginTop: 20, display: "flex", gap: 16, flexWrap: "wrap" }}
         >
           {[
-            "Research collaborations",
+            "Textile collaborations",
             "Healthcare partnerships",
             "Institutional licensing",
           ].map((t) => (
@@ -1654,18 +1654,18 @@ function Slide09() {
     {
       p: "Phase 1",
       t: "Early testers & waitlist onboarding",
-      d: "Underway today.",
+      d: "£75,000 - Pre-Seed",
     },
     {
       p: "Phase 2",
       t: "Community-driven growth",
-      d: "Ambassador & referral loops.",
+      d: "£300,000 - Seed Phase ",
     },
-    { p: "Phase 3", t: "Commercial pilot launches", d: "Premium D2C release." },
+    { p: "Phase 3", t: "Commercial pilot launches", d: "Premium D2C release. Series A (Optimisation)" },
     {
       p: "Phase 4",
       t: "Retail & institutional partnerships",
-      d: "Healthcare and research deals.",
+      d: "Healthcare and research deals. Series B Phase (Expansion)",
     },
   ];
   return (
@@ -1681,7 +1681,7 @@ function Slide09() {
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 80 }}
         >
-          A staged path to scale.
+          Path to scale.
         </h2>
         <div
           style={{
@@ -1757,10 +1757,10 @@ function Slide09() {
 function Slide10() {
   const items = [
     { t: "Prototype validation", q: "Now" },
-    { t: "Pilot deployment", q: "Q2 2026" },
-    { t: "Commercial launch", q: "Q4 2026" },
-    { t: "Platform expansion", q: "2027" },
-    { t: "Dataset growth", q: "2027 +" },
+    { t: "Pilot deployment (Wait List)", q: "(Q4) 2026" },
+    { t: "Commercial launch", q: "(Q2) 2027" },
+    { t: "Product and platform expansion", q: "2028" },
+    { t: "Dataset growth", q: "2028" },
   ];
   return (
     <SlideFrame variant="soft" pageNumber={10} pageTotal={TOTAL}>
@@ -1770,13 +1770,13 @@ function Slide10() {
         className="blob"
         style={{ top: -120, right: -120, width: 480, opacity: 0.7 }}
       />
-      <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div
+      <div style={{ position: "absolute", top: 150, left: 110, right: 110 }}>
+        {/* <div
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
           09 · Roadmap · Next 12–24 months
-        </div>
+        </div> */}
         <h2
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 24 }}
@@ -1785,7 +1785,7 @@ function Slide10() {
           <br />
           and physiological infrastructure.
         </h2>
-        <div style={{ marginTop: 80, display: "grid", gap: 18 }}>
+        <div style={{ marginTop: 30, display: "grid", gap: 18 }}>
           {items.map((it, i) => (
             <div
               key={it.t}
@@ -1840,11 +1840,11 @@ function Slide10() {
 // ----- 11: Team -----
 function Slide11() {
   const team = [
-    {
-      n: "Emma Mendez.",
-      r: "Founder & CEO",
-      d: "Founder of KLPS technology. Building the wearable category for women's health.",
-    },
+    // {
+    //   n: "Emma Mendez.",
+    //   r: "Founder & CEO",
+    //   d: "Founder of KLPS technology. Building the wearable category for women's health.",
+    // },
     {
       n: "Oyin A.",
       r: "Advisor",
@@ -1865,17 +1865,17 @@ function Slide11() {
         style={{ top: -120, right: -80, width: 460, opacity: 0.55 }}
       />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div
+        {/* <div
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
           10 · The Team
-        </div>
+        </div> */}
         <h2
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 72 }}
         >
-          Builders behind the fabric.
+          Honourable Mention Advisors .
         </h2>
         <div
           style={{
@@ -1972,12 +1972,12 @@ function Slide12() {
         }}
       >
         <div>
-          <div
+          {/* <div
             className="slide-kicker"
             style={{ color: "rgba(255,255,255,0.8)", marginBottom: 40 }}
           >
             11 · Vision
-          </div>
+          </div> */}
           <h2
             style={{
               fontSize: 140,
@@ -2003,8 +2003,18 @@ function Slide12() {
               margin: "0 auto",
             }}
           >
-            KLPS is introducing a new category of wearable technology — starting
-            in FemTech, built for women's health intelligence.
+            KLPS' new category of wearable technology 
+          </p>
+          <p
+            style={{
+              fontSize: 36,
+              lineHeight: 1.4,
+              color: "rgba(255,255,255,0.9)",
+              maxWidth: 1300,
+              margin: "0 auto",
+            }}
+          >
+            Designed for health intelligence.
           </p>
         </div>
       </div>
