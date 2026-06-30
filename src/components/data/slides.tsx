@@ -618,7 +618,7 @@ function Slide04() {
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
-          03 · Why This
+          Why This
         </div>
         <h2
           className="slide-title"
@@ -752,7 +752,7 @@ function Slide04() {
 function Slide05() {
   const groups = [
     {
-      h: "'$97 Billion Projected Global Femtech Market Growth By 2030'",
+      h: "$97 Billion Projected Global Femtech Market Growth By 2030",
       q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
       items: [
         "Flo",
@@ -994,7 +994,16 @@ function Slide06() {
               maxWidth: 60,
               marginRight: 110,
             }}
-          >
+          >        <div
+          className="slide-kicker"
+          style={{
+            color: "var(--brand-magenta)",
+            marginBottom: 10,
+            paddingTop: 20,
+          }}
+        >
+          Moat
+        </div>
             Insights that <span className="brand-text">matter</span>
           </h2>
           <p
@@ -1570,19 +1579,19 @@ function Slide09() {
   const phases = [
     {
       p: "Now",
-      t: "Prototype validation",
+      t: "Prototype Validation",
     },
     {
       p: "Q1 2027",
-      t: "Pilot waitlist live",
+      t: "Pilot Waitlist Live",
     },
     {
       p: "Q3 2027",
-      t: "Commercial launch",
+      t: "Commercial Launch",
     },
     {
       p: "2028",
-      t: "Platform expansion",
+      t: "Platform Expansion",
     },
   ];
   return (
@@ -1703,8 +1712,8 @@ function Slide10() {
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 24 }}
         >
-          We've validated the demand. <br />
-          Now we build it.{" "}
+          We've Validated the Demand. <br />
+          Now We Build It.{" "}
         </h2>
         <div style={{ marginTop: 30, display: "grid", gap: 18 }}>
           {items.map((it, i) => (
@@ -1769,12 +1778,17 @@ function Slide11() {
     {
       n: "Oyin. A",
       r: "Advisor/Angel",
-      d: "Award-winning commercial leadership and deep community reach in women-in-tech.",
+      d: "Award-winning Commercial Leadership and Deep Community Reach in Women-in-Tech.",
     },
     {
       n: "Muneeb. A",
+      r: "Technical Advisor",
+      d: "Specialist in LLM systems, MVP Development, and Enterprise-Scale Computer Vision Architectures.",
+    },
+        {
+      n: "Imran. K",
       r: "Advisor",
-      d: "LLM systems, MVP development and computer vision pipelines at scale.",
+      d: "Director | Professional Services Procurement Expert | Big 4 Advisory",
     },
   ];
   return (
@@ -1825,7 +1839,7 @@ function Slide11() {
                   display: "grid",
                   placeItems: "center",
                   fontSize: 42,
-                  fontWeight: 800,
+                  fontWeight: 900,
                   marginBottom: 32,
                 }}
               >
@@ -1856,6 +1870,7 @@ function Slide11() {
               <div
                 style={{
                   fontSize: 34,
+                  fontWeight: 700,
                   lineHeight: 1.4,
                   color: "#4f4554",
                   marginTop: 24,
