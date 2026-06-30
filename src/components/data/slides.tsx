@@ -20,6 +20,7 @@ import ffrLogo from "@/assets/ffr-logo.jpg";
 import ctfLogo from "@/assets/ctf-logo.png";
 import catapultLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
 import uom from "@/assets/uomlogo.jpg";
+import { Italic } from "lucide-react";
 const TOTAL = 14;
 
 // const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
@@ -1989,12 +1990,55 @@ function Slide13() {
         }}
       >
         <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+          style={{
+            color: "var(--brand-magenta)",
+            marginBottom: 10,
+            fontSize: 40,
+            marginTop: -70,
+            fontStyle: "italic",
+            fontWeight: 160,
+          }}
         >
-          Woman wearing an Oura ring, WHOOP strap, Fitbit or Manually Tracking —
-          say 'I dont Want To Manually Track or Wear These and Charge' The
-          richest non-invasive data zone is not her wrist. It never was.{" "}
+          Every woman wearing an Oura Ring or a WHOOP Strap
+        </div>
+        <div
+          style={{
+            color: "var(--brand-magenta)",
+            marginBottom: 10,
+            fontSize: 40,
+            marginTop: -20,
+            fontStyle: "italic",
+            fontWeight: 160,
+          }}
+        >
+          {" "}
+          already buy into 'insight' technology!{" "}
+        </div>
+        <div
+          style={{
+            color: "var(--brand-magenta)",
+            marginBottom: 10,
+            fontSize: 40,
+            marginTop: -20,
+            fontStyle: "italic",
+            fontWeight: 160,
+          }}
+        >
+          {" "}
+          Just in the wrong place.
+        </div>
+        <div
+          style={{
+            color: "var(--brand-magenta)",
+            marginBottom: 10,
+            fontSize: 40,
+            marginTop: -10,
+            fontStyle: "italic",
+            fontWeight: 160,
+          }}
+        >
+          {" "}
+          The richest data zone is NOT her wrist. It never was.{" "}
         </div>
         <h2 className="slide-title-xl" style={{ color: "var(--brand-ink)" }}>
           The Question is Who
@@ -2065,33 +2109,28 @@ function Slide14({ metrics }: { metrics?: SlideMetrics }) {
           <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
         </span>
       </h2>
+      {/* Top row */}
       <div
         style={{
           position: "absolute",
-          left: 50,
+          left: "25%",
           top: 120,
-          // width: "46%",
-          // minWidth: 760,
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: 24,
-          alignItems: "stretch",
+          alignItems: "center",
+          textAlign: "center",
         }}
       >
         {[
           {
-            value: `0`,
-            label: `COMPETITORS`,
-            description: "In This Exact Space",
-          },
-          {
-            value: `£75k`,
-            label: `Pre-Seed `,
+            value: "£75k",
+            label: "Pre-Seed",
             description: "SEIS Eligible",
           },
           {
             value: `${metrics?.commercialInterestPercent ?? 0}%`,
-            label: `of Women`,
+            label: "of Women",
             description: "Would Pay For Personalised Body Insights",
           },
         ].map((row) => (
@@ -2102,45 +2141,35 @@ function Slide14({ metrics }: { metrics?: SlideMetrics }) {
               padding: 36,
               display: "flex",
               flexDirection: "column",
+              width: 520,
               height: 360,
             }}
           >
-            <div
-              style={{
-                height: 150,
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+            <div style={{ height: 150 }}>
               <div
                 style={{
                   fontSize: 50,
                   fontWeight: 700,
                   color: "var(--brand-ink)",
-                  lineHeight: 1.05,
                 }}
               >
                 {row.value}
               </div>
 
-              {row.label && (
-                <div
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 600,
-                    color: "var(--brand-ink)",
-                    lineHeight: 1.2,
-                    marginTop: 8,
-                  }}
-                >
-                  {row.label}
-                </div>
-              )}
+              <div
+                style={{
+                  fontSize: 28,
+                  fontWeight: 600,
+                  color: "var(--brand-ink)",
+                  marginTop: 8,
+                }}
+              >
+                {row.label}
+              </div>
             </div>
 
             <div
               style={{
-                // marginTop: "auto",
                 fontSize: 37,
                 fontWeight: 600,
                 color: "var(--brand-magenta)",
@@ -2151,6 +2180,58 @@ function Slide14({ metrics }: { metrics?: SlideMetrics }) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Centre card */}
+      <div
+        className="stat-card"
+        style={{
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
+          top: 520,
+          width: 520,
+          height: 300,
+          padding: 36,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ height: 150 }}>
+          <div
+            style={{
+              fontSize: 50,
+              fontWeight: 700,
+              color: "var(--brand-ink)",
+            }}
+          >
+            0
+          </div>
+
+          <div
+            style={{
+              fontSize: 28,
+              fontWeight: 600,
+              color: "var(--brand-ink)",
+              marginTop: 8,
+            }}
+          >
+            COMPETITORS
+          </div>
+        </div>
+
+        <div
+          style={{
+            fontSize: 37,
+            fontWeight: 600,
+            color: "var(--brand-magenta)",
+            lineHeight: 1.3,
+          }}
+        >
+          In This Exact Space
+        </div>
       </div>
     </SlideFrame>
   );
