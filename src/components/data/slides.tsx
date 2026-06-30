@@ -752,7 +752,7 @@ function Slide04() {
 function Slide05() {
   const groups = [
     {
-      h: "'The Global Femtech Market is Projected To Reach $97 Billion By 2030.'",
+      h: "'$97 Billion Projected Global Femtech Market Growth By 2030'",
       q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
       items: [
         "Flo",
