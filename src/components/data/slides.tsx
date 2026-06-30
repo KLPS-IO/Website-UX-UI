@@ -891,7 +891,7 @@ function Slide06() {
     {
       img: wireframeScanAsset,
       label: "A standard data set",
-      caption: "Consistent measurements captured the same way, every time.",
+      caption: "Consistent measurements captured in real-time.",
     },
     {
       img: wireframeCompositionAsset,
@@ -901,7 +901,7 @@ function Slide06() {
         {
       img: ChatToLema,
       label: "KLPS' LLM - Chat Lema",
-      caption: "Data Capture Unique To KLPS",
+      caption: "Data capture unique to KLPS",
     },
   ];
   const insights = [
