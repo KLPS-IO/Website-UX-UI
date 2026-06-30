@@ -563,7 +563,7 @@ function Slide04() {
     {
       n: "04",
       t: "Insight layer",
-      d: "The Platform Is Our Moat, And The Hardest To Replicate.  ",
+      d: "The Product - Platform IP Is Our Moat, and The Hardest To Replicate.  ",
       media: insightAsset,
       type: "video",
     },
@@ -758,7 +758,7 @@ function Slide04() {
 function Slide05() {
   const groups = [
     {
-      h: "$97 Billion Projected Global Femtech Market Growth By 2030",
+      h: "$97 Billion Projected Global Femtech Market Growth By 2030-",
       q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
       items: [
         "Flo",
@@ -1012,7 +1012,7 @@ function Slide06() {
             >
               Moat
             </div>
-            Insights that <span className="brand-text">matter</span>
+            Insights That <span className="brand-text">Matter</span>
           </h2>
           <p
             style={{
@@ -1796,7 +1796,7 @@ function Slide11() {
     {
       n: "Oyin. A",
       r: "Advisor/Angel",
-      d: "Award-winning Commercial Leadership and Deep Community Reach in Women-in-Tech.",
+      d: "Award-Winning Commercial Leadership and Deep Community Reach in Women-in-Tech.",
     },
     {
       n: "Muneeb. A",
@@ -1957,7 +1957,7 @@ function Slide12() {
               margin: "0 auto",
             }}
           >
-            KLPS' new category of wearable technology
+            KLPS' new category of wearable technology.
           </p>
           <p
             style={{
@@ -2032,7 +2032,7 @@ function Slide13() {
             color: "var(--brand-magenta)",
             marginBottom: 10,
             fontSize: 40,
-            marginTop: -10,
+            marginTop: -20,
             fontStyle: "italic",
             fontWeight: 160,
           }}
