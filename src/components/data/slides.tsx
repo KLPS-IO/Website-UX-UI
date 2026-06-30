@@ -391,7 +391,7 @@ function Slide03() {
       n: "Emma Mendez.",
       d: "I lost 4 stone",
       c: "Tracking Wasn't Straight Forward.",
-      e: " The bodies most honest signal we care about happen at the abdomen, not the wrist.",
+      e: " Communicating, Community and Accountability Partners Were My Biggest Success Factors",
       f: "- Corporate Software Engineer",
       g: "- Graphene Strategist",
       h: "- Mother",
