@@ -12,9 +12,10 @@ import insightAsset from "@/assets/insight.mp4";
 import { AnimatedHeadline } from "../AnimatedHeadline";
 import garmentVideo from "@/assets/garment.mp4";
 import grapheneVideo from "@/assets/graphene.mp4";
-import wireframeStatsAsset from "@/assets/wireframe-stats.jpeg";
+import wireframeStatsAsset from "@/assets/wireframe-composition.png";
 import wireframeScanAsset from "@/assets/wireframe-scan.jpeg";
 import wireframeCompositionAsset from "@/assets/wireframe-stats.jpeg";
+import ChatToLema from "@/assets/chat-lema.png";
 import niyoLogo from "@/assets/niyo-group-logo-l.png";
 import ffrLogo from "@/assets/ffr-logo.jpg";
 import ctfLogo from "@/assets/ctf-logo.png";
@@ -897,6 +898,11 @@ function Slide06() {
       label: "Always-on signal",
       caption: "BLE-synced underwear builds cumulative data over time.",
     },
+        {
+      img: ChatToLema,
+      label: "KLPS' LLM - Chat Lema",
+      caption: "Data Capture Unique To KLPS",
+    },
   ];
   const insights = [
     "Bloating",
@@ -966,7 +972,7 @@ function Slide06() {
       <div
         style={{
           position: "absolute",
-          top: 150,
+          top: 130,
           left: 110,
           right: 110,
           bottom: 140,
@@ -996,7 +1002,7 @@ function Slide06() {
             className="slide-title"
             style={{
               color: "var(--brand-ink)",
-              marginBottom: 36,
+              marginBottom: 30,
               maxWidth: 60,
               marginRight: 110,
             }}
@@ -1033,7 +1039,7 @@ function Slide06() {
               fontWeight: 800,
               color: "var(--brand-magenta)",
               textTransform: "uppercase",
-              marginBottom: 20,
+              marginBottom: 10,
             }}
           >
             Top Insights Identified
