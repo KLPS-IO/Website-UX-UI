@@ -785,7 +785,7 @@ function Slide05() {
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 0 }}
         >
-          A new category of wearables.
+          A New Category of Wearables.
         </h2>
         <div>
           {" "}
