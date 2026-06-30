@@ -394,8 +394,8 @@ function Slide03() {
       e: "Community and Accountability Partners Were My Biggest Success Factors",
       f: "- Corporate Software Engineer",
       g: "- Graphene Strategist",
-      h: "- Mother",
-      j: "- Femtech Founder",
+      h: "- Femtech Founder ",
+      j: "- Mother",
     },
   ];
 
