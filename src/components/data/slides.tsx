@@ -130,14 +130,20 @@ function Slide01() {
         </div> */}
         <h1
           className="slide-title-xl"
-          style={{ color: "var(--brand-ink)", marginRight: "100px" }}
+          style={{
+            color: "var(--brand-ink)",
+            marginRight: "100px",
+            marginTop: "-40px",
+          }}
         >
-          <span className="brand-text pr-40">New Category</span>
-          <span className="brand-text pr-40"> Of Wearables</span>
+          <span>
+            <span>The Future of Health Monitoring Is Not Devices. </span>
+          </span>{" "}
           <br />
-          <p>
-            <span>Sensing Underwear</span>
-          </p>{" "}
+          <span className="brand-text pr-40">It is Fabrics. </span> <br />
+          {/* <span className="brand-text pr-40"> </span> */}
+          <br />
+          <p></p>{" "}
         </h1>
         <div
           style={{
@@ -157,6 +163,7 @@ function Slide01() {
             style={{
               width: "500px",
               borderRadius: "20px",
+              marginTop: "-250px",
             }}
           >
             <source src={klpsVideo} type="video/mp4" />
@@ -201,6 +208,10 @@ function Slide01() {
 
 // ----- 02: The Problem -----
 function Slide02({ metrics }: { metrics?: SlideMetrics }) {
+  const formattedPricePoint = metrics?.topPricePoint
+    ? `£${metrics.topPricePoint.replace("_", "-£")}`
+    : "No data";
+
   const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
 
   return (
@@ -212,13 +223,6 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
         style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
       />
       <div style={{ position: "absolute", top: 220, left: 110, right: 900 }}>
-        {/* <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
-        >
-          01
-        </div> */}
-
         <AnimatedHeadline
           className="text-balance text-5xl font-bold leading-[7.05] tracking-wide text-foreground md:text-5xl lg:text-5xl"
           lines={[
@@ -259,87 +263,119 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
             },
           ]}
         />
-        {/* <h2
-          className="slide-title"
-          style={{ color: "var(--brand-ink)", marginBottom: 48 }}
-        >
-          Insights That Matter 
-          <br />
-          <span className="brand-text">At The Abdomen and Pelvis.</span>
-        </h2> */}
         <h2
           className="slide-title"
-          style={{ color: "var(--brand-ink)", marginTop: 48 }}
+          style={{ color: "var(--brand-ink)", marginTop: 28 }}
         >
           NOT WRIST
           <br />
           <span>OR FINGER</span>
         </h2>
-        {/* <p
-          className="slide-body-lg"
-          style={{ color: "#4f4554", maxWidth: 940 }}
-        >
-          - Womens Health Gap - <br />
-          Closing the gap could add approximately 2.5 additional healthy days
-          per woman per year and deliver $400 billion in annual global GDP by
-          2040.
-        </p> */}
       </div>
-
+      <h2
+        className="slide-title"
+        style={{
+          color: "var(--brand-ink)",
+          marginLeft: 100,
+          fontSize: 60,
+          fontWeight: 290,
+          paddingRight: 10,
+          paddingTop: 890,
+        }}
+      >
+        <span className="brand-text">
+          "If a solution gave you insights into your body, would you consider
+          paying for it?" - 93% said yes or maybe.
+        </span>
+      </h2>
       <div
         style={{
           position: "absolute",
-          right: 310,
-          top: 100,
-          width: "30%",
-          minWidth: 420,
+          right: 110,
+          top: 120,
+          width: "46%",
+          minWidth: 760,
           display: "grid",
+          gridTemplateColumns: "1fr 1fr",
           gap: 24,
+          alignItems: "stretch",
         }}
       >
         {[
           {
-            label: `${tummyInTen} in 10 women`,
-            pct: "Want more insight into their abdominal health",
-          },
-          //   {
-          //     label: `${metrics?.topConcernPercent ?? 0}% of ${metrics?.participants ?? 0} women asked`,
-          //     pct: "Report 'Bloating' as a recurring experience",
-          //   },
-          {
-            label: `${metrics?.commercialInterestPercent ?? 0}% of ${metrics?.participants ?? 0} women asked`,
-            pct: "Would pay for personalised body insights",
+            value: `${metrics?.commercialInterestPercent ?? 0}%`,
+            label: `of ${metrics?.participants ?? 0} surveyed`,
+            description: "Would Pay For Personalised Body Insights",
           },
           {
-            label: `$1 Trillion Boost: Addressing the women’s health gap boosts the global economy, improving health and quality of life for millions.
-         `,
-            pct: "The World Economic Forum and its Global Alliance for Women’s Health",
+            value: `${tummyInTen} in 10`,
+            label: "Women",
+            description: "Want Insights From Their Abdomen",
+          },
+          {
+            value: `${metrics?.spentMoneyPercent ?? 0}%`,
+            label: `of ${metrics?.participants ?? 0} surveyed`,
+            description: "Have Already Spent Money On Devices/Tracking",
+          },
+          {
+            value: formattedPricePoint,
+            label: "",
+            description: "Most Popular Price Point Women Would Pay",
           },
         ].map((row) => (
           <div
-            key={`${row.label}-${row.pct}`}
+            key={`${row.value}-${row.description}`}
             className="stat-card"
-            style={{ padding: 36 }}
+            style={{
+              padding: 36,
+              display: "flex",
+              flexDirection: "column",
+              height: 360,
+            }}
           >
-            {" "}
             <div
               style={{
-                fontSize: 30,
-                fontWeight: 700,
-                color: "var(--brand-ink)",
+                height: 150,
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              {row.label}
+              <div
+                style={{
+                  fontSize: 50,
+                  fontWeight: 700,
+                  color: "var(--brand-ink)",
+                  lineHeight: 1.05,
+                }}
+              >
+                {row.value}
+              </div>
+
+              {row.label && (
+                <div
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 600,
+                    color: "var(--brand-ink)",
+                    lineHeight: 1.2,
+                    marginTop: 8,
+                  }}
+                >
+                  {row.label}
+                </div>
+              )}
             </div>
+
             <div
               style={{
+                // marginTop: "auto",
                 fontSize: 37,
-                color: "var(--brand-magenta)",
-                marginTop: 8,
                 fontWeight: 600,
+                color: "var(--brand-magenta)",
+                lineHeight: 1.3,
               }}
             >
-              {row.pct}
+              {row.description}
             </div>
           </div>
         ))}
@@ -348,32 +384,21 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
   );
 }
 
-// ----- 03: What it feels like -----
+// ----- 03: FOUNDER -----
 function Slide03() {
   const team = [
     {
       n: "Emma Mendez.",
-      //   r: "Founder & CEO",
-      d: "Founder of KLPS technology.",
-      c: "Entrepreneur, Speaker, Software Engineer",
-      e: "Experience:",
+      d: "I lost 4 stone",
+      c: "Tracking Wasn't Straight Forward.",
+      e: " The bodies most honest signal we care about happen at the abdomen, not the wrist.",
       f: "- Corporate Software Engineer",
       g: "- Graphene Strategist",
       h: "- Mother",
-      i: "- Lost 4st of weight",
-      j: "- Femtech",
+      j: "- Femtech Founder",
     },
-    // {
-    //   n: "Oyin A.",
-    //   r: "Advisor",
-    //   d: "Award-winning commercial leadership and deep community reach in women-in-tech.",
-    // },
-    // {
-    //   n: "Muneeb A.",
-    //   r: "Advisor",
-    //   d: "LLM systems, MVP development and computer vision pipelines at scale.",
-    // },
   ];
+
   return (
     <SlideFrame variant="soft" pageNumber={3} pageTotal={TOTAL}>
       <img
@@ -456,9 +481,7 @@ function Slide03() {
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
                   }}
-                >
-                  {/* {m.r} */}
-                </div>
+                ></div>
                 <div
                   style={{
                     fontSize: 24,
@@ -495,67 +518,12 @@ function Slide03() {
                   <div>{m.f}</div>
                   <div>{m.g}</div>
                   <div>{m.h}</div>
-                  <div>{m.i}</div>
                   <div>{m.j}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-        {/* <h2
-          className="slide-title"
-          style={{ color: "var(--brand-ink)", maxWidth: 1400 }}
-        >
-          Tracking devices.
-          <br />
-          <span className="brand-text">Just don't track what matters.</span>
-        </h2> */}
-
-        {/* <div
-          style={{
-            marginTop: 80,
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 40,
-          }}
-        >
-          <div className="stat-card">
-            <div
-              className="slide-kicker"
-              style={{ color: "var(--brand-violet)", marginBottom: 16 }}
-            >
-              Today
-            </div>
-            <div
-              style={{
-                fontSize: 36,
-                fontWeight: 700,
-                lineHeight: 1.25,
-                color: "var(--brand-ink)",
-              }}
-            >
-              WHOOP. Apple Watch. Oura. Flo.
-              <br />
-              All worn on the wrist, the finger, or the phone.
-            </div>
-          </div>
-          <div
-            className="stat-card"
-            style={{ background: "var(--brand-gradient)", color: "white" }}
-          >
-            <div
-              className="slide-kicker"
-              style={{ color: "rgba(255,255,255,0.85)", marginBottom: 16 }}
-            >
-              KLPS
-            </div>
-            <div style={{ fontSize: 36, fontWeight: 700, lineHeight: 1.25 }}>
-              Sensing embedded into garments.
-              <br />
-              Passive monitoring. No behaviour change.
-            </div>
-          </div>
-        </div> */}
       </div>
     </SlideFrame>
   );
@@ -784,7 +752,8 @@ function Slide04() {
 function Slide05() {
   const groups = [
     {
-      h: "Femtech $97 billion by 2030. No company has married non-invasive, sensing fabric with a goal-oriented women's platform.",
+      h: "'The Global Femtech Market is Projected To Reach $97 Billion By 2030.'",
+      q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
       items: [
         "Flo",
         "Clue",
@@ -802,18 +771,6 @@ function Slide05() {
         "Oura",
       ],
     },
-    // {
-    //   h: "Smart textiles — non-intimate",
-    //   items: ["Hexoskin", "Siren"],
-    // },
-    // {
-    //   h: "Absorbent fabrics, no sensing",
-    //   items: ["Thinx", "Modibodi"],
-    // },
-    // {
-    //   h: "Single-signal trackers",
-    //   items: ["Tempdrop", "Elvie", "Femsense"],
-    // },
   ];
   return (
     <SlideFrame variant="white" pageNumber={5} pageTotal={TOTAL}>
@@ -833,7 +790,7 @@ function Slide05() {
         <div>
           {" "}
           <div
-            style={{ position: "absolute", top: 320, left: 300, right: -210 }}
+            style={{ position: "absolute", top: 320, left: 200, right: -10 }}
           >
             <div
               style={{
@@ -847,7 +804,7 @@ function Slide05() {
                   key={g.h}
                   style={{
                     padding: 10,
-                    marginRight: -700,
+                    marginRight: -900,
                     borderRadius: 28,
                     border: "1px solid #eadde8",
                     background: "white",
@@ -857,6 +814,7 @@ function Slide05() {
                   <div
                     style={{
                       fontSize: 42,
+                      textAlign: "center",
                       fontWeight: 700,
                       color: "var(--brand-magenta)",
                       marginBottom: 14,
@@ -864,6 +822,17 @@ function Slide05() {
                     }}
                   >
                     {g.h}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 42,
+                      fontWeight: 900,
+                      color: "var(--brand-magenta)",
+                      marginBottom: 14,
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    {g.q}
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
                     {g.items.map((i) => (
@@ -887,66 +856,6 @@ function Slide05() {
             </div>
           </div>
         </div>
-
-        {/* <div style={{ display: "grid", gap: 28 }}>
-          {[
-            { tag: "TAM", value: "£165B", label: "Femtech in the next decade" },
-            { tag: "SAM", value: "£46B", label: "Femtech wearables" },
-            {
-              tag: "SOM",
-              value: "£180m – £240m",
-              label: "Premium early adopters + pilots (5 yrs)",
-            },
-          ].map((m) => (
-            <div
-              key={m.tag}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 30,
-                padding: "10px 0",
-                borderBottom: "1px solid #e4d6e1",
-              }}
-            >
-              <div
-                style={{
-                  width: 110,
-                  fontWeight: 800,
-                  fontSize: 22,
-                  letterSpacing: "0.18em",
-                  color: "var(--brand-magenta)",
-                }}
-              >
-                {m.tag}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    fontSize: 56,
-                    fontWeight: 800,
-                    color: "var(--brand-ink)",
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  {m.value}
-                </div>
-                <div
-                  style={{
-                    fontSize: 24,
-                    color: "#5f5364",
-                    marginTop: 4,
-                  }}
-                >
-                  {m.label}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div> */}
-        {/* <div style={{ marginTop: 32, fontSize: 18, color: "#706876" }}>
-          Sources: McKinsey Femtech Outlook 2024 · Smart Textiles Market Report
-          2023 · Graphene Market UK Forecast 2025.
-        </div> */}
       </div>
 
       <div
@@ -959,17 +868,7 @@ function Slide05() {
           display: "grid",
           placeItems: "center",
         }}
-      >
-        {/* <div className="tam-circles">
-          <div className="ring r1 ">£165B</div>
-          <div className="ring r2">£46B</div>
-          <div className="ring r3">
-            £180m
-            <br />
-            £240m
-          </div>
-        </div> */}
-      </div>
+      ></div>
     </SlideFrame>
   );
 }
@@ -1101,7 +1000,7 @@ function Slide06() {
           <p
             style={{
               fontSize: 26,
-              color: "oklch(0.4 0.03 290)",
+              color: "#5f5364",
               lineHeight: 1.4,
               maxWidth: 720,
               marginBottom: 32,
@@ -1141,12 +1040,12 @@ function Slide06() {
                 style={{
                   padding: "12px 22px",
                   borderRadius: 9999,
-                  background: "oklch(0.96 0.02 320)",
+                  background: "#faf4f8",
                   color: "var(--brand-ink)",
                   fontWeight: 600,
                   fontSize: 22,
                   paddingLeft: 10,
-                  border: "1px solid oklch(0.9 0.03 320)",
+                  border: "1px solid #eadce8",
                   marginBottom: 10,
                 }}
               >
@@ -1162,7 +1061,7 @@ function Slide06() {
               padding: 28,
               borderRadius: 24,
               background: "var(--brand-gradient-soft)",
-              border: "1px solid oklch(0.9 0.04 320)",
+              border: "1px solid #eadce8",
               maxWidth: 720,
               animation: "fade-in 500ms ease-out",
               marginTop: 50,
@@ -1210,8 +1109,8 @@ function Slide06() {
         >
           <defs>
             <linearGradient id="arrowGrad" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="oklch(0.82 0.10 350)" />
-              <stop offset="100%" stopColor="oklch(0.55 0.30 320)" />
+              <stop offset="0%" stopColor="#efbdd6" />
+              <stop offset="100%" stopColor="#b80082" />
             </linearGradient>
             <marker
               id="arrowHead"
@@ -1222,7 +1121,7 @@ function Slide06() {
               markerHeight="6"
               orient="auto-start-reverse"
             >
-              <path d="M0,0 L10,5 L0,10 z" fill="oklch(0.55 0.30 320)" />
+              <path d="M0,0 L10,5 L0,10 z" fill="#b80082" />
             </marker>
           </defs>
           <path
@@ -1252,11 +1151,10 @@ function Slide06() {
               width: 360,
               height: 720,
               borderRadius: 56,
-              background:
-                "linear-gradient(160deg, oklch(0.18 0.04 290), oklch(0.12 0.02 280))",
+              background: "linear-gradient(160deg, #32243d, #201523)",
               padding: 14,
               boxShadow:
-                "0 60px 120px -30px oklch(0.55 0.30 320 / 0.55), 0 0 0 2px oklch(0.55 0.30 320 / 0.25)",
+                "0 60px 120px -30px rgba(184,0,130,.5), 0 0 0 2px rgba(184,0,130,.25)",
             }}
           >
             {/* notch */}
@@ -1320,10 +1218,7 @@ function Slide06() {
                   width: i === active ? 32 : 10,
                   height: 10,
                   borderRadius: 9999,
-                  background:
-                    i === active
-                      ? "var(--brand-magenta)"
-                      : "oklch(0.85 0.04 320)",
+                  background: i === active ? "var(--brand-magenta)" : "#e7d5e3",
                   transition: "all 400ms ease",
                 }}
               />
@@ -1338,6 +1233,7 @@ function Slide06() {
 // ----- 07: Traction -----
 function Slide07() {
   type Stat = {
+    c: string;
     v: string;
     l: string;
     alt?: string;
@@ -1347,28 +1243,32 @@ function Slide07() {
 
   const stats: Stat[] = [
     {
+      c: "She Builds Accelerator",
+      v: "Niyo Enterprise",
+      l: "",
+      logo: niyoLogo,
+      alt: "Niyo Enterprise",
+    },
+    {
+      c: "University of Manchester · Materials Research",
       v: "UoM Henry Royce Institute",
       l: "",
       logo: uom,
       alt: "University of Manchester Henry Royce Institute",
     },
     {
+      c: "CreaTech Frontiers Accelerator",
       v: "CreaTech. Digital Catapult",
       l: "",
       logos: [ctfLogo, catapultLogo],
       alt: "CreaTech Frontiers",
     },
     {
+      c: "Fundraising Accelerator",
       v: "Female Founders Rise",
       l: "",
       logo: ffrLogo,
       alt: "Female Founders Rise",
-    },
-    {
-      v: "Niyo Enterprise",
-      l: "",
-      logo: niyoLogo,
-      alt: "Niyo Enterprise",
     },
   ];
   return (
@@ -1385,17 +1285,29 @@ function Slide07() {
         className="blob"
         style={{ bottom: -180, left: -80, width: 520, opacity: 0.6 }}
       />
-      <div style={{ position: "absolute", top: 220, left: 50, right: 110 }}>
-        <div
-          className="slide-kicker"
-          style={{ color: "rgba(255,255,255,0.8)", marginBottom: 28 }}
-        ></div>
+      <div style={{ position: "absolute", top: 160, left: 50, right: 110 }}>
+        <h2
+          className="slide-title"
+          style={{ color: "white", marginBottom: 20, maxWidth: 1500 }}
+        >
+          Not Just Our Opinion.
+        </h2>
         <h2
           className="slide-title"
           style={{ color: "white", marginBottom: 80, maxWidth: 1500 }}
         >
-          Traction
+          Institutions Agree.
         </h2>
+        <div
+          className="slide-kicker"
+          style={{
+            color: "var(--brand-magenta)",
+            marginBottom: 28,
+            marginTop: -40,
+          }}
+        >
+          Traction
+        </div>
         <div
           style={{
             display: "grid",
@@ -1419,7 +1331,19 @@ function Slide07() {
             >
               <div
                 style={{
-                  fontSize: 76,
+                  marginBottom: 40,
+                  fontSize: 30,
+                  fontWeight: 600,
+                  letterSpacing: "-0.04em",
+                  lineHeight: 1,
+                }}
+              >
+                {s.c}
+              </div>
+              <div
+                style={{
+                  marginBottom: 140,
+                  fontSize: 60,
                   fontWeight: 800,
                   letterSpacing: "-0.04em",
                   lineHeight: 1,
@@ -1430,8 +1354,8 @@ function Slide07() {
               <div
                 style={{
                   position: "absolute",
-                  bottom: 24,
-                  right: 50,
+                  bottom: 14,
+                  right: 10,
                   width: 205,
                   height: 100,
                   borderRadius: 16,
@@ -1506,12 +1430,6 @@ function Slide08() {
         style={{ top: -100, right: -100, width: 460, opacity: 0.7 }}
       />
       <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
-        >
-          07 · Business Model
-        </div>
         <h2
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 24 }}
@@ -1526,8 +1444,7 @@ function Slide08() {
             marginBottom: 34,
           }}
         >
-          A hybrid model: a premium physical product that fuels a high-margin
-          recurring insight layer.
+          Premium Physical Product with Subscription Layer.
         </p>
 
         <div
@@ -1652,20 +1569,20 @@ function Slide08() {
 function Slide09() {
   const phases = [
     {
-      p: "Phase 1",
-      t: "Early testers & waitlist onboarding",
-      d: "£75,000 - Pre-Seed",
+      p: "Now",
+      t: "Prototype validation",
     },
     {
-      p: "Phase 2",
-      t: "Community-driven growth",
-      d: "£300,000 - Seed Phase ",
+      p: "Q1 2027",
+      t: "Pilot waitlist live",
     },
-    { p: "Phase 3", t: "Commercial pilot launches", d: "Premium D2C release. Series A (Optimisation)" },
     {
-      p: "Phase 4",
-      t: "Retail & institutional partnerships",
-      d: "Healthcare and research deals. Series B Phase (Expansion)",
+      p: "Q3 2027",
+      t: "Commercial launch",
+    },
+    {
+      p: "2028",
+      t: "Platform expansion",
     },
   ];
   return (
@@ -1675,7 +1592,7 @@ function Slide09() {
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
-          08 · Go-to-market
+          Roadmap
         </div>
         <h2
           className="slide-title"
@@ -1744,7 +1661,7 @@ function Slide09() {
               >
                 {ph.t}
               </div>
-              <div style={{ fontSize: 22, color: "#5f5364" }}>{ph.d}</div>
+              <div style={{ fontSize: 22, color: "#5f5364" }}></div>
             </div>
           ))}
         </div>
@@ -1756,11 +1673,11 @@ function Slide09() {
 // ----- 10: Roadmap -----
 function Slide10() {
   const items = [
-    { t: "Prototype validation", q: "Now" },
-    { t: "Pilot deployment (Wait List)", q: "(Q4) 2026" },
-    { t: "Commercial launch", q: "(Q2) 2027" },
-    { t: "Product and platform expansion", q: "2028" },
-    { t: "Dataset growth", q: "2028" },
+    { t: "£75,000", q: "Pre-seed · Investment" },
+    { t: " Conductive Fabric IP Development", q: "£15k R&D" },
+    { t: " Early Testers and Waitlist Onboarding", q: "£25k TRL-4 Marketing" },
+    { t: " Strategy, Legal and Insight Platform Build", q: "35k Overheads" },
+    { t: "Pilot Scaled to First 200 Users", q: "2028 CRL-5" },
   ];
   return (
     <SlideFrame variant="soft" pageNumber={10} pageTotal={TOTAL}>
@@ -1770,20 +1687,24 @@ function Slide10() {
         className="blob"
         style={{ top: -120, right: -120, width: 480, opacity: 0.7 }}
       />
-      <div style={{ position: "absolute", top: 150, left: 110, right: 110 }}>
-        {/* <div
+      <div style={{ position: "absolute", top: 70, left: 110, right: 110 }}>
+        <div
           className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+          style={{
+            color: "var(--brand-magenta)",
+            marginTop: 28,
+            marginLeft: 1400,
+            marginBottom: 30,
+          }}
         >
-          09 · Roadmap · Next 12–24 months
-        </div> */}
+          The Ask
+        </div>
         <h2
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 24 }}
         >
-          Building reliable behavioural
-          <br />
-          and physiological infrastructure.
+          We've validated the demand. <br />
+          Now we build it.{" "}
         </h2>
         <div style={{ marginTop: 30, display: "grid", gap: 18 }}>
           {items.map((it, i) => (
@@ -1846,12 +1767,12 @@ function Slide11() {
     //   d: "Founder of KLPS technology. Building the wearable category for women's health.",
     // },
     {
-      n: "Oyin A.",
-      r: "Advisor",
+      n: "Oyin. A",
+      r: "Advisor/Angel",
       d: "Award-winning commercial leadership and deep community reach in women-in-tech.",
     },
     {
-      n: "Muneeb A.",
+      n: "Muneeb. A",
       r: "Advisor",
       d: "LLM systems, MVP development and computer vision pipelines at scale.",
     },
@@ -1875,7 +1796,7 @@ function Slide11() {
           className="slide-title"
           style={{ color: "var(--brand-ink)", marginBottom: 72 }}
         >
-          Honourable Mention Advisors .
+          Advisors
         </h2>
         <div
           style={{
@@ -1934,7 +1855,7 @@ function Slide11() {
               </div>
               <div
                 style={{
-                  fontSize: 24,
+                  fontSize: 34,
                   lineHeight: 1.4,
                   color: "#4f4554",
                   marginTop: 24,
@@ -2003,7 +1924,7 @@ function Slide12() {
               margin: "0 auto",
             }}
           >
-            KLPS' new category of wearable technology 
+            KLPS' new category of wearable technology
           </p>
           <p
             style={{
@@ -2085,7 +2006,10 @@ export interface SlideMetrics {
   tummyPercent?: number;
   topConcernPercent?: number;
   commercialInterestPercent?: number;
-  [key: string]: unknown;
+
+  spentMoneyPercent?: number;
+  participants?: number;
+  topPricePoint?: string;
 }
 
 export interface SlideMeta {

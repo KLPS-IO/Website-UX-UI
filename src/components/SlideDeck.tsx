@@ -86,6 +86,8 @@ export function SlideDeck() {
     if (exporting) return;
     setExportError("");
     setExporting(true);
+    document.body.classList.add("pdf-export");
+
     try {
       const pool = exportPoolRef.current;
       if (!pool) return;
@@ -126,6 +128,8 @@ export function SlideDeck() {
           : "Could not export the pitch deck PDF.",
       );
     } finally {
+      document.body.classList.remove("pdf-export");
+
       setExporting(false);
     }
   };

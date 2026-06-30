@@ -680,3 +680,10 @@ All colors MUST be HSL.
   display: inline-block;
   animation: pulseBig 2s ease-in-out infinite;
 }
+
+.pdf-export .brand-text {
+  background: none !important;
+  color: var(--brand-magenta) !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+}
