@@ -309,7 +309,7 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
           },
           {
             value: `${tummyInTen} in 10`,
-            label: "Women Surveyed",
+            label: "Women surveyed",
             description: "Want Insights From Their Abdomen",
           },
           {
