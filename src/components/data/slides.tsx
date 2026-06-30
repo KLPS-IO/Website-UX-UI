@@ -20,7 +20,7 @@ import ffrLogo from "@/assets/ffr-logo.jpg";
 import ctfLogo from "@/assets/ctf-logo.png";
 import catapultLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
 import uom from "@/assets/uomlogo.jpg";
-const TOTAL = 13;
+const TOTAL = 14;
 
 // const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
 
@@ -208,6 +208,7 @@ function Slide01() {
 
 // ----- 02: The Problem -----
 function Slide02({ metrics }: { metrics?: SlideMetrics }) {
+  const interest = metrics?.commercialInterestPercent ?? 0;
   const formattedPricePoint = metrics?.topPricePoint
     ? `£${metrics.topPricePoint.replace("_", "-£")}`
     : "No data";
@@ -234,16 +235,16 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
           ]}
         />
         <AnimatedHeadline
-          className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-6xl"
+          className="text-balance text-6xl font-bold leading-[5.05] tracking-wide text-foreground md:text-6xl lg:text-7xl"
           lines={[
             {
-              text: "That Matter",
+              text: "Matter",
               italic: true,
               brand: false,
             },
           ]}
         />
-        <AnimatedHeadline
+        {/* <AnimatedHeadline
           className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-7xl"
           lines={[
             {
@@ -252,7 +253,7 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
               brand: false,
             },
           ]}
-        />
+        /> */}
         <AnimatedHeadline
           className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-8xl"
           lines={[
@@ -284,8 +285,12 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
         }}
       >
         <span className="brand-text">
-          "If a solution gave you insights into your body, would you consider
-          paying for it?" - 93% said yes or maybe.
+          {
+            "If a solution gave you insights into your body, would you consider paying for it?"
+          }
+          <br />
+          <strong>{interest}%</strong> of women surveyed said{" "}
+          <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
         </span>
       </h2>
       <div
@@ -994,16 +999,18 @@ function Slide06() {
               maxWidth: 60,
               marginRight: 110,
             }}
-          >        <div
-          className="slide-kicker"
-          style={{
-            color: "var(--brand-magenta)",
-            marginBottom: 10,
-            paddingTop: 20,
-          }}
-        >
-          Moat
-        </div>
+          >
+            {" "}
+            <div
+              className="slide-kicker"
+              style={{
+                color: "var(--brand-magenta)",
+                marginBottom: 10,
+                paddingTop: 20,
+              }}
+            >
+              Moat
+            </div>
             Insights that <span className="brand-text">matter</span>
           </h2>
           <p
@@ -1244,7 +1251,6 @@ function Slide07() {
   type Stat = {
     c: string;
     v: string;
-    l: string;
     alt?: string;
     logo?: string;
     logos?: string[];
@@ -1254,28 +1260,24 @@ function Slide07() {
     {
       c: "She Builds Accelerator",
       v: "Niyo Enterprise",
-      l: "",
       logo: niyoLogo,
       alt: "Niyo Enterprise",
     },
     {
       c: "University of Manchester · Materials Research",
       v: "UoM Henry Royce Institute",
-      l: "",
       logo: uom,
       alt: "University of Manchester Henry Royce Institute",
     },
     {
       c: "CreaTech Frontiers Accelerator",
       v: "CreaTech. Digital Catapult",
-      l: "",
       logos: [ctfLogo, catapultLogo],
       alt: "CreaTech Frontiers",
     },
     {
       c: "Fundraising Accelerator",
       v: "Female Founders Rise",
-      l: "",
       logo: ffrLogo,
       alt: "Female Founders Rise",
     },
@@ -1326,7 +1328,7 @@ function Slide07() {
         >
           {stats.map((s) => (
             <div
-              key={s.l}
+              key={s.v}
               style={{
                 position: "relative",
                 padding: 44,
@@ -1580,18 +1582,22 @@ function Slide09() {
     {
       p: "Now",
       t: "Prototype Validation",
+      n: "Moving from TRL-3 to 4. Fundraising pre-seed to access labs for validating CRL-4 - 5",
     },
     {
       p: "Q1 2027",
       t: "Pilot Waitlist Live",
+      n: "Wait list open. Actively growing early adopters",
     },
     {
       p: "Q3 2027",
       t: "Commercial Launch",
+      n: "First sales to 50 early adopters",
     },
     {
       p: "2028",
       t: "Platform Expansion",
+      n: "Moving to TRL-5 and CRL-5 ",
     },
   ];
   return (
@@ -1669,6 +1675,17 @@ function Slide09() {
                 }}
               >
                 {ph.t}
+              </div>
+              <div
+                style={{
+                  fontSize: 32,
+                  fontWeight: 300,
+                  color: "var(--brand-ink)",
+                  lineHeight: 1.2,
+                  marginBottom: 12,
+                }}
+              >
+                {ph.n}
               </div>
               <div style={{ fontSize: 22, color: "#5f5364" }}></div>
             </div>
@@ -1785,7 +1802,7 @@ function Slide11() {
       r: "Technical Advisor",
       d: "Specialist in LLM systems, MVP Development, and Enterprise-Scale Computer Vision Architectures.",
     },
-        {
+    {
       n: "Imran. K",
       r: "Advisor",
       d: "Director | Professional Services Procurement Expert | Big 4 Advisory",
@@ -1975,23 +1992,23 @@ function Slide13() {
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
         >
-          Let's talk
+          Woman wearing an Oura ring, WHOOP strap, Fitbit or Manually Tracking —
+          say 'I dont Want To Manually Track or Wear These and Charge' The
+          richest non-invasive data zone is not her wrist. It never was.{" "}
         </div>
         <h2 className="slide-title-xl" style={{ color: "var(--brand-ink)" }}>
-          Thank you
+          The Question is Who
           <br />
-          for your <span className="brand-text">time.</span>
+          Builds It? <span className="brand-text">I AM</span>
         </h2>
         <div style={{ marginTop: 80, display: "grid", gap: 18 }}>
           <div
             style={{ fontSize: 32, fontWeight: 600, color: "var(--brand-ink)" }}
           >
-            emmamendez@klps.co.uk
-          </div>
-          <div
-            style={{ fontSize: 32, fontWeight: 600, color: "var(--brand-ink)" }}
-          >
-            klps.co.uk
+            Backed by Research. Powered by Breakthrough Materials. Validated by
+            Women. 93% of Women Surveyed Would Pay for Personalised Insights.
+            KLPS is Building the Future of Women's Health. This is Your Moment
+            to be Part of it.
           </div>
         </div>
       </div>
@@ -2012,6 +2029,128 @@ function Slide13() {
         <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>
           Founder &amp; CEO · KLPS technology
         </div>
+      </div>
+    </SlideFrame>
+  );
+}
+
+// ----- 14: The Problem -----
+function Slide14({ metrics }: { metrics?: SlideMetrics }) {
+  const interest = metrics?.commercialInterestPercent ?? 0;
+  return (
+    <SlideFrame variant="white" pageNumber={14} pageTotal={TOTAL}>
+      <img
+        src={blobPink}
+        alt=""
+        className="blob"
+        style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
+      />
+      <h2
+        className="slide-title"
+        style={{
+          color: "var(--brand-ink)",
+          marginLeft: 100,
+          fontSize: 60,
+          fontWeight: 290,
+          paddingRight: 10,
+          paddingTop: 890,
+        }}
+      >
+        <span className="brand-text italic">
+          {
+            "'If a solution gave you insights into your body, would you consider paying for it?'"
+          }
+          <br />
+          <strong>{interest}%</strong> of women surveyed said{" "}
+          <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
+        </span>
+      </h2>
+      <div
+        style={{
+          position: "absolute",
+          left: 50,
+          top: 120,
+          // width: "46%",
+          // minWidth: 760,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 24,
+          alignItems: "stretch",
+        }}
+      >
+        {[
+          {
+            value: `0`,
+            label: `COMPETITORS`,
+            description: "In This Exact Space",
+          },
+          {
+            value: `£75k`,
+            label: `Pre-Seed `,
+            description: "SEIS Eligible",
+          },
+          {
+            value: `${metrics?.commercialInterestPercent ?? 0}%`,
+            label: `of Women`,
+            description: "Would Pay For Personalised Body Insights",
+          },
+        ].map((row) => (
+          <div
+            key={`${row.value}-${row.description}`}
+            className="stat-card"
+            style={{
+              padding: 36,
+              display: "flex",
+              flexDirection: "column",
+              height: 360,
+            }}
+          >
+            <div
+              style={{
+                height: 150,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 50,
+                  fontWeight: 700,
+                  color: "var(--brand-ink)",
+                  lineHeight: 1.05,
+                }}
+              >
+                {row.value}
+              </div>
+
+              {row.label && (
+                <div
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 600,
+                    color: "var(--brand-ink)",
+                    lineHeight: 1.2,
+                    marginTop: 8,
+                  }}
+                >
+                  {row.label}
+                </div>
+              )}
+            </div>
+
+            <div
+              style={{
+                // marginTop: "auto",
+                fontSize: 37,
+                fontWeight: 600,
+                color: "var(--brand-magenta)",
+                lineHeight: 1.3,
+              }}
+            >
+              {row.description}
+            </div>
+          </div>
+        ))}
       </div>
     </SlideFrame>
   );
@@ -2048,5 +2187,9 @@ export const slides: SlideMeta[] = [
   { title: "Roadmap", render: () => <Slide10 /> },
   { title: "Team", render: () => <Slide11 /> },
   { title: "Vision", render: () => <Slide12 /> },
-  { title: "Thank you", render: () => <Slide13 /> },
+  { title: "Build it", render: () => <Slide13 /> },
+  {
+    title: "Final Stats",
+    render: (metrics) => <Slide14 metrics={metrics} />,
+  },
 ];
