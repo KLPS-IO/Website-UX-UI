@@ -2122,24 +2122,22 @@ function Slide13() {
   );
 }
 
-// ----- 14: The Problem -----
+// ----- 14: The Competitor -----
 function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
-  const metrics = metricsState.data;
-  const metricsMessage = getMetricsMessage(metricsState);
-  const interest = formatMetricPercent(metrics?.commercialInterestPercent);
+
   const competitorGaps = [
     "Graphene conductivity",
     "Shapewear form factor",
-    "Perimenopause & menopause",
+    // "Perimenopause & menopause",
     "Whole-body goals platform",
     "UK market",
   ];
   const klpsAdvantages = [
     "Graphene-native fabric",
     "Shapewear form factor",
-    "35-55 whole-body goals",
+    "All age group audience",
     "UK-first, SEIS-backed",
-    "Validated demand data",
+    // "Validated demand data",
   ];
 
   return (
@@ -2150,107 +2148,6 @@ function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
         className="blob"
         style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
       />
-      <h2
-        className="slide-title"
-        style={{
-          color: "var(--brand-ink)",
-          marginLeft: 100,
-          fontSize: 60,
-          fontWeight: 290,
-          paddingRight: 10,
-          paddingTop: 890,
-        }}
-      >
-        <span className="brand-text italic">
-          {
-            "'If a solution gave you insights into your body, would you consider paying for it?'"
-          }
-          <br />
-          {interest ? (
-            <>
-              <strong>{interest}</strong> of women surveyed said{" "}
-              <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
-            </>
-          ) : (
-            <strong>{metricsMessage}</strong>
-          )}
-        </span>
-      </h2>
-      {/* Top row */}
-      <div
-        style={{
-          position: "absolute",
-          left: "25%",
-          top: 120,
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 24,
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
-        {[
-          {
-            value: "£75k",
-            label: "Pre-Seed",
-            description: "SEIS Eligible",
-          },
-          {
-            value: interest ?? metricsMessage,
-            label: interest ? "of Women" : "",
-            description: "Would Pay For Personalised Body Insights",
-          },
-        ].map((row) => (
-          <div
-            key={`${row.value}-${row.description}`}
-            className="stat-card"
-            style={{
-              padding: 36,
-              display: "flex",
-              flexDirection: "column",
-              width: 520,
-              height: 360,
-            }}
-          >
-            <div style={{ height: 150 }}>
-              <div
-                style={{
-                  fontSize: 50,
-                  fontWeight: 700,
-                  color: "var(--brand-ink)",
-                }}
-              >
-                {row.value}
-              </div>
-
-              {row.label && (
-                <div
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 600,
-                    color: "var(--brand-ink)",
-                    marginTop: 8,
-                  }}
-                >
-                  {row.label}
-                </div>
-              )}
-            </div>
-
-            <div
-              style={{
-                fontSize: 37,
-                fontWeight: 600,
-                color: "var(--brand-magenta)",
-                lineHeight: 1.3,
-              }}
-            >
-              {row.description}
-            </div>
-          </div>
-        ))}
-      </div>
-
       {/* Centre card */}
       <div
         className="stat-card"
@@ -2258,10 +2155,10 @@ function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
           position: "absolute",
           left: "50%",
           transform: "translateX(-50%)",
-          top: 520,
+          top: 200,
           width: 1660,
-          height: 320,
-          padding: "44px 54px",
+          // height: 320,
+          padding: "44px 154px",
           display: "grid",
           gridTemplateColumns: "1.05fr 1.05fr 1fr",
           gap: 56,
@@ -2395,6 +2292,124 @@ function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
   );
 }
 
+// ----- 14: The Stats -----
+function Slide15({ metricsState }: { metricsState: SlideMetricsState }) {
+  const metrics = metricsState.data;
+  const metricsMessage = getMetricsMessage(metricsState);
+  const interest = formatMetricPercent(metrics?.commercialInterestPercent);
+
+  return (
+    <SlideFrame variant="white" pageNumber={14} pageTotal={TOTAL}>
+      <img
+        src={blobPink}
+        alt=""
+        className="blob"
+        style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
+      />
+      <h2
+        className="slide-title"
+        style={{
+          color: "var(--brand-ink)",
+          marginLeft: 100,
+          fontSize: 60,
+          fontWeight: 290,
+          paddingRight: 10,
+          paddingTop: 730,
+        }}
+      >
+        <span className="brand-text italic">
+          {
+            "'If a solution gave you insights into your body, would you consider paying for it?'"
+          }
+          <br />
+          {interest ? (
+            <>
+              <strong>{interest}</strong> of women surveyed said{" "}
+              <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
+            </>
+          ) : (
+            <strong>{metricsMessage}</strong>
+          )}
+        </span>
+      </h2>
+      {/* Top row */}
+      <div
+        style={{
+          position: "absolute",
+          left: "25%",
+          top: 320,
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 24,
+          alignItems: "center",
+          textAlign: "center",
+        }}
+      >
+        {[
+          {
+            value: "£75k",
+            label: "Pre-Seed",
+            description: "SEIS Eligible",
+          },
+          {
+            value: interest ?? metricsMessage,
+            label: interest ? "of Women" : "",
+            description: "Would Pay For Personalised Body Insights",
+          },
+        ].map((row) => (
+          <div
+            key={`${row.value}-${row.description}`}
+            className="stat-card"
+            style={{
+              padding: 36,
+              display: "flex",
+              flexDirection: "column",
+              width: 520,
+              height: 360,
+            }}
+          >
+            <div style={{ height: 150 }}>
+              <div
+                style={{
+                  fontSize: 50,
+                  fontWeight: 700,
+                  color: "var(--brand-ink)",
+                }}
+              >
+                {row.value}
+              </div>
+
+              {row.label && (
+                <div
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 600,
+                    color: "var(--brand-ink)",
+                    marginTop: 8,
+                  }}
+                >
+                  {row.label}
+                </div>
+              )}
+            </div>
+
+            <div
+              style={{
+                fontSize: 37,
+                fontWeight: 600,
+                color: "var(--brand-magenta)",
+                lineHeight: 1.3,
+              }}
+            >
+              {row.description}
+            </div>
+          </div>
+        ))}
+      </div>
+    </SlideFrame>
+  );
+}
+
 export interface SlideMetrics {
   tummyPercent?: number;
   topConcernPercent?: number;
@@ -2438,8 +2453,10 @@ export const slides: SlideMeta[] = [
   { title: "Team", render: () => <Slide11 /> },
   { title: "Vision", render: () => <Slide12 /> },
   { title: "Build it", render: () => <Slide13 /> },
+  { title: "Competitors", render: () => <Slide14 /> },
+
   {
     title: "Final Stats",
-    render: (metricsState) => <Slide14 metricsState={metricsState} />,
+    render: (metricsState) => <Slide15 metricsState={metricsState} />,
   },
 ];
