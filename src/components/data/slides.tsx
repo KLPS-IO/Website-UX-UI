@@ -1485,33 +1485,55 @@ function Slide08() {
         className="blob"
         style={{ top: -100, right: -100, width: 460, opacity: 0.7 }}
       />
-      <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
-        <h2
-          className="slide-title"
-          style={{ color: "var(--brand-ink)", marginBottom: 24 }}
-        >
-          Hardware <span className="brand-text">+</span> Intelligence.
-        </h2>
-        <p
-          className="slide-body-lg"
-          style={{
-            color: "#5f5364",
-            maxWidth: 1300,
-            marginBottom: 34,
-          }}
-        >
-          Premium Physical Product with Subscription Layer.
-        </p>
+      <div style={{ position: "absolute", top: 160, left: 110, right: 110 }}>
 
+        {/* Header */}
+        <div style={{ marginBottom: 32 }}>
+          <div
+            style={{
+              fontSize: 22,
+              letterSpacing: "0.18em",
+              fontWeight: 800,
+              color: "var(--brand-magenta)",
+              marginBottom: 14,
+            }}
+          >
+            THE OPPORTUNITY
+          </div>
+          <h2
+            className="slide-title"
+            style={{ color: "var(--brand-ink)", marginBottom: 14 }}
+          >
+            Hardware <span className="brand-text">+</span> Intelligence.
+          </h2>
+          <p
+            style={{
+              fontSize: 28,
+              fontWeight: 600,
+              color: "#5f5364",
+              maxWidth: 1300,
+              lineHeight: 1.4,
+            }}
+          >
+            WHOOP charges £30/month. Oura sells at £399. No one has built this
+            for the body part that matters most.{" "}
+            <span style={{ color: "var(--brand-magenta)" }}>
+              We are first. And we intend to own it.
+            </span>
+          </p>
+        </div>
+
+        {/* Revenue cards */}
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28 }}
         >
+          {/* Card 1 — Garment */}
           <div
             style={{
               padding: 44,
               borderRadius: 28,
               background: "var(--brand-gradient-soft)",
-              minHeight: 320,
+              minHeight: 340,
             }}
           >
             <div
@@ -1541,27 +1563,33 @@ function Slide08() {
                 letterSpacing: "-0.04em",
                 color: "var(--brand-ink)",
                 marginTop: 24,
+                lineHeight: 1,
               }}
             >
-              £120 – £140
+              £249 – £399
             </div>
             <div
               style={{
                 fontSize: 22,
                 color: "#5f5364",
-                marginTop: 4,
+                marginTop: 8,
+                lineHeight: 1.4,
               }}
             >
-              For 5-7 garments
+              Consumer entry to performance tier.
+              <br />
+              COGS £37–52 at scale. Margin 68–78%.
             </div>
           </div>
+
+          {/* Card 2 — Subscription */}
           <div
             style={{
               padding: 44,
               borderRadius: 28,
               background: "var(--brand-gradient)",
               color: "white",
-              minHeight: 320,
+              minHeight: 340,
             }}
           >
             <div
@@ -1574,8 +1602,14 @@ function Slide08() {
             >
               REVENUE STREAM · 02
             </div>
-            <div style={{ fontSize: 40, fontWeight: 800, marginTop: 16 }}>
-              Insight Subscription Tier Model
+            <div
+              style={{
+                fontSize: 40,
+                fontWeight: 800,
+                marginTop: 16,
+              }}
+            >
+              Insight Subscription Platform
             </div>
             <div
               style={{
@@ -1583,23 +1617,88 @@ function Slide08() {
                 fontWeight: 800,
                 letterSpacing: "-0.04em",
                 marginTop: 24,
+                lineHeight: 1,
               }}
             >
-              £4 – £9
+              £20 – £30
             </div>
-            <div style={{ fontSize: 22, opacity: 0.85, marginTop: 4 }}>
-              per user / month
+            <div
+              style={{
+                fontSize: 22,
+                opacity: 0.85,
+                marginTop: 8,
+                lineHeight: 1.4,
+              }}
+            >
+              per user / month.
+              <br />
+              Year 1 LTV per customer: £759. 2-yr LTV: £1,119.
             </div>
           </div>
         </div>
 
+        {/* Enterprise + bottom tags */}
         <div
-          style={{ marginTop: 20, display: "flex", gap: 16, flexWrap: "wrap" }}
+          style={{
+            marginTop: 20,
+            padding: "22px 36px",
+            borderRadius: 28,
+            background: "var(--brand-gradient-soft)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 28,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 22,
+                letterSpacing: "0.18em",
+                fontWeight: 800,
+                color: "var(--brand-magenta)",
+                marginBottom: 6,
+              }}
+            >
+              REVENUE STREAM · 03
+            </div>
+            <div
+              style={{
+                fontSize: 30,
+                fontWeight: 800,
+                color: "var(--brand-ink)",
+              }}
+            >
+              Enterprise B2B · Military · Elite Sport · Corporate Wellness
+            </div>
+          </div>
+          <div
+            style={{
+              fontSize: 72,
+              fontWeight: 800,
+              letterSpacing: "-0.04em",
+              color: "var(--brand-ink)",
+              flexShrink: 0,
+            }}
+          >
+            £550 – £750
+          </div>
+        </div>
+
+        {/* Bottom pills */}
+        <div
+          style={{
+            marginTop: 20,
+            display: "flex",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
         >
           {[
             "Textile collaborations",
             "Healthcare partnerships",
             "Institutional licensing",
+            "Data API access",
           ].map((t) => (
             <span
               key={t}
@@ -1616,6 +1715,7 @@ function Slide08() {
             </span>
           ))}
         </div>
+
       </div>
     </SlideFrame>
   );
