@@ -5,7 +5,7 @@ import blobSpiral from "@/assets/blob-spiral.png";
 import blobRing from "@/assets/blob-ring.png";
 import klpsVideo from "@/assets/klps.mp4";
 import headShot from "@/assets/headshot.jpg";
-import garmentAsset from "@/assets/garment.png";
+import garmentAsset from "@/assets/garmentklps.jpeg";
 import textileAsset from "@/assets/textile.png";
 import mcuAsset from "@/assets/mcu.png";
 import insightAsset from "@/assets/insight.mp4";
@@ -799,6 +799,7 @@ function Slide05() {
       h: "$97 Billion Projected Global Femtech Market Growth By 2030-",
       q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
       items: [
+        "Fibra",
         "Flo",
         "Clue",
         "Glow",
@@ -935,7 +936,7 @@ function Slide06() {
       label: "Always-on signal",
       caption: "BLE-synced underwear builds cumulative data over time.",
     },
-        {
+    {
       img: ChatToLema,
       label: "KLPS' LLM - Chat Lema",
       caption: "Data capture unique to KLPS",
