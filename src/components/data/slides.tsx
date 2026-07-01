@@ -2127,6 +2127,21 @@ function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
   const metrics = metricsState.data;
   const metricsMessage = getMetricsMessage(metricsState);
   const interest = formatMetricPercent(metrics?.commercialInterestPercent);
+  const competitorGaps = [
+    "Graphene conductivity",
+    "Shapewear form factor",
+    "Perimenopause & menopause",
+    "Whole-body goals platform",
+    "UK market",
+  ];
+  const klpsAdvantages = [
+    "Graphene-native fabric",
+    "Shapewear form factor",
+    "35-55 whole-body goals",
+    "UK-first, SEIS-backed",
+    "Validated demand data",
+  ];
+
   return (
     <SlideFrame variant="white" pageNumber={14} pageTotal={TOTAL}>
       <img
@@ -2244,47 +2259,136 @@ function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
           left: "50%",
           transform: "translateX(-50%)",
           top: 520,
-          width: 520,
-          height: 300,
-          padding: 36,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
+          width: 1660,
+          height: 320,
+          padding: "44px 54px",
+          display: "grid",
+          gridTemplateColumns: "1.05fr 1.05fr 1fr",
+          gap: 56,
+          alignItems: "start",
+          textAlign: "left",
+          background: "rgba(255,255,255,0.82)",
+          border: "1px solid #eadde8",
+          boxShadow: "0 24px 70px -38px rgba(60, 20, 90, 0.35)",
         }}
       >
-        <div style={{ height: 150 }}>
+        <div>
           <div
             style={{
-              fontSize: 50,
-              fontWeight: 700,
-              color: "var(--brand-ink)",
+              fontSize: 24,
+              lineHeight: 1.1,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              fontWeight: 800,
+              color: "#8b8686",
+              marginBottom: 24,
             }}
           >
-            0
+            Competitive Position
           </div>
 
           <div
             style={{
-              fontSize: 28,
-              fontWeight: 600,
+              fontSize: 30,
+              lineHeight: 1.28,
+              fontWeight: 700,
               color: "var(--brand-ink)",
-              marginTop: 8,
             }}
           >
-            COMPETITORS
+            <div style={{ color: "#7b7777", fontWeight: 700 }}>
+              Closest competitor
+            </div>
+            <div style={{ fontSize: 34, marginTop: 8 }}>Fibra (Canada)</div>
+            <div
+              style={{
+                marginTop: 10,
+                color: "#4f4b4b",
+                fontWeight: 600,
+              }}
+            >
+              Smart underwear for reproductive tracking: cycle, ovulation, pH.
+              Cotton yarn sensors. Medical-adjacent frame. UK market: not yet
+              active.
+            </div>
+          </div>
+        </div>
+
+        <div style={{ paddingTop: 58 }}>
+          <div
+            style={{
+              fontSize: 30,
+              lineHeight: 1.1,
+              fontWeight: 800,
+              color: "#8b8686",
+              marginBottom: 18,
+            }}
+          >
+            What they don't do
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {competitorGaps.map((gap) => (
+              <div
+                key={gap}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "24px 1fr",
+                  gap: 14,
+                  alignItems: "start",
+                  color: "#4f4b4b",
+                  fontSize: 29,
+                  lineHeight: 1.18,
+                  fontWeight: 650,
+                }}
+              >
+                <span style={{ color: "#e33d76", fontWeight: 400 }}>x</span>
+                <span>{gap}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         <div
           style={{
-            fontSize: 37,
-            fontWeight: 600,
-            color: "var(--brand-magenta)",
-            lineHeight: 1.3,
+            alignSelf: "stretch",
+            padding: "34px 38px",
+            borderRadius: 28,
+            border: "1px solid #e2dce1",
+            background: "rgba(255,255,255,0.74)",
+            display: "flex",
+            flexDirection: "column",
           }}
         >
-          In This Exact Space
+          <div
+            style={{
+              fontSize: 30,
+              lineHeight: 1.15,
+              fontWeight: 800,
+              color: "#8b8686",
+              marginBottom: 20,
+            }}
+          >
+            KLPS is the only player combining
+          </div>
+          <div style={{ display: "grid", gap: 12 }}>
+            {klpsAdvantages.map((advantage) => (
+              <div
+                key={advantage}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "26px 1fr",
+                  gap: 14,
+                  alignItems: "start",
+                  color: "#4f4b4b",
+                  fontSize: 29,
+                  lineHeight: 1.15,
+                  fontWeight: 700,
+                }}
+              >
+                <span style={{ color: "#119c67", fontWeight: 700 }}>✓</span>
+                <span>{advantage}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </SlideFrame>
