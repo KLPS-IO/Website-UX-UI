@@ -80,9 +80,14 @@ export function SlideDeck() {
     const el = scalerRef.current;
     if (!el) return;
     const observer = new ResizeObserver(() => {
-      const w = el.clientWidth;
-      const h = el.clientHeight;
-      const s = Math.min(w / 1920, h / 1080) * 0.94;
+      const style = window.getComputedStyle(el);
+      const paddingX =
+        parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+      const paddingY =
+        parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+      const w = el.clientWidth - paddingX;
+      const h = el.clientHeight - paddingY;
+      const s = Math.min(w / 1920, h / 1080) * 0.96;
       setScale(s);
     });
     observer.observe(el);
@@ -232,49 +237,20 @@ export function SlideDeck() {
       </div>
 
       {/* Bottom chrome */}
-      <div
-        style={{
-          padding: "20px 28px 24px",
-          display: "grid",
-          gridTemplateColumns: "1fr auto 1fr",
-          alignItems: "center",
-          gap: 16,
-          color: "white",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 14,
-            opacity: 0.8,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 13,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-            }}
-          >
+      <div className="deck-chrome">
+        <div className="deck-meta">
+          <div className="deck-brand">
             KLPS · Pitch Deck
           </div>
-          <div
-            style={{
-              width: 1,
-              height: 16,
-              background: "rgba(255,255,255,0.2)",
-            }}
-          />
-          <div style={{ fontSize: 13 }}>
+          <div className="deck-meta-divider" />
+          <div className="deck-slide-label">
             {String(index + 1).padStart(2, "0")} /{" "}
             {String(total).padStart(2, "0")} ·{" "}
             <span style={{ opacity: 0.7 }}>{slides[index].title}</span>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div className="deck-nav">
           <button
             className="nav-btn"
             onClick={() => go(index - 1)}
@@ -283,14 +259,7 @@ export function SlideDeck() {
           >
             <ChevronLeft size={22} />
           </button>
-          <div
-            style={{
-              display: "flex",
-              gap: 6,
-              alignItems: "center",
-              padding: "0 6px",
-            }}
-          >
+          <div className="deck-dots">
             {slides.map((_, i) => (
               <button
                 key={i}
@@ -311,7 +280,7 @@ export function SlideDeck() {
           </button>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+        <div className="deck-actions">
           <button
             className="nav-btn"
             onClick={() =>
@@ -329,13 +298,7 @@ export function SlideDeck() {
           {exportError && (
             <div
               role="alert"
-              style={{
-                alignSelf: "center",
-                maxWidth: 260,
-                color: "rgba(255,255,255,0.82)",
-                fontSize: 12,
-                lineHeight: 1.35,
-              }}
+              className="deck-export-error"
             >
               Export failed: {exportError}
             </div>
