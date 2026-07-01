@@ -2,8 +2,39 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Download, Maximize2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
-import { slides } from "@/components/data/slides";
+import {
+  slides,
+  type SlideMetrics,
+  type SlideMetricsState,
+} from "@/components/data/slides";
 import { API_BASE } from "@/config/api";
+
+const METRICS_RETRY_DELAYS_MS = [1000, 2000, 4000, 8000];
+
+const wait = (delay: number, signal: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    const timeoutId = window.setTimeout(resolve, delay);
+    signal.addEventListener(
+      "abort",
+      () => {
+        window.clearTimeout(timeoutId);
+        reject(signal.reason ?? new DOMException("Aborted", "AbortError"));
+      },
+      { once: true },
+    );
+  });
+
+async function fetchResearchMetrics(signal: AbortSignal): Promise<SlideMetrics> {
+  const response = await fetch(`${API_BASE}/api/research/public/metrics`, {
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Metrics request failed with ${response.status}`);
+  }
+
+  return response.json();
+}
 
 export function SlideDeck() {
   const [index, setIndex] = useState(0);
@@ -70,15 +101,58 @@ export function SlideDeck() {
     touchStartX.current = null;
   };
 
-  const [metrics, setMetrics] = useState<Record<string, unknown> | null>(null);
+  const [metricsState, setMetricsState] = useState<SlideMetricsState>({
+    status: "loading",
+    data: null,
+  });
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/research/public/metrics`)
-      .then((r) => r.json())
-      .then((data) => {
-        setMetrics(data);
-      })
-      .catch(console.error);
+    const controller = new AbortController();
+    let active = true;
+
+    const loadMetrics = async () => {
+      for (let attempt = 0; attempt < METRICS_RETRY_DELAYS_MS.length + 1; attempt++) {
+        if (!active || controller.signal.aborted) return;
+
+        if (attempt > 0) {
+          setMetricsState((current) =>
+            current.status === "retrying"
+              ? current
+              : { status: "retrying", data: null },
+          );
+        }
+
+        try {
+          const data = await fetchResearchMetrics(controller.signal);
+          if (active && !controller.signal.aborted) {
+            setMetricsState({ status: "success", data });
+          }
+          return;
+        } catch (error) {
+          if (controller.signal.aborted) return;
+
+          const isFinalAttempt = attempt === METRICS_RETRY_DELAYS_MS.length;
+          if (isFinalAttempt) {
+            console.error("Live research metrics unavailable", error);
+            if (active) {
+              setMetricsState({ status: "unavailable", data: null });
+            }
+            return;
+          }
+
+          await wait(METRICS_RETRY_DELAYS_MS[attempt], controller.signal).catch(
+            () => {},
+          );
+        }
+      }
+    };
+
+    loadMetrics();
+
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, []);
 
   // PDF export
@@ -150,7 +224,7 @@ export function SlideDeck() {
           >
             {slides.map((s, i) => (
               <div key={i} style={{ flex: "0 0 100%", height: "100%" }}>
-                {s.render(metrics)}{" "}
+                {s.render(metricsState)}{" "}
               </div>
             ))}
           </div>
@@ -277,7 +351,7 @@ export function SlideDeck() {
             data-export-slide
             style={{ width: 1920, height: 1080, background: "white" }}
           >
-            {s.render(metrics)}{" "}
+            {s.render(metricsState)}{" "}
           </div>
         ))}
       </div>

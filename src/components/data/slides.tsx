@@ -10,7 +10,6 @@ import textileAsset from "@/assets/textile.png";
 import mcuAsset from "@/assets/mcu.png";
 import insightAsset from "@/assets/insight.mp4";
 import { AnimatedHeadline } from "../AnimatedHeadline";
-import garmentVideo from "@/assets/garment.mp4";
 import grapheneVideo from "@/assets/graphene.mp4";
 import wireframeStatsAsset from "@/assets/wireframe-composition.png";
 import wireframeScanAsset from "@/assets/wireframe-scan.jpeg";
@@ -24,9 +23,33 @@ import uom from "@/assets/uomlogo.jpg";
 import { Italic } from "lucide-react";
 const TOTAL = 14;
 
-// const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
+const metricsStatusCopy: Record<SlideMetricsState["status"], string> = {
+  loading: "Connecting to live research...",
+  retrying: "Updating live survey metrics...",
+  unavailable: "Live research data temporarily unavailable",
+  success: "",
+};
+const unavailableMetricsMessage = metricsStatusCopy.unavailable;
 
 // ----- helpers -----
+function hasMetricValue(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function formatMetricPercent(value: number | undefined) {
+  return hasMetricValue(value) ? `${Math.round(value)}%` : null;
+}
+
+function formatParticipants(value: number | undefined) {
+  return hasMetricValue(value) ? `of ${Math.round(value)} surveyed` : null;
+}
+
+function getMetricsMessage(metricsState: SlideMetricsState) {
+  return metricsState.status === "success"
+    ? unavailableMetricsMessage
+    : metricsStatusCopy[metricsState.status];
+}
+
 function BlobDecor({
   variant = "all",
 }: {
@@ -209,13 +232,17 @@ function Slide01() {
 }
 
 // ----- 02: The Problem -----
-function Slide02({ metrics }: { metrics?: SlideMetrics }) {
-  const interest = metrics?.commercialInterestPercent ?? 0;
+function Slide02({ metricsState }: { metricsState: SlideMetricsState }) {
+  const metrics = metricsState.data;
+  const metricsMessage = getMetricsMessage(metricsState);
+  const interest = formatMetricPercent(metrics?.commercialInterestPercent);
   const formattedPricePoint = metrics?.topPricePoint
     ? `£${metrics.topPricePoint.replace("_", "-£")}`
-    : "No data";
+    : metricsMessage;
 
-  const tummyInTen = Math.round((metrics?.tummyPercent ?? 0) / 10);
+  const tummyInTen = hasMetricValue(metrics?.tummyPercent)
+    ? `${Math.round(metrics.tummyPercent / 10)} in 10`
+    : metricsMessage;
 
   return (
     <SlideFrame variant="white" pageNumber={2} pageTotal={TOTAL}>
@@ -291,8 +318,14 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
             "If a solution gave you insights into your body, would you consider paying for it?"
           }
           <br />
-          <strong>{interest}%</strong> of women surveyed said{" "}
-          <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
+          {interest ? (
+            <>
+              <strong>{interest}</strong> of women surveyed said{" "}
+              <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
+            </>
+          ) : (
+            <strong>{metricsMessage}</strong>
+          )}
         </span>
       </h2>
       <div
@@ -310,18 +343,19 @@ function Slide02({ metrics }: { metrics?: SlideMetrics }) {
       >
         {[
           {
-            value: `${metrics?.commercialInterestPercent ?? 0}%`,
-            label: `of ${metrics?.participants ?? 0} surveyed`,
+            value: interest ?? metricsMessage,
+            label: formatParticipants(metrics?.participants),
             description: "Would Pay For Personalised Body Insights",
           },
           {
-            value: `${tummyInTen} in 10`,
+            value: tummyInTen,
             label: "Women surveyed",
             description: "Want Insights From Their Abdomen",
           },
           {
-            value: `${metrics?.spentMoneyPercent ?? 0}%`,
-            label: `of ${metrics?.participants ?? 0} surveyed`,
+            value:
+              formatMetricPercent(metrics?.spentMoneyPercent) ?? metricsMessage,
+            label: formatParticipants(metrics?.participants),
             description: "Have Already Spent Money On Devices/Tracking",
           },
           {
@@ -397,7 +431,7 @@ function Slide03() {
     {
       n: "Emma Mendez.",
       d: "I lost 4 stone",
-      c: "Tracking Wasn't Straight Forward.",
+      c: "Tracking Wasn't Straightforward.",
       e: "Community and Accountability Partners Were My Biggest Success Factors",
       f: "- Corporate Software Engineer",
       g: "- Graphene Strategist",
@@ -544,8 +578,8 @@ function Slide04() {
       n: "01",
       t: "Underwear",
       d: "We Create Underwear",
-      media: garmentVideo,
-      type: "video",
+      media: garmentAsset,
+      type: "image",
     },
     {
       n: "02",
@@ -557,7 +591,7 @@ function Slide04() {
     {
       n: "03",
       t: "Microcontroller",
-      d: "Our MVP Uses Aurdino Micro Controller",
+      d: "Our MVP Uses Arduino Microcontroller",
       media: mcuAsset,
       type: "image",
     },
@@ -569,7 +603,7 @@ function Slide04() {
       type: "video",
     },
   ];
-  // Rotation: 0 → 1 → 2 → 3 → 0 (stop). Each step 5s, final garment 7s.
+  // Rotation: 0 → 1 → 2 → 3 → 0 (stop).
   const [active, setActive] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -620,7 +654,7 @@ function Slide04() {
         className="blob"
         style={{ top: -160, right: -120, width: 520, opacity: 0.7 }}
       />
-      <div style={{ position: "absolute", top: 190, left: 110, right: 110 }}>
+      <div style={{ position: "absolute", top: 150, left: 110, right: 110 }}>
         <div
           className="slide-kicker"
           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
@@ -635,7 +669,7 @@ function Slide04() {
         </h2>
         <div
           style={{
-            marginTop: 90,
+            marginTop: 62,
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
             gap: 28,
@@ -656,9 +690,10 @@ function Slide04() {
                   boxShadow: isActive
                     ? "0 28px 60px -10px rgba(184, 0, 130, 0.45)"
                     : "0 20px 50px -28px rgba(184, 0, 130, 0.25)",
-                  minHeight: 480,
-                  transform: isActive ? "translateY(-80px)" : "none",
-                  transition: "all 600ms ease",
+                  minHeight: 510,
+                  transform: isActive ? "translateY(-24px)" : "none",
+                  transition:
+                    "border-color 600ms ease, box-shadow 600ms ease, transform 600ms ease",
                   display: "flex",
                   flexDirection: "column",
                 }}
@@ -666,11 +701,13 @@ function Slide04() {
                 <div
                   style={{
                     width: "100%",
-                    height: 200,
+                    height: 230,
                     borderRadius: 18,
                     overflow: "hidden",
-                    background: "#f8eef6",
+                    background: s.n === "01" ? "#ffffff" : "#f8eef6",
                     marginBottom: 18,
+                    display: "grid",
+                    placeItems: "center",
                   }}
                 >
                   {s.type === "video" ? (
@@ -683,7 +720,7 @@ function Slide04() {
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
-                        transform: isActive ? "scale(1.05)" : "scale(2)",
+                        transform: isActive ? "scale(1.03)" : "scale(1)",
                         transition: "transform 1.2s ease",
                       }}
                     >
@@ -696,8 +733,8 @@ function Slide04() {
                       style={{
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
-                        transform: isActive ? "scale(1.05)" : "scale(2)",
+                        objectFit: s.n === "01" ? "contain" : "cover",
+                        transform: isActive ? "scale(1.03)" : "scale(1)",
                         transition: "transform 1.2s ease",
                       }}
                     />
@@ -1594,7 +1631,7 @@ function Slide09() {
     {
       p: "Q1 2027",
       t: "Pilot Waitlist Live",
-      n: "Wait list open. Actively growing early adopters",
+      n: "Waitlist open. Actively growing early adopters",
     },
     {
       p: "Q3 2027",
@@ -2018,7 +2055,7 @@ function Slide13() {
           }}
         >
           {" "}
-          already buy into 'insight' technology!{" "}
+          already buys into 'insight' technology!{" "}
         </div>
         <div
           style={{
@@ -2085,8 +2122,10 @@ function Slide13() {
 }
 
 // ----- 14: The Problem -----
-function Slide14({ metrics }: { metrics?: SlideMetrics }) {
-  const interest = metrics?.commercialInterestPercent ?? 0;
+function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
+  const metrics = metricsState.data;
+  const metricsMessage = getMetricsMessage(metricsState);
+  const interest = formatMetricPercent(metrics?.commercialInterestPercent);
   return (
     <SlideFrame variant="white" pageNumber={14} pageTotal={TOTAL}>
       <img
@@ -2111,8 +2150,14 @@ function Slide14({ metrics }: { metrics?: SlideMetrics }) {
             "'If a solution gave you insights into your body, would you consider paying for it?'"
           }
           <br />
-          <strong>{interest}%</strong> of women surveyed said{" "}
-          <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
+          {interest ? (
+            <>
+              <strong>{interest}</strong> of women surveyed said{" "}
+              <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
+            </>
+          ) : (
+            <strong>{metricsMessage}</strong>
+          )}
         </span>
       </h2>
       {/* Top row */}
@@ -2135,8 +2180,8 @@ function Slide14({ metrics }: { metrics?: SlideMetrics }) {
             description: "SEIS Eligible",
           },
           {
-            value: `${metrics?.commercialInterestPercent ?? 0}%`,
-            label: "of Women",
+            value: interest ?? metricsMessage,
+            label: interest ? "of Women" : "",
             description: "Would Pay For Personalised Body Insights",
           },
         ].map((row) => (
@@ -2162,16 +2207,18 @@ function Slide14({ metrics }: { metrics?: SlideMetrics }) {
                 {row.value}
               </div>
 
-              <div
-                style={{
-                  fontSize: 28,
-                  fontWeight: 600,
-                  color: "var(--brand-ink)",
-                  marginTop: 8,
-                }}
-              >
-                {row.label}
-              </div>
+              {row.label && (
+                <div
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 600,
+                    color: "var(--brand-ink)",
+                    marginTop: 8,
+                  }}
+                >
+                  {row.label}
+                </div>
+              )}
             </div>
 
             <div
@@ -2253,16 +2300,27 @@ export interface SlideMetrics {
   topPricePoint?: string;
 }
 
+export type SlideMetricsStatus =
+  | "loading"
+  | "retrying"
+  | "success"
+  | "unavailable";
+
+export interface SlideMetricsState {
+  status: SlideMetricsStatus;
+  data: SlideMetrics | null;
+}
+
 export interface SlideMeta {
   title: string;
-  render: (metrics?: SlideMetrics) => ReactNode;
+  render: (metricsState: SlideMetricsState) => ReactNode;
 }
 
 export const slides: SlideMeta[] = [
   { title: "Cover", render: () => <Slide01 /> },
   {
     title: "The Problem",
-    render: (metrics) => <Slide02 metrics={metrics} />,
+    render: (metricsState) => <Slide02 metricsState={metricsState} />,
   },
   { title: "The Gap", render: () => <Slide03 /> },
   { title: "How it works", render: () => <Slide04 /> },
@@ -2277,6 +2335,6 @@ export const slides: SlideMeta[] = [
   { title: "Build it", render: () => <Slide13 /> },
   {
     title: "Final Stats",
-    render: (metrics) => <Slide14 metrics={metrics} />,
+    render: (metricsState) => <Slide14 metricsState={metricsState} />,
   },
 ];

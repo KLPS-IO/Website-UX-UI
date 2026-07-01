@@ -687,3 +687,10 @@ All colors MUST be HSL.
   -webkit-background-clip: initial !important;
   background-clip: initial !important;
 }
+
+.pdf-export .export-pool *,
+.pdf-export .export-pool *::before,
+.pdf-export .export-pool *::after {
+  animation: none !important;
+  transition: none !important;
+}
