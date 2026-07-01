@@ -1480,7 +1480,6 @@ function Slide08() {
         style={{ top: -100, right: -100, width: 460, opacity: 0.7 }}
       />
       <div style={{ position: "absolute", top: 160, left: 110, right: 110 }}>
-
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
           <div
@@ -1709,7 +1708,6 @@ function Slide08() {
             </span>
           ))}
         </div>
-
       </div>
     </SlideFrame>
   );
@@ -2291,11 +2289,11 @@ function Slide14() {
               color: "var(--brand-ink)",
             }}
           >
-            We Know Who We're Up Against.
+            Why KLPS Wins{" "}
           </div>
         </div>
         {/* Column 1 — Fibra */}
-        <div style={{ paddingRight: 56, borderRight: "1px solid #eadde8",  }}>
+        <div style={{ paddingRight: 56, borderRight: "1px solid #eadde8" }}>
           <div
             style={{
               fontSize: 24,
@@ -2317,8 +2315,7 @@ function Slide14() {
               marginBottom: 28,
             }}
           >
-            Smart underwear for reproductive tracking only: cycle, ovulation,
-            pH. Cotton yarn sensors. Medical-adjacent. Not in UK.
+            Focused reproductive health platform. Cotton yarn sensors. Medical-adjacent. Not in UK.
           </div>
           <div style={{ display: "grid", gap: 14 }}>
             {competitorGaps.map((gap) => (
