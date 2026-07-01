@@ -287,6 +287,7 @@ const endpointSets = {
   acceptNda: ["/api/data-room/nda/accept", "/api/nda/accept"],
   documents: ["/api/data-room/documents", "/api/documents"],
   documentAccess: (id: string) => [`/api/data-room/documents/${id}/url`],
+  metrics: ["/api/research/metrics"],
   logs: ["/api/data-room/admin/access-logs", "/api/admin/access-logs"],
   authorise: [
     "/api/data-room/admin/users/authorise",
@@ -319,10 +320,33 @@ function clearPrototypeAccess() {
 const wait = (milliseconds: number) =>
   new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
 
+const METRICS_RETRY_DELAYS_MS = [1000, 2000, 4000, 8000];
+
 const isRetryableLoginError = (error: unknown) =>
   error instanceof ApiRequestError
     ? typeof error.status === "number" && error.status >= 500
     : error instanceof TypeError;
+
+async function fetchSecureResearchMetrics(): Promise<ResearchMetrics> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < METRICS_RETRY_DELAYS_MS.length + 1; attempt++) {
+    try {
+      return await apiRequest<ResearchMetrics>(endpointSets.metrics);
+    } catch (error) {
+      lastError = error;
+
+      const isFinalAttempt = attempt === METRICS_RETRY_DELAYS_MS.length;
+      if (isFinalAttempt) break;
+
+      await wait(METRICS_RETRY_DELAYS_MS[attempt]);
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Live research metrics unavailable.");
+}
 
 async function apiRequest<T>(
   paths: string[],
@@ -854,15 +878,10 @@ const DataRoom = () => {
     }
 
     try {
-      const metricsResponse = await fetch(`${API_BASE}/api/research/metrics`);
-
-      const metricsData = await apiRequest<ResearchMetrics>([
-        "/api/research/metrics",
-      ]);
-
-      setMetrics(metricsData);
+      setMetrics(await fetchSecureResearchMetrics());
     } catch (error) {
-      console.error(error);
+      console.error("Data room research metrics unavailable", error);
+      setMetrics(null);
     }
 
     if (isAdminUser(nextUser)) {
@@ -967,6 +986,16 @@ const DataRoom = () => {
 
   const topPriceLabel =
     PRICE_LABELS[metrics?.topPricePoint] ?? metrics?.topPricePoint;
+  const metricsUnavailableLabel = "Live research data temporarily unavailable";
+  const compactMetricsUnavailableLabel = "Unavailable";
+  const metricNumber = (value: number | undefined) =>
+    typeof value === "number" && Number.isFinite(value)
+      ? String(Math.round(value))
+      : compactMetricsUnavailableLabel;
+  const metricPercent = (value: number | undefined) =>
+    typeof value === "number" && Number.isFinite(value)
+      ? `${Math.round(value)}%`
+      : compactMetricsUnavailableLabel;
 
   const logout = async () => {
     await apiRequest(endpointSets.logout, { method: "POST" }).catch(
@@ -1157,7 +1186,7 @@ const DataRoom = () => {
                     Survey Participants
                   </div>
                   <div className="mt-2 text-3xl font-light">
-                    {metrics?.participants ?? 0}
+                    {metricNumber(metrics?.participants)}
                   </div>
                 </div>
 
@@ -1166,7 +1195,7 @@ const DataRoom = () => {
                     Customer Interviews
                   </div>
                   <div className="mt-2 text-3xl font-light">
-                    {metrics?.voiceRecordings ?? 0}
+                    {metricNumber(metrics?.voiceRecordings)}
                   </div>
                 </div>
 
@@ -1176,13 +1205,15 @@ const DataRoom = () => {
                   </div>
 
                   <div className="mt-2 text-3xl font-light">
-                    {topPriceLabel || "No data"}
+                    {topPriceLabel || compactMetricsUnavailableLabel}
                   </div>
 
-                  <div className="mt-1 text-sm text-muted-foreground">
-                    {metrics?.topPricePointCount ?? 0} of{" "}
-                    {metrics?.participants ?? 0} responses
-                  </div>
+                  {metrics && (
+                    <div className="mt-1 text-sm text-muted-foreground">
+                      {metricNumber(metrics.topPricePointCount)} of{" "}
+                      {metricNumber(metrics.participants)} responses
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1200,12 +1231,12 @@ const DataRoom = () => {
                     <div className="mt-3">
                       <p className="text-sm leading-7 text-muted-foreground">
                         <span className="font-medium text-foreground">
-                          {Math.round(Number(metrics?.topConcernPercent ?? 0))}%
+                          {metricPercent(metrics?.topConcernPercent)}
                           <br />
                         </span>
                         Of participants report {""}
                         <span className="font-medium text-foreground">
-                          '{metrics?.topConcern}'
+                          '{metrics?.topConcern ?? metricsUnavailableLabel}'
                         </span>{" "}
                         as a recurring concern.{" "}
                       </p>
@@ -1219,7 +1250,7 @@ const DataRoom = () => {
 
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">
                       <span className="font-medium text-foreground">
-                        {Math.round(Number(metrics?.spentMoneyPercent ?? 0))}%{" "}
+                        {metricPercent(metrics?.spentMoneyPercent)}{" "}
                         <br />
                       </span>{" "}
                       Have already spent money trying to solve the problem.
@@ -1235,7 +1266,9 @@ const DataRoom = () => {
                       <span className="font-medium text-foreground">
                         Top Insight Requested
                         <br /> '
-                        {metrics?.topDesiredInsights?.[0]?.value ?? "No data"}'
+                        {metrics?.topDesiredInsights?.[0]?.value ??
+                          metricsUnavailableLabel}
+                        '
                       </span>{" "}
                       is the most requested insight by participants.
                     </p>
@@ -1247,7 +1280,8 @@ const DataRoom = () => {
                     </div>
                     <p className="mt-3 text-sm leading-7 text-muted-foreground">
                       <span className="font-medium text-foreground">
-                        {metrics?.commercialInterestPercent ?? 0}% <br />
+                        {metricPercent(metrics?.commercialInterestPercent)}{" "}
+                        <br />
                       </span>
                       Respondents answered 'Yes' or 'Maybe' when asked{" "}
                       <span className="font-bold italic text-foreground">
