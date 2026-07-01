@@ -5,7 +5,7 @@ import blobSpiral from "@/assets/blob-spiral.png";
 import blobRing from "@/assets/blob-ring.png";
 import klpsVideo from "@/assets/klps.mp4";
 import headShot from "@/assets/headshot.jpg";
-import garmentAsset from "@/assets/garment.jpg";
+import garmentAsset from "@/assets/garment.png";
 import textileAsset from "@/assets/textile.png";
 import mcuAsset from "@/assets/mcu.png";
 import insightAsset from "@/assets/insight.mp4";
