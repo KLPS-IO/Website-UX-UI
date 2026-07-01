@@ -2123,7 +2123,7 @@ function Slide13() {
 }
 
 // ----- 14: The Competitor -----
-function Slide14({ metricsState }: { metricsState: SlideMetricsState }) {
+function Slide14() {
 
   const competitorGaps = [
     "Graphene conductivity",
