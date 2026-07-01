@@ -2124,20 +2124,20 @@ function Slide13() {
 
 // ----- 14: The Competitor -----
 function Slide14() {
-
   const competitorGaps = [
-    "Graphene conductivity",
-    "Shapewear form factor",
-    // "Perimenopause & menopause",
-    "Whole-body goals platform",
-    "UK market",
+    "Graphene - uses cotton yarn",
+    "Shapewear - clinical underwear only",
+    "Women, mums & families - fertility focus only",
+    "Whole-body goals platform - no bloating, weight, habits",
+    "UK market presence",
   ];
+
   const klpsAdvantages = [
-    "Graphene-native fabric",
-    "Shapewear form factor",
-    "All age group audience",
-    "UK-first, SEIS-backed",
-    // "Validated demand data",
+    "Graphene-native conductivity - stronger IP moat",
+    "Shapewear - fashion-grade, women already buying",
+    "Women, mums & families - not fertility only",
+    "Goals platform - habits, bloating, weight, cycle in one",
+    "UK-first, SEIS-backed, UoM graphene research access",
   ];
 
   return (
@@ -2148,20 +2148,18 @@ function Slide14() {
         className="blob"
         style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
       />
-      {/* Centre card */}
       <div
         className="stat-card"
         style={{
           position: "absolute",
           left: "50%",
           transform: "translateX(-50%)",
-          top: 200,
+          top: 300,
           width: 1660,
-          // height: 320,
-          padding: "44px 154px",
+          padding: "44px 80px",
           display: "grid",
-          gridTemplateColumns: "1.05fr 1.05fr 1fr",
-          gap: 56,
+          gridTemplateColumns: "1fr 1fr",
+          gap: 0,
           alignItems: "start",
           textAlign: "left",
           background: "rgba(255,255,255,0.82)",
@@ -2169,60 +2167,66 @@ function Slide14() {
           boxShadow: "0 24px 70px -38px rgba(60, 20, 90, 0.35)",
         }}
       >
-        <div>
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            top: -150,
+            width: 1660,
+            textAlign: "left",
+          }}
+        >
           <div
             style={{
               fontSize: 24,
-              lineHeight: 1.1,
               letterSpacing: "0.18em",
               textTransform: "uppercase",
               fontWeight: 800,
               color: "#8b8686",
-              marginBottom: 24,
+              marginBottom: 16,
             }}
           >
             Competitive Position
           </div>
-
           <div
             style={{
-              fontSize: 30,
-              lineHeight: 1.28,
-              fontWeight: 700,
+              fontSize: 62,
+              fontWeight: 800,
+              lineHeight: 1.1,
               color: "var(--brand-ink)",
             }}
           >
-            <div style={{ color: "#7b7777", fontWeight: 700 }}>
-              Closest competitor
-            </div>
-            <div style={{ fontSize: 34, marginTop: 8 }}>Fibra (Canada)</div>
-            <div
-              style={{
-                marginTop: 10,
-                color: "#4f4b4b",
-                fontWeight: 600,
-              }}
-            >
-              Smart underwear for reproductive tracking: cycle, ovulation, pH.
-              Cotton yarn sensors. Medical-adjacent frame. UK market: not yet
-              active.
-            </div>
+            We Know Who We're Up Against.
           </div>
         </div>
-
-        <div style={{ paddingTop: 58 }}>
+        {/* Column 1 — Fibra */}
+        <div style={{ paddingRight: 56, borderRight: "1px solid #eadde8",  }}>
+          <div
+            style={{
+              fontSize: 24,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              fontWeight: 800,
+              color: "#8b8686",
+              marginBottom: 20,
+            }}
+          >
+            Fibra · Canada
+          </div>
           <div
             style={{
               fontSize: 30,
-              lineHeight: 1.1,
-              fontWeight: 800,
-              color: "#8b8686",
-              marginBottom: 18,
+              lineHeight: 1.4,
+              fontWeight: 600,
+              color: "#4f4b4b",
+              marginBottom: 28,
             }}
           >
-            What they don't do
+            Smart underwear for reproductive tracking only: cycle, ovulation,
+            pH. Cotton yarn sensors. Medical-adjacent. Not in UK.
           </div>
-          <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ display: "grid", gap: 14 }}>
             {competitorGaps.map((gap) => (
               <div
                 key={gap}
@@ -2237,36 +2241,40 @@ function Slide14() {
                   fontWeight: 650,
                 }}
               >
-                <span style={{ color: "#e33d76", fontWeight: 400 }}>x</span>
+                <span style={{ color: "#e33d76", fontWeight: 400 }}>✗</span>
                 <span>{gap}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div
-          style={{
-            alignSelf: "stretch",
-            padding: "34px 38px",
-            borderRadius: 28,
-            border: "1px solid #e2dce1",
-            background: "rgba(255,255,255,0.74)",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        {/* Column 2 — KLPS */}
+        <div style={{ paddingLeft: 56 }}>
           <div
             style={{
-              fontSize: 30,
-              lineHeight: 1.15,
+              fontSize: 24,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
               fontWeight: 800,
-              color: "#8b8686",
+              color: "#e33d76",
               marginBottom: 20,
             }}
           >
-            KLPS is the only player combining
+            KLPS · UK
           </div>
-          <div style={{ display: "grid", gap: 12 }}>
+          <div
+            style={{
+              fontSize: 30,
+              lineHeight: 1.4,
+              fontWeight: 600,
+              color: "#4f4b4b",
+              marginBottom: 28,
+            }}
+          >
+            Graphene shapewear and goals platform for women, mums and families.
+            Bloating, hormones, weight, habits - the whole picture.
+          </div>
+          <div style={{ display: "grid", gap: 14 }}>
             {klpsAdvantages.map((advantage) => (
               <div
                 key={advantage}
