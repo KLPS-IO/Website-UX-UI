@@ -577,28 +577,28 @@ function Slide04() {
     {
       n: "01",
       t: "Underwear",
-      d: "We Create Underwear",
+      d: "Everyday clothing designed to become a non-invasive health interface.",
       media: garmentAsset,
       type: "image",
     },
     {
       n: "02",
       t: "IP Fabric",
-      d: "Using Conductive Fabrics.",
+      d: "Washable Conductive Textiles. Designed to retain performance through repeated wear and washing.",
       media: grapheneVideo,
       type: "video",
     },
     {
       n: "03",
       t: "Microcontroller",
-      d: "Our MVP Uses Arduino Microcontroller",
+      d: "We are developing embedded electronics",
       media: mcuAsset,
       type: "image",
     },
     {
       n: "04",
       t: "Insight layer",
-      d: "The Product - Platform IP Is Our Moat, and The Hardest To Replicate.  ",
+      d: "The Product - AI transforms garment signals into personalised health insights. ",
       media: insightAsset,
       type: "video",
     },
@@ -654,10 +654,10 @@ function Slide04() {
         className="blob"
         style={{ top: -160, right: -120, width: 520, opacity: 0.7 }}
       />
-      <div style={{ position: "absolute", top: 150, left: 110, right: 110 }}>
+      <div style={{ position: "absolute", top: 140, left: 110, right: 110 }}>
         <div
           className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+          style={{ color: "var(--brand-magenta)", marginBottom: 8 }}
         >
           Why This
         </div>
@@ -669,7 +669,7 @@ function Slide04() {
         </h2>
         <div
           style={{
-            marginTop: 62,
+            marginTop: 42,
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",
             gap: 28,
@@ -796,20 +796,14 @@ function Slide04() {
 function Slide05() {
   const groups = [
     {
-      h: "$97 Billion Projected Global Femtech Market Growth By 2030-",
+      h: "$97 Billion Femtech Market Growth By 2030-",
       q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
       items: [
         "Fibra",
         "Flo",
         "Clue",
-        "Glow",
         "Hexoskin",
-        "Siren",
-        "Thinx",
         "Modibodi",
-        "Tempdrop",
-        "Elvie",
-        "Femsense",
         "Apple",
         "Fitbit",
         "Whoop",
