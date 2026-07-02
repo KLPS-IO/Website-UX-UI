@@ -93,23 +93,33 @@ const Waitlist = () => {
             className="animate-in fade-in slide-in-from-bottom-4 duration-1000"
             style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
           >
-            <h1 className="text-5xl leading-[1.05] tracking-tight text-gray-900 md:text-6xl lg:text-7xl">
-              Coming
+            <h1 className="text-5xl leading-[1.05] tracking-tight text-gray-900 md:text-6xl lg:text-6xl">
+              The Future of Health Monitoring
               <br />
               <em className="font-normal italic" style={{ color: PINK }}>
-                together
+                Is Not Devices.
               </em>
               ,
               <br />
-              for you.
+              It is Fabrics.
             </h1>
 
             <p
               className="mt-8 max-w-xl text-lg leading-relaxed text-gray-500"
               style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
             >
-              KLPS is a new kind of care, built petal by petal around women's
-              health. Be first through the door.
+              Your body's been talking. Now you can hear it.
+            </p>
+            <p
+              className="mt-8 max-w-xl text-lg leading-relaxed text-gray-500"
+              style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+            >
+              Wear it!
+            </p>
+            <p
+              className="font-normal italic" style={{ color: PINK }}
+            >
+              By KLPS &hearts;
             </p>
           </div>
 
