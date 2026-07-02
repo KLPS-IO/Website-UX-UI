@@ -2552,9 +2552,4 @@ export const slides: SlideMeta[] = [
   { title: "Vision", render: () => <Slide12 /> },
   { title: "Build it", render: () => <Slide13 /> },
   { title: "Competitors", render: () => <Slide14 /> },
-
-  {
-    title: "Final Stats",
-    render: (metricsState) => <Slide15 metricsState={metricsState} />,
-  },
 ];

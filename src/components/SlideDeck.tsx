@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, Download, Maximize2 } from "lucide-react";
-import html2canvas from "html2canvas";
-import { jsPDF } from "jspdf";
 import {
   slides,
   type SlideMetrics,
   type SlideMetricsState,
 } from "@/components/data/slides";
 import { API_BASE } from "@/config/api";
+import pitchDeckPdfUrl from "@/assets/KLPS-pitch-deck (1).pdf?url";
 
 const METRICS_RETRY_DELAYS_MS = [1000, 2000, 4000, 8000];
 
@@ -43,13 +42,17 @@ export function SlideDeck() {
   const [exportError, setExportError] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const scalerRef = useRef<HTMLDivElement>(null);
-  const exportPoolRef = useRef<HTMLDivElement>(null);
 
   const total = slides.length;
 
-  // Mobile detection
+  // Compact screens get a download-first page. The slide canvas is too wide
+  // to be useful in portrait tablet/phone layouts.
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
+    const check = () =>
+      setIsMobile(
+        window.innerWidth < 768 ||
+          (window.innerWidth < 1024 && window.innerHeight >= window.innerWidth),
+      );
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -95,7 +98,7 @@ export function SlideDeck() {
         parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
       const w = el.clientWidth - paddingX;
       const h = el.clientHeight - paddingY;
-      const s = Math.min(w / 1920, h / 1080) * 0.96;
+      const s = Math.min(w / 1920, h / 1080) * 0.995;
       setScale(s);
     });
     observer.observe(el);
@@ -171,56 +174,28 @@ export function SlideDeck() {
     };
   }, []);
 
-  // PDF export
-  const exportPdf = async () => {
+  const downloadPdf = async () => {
     if (exporting) return;
     setExportError("");
     setExporting(true);
-    document.body.classList.add("pdf-export");
 
     try {
-      await document.fonts.ready;
-      const pool = exportPoolRef.current;
-      if (!pool) return;
-      const pdf = new jsPDF({
-        orientation: "landscape",
-        unit: "px",
-        format: [1920, 1080],
-      });
-      const nodes = pool.querySelectorAll<HTMLElement>("[data-export-slide]");
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        const canvas = await html2canvas(node, {
-          width: 1920,
-          height: 1080,
-          windowWidth: 1920,
-          windowHeight: 1080,
-          scale: 1.2,
-          backgroundColor: "#ffffff",
-          useCORS: true,
-        });
-        const img = canvas.toDataURL("image/jpeg", 0.92);
-        if (i > 0) pdf.addPage([1920, 1080], "landscape");
-        pdf.addImage(img, "JPEG", 0, 0, 1920, 1080);
-      }
-      const blobUrl = URL.createObjectURL(pdf.output("blob"));
       const link = document.createElement("a");
-      link.href = blobUrl;
+      link.href = pitchDeckPdfUrl;
       link.download = "KLPS-pitch-deck.pdf";
+      link.rel = "noopener";
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
     } catch (error) {
-      console.error("Could not export pitch deck PDF", error);
+      console.error("Could not download pitch deck PDF", error);
       setExportError(
         error instanceof Error
           ? error.message
-          : "Could not export the pitch deck PDF.",
+          : "Could not download the pitch deck PDF.",
       );
     } finally {
-      document.body.classList.remove("pdf-export");
-      setExporting(false);
+      window.setTimeout(() => setExporting(false), 300);
     }
   };
 
@@ -363,7 +338,7 @@ export function SlideDeck() {
 
           {/* Primary CTA — PDF download */}
           <button
-            onClick={exportPdf}
+            onClick={downloadPdf}
             disabled={exporting}
             style={{
               padding: "18px 36px",
@@ -385,7 +360,7 @@ export function SlideDeck() {
             }}
           >
             <Download size={20} />
-            {exporting ? "Generating PDF…" : "Download Pitch Deck PDF"}
+            {exporting ? "Starting download..." : "Download Pitch Deck PDF"}
           </button>
 
           {exportError && (
@@ -445,28 +420,6 @@ export function SlideDeck() {
           </div>
         </div>
 
-        {/* Export pool still rendered for PDF generation */}
-        <div
-          ref={exportPoolRef}
-          aria-hidden
-          style={{
-            position: "fixed",
-            left: "-9999px",
-            top: 0,
-            zIndex: -1,
-            pointerEvents: "none",
-          }}
-        >
-          {slides.map((s, i) => (
-            <div
-              key={i}
-              data-export-slide
-              style={{ width: 1920, height: 1080, background: "white" }}
-            >
-              {s.render(metricsState)}
-            </div>
-          ))}
-        </div>
       </>
     );
   }
@@ -548,9 +501,9 @@ export function SlideDeck() {
           >
             <Maximize2 size={18} />
           </button>
-          <button className="pill-btn" onClick={exportPdf} disabled={exporting}>
+          <button className="pill-btn" onClick={downloadPdf} disabled={exporting}>
             <Download size={16} />
-            {exporting ? "Generating PDF…" : "Download PDF"}
+            {exporting ? "Starting download..." : "Download PDF"}
           </button>
           {exportError && (
             <div role="alert" className="deck-export-error">
@@ -558,29 +511,6 @@ export function SlideDeck() {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Export pool — fixed off-screen so html2canvas can render fully */}
-      <div
-        ref={exportPoolRef}
-        aria-hidden
-        style={{
-          position: "fixed",
-          left: "-9999px",
-          top: 0,
-          zIndex: -1,
-          pointerEvents: "none",
-        }}
-      >
-        {slides.map((s, i) => (
-          <div
-            key={i}
-            data-export-slide
-            style={{ width: 1920, height: 1080, background: "white" }}
-          >
-            {s.render(metricsState)}
-          </div>
-        ))}
       </div>
     </div>
   );
