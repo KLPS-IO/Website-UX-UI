@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BetaLogin from "./pages/BetaLogin";
+import Waitlist from "./pages/Waitlist";
 import BetaDashboard from "./pages/BetaDashboard";
 import { DashboardLayout } from "./components/DasboardLayout";
 import { BodyScanPage } from "./components/BodyScanPage";
@@ -52,6 +53,7 @@ const App = () => (
             }
           />
           <Route path="/data-room" element={<DataRoom />} />
+          <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/beta-login" element={<BetaLogin />} />
           <Route path="/beta-dashboard" element={<DashboardLayout />}>
             <Route index element={<BetaDashboard />} />

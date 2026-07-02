@@ -3,15 +3,13 @@ import { Input } from "@/components/ui/input";
 import heroBg from "@/assets/hero-bg.jpg";
 
 const HeroSection = () => {
-  
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={heroBg} 
-          alt="Innovative femtech solutions" 
+        <img
+          src={heroBg}
+          alt="Innovative femtech solutions"
           className="w-full h-full object-cover opacity-40"
         />
         <div className="absolute inset-0 gradient-accent"></div>
@@ -27,23 +25,43 @@ const HeroSection = () => {
             </span>
             Coming Soon
           </span>
+          <div className="mt-8">
+          <Button
+            size="lg"
+            onClick={() => (window.location.href = "/waitlist")}
+            className="
+              whitespace-nowrap
+              bg-gradient-to-r
+              from-[hero]
+              via-[black]
+              to-[pink]
+              text-[white]
+              font-bold
+              animate-heartbeat
+              hover:opacity-90
+            "
+          >
+            JOIN THE WAITLIST - NOW OPEN
+          </Button>
+        </div>
         </div>
 
         <h1 className="text-5xl md:text-7xl mb-6 bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent leading-tight">
           Redefining Women's Health
         </h1>
-        
+
         <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
-          A revolutionary approach to femtech that puts you first. 
-          Join our waitlist to be part of something extraordinary.
+          A revolutionary approach to femtech that puts you first. Join our
+          waitlist to be part of something extraordinary.
         </p>
 
         <div className="mb-8">
-          <Button 
-            variant="hero" 
+          <Button
+            variant="hero"
             size="lg"
-            onClick={() => window.location.href = '/beta-login'}
-            className="whitespace-nowrap">
+            onClick={() => (window.location.href = "/beta-login")}
+            className="whitespace-nowrap"
+          >
             Login for Beta Users
           </Button>
         </div>
@@ -52,8 +70,9 @@ const HeroSection = () => {
           <Button
             size="lg"
             variant="hero"
-            onClick={() => window.location.href = '/body-discovery'}
-            className="whitespace-nowrap text-white font-bold">
+            onClick={() => (window.location.href = "/body-discovery")}
+            className="whitespace-nowrap text-white font-bold"
+          >
             Questionnaire
           </Button>
         </div>
@@ -71,7 +90,7 @@ const HeroSection = () => {
         <div className="mb-8">
           <Button
             size="lg"
-            onClick={() => window.location.href = '/innovation-lab'}
+            onClick={() => (window.location.href = "/innovation-lab")}
             className="
               whitespace-nowrap
               bg-gradient-to-r
@@ -81,7 +100,8 @@ const HeroSection = () => {
               text-[gold]
               font-bold
               hover:opacity-90
-            ">
+            "
+          >
             Investors Innovation Lab
           </Button>
         </div>
@@ -98,4 +118,3 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
-

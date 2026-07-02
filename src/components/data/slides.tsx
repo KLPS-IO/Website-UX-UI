@@ -1482,17 +1482,6 @@ function Slide08() {
       <div style={{ position: "absolute", top: 160, left: 110, right: 110 }}>
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
-          <div
-            style={{
-              fontSize: 22,
-              letterSpacing: "0.18em",
-              fontWeight: 800,
-              color: "var(--brand-magenta)",
-              marginBottom: 14,
-            }}
-          >
-            THE OPPORTUNITY
-          </div>
           <h2
             className="slide-title"
             style={{ color: "var(--brand-ink)", marginBottom: 14 }}
@@ -1506,6 +1495,8 @@ function Slide08() {
               color: "#5f5364",
               maxWidth: 1300,
               lineHeight: 1.4,
+              wordSpacing: "normal",
+              letterSpacing: "normal",
             }}
           >
             WHOOP charges £30/month. Oura sells at £399. No one has built this
@@ -1545,6 +1536,7 @@ function Slide08() {
                 fontWeight: 800,
                 color: "var(--brand-ink)",
                 marginTop: 16,
+                wordSpacing: "0.05em",
               }}
             >
               Smart Garment Sales
@@ -2183,7 +2175,14 @@ function Slide13() {
         </h2>
         <div style={{ marginTop: 80, display: "grid", gap: 18 }}>
           <div
-            style={{ fontSize: 32, fontWeight: 600, color: "var(--brand-ink)" }}
+            style={{
+              fontSize: 32,
+              fontWeight: 600,
+              color: "var(--brand-ink)",
+              wordSpacing: "0.08em",
+              whiteSpace: "normal",
+              letterSpacing: "0",
+            }}
           >
             Backed by Research. Powered by Breakthrough Materials. Validated by
             Women. 93% of Women Surveyed Would Pay for Personalised Insights.
@@ -2315,7 +2314,8 @@ function Slide14() {
               marginBottom: 28,
             }}
           >
-            Focused reproductive health platform. Cotton yarn sensors. Medical-adjacent. Not in UK.
+            Focused reproductive health platform. Cotton yarn sensors.
+            Medical-adjacent. Not in UK.
           </div>
           <div style={{ display: "grid", gap: 14 }}>
             {competitorGaps.map((gap) => (
@@ -2391,7 +2391,7 @@ function Slide14() {
   );
 }
 
-// ----- 14: The Stats -----
+// ----- 15: The Stats -----
 function Slide15({ metricsState }: { metricsState: SlideMetricsState }) {
   const metrics = metricsState.data;
   const metricsMessage = getMetricsMessage(metricsState);
@@ -2413,7 +2413,7 @@ function Slide15({ metricsState }: { metricsState: SlideMetricsState }) {
           fontSize: 60,
           fontWeight: 290,
           paddingRight: 10,
-          paddingTop: 730,
+          paddingTop: 620,
         }}
       >
         <span className="brand-text italic">
@@ -2435,13 +2435,12 @@ function Slide15({ metricsState }: { metricsState: SlideMetricsState }) {
       <div
         style={{
           position: "absolute",
-          left: "25%",
-          top: 320,
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          top: 200,
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "center",
           gap: 24,
-          alignItems: "center",
-          textAlign: "center",
         }}
       >
         {[

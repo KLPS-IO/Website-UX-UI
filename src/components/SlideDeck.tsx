@@ -179,6 +179,7 @@ export function SlideDeck() {
     document.body.classList.add("pdf-export");
 
     try {
+      await document.fonts.ready;
       const pool = exportPoolRef.current;
       if (!pool) return;
       const pdf = new jsPDF({
@@ -267,7 +268,12 @@ export function SlideDeck() {
             </div>
             <div>
               <div
-                style={{ color: "white", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em" }}
+                style={{
+                  color: "white",
+                  fontWeight: 800,
+                  fontSize: 22,
+                  letterSpacing: "-0.02em",
+                }}
               >
                 KLPS technology
               </div>
@@ -423,7 +429,11 @@ export function SlideDeck() {
             }}
           >
             <div
-              style={{ color: "rgba(255,255,255,0.7)", fontSize: 13, lineHeight: 1.6 }}
+              style={{
+                color: "rgba(255,255,255,0.7)",
+                fontSize: 13,
+                lineHeight: 1.6,
+              }}
             >
               <div style={{ fontWeight: 600, color: "white", marginBottom: 4 }}>
                 Emma Mendez · Founder & CEO
@@ -538,11 +548,7 @@ export function SlideDeck() {
           >
             <Maximize2 size={18} />
           </button>
-          <button
-            className="pill-btn"
-            onClick={exportPdf}
-            disabled={exporting}
-          >
+          <button className="pill-btn" onClick={exportPdf} disabled={exporting}>
             <Download size={16} />
             {exporting ? "Generating PDF…" : "Download PDF"}
           </button>

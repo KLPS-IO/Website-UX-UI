@@ -880,6 +880,16 @@ All colors MUST be HSL.
   animation: pulseBig 2s ease-in-out infinite;
 }
 
+.pdf-export * {
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-rendering: geometricPrecision;
+}
+
+.pdf-export .slide-kicker {
+  letter-spacing: 0.18em !important;
+}
+
 .pdf-export .brand-text {
   background: none !important;
   color: var(--brand-magenta) !important;
