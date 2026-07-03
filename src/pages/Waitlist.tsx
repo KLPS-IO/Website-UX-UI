@@ -60,9 +60,10 @@ const Waitlist = () => {
 
   const handleShare = async () => {
     const waitlistUrl = `${window.location.origin}/waitlist`;
+
     const shareData = {
-      title: "KLPS",
-      text: "Join the KLPS waitlist - a new kind of care for women's health.",
+      title: "KLPS | The Future of Health Monitoring",
+      text: "Your body's been trying to tell you something for years. We built the underwear that finally listens.\n\nJoin the founding waitlist and be the first to try it at launch.",
       url: waitlistUrl,
     };
 
@@ -72,7 +73,9 @@ const Waitlist = () => {
         return;
       }
 
-      await navigator.clipboard.writeText(waitlistUrl);
+      await navigator.clipboard.writeText(
+        `${shareData.text}\n\n${waitlistUrl}`,
+      );
       toast.success("Link copied to clipboard.");
     } catch {
       toast.error("Unable to share right now.");
@@ -116,9 +119,7 @@ const Waitlist = () => {
             >
               Wear it!
             </p>
-            <p
-              className="font-normal italic" style={{ color: PINK }}
-            >
+            <p className="font-normal italic" style={{ color: PINK }}>
               By KLPS &hearts;
             </p>
           </div>
