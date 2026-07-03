@@ -63,7 +63,7 @@ const Waitlist = () => {
 
     const shareData = {
       title: "KLPS | The Future of Health Monitoring",
-      text: "Your body's been trying to tell you something for years. We built the underwear that finally listens.\n\nJoin the founding waitlist and be the first to try it at launch.\n\nAnd please share this link so more people know about it.",
+      text: "Your body's been trying to tell you something for years. Bloating. Hormones. Energy. Weight. Cycle.\n\nWe built the underwear that finally listens.\n\nShare with someone who needs to hear this 👉 klps.co.uk/waitlist",
       url: waitlistUrl,
     };
 
