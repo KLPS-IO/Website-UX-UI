@@ -96,6 +96,7 @@ function Slide01() {
       showWatermark
     >
       <BlobDecor />
+
       <div
         style={{
           position: "absolute",
@@ -104,9 +105,14 @@ function Slide01() {
           right: 600,
         }}
       >
+        {/* Logo */}
         <div style={{ marginBottom: 56 }}>
           <div
-            style={{ display: "inline-flex", alignItems: "baseline", gap: 18 }}
+            style={{
+              display: "inline-flex",
+              alignItems: "baseline",
+              gap: 18,
+            }}
           >
             <span
               style={{
@@ -116,7 +122,7 @@ function Slide01() {
                 background: "var(--brand-gradient)",
                 borderRadius: 18,
                 position: "relative",
-                boxShadow: "0 16px 40px -12px rgba(184, 0, 130, 0.55)",
+                boxShadow: "0 16px 40px -12px rgba(184,0,130,.55)",
               }}
             >
               <span
@@ -133,6 +139,7 @@ function Slide01() {
                 K
               </span>
             </span>
+
             <span
               style={{
                 fontWeight: 900,
@@ -142,53 +149,71 @@ function Slide01() {
             >
               KLPS
             </span>
-            <span style={{ fontSize: 32, color: "var(--muted-foreground)" }}>
+
+            <span
+              style={{
+                fontSize: 32,
+                color: "var(--muted-foreground)",
+              }}
+            >
               technology
             </span>
           </div>
         </div>
-        {/* <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 24 }}
-        >
-          Investor Pitch · 2026
-        </div> */}
+
+        {/* Headline */}
         <h1
           className="slide-title-xl"
           style={{
             color: "var(--brand-ink)",
-            marginRight: "100px",
+            marginRight: "60px",
             marginTop: "-40px",
+            lineHeight: 0.96,
           }}
         >
-          <span>
-            <span>The Future of Health Monitoring Is Not Devices. </span>
-          </span>{" "}
+          <span>The Future of</span>
           <br />
-          <span className="brand-text pr-40">It is Fabrics. </span> <br />
-          {/* <span className="brand-text pr-40"> </span> */}
+          <span>Health Monitoring</span>
           <br />
-          <p></p>{" "}
+          <span>Isn't Devices.</span>
+          <br />
+          <span className="brand-text">It's Textiles.</span>
         </h1>
+
+        {/* Subheading */}
+        <div
+          style={{
+            fontWeight: 700,
+            fontSize: 36,
+            letterSpacing: "-0.02em",
+            marginTop: 64,
+            maxWidth: 900,
+            lineHeight: 1.35,
+            color: "var(--muted-foreground)",
+          }}
+        >
+          Wearable technology is moving from devices we wear
+          <br />
+          to garments that become the technology.
+        </div>
+
+        {/* Product video */}
         <div
           style={{
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "40px",
+            justifyContent: "flex-end",
+            marginTop: "-390px",
           }}
         >
-          <div>{/* Your existing KLPS logo and title code */}</div>
-
           <video
             autoPlay
             muted
             loop
             playsInline
             style={{
-              width: "500px",
-              borderRadius: "20px",
-              marginTop: "-250px",
+              width: "430px",
+              borderRadius: "24px",
+              boxShadow: "0 30px 80px rgba(0,0,0,.12)",
             }}
           >
             <source src={klpsVideo} type="video/mp4" />
@@ -196,23 +221,7 @@ function Slide01() {
         </div>
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          bottom: 140,
-          left: 110,
-          color: "white",
-        }}
-      >
-        <div
-          style={{ fontWeight: 700, fontSize: 36, letterSpacing: "-0.02em" }}
-        >
-          Emma Mendez
-        </div>
-        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>
-          Founder &amp; CEO
-        </div>
-      </div>
+      {/* Contact */}
       <div
         style={{
           position: "absolute",
@@ -222,8 +231,22 @@ function Slide01() {
           color: "white",
         }}
       >
-        <div style={{ fontSize: 22, opacity: 0.9 }}>emmamendez@klps.co.uk</div>
-        <div style={{ fontSize: 22, opacity: 0.9, marginTop: 6 }}>
+        <div
+          style={{
+            fontSize: 22,
+            opacity: 0.9,
+          }}
+        >
+          emmamendez@klps.co.uk
+        </div>
+
+        <div
+          style={{
+            fontSize: 22,
+            opacity: 0.9,
+            marginTop: 6,
+          }}
+        >
           klps.co.uk
         </div>
       </div>
@@ -231,18 +254,29 @@ function Slide01() {
   );
 }
 
-// ----- 02: The Problem -----
-function Slide02({ metricsState }: { metricsState: SlideMetricsState }) {
-  const metrics = metricsState.data;
-  const metricsMessage = getMetricsMessage(metricsState);
-  const interest = formatMetricPercent(metrics?.commercialInterestPercent);
-  const formattedPricePoint = metrics?.topPricePoint
-    ? `£${metrics.topPricePoint.replace("_", "-£")}`
-    : metricsMessage;
-
-  const tummyInTen = hasMetricValue(metrics?.tummyPercent)
-    ? `${Math.round(metrics.tummyPercent / 10)} in 10`
-    : metricsMessage;
+function Slide02() {
+  const drivers = [
+    {
+      title: "Graphene Materials",
+      description:
+        "Flexible conductive textiles make sensing possible without bulky wearable devices.",
+    },
+    {
+      title: "Flexible Electronics",
+      description:
+        "Electronics are becoming smaller, printable and increasingly invisible inside everyday products.",
+    },
+    {
+      title: "Consumer Behaviour",
+      description:
+        "Millions already wear smart watches and rings. The next evolution is technology woven into clothing they already wear every day.",
+    },
+    {
+      title: "Artificial Intelligence",
+      description:
+        "AI can now transform continuous physiological signals into meaningful health insights.",
+    },
+  ];
 
   return (
     <SlideFrame variant="white" pageNumber={2} pageTotal={TOTAL}>
@@ -250,176 +284,110 @@ function Slide02({ metricsState }: { metricsState: SlideMetricsState }) {
         src={blobPink}
         alt=""
         className="blob"
-        style={{ top: -120, right: -80, width: 520, opacity: 0.55 }}
-      />
-      <div style={{ position: "absolute", top: 220, left: 110, right: 900 }}>
-        <AnimatedHeadline
-          className="text-balance text-5xl font-bold leading-[7.05] tracking-wide text-foreground md:text-5xl lg:text-5xl"
-          lines={[
-            {
-              text: "Insights",
-              italic: true,
-              brand: false,
-            },
-          ]}
-        />
-        <AnimatedHeadline
-          className="text-balance text-6xl font-bold leading-[5.05] tracking-wide text-foreground md:text-6xl lg:text-7xl"
-          lines={[
-            {
-              text: "Matter",
-              italic: true,
-              brand: false,
-            },
-          ]}
-        />
-        {/* <AnimatedHeadline
-          className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-7xl"
-          lines={[
-            {
-              text: "Happen At",
-              italic: true,
-              brand: false,
-            },
-          ]}
-        /> */}
-        <AnimatedHeadline
-          className="text-balance text-5xl font-bold leading-[5.05] tracking-wide text-foreground md:text-5xl lg:text-8xl"
-          lines={[
-            {
-              text: "From Abdomen",
-              italic: false,
-              brand: true,
-            },
-          ]}
-        />
-        <h2
-          className="slide-title"
-          style={{ color: "var(--brand-ink)", marginTop: 28 }}
-        >
-          NOT WRIST
-          <br />
-          <span>OR FINGER</span>
-        </h2>
-      </div>
-      <h2
-        className="slide-title"
         style={{
-          color: "var(--brand-ink)",
-          marginLeft: 100,
-          fontSize: 60,
-          fontWeight: 290,
-          paddingRight: 10,
-          paddingTop: 890,
+          top: -120,
+          right: -80,
+          width: 520,
+          opacity: 0.55,
         }}
-      >
-        <span className="brand-text">
-          {
-            "If a solution gave you insights into your body, would you consider paying for it?"
-          }
-          <br />
-          {interest ? (
-            <>
-              <strong>{interest}</strong> of women surveyed said{" "}
-              <strong>"Yes"</strong> or <strong>"Maybe"</strong>.
-            </>
-          ) : (
-            <strong>{metricsMessage}</strong>
-          )}
-        </span>
-      </h2>
+      />
+
       <div
         style={{
           position: "absolute",
+          top: 150,
+          left: 110,
           right: 110,
-          top: 120,
-          width: "46%",
-          minWidth: 760,
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 24,
-          alignItems: "stretch",
         }}
       >
-        {[
-          {
-            value: interest ?? metricsMessage,
-            label: formatParticipants(metrics?.participants),
-            description: "Would Pay For Personalised Body Insights",
-          },
-          {
-            value: tummyInTen,
-            label: "Women surveyed",
-            description: "Want Insights From Their Abdomen",
-          },
-          {
-            value:
-              formatMetricPercent(metrics?.spentMoneyPercent) ?? metricsMessage,
-            label: formatParticipants(metrics?.participants),
-            description: "Have Already Spent Money On Devices/Tracking",
-          },
-          {
-            value: formattedPricePoint,
-            label: "",
-            description: "Most Popular Price Point Women Would Pay",
-          },
-        ].map((row) => (
-          <div
-            key={`${row.value}-${row.description}`}
-            className="stat-card"
-            style={{
-              padding: 36,
-              display: "flex",
-              flexDirection: "column",
-              height: 360,
-            }}
-          >
+        <div
+          className="slide-kicker"
+          style={{
+            color: "var(--brand-magenta)",
+            marginBottom: 24,
+          }}
+        >
+          Why Now?
+        </div>
+
+        <h2
+          className="slide-title"
+          style={{
+            color: "var(--brand-ink)",
+            maxWidth: 1300,
+            marginBottom: 24,
+            fontSize: 78,
+          }}
+        >
+          The future of fashion isn't just what you wear, but what your clothes
+          can actually do.
+        </h2>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: 28,
+          }}
+        >
+          {drivers.map((driver) => (
             <div
+              key={driver.title}
+              className="stat-card"
               style={{
-                height: 150,
-                display: "flex",
-                flexDirection: "column",
+                padding: 36,
+                minHeight: 240,
               }}
             >
               <div
                 style={{
-                  fontSize: 50,
-                  fontWeight: 700,
-                  color: "var(--brand-ink)",
-                  lineHeight: 1.05,
+                  fontSize: 38,
+                  fontWeight: 800,
+                  color: "var(--brand-magenta)",
+                  marginBottom: 18,
                 }}
               >
-                {row.value}
+                {driver.title}
               </div>
 
-              {row.label && (
-                <div
-                  style={{
-                    fontSize: 28,
-                    fontWeight: 600,
-                    color: "var(--brand-ink)",
-                    lineHeight: 1.2,
-                    marginTop: 8,
-                  }}
-                >
-                  {row.label}
-                </div>
-              )}
+              <div
+                style={{
+                  fontSize: 30,
+                  lineHeight: 1.45,
+                  color: "var(--brand-ink)",
+                }}
+              >
+                {driver.description}
+              </div>
             </div>
+          ))}
+        </div>
 
-            <div
-              style={{
-                // marginTop: "auto",
-                fontSize: 37,
-                fontWeight: 600,
-                color: "var(--brand-magenta)",
-                lineHeight: 1.3,
-              }}
-            >
-              {row.description}
-            </div>
+        <div
+          style={{
+            marginTop: 80,
+            padding: "34px 44px",
+            borderRadius: 24,
+            background:
+              "linear-gradient(135deg, rgba(184,0,130,.08), rgba(255,255,255,.95))",
+            border: "1px solid #eadde8",
+          }}
+        >
+          <div
+            style={{
+              fontSize: 42,
+              fontWeight: 800,
+              color: "var(--brand-ink)",
+              lineHeight: 1.35,
+            }}
+          >
+            The next generation of wearable technology won't be another device.
+            <span className="brand-text">
+              {" "}
+              It will be woven into the textiles people already wear.
+            </span>
           </div>
-        ))}
+        </div>
       </div>
     </SlideFrame>
   );
@@ -429,14 +397,16 @@ function Slide02({ metricsState }: { metricsState: SlideMetricsState }) {
 function Slide03() {
   const team = [
     {
-      n: "Emma Mendez.",
-      d: "I lost 4 stone",
-      c: "Tracking Wasn't Straightforward.",
-      e: "Community and Accountability Partners Were My Biggest Success Factors",
-      f: "- Corporate Software Engineer",
-      g: "- Graphene Strategist",
-      h: "- Femtech Founder ",
-      j: "- Mother",
+      name: "Emma Mendez",
+      title: "Founder & CEO",
+      statement:
+        "My experience in enterprise software, advanced materials and women's health uniquely combines all three in KLPS.",
+      strengths: [
+        "Enterprise Software",
+        "Advanced Materials",
+        "FemTech Founder",
+        "Entrepreneur",
+      ],
     },
   ];
 
@@ -446,124 +416,131 @@ function Slide03() {
         src={blobSpiral}
         alt=""
         className="blob"
-        style={{ bottom: -120, left: -120, width: 520, opacity: 0.8 }}
+        style={{
+          bottom: -120,
+          left: -120,
+          width: 520,
+          opacity: 0.8,
+        }}
       />
-      <div style={{ position: "absolute", top: 220, left: 110, right: 110 }}>
+
+      <div
+        style={{
+          position: "absolute",
+          top: 100,
+          left: 110,
+          right: 110,
+        }}
+      >
         <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "320px 1fr",
+            gap: 70,
+            alignItems: "center",
+          }}
         >
-          Founder & CEO
-          <div
-            style={{ position: "absolute", top: 120, left: 110, right: 110 }}
-          >
+          {/* Photo */}
+          <div>
             <img
-              style={{
-                width: "300px",
-                borderRadius: "20px",
-              }}
               src={headShot}
-            ></img>
+              style={{
+                width: "320px",
+                borderRadius: "24px",
+                boxShadow: "0 30px 70px rgba(0,0,0,.12)",
+              }}
+            />
           </div>
-          <div
-            style={{
-              display: "contents",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 32,
-            }}
-          >
-            {team.map((m) => (
+
+          {/* Content */}
+          {team.map((m) => (
+            <div
+              key={m.name}
+              className="stat-card"
+              style={{
+                padding: 54,
+              }}
+            >
               <div
-                key={m.n}
                 style={{
-                  padding: 44,
-                  borderRadius: 28,
-                  background: "var(--brand-gradient-soft)",
-                  minHeight: 380,
-                  marginLeft: 500,
-                  marginTop: 25,
-                  paddingBottom: 70,
-                  paddingRight: 150,
+                  fontSize: 56,
+                  fontWeight: 900,
+                  color: "var(--brand-ink)",
+                  letterSpacing: "-0.03em",
                 }}
               >
-                <div
-                  style={{
-                    width: 96,
-                    height: 96,
-                    borderRadius: 9999,
-                    background: "var(--brand-gradient)",
-                    color: "white",
-                    display: "grid",
-                    placeItems: "center",
-                    fontSize: 42,
-                    fontWeight: 800,
-                    marginBottom: 32,
-                  }}
-                >
-                  {m.n.charAt(0)}
-                </div>
-                <div
-                  style={{
-                    fontSize: 40,
-                    fontWeight: 800,
-                    color: "var(--brand-ink)",
-                    letterSpacing: "-0.02em",
-                    paddingRight: 150,
-                  }}
-                >
-                  {m.n}
-                </div>
-                <div
-                  style={{
-                    fontSize: 22,
-                    fontWeight: 700,
-                    color: "var(--brand-magenta)",
-                    marginTop: 9,
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                  }}
-                ></div>
-                <div
-                  style={{
-                    fontSize: 24,
-                    lineHeight: 1.4,
-                    color: "#4f4554",
-                    marginTop: 24,
-                  }}
-                >
-                  {m.d}
-                </div>
-                <div>{m.c}</div>
-                <div
-                  style={{
-                    fontSize: 35,
-                    fontWeight: 800,
-                    marginTop: 50,
-                    color: "var(--brand-ink)",
-                    letterSpacing: "-0.02em",
-                    paddingRight: 150,
-                  }}
-                >
-                  {m.e}
-                </div>
-                <div
-                  style={{
-                    fontSize: 35,
-                    fontWeight: 800,
-                    marginTop: 50,
-                    color: "var(--brand-magenta)",
-                    letterSpacing: "-0.02em",
-                    paddingRight: 150,
-                  }}
-                >
-                  <div>{m.f}</div>
-                  <div>{m.g}</div>
-                  <div>{m.h}</div>
-                  <div>{m.j}</div>
-                </div>
+                {m.name}
               </div>
-            ))}
-          </div>
+
+              <div
+                style={{
+                  marginTop: 14,
+                  fontSize: 28,
+                  fontWeight: 700,
+                  color: "var(--brand-magenta)",
+                  letterSpacing: ".08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {m.title}
+              </div>
+
+              <div
+                style={{
+                  marginTop: 44,
+                  fontSize: 46,
+                  fontWeight: 800,
+                  lineHeight: 1.25,
+                  color: "var(--brand-ink)",
+                  maxWidth: 1050,
+                }}
+              >
+                {m.statement}
+              </div>
+
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 18,
+                  marginTop: 60,
+                }}
+              >
+                {m.strengths.map((item) => (
+                  <div
+                    key={item}
+                    style={{
+                      padding: "16px 28px",
+                      borderRadius: 999,
+                      background: "#f8eef6",
+                      color: "var(--brand-magenta)",
+                      fontSize: 28,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              <div
+                style={{
+                  marginTop: 60,
+                  fontSize: 34,
+                  fontWeight: 700,
+                  lineHeight: 1.45,
+                  color: "#555",
+                  maxWidth: 1100,
+                }}
+              >
+                My career began with working with advanced materials and
+                wearable technology, in VR film making, before I built
+                enterprise grade software at KPMG for highly regulated
+                organisations. Today, I'm applying that experience to build the
+                future of intelligent textiles for women's health.
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </SlideFrame>
@@ -576,33 +553,34 @@ function Slide04() {
   const steps = [
     {
       n: "01",
-      t: "Underwear",
-      d: "Everyday clothing designed to become a non-invasive health interface.",
+      t: "Garment",
+      d: "Everyday clothing becomes a passive, non-invasive health interface.",
       media: garmentAsset,
       type: "image",
     },
     {
       n: "02",
-      t: "IP Fabric",
-      d: "Washable Conductive Textiles. Designed to retain performance through repeated wear and washing.",
+      t: "Conductive Fabric",
+      d: "Washable conductive textiles designed to retain sensing performance through everyday wear.",
       media: grapheneVideo,
       type: "video",
     },
     {
       n: "03",
-      t: "Microcontroller",
-      d: "We are developing embedded electronics",
+      t: "Body Intelligence",
+      d: "Capturing the physiological signals women actually want to understand from everyday wear.",
       media: mcuAsset,
       type: "image",
     },
     {
       n: "04",
-      t: "Insight layer",
-      d: "The Product - AI transforms garment signals into personalised health insights. ",
+      t: "Insight Platform",
+      d: "AI transforms garment signals into personalised health insights/ A coach built into the clothing itself.",
       media: insightAsset,
       type: "video",
     },
   ];
+
   // Rotation: 0 → 1 → 2 → 3 → 0 (stop).
   const [active, setActive] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -610,30 +588,40 @@ function Slide04() {
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
+
     let timers: ReturnType<typeof setTimeout>[] = [];
+
     const start = () => {
       timers.forEach(clearTimeout);
       timers = [];
+
       setActive(0);
       timers.push(setTimeout(() => setActive(1), 5000));
       timers.push(setTimeout(() => setActive(2), 10000));
       timers.push(setTimeout(() => setActive(3), 15000));
       timers.push(setTimeout(() => setActive(0), 20000));
     };
+
     const stop = () => {
       timers.forEach(clearTimeout);
       timers = [];
     };
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5) start();
-          else stop();
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            start();
+          } else {
+            stop();
+          }
         }
       },
       { threshold: [0, 0.5, 1] },
     );
+
     observer.observe(el);
+
     return () => {
       observer.disconnect();
       stop();
@@ -652,21 +640,33 @@ function Slide04() {
         src={blobRing}
         alt=""
         className="blob"
-        style={{ top: -160, right: -120, width: 520, opacity: 0.7 }}
+        style={{
+          top: -160,
+          right: -120,
+          width: 520,
+          opacity: 0.7,
+        }}
       />
-      <div style={{ position: "absolute", top: 140, left: 110, right: 110 }}>
-        <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 8 }}
-        >
-          Why This
-        </div>
+
+      <div
+        style={{
+          position: "absolute",
+          top: 140,
+          left: 110,
+          right: 110,
+        }}
+      >
         <h2
           className="slide-title"
-          style={{ color: "var(--brand-ink)", maxWidth: 1400 }}
+          style={{
+            color: "var(--brand-ink)",
+            maxWidth: 1450,
+            fontSize: 78,
+          }}
         >
-          A <span className="brand-text">garment</span> that listens.
+          The <span className="brand-text">garment</span> becomes the interface.
         </h2>
+
         <div
           style={{
             marginTop: 42,
@@ -677,6 +677,7 @@ function Slide04() {
         >
           {steps.map((s, i) => {
             const isActive = i === active;
+
             return (
               <div
                 key={s.n}
@@ -685,11 +686,11 @@ function Slide04() {
                   borderRadius: 28,
                   background: "white",
                   border: isActive
-                    ? "2px solid var(--brand-magenta)"
+                    ? "3px solid var(--brand-magenta)"
                     : "1px solid #eadde8",
                   boxShadow: isActive
-                    ? "0 28px 60px -10px rgba(184, 0, 130, 0.45)"
-                    : "0 20px 50px -28px rgba(184, 0, 130, 0.25)",
+                    ? "0 35px 80px -15px rgba(184,0,130,.35)"
+                    : "0 20px 50px -28px rgba(184,0,130,.18)",
                   minHeight: 510,
                   transform: isActive ? "translateY(-24px)" : "none",
                   transition:
@@ -740,6 +741,7 @@ function Slide04() {
                     />
                   )}
                 </div>
+
                 <div
                   style={{
                     fontSize: 20,
@@ -751,6 +753,7 @@ function Slide04() {
                 >
                   {s.n}
                 </div>
+
                 <div
                   style={{
                     fontSize: 28,
@@ -761,8 +764,13 @@ function Slide04() {
                 >
                   {s.t}
                 </div>
+
                 <div
-                  style={{ fontSize: 30, lineHeight: 1.4, color: "#5f5364" }}
+                  style={{
+                    fontSize: 30,
+                    lineHeight: 1.4,
+                    color: "#5f5364",
+                  }}
                 >
                   {s.d}
                 </div>
@@ -770,22 +778,23 @@ function Slide04() {
             );
           })}
         </div>
+
         <div
           style={{
-            marginTop: 20,
+            marginTop: 24,
             display: "inline-flex",
             alignItems: "center",
-            gap: 24,
-            padding: "10px 26px",
+            gap: 28,
+            padding: "14px 34px",
             borderRadius: 9999,
             background: "var(--brand-gradient)",
             color: "white",
-            fontWeight: 700,
-            fontSize: 28,
-            letterSpacing: "-0.01em",
+            fontWeight: 800,
+            fontSize: 32,
+            letterSpacing: "-0.02em",
           }}
         >
-          Signal &nbsp;→&nbsp; Memory &nbsp;→&nbsp; Insight
+          Signal &nbsp;→&nbsp; Insight &nbsp;→&nbsp; Understanding
         </div>
       </div>
     </SlideFrame>
@@ -793,125 +802,298 @@ function Slide04() {
 }
 
 // ----- 05: Market Opportunity -----
+// function Slide05() {
+//   const groups = [
+//     {
+//       h: "$97 Billion Femtech Market Growth By 2030-",
+//       q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
+//       items: [
+//         "Fibra",
+//         "Flo",
+//         "Clue",
+//         "Hexoskin",
+//         "Modibodi",
+//         "Apple",
+//         "Fitbit",
+//         "Whoop",
+//         "Oura",
+//       ],
+//     },
+//   ];
+//   return (
+//     <SlideFrame variant="white" pageNumber={5} pageTotal={TOTAL}>
+//       <div style={{ position: "absolute", top: 180, left: 110, width: 880 }}>
+//         <div
+//           className="slide-kicker"
+//           style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
+//         >
+//           The Opportunity
+//         </div>
+//         <h2
+//           className="slide-title"
+//           style={{ color: "var(--brand-ink)", marginBottom: 0 }}
+//         >
+//           A New Category of Wearables.
+//         </h2>
+//         <div>
+//           {" "}
+//           <div
+//             style={{ position: "absolute", top: 320, left: 200, right: -10 }}
+//           >
+//             <div
+//               style={{
+//                 display: "grid",
+//                 gridTemplateColumns: "repeat(2, 1fr)",
+//                 gap: 28,
+//               }}
+//             >
+//               {groups.map((g) => (
+//                 <div
+//                   key={g.h}
+//                   style={{
+//                     padding: 10,
+//                     marginRight: -900,
+//                     borderRadius: 28,
+//                     border: "1px solid #eadde8",
+//                     background: "white",
+//                     boxShadow: "0 18px 40px -28px rgba(184, 0, 130, 0.2)",
+//                   }}
+//                 >
+//                   <div
+//                     style={{
+//                       fontSize: 42,
+//                       textAlign: "center",
+//                       fontWeight: 700,
+//                       color: "var(--brand-magenta)",
+//                       marginBottom: 14,
+//                       letterSpacing: "0.04em",
+//                     }}
+//                   >
+//                     {g.h}
+//                   </div>
+//                   <div
+//                     style={{
+//                       fontSize: 42,
+//                       fontWeight: 900,
+//                       color: "var(--brand-magenta)",
+//                       marginBottom: 14,
+//                       letterSpacing: "0.04em",
+//                     }}
+//                   >
+//                     {g.q}
+//                   </div>
+//                   <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+//                     {g.items.map((i) => (
+//                       <span
+//                         key={i}
+//                         style={{
+//                           padding: "10px 22px",
+//                           borderRadius: 9999,
+//                           background: "#f8eef6",
+//                           color: "var(--brand-ink)",
+//                           fontWeight: 600,
+//                           fontSize: 24,
+//                         }}
+//                       >
+//                         {i}
+//                       </span>
+//                     ))}
+//                   </div>
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+
+//       <div
+//         style={{
+//           position: "absolute",
+//           right: 120,
+//           top: 180,
+//           width: 760,
+//           height: 760,
+//           display: "grid",
+//           placeItems: "center",
+//         }}
+//       ></div>
+//     </SlideFrame>
+//   );
+// }
 function Slide05() {
-  const groups = [
-    {
-      h: "$97 Billion Femtech Market Growth By 2030-",
-      q: "NO COMPANY HAS MARRIED NON-INVASIVE, SENSING FABRIC WITH A GOAL-ORIENTED WOMEN'S PLATFORM.",
-      items: [
-        "Fibra",
-        "Flo",
-        "Clue",
-        "Hexoskin",
-        "Modibodi",
-        "Apple",
-        "Fitbit",
-        "Whoop",
-        "Oura",
-      ],
-    },
+  const today = [
+    "Heart rate, sleep and activity",
+    "General biometric tracking",
+    "External devices you must remember to wear",
+    "Data without everyday context",
+    "Same metrics for everyone",
   ];
+
+  const tomorrow = [
+    "Habits affecting my symptoms",
+    "Patterns I might be missing",
+    "My personal baseline",
+    "Food & nutrition insights",
+    "Trigger detection",
+  ];
+
   return (
     <SlideFrame variant="white" pageNumber={5} pageTotal={TOTAL}>
-      <div style={{ position: "absolute", top: 180, left: 110, width: 880 }}>
-        <div
-          className="slide-kicker"
-          style={{ color: "var(--brand-magenta)", marginBottom: 28 }}
-        >
-          The Opportunity
-        </div>
-        <h2
-          className="slide-title"
-          style={{ color: "var(--brand-ink)", marginBottom: 0 }}
-        >
-          A New Category of Wearables.
-        </h2>
-        <div>
-          {" "}
-          <div
-            style={{ position: "absolute", top: 320, left: 200, right: -10 }}
-          >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: 28,
-              }}
-            >
-              {groups.map((g) => (
-                <div
-                  key={g.h}
-                  style={{
-                    padding: 10,
-                    marginRight: -900,
-                    borderRadius: 28,
-                    border: "1px solid #eadde8",
-                    background: "white",
-                    boxShadow: "0 18px 40px -28px rgba(184, 0, 130, 0.2)",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 42,
-                      textAlign: "center",
-                      fontWeight: 700,
-                      color: "var(--brand-magenta)",
-                      marginBottom: 14,
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    {g.h}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 42,
-                      fontWeight: 900,
-                      color: "var(--brand-magenta)",
-                      marginBottom: 14,
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    {g.q}
-                  </div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-                    {g.items.map((i) => (
-                      <span
-                        key={i}
-                        style={{
-                          padding: "10px 22px",
-                          borderRadius: 9999,
-                          background: "#f8eef6",
-                          color: "var(--brand-ink)",
-                          fontWeight: 600,
-                          fontSize: 24,
-                        }}
-                      >
-                        {i}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <img
+        src={blobPink}
+        alt=""
+        className="blob"
+        style={{
+          top: -120,
+          right: -80,
+          width: 520,
+          opacity: 0.55,
+        }}
+      />
 
       <div
         style={{
           position: "absolute",
-          right: 120,
-          top: 180,
-          width: 760,
-          height: 760,
-          display: "grid",
-          placeItems: "center",
+          top: 150,
+          left: 110,
+          right: 110,
         }}
-      ></div>
+      >
+        <h2
+          className="slide-title"
+          style={{
+            color: "var(--brand-ink)",
+            maxWidth: 1450,
+            marginBottom: 0,
+            marginTop: 0,
+            fontSize: 74,
+          }}
+        >
+          The next generation of wearables
+          <br />
+          <span className="brand-text">
+            won't be something you THINK to wear.
+          </span>
+          <br />
+          It'll be something you already wear.
+        </h2>
+
+        <div
+          className="stat-card"
+          style={{
+            marginTop: 15,
+            marginBottom: -10,
+            padding: "60px 70px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 80,
+            alignItems: "start",
+          }}
+        >
+          {/* TODAY */}
+          <div>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 800,
+                letterSpacing: ".18em",
+                textTransform: "uppercase",
+                color: "#8b8686",
+                marginBottom: 30,
+              }}
+            >
+              Today's Wearables
+            </div>
+
+            <div style={{ display: "grid", gap: 24 }}>
+              {today.map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "26px 1fr",
+                    gap: 18,
+                    alignItems: "start",
+                    fontSize: 32,
+                    fontWeight: 600,
+                    color: "#555",
+                  }}
+                >
+                  <span style={{ color: "#999" }}>•</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* WHAT WOMEN ASKED FOR */}
+          <div>
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 800,
+                letterSpacing: ".18em",
+                textTransform: "uppercase",
+                color: "var(--brand-magenta)",
+                marginBottom: 30,
+              }}
+            >
+              What Women Asked For
+            </div>
+
+            <div style={{ display: "grid", gap: 24 }}>
+              {tomorrow.map((item) => (
+                <div
+                  key={item}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "28px 1fr",
+                    gap: 18,
+                    alignItems: "start",
+                    fontSize: 32,
+                    fontWeight: 700,
+                    color: "var(--brand-ink)",
+                  }}
+                >
+                  <span style={{ color: "#16a36b" }}>✓</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+
+            <div
+              style={{
+                marginTop: 34,
+                fontSize: 20,
+                color: "#8b8686",
+                fontStyle: "italic",
+              }}
+            >
+              Based on interviews and survey responses from 44 women.
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: 26,
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "14px 34px",
+            borderRadius: 999,
+            background: "var(--brand-gradient)",
+            color: "white",
+            fontWeight: 800,
+            fontSize: 32,
+            marginLeft: 550,
+          }}
+        >
+          Biometrics → Understanding → Action
+        </div>
+      </div>
     </SlideFrame>
   );
 }
-
 // ----- 06: No one is doing this -----
 function Slide06() {
   const frames = [
@@ -2538,7 +2720,7 @@ export const slides: SlideMeta[] = [
   { title: "Cover", render: () => <Slide01 /> },
   {
     title: "The Problem",
-    render: (metricsState) => <Slide02 metricsState={metricsState} />,
+    render: (metricsState) => <Slide02 />,
   },
   { title: "The Gap", render: () => <Slide03 /> },
   { title: "How it works", render: () => <Slide04 /> },
