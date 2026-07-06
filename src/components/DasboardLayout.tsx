@@ -24,6 +24,7 @@ export const DashboardLayout = () => {
     localStorage.removeItem("betaCohort");
     localStorage.removeItem("betaRole");
     localStorage.removeItem("betaIsAdmin");
+    sessionStorage.removeItem("klps.founderDashboard.sessionToken");
     navigate("/");
   };
 

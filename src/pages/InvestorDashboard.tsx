@@ -84,22 +84,16 @@ const investorEndpoints = {
     `${API_BASE}/api/founder/pattern-frequency`,
 };
 
-const DATA_ROOM_TOKEN_KEY =
-  "klps.dataRoom.sessionToken";
+const FOUNDER_DASHBOARD_TOKEN_KEY =
+  "klps.founderDashboard.sessionToken";
 
 function getSecureDashboardHeaders() {
   const token =
-    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY);
+    sessionStorage.getItem(FOUNDER_DASHBOARD_TOKEN_KEY);
 
   return token
     ? { Authorization: `Bearer ${token}` }
     : {};
-}
-
-function hasSecureDashboardSession() {
-  return Boolean(
-    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY)
-  );
 }
 
  // patternData state moved inside the InvestorDashboard component to comply with React Hooks rules
@@ -171,18 +165,6 @@ export default function InvestorDashboard() {
       setLoading(true);
       setError("");
 
-      if (!hasSecureDashboardSession()) {
-        if (cancelled) return;
-
-        setData(defaultData);
-        setPatternData([]);
-        setError(
-          "Secure investor metrics require a Data Room session. Please sign into the Data Room to refresh your protected access."
-        );
-        setLoading(false);
-        return;
-      }
-
       const results =
         await Promise.allSettled([
 
@@ -245,7 +227,7 @@ export default function InvestorDashboard() {
       if (failedCount === protectedResults.length) {
 
         setError(
-          "Secure investor metrics are unavailable. Please sign into the Data Room to refresh your protected session."
+          "Secure investor metrics are unavailable. Please log out and back into your founder beta account to refresh protected access."
         );
 
       }
@@ -382,6 +364,11 @@ export default function InvestorDashboard() {
       ? "Unavailable"
       : value;
 
+  const checkInSummary =
+    error && !hasDashboardMetrics
+      ? "Check-in count unavailable."
+      : `${completedCheckins} check-ins recorded so far.`;
+
   /* ---------------- NARRATIVE ---------------- */
 
   let tractionHeadline =
@@ -423,7 +410,7 @@ export default function InvestorDashboard() {
       "Protected dashboard data is not loaded.";
 
     retentionMessage =
-      "Please sign into the Data Room to refresh your protected session.";
+      "Please log out and back into your founder beta account to refresh protected access.";
 
   }
 
@@ -465,13 +452,7 @@ Early Traction Story
 
 <p>{retentionMessage}</p>
 
-<p>
-
-{completedCheckins}
-{" "}
-check-ins recorded so far.
-
-</p>
+<p>{checkInSummary}</p>
 
 </CardContent>
 

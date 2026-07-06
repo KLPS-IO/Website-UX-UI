@@ -92,22 +92,16 @@ const founderEndpoints = {
     `${API_BASE}/api/summary/word-cloud`, 
 };
 
-const DATA_ROOM_TOKEN_KEY =
-  "klps.dataRoom.sessionToken";
+const FOUNDER_DASHBOARD_TOKEN_KEY =
+  "klps.founderDashboard.sessionToken";
 
 function getSecureDashboardHeaders() {
   const token =
-    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY);
+    sessionStorage.getItem(FOUNDER_DASHBOARD_TOKEN_KEY);
 
   return token
     ? { Authorization: `Bearer ${token}` }
     : {};
-}
-
-function hasSecureDashboardSession() {
-  return Boolean(
-    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY)
-  );
 }
 
 /* ---------------- FETCH ---------------- */
@@ -180,21 +174,6 @@ export default function FounderDashboard() {
 
       setLoading(true);
       setError("");
-
-      if (!hasSecureDashboardSession()) {
-        if (cancelled) return;
-
-        setData(defaultData);
-        setWordCloudData({
-          last7Days: [],
-          historical: []
-        });
-        setError(
-          "Secure founder metrics require a Data Room session. Please sign into the Data Room to refresh your protected access."
-        );
-        setLoading(false);
-        return;
-      }
 
       const results =
         await Promise.allSettled([
@@ -281,7 +260,7 @@ export default function FounderDashboard() {
       if (failedCount === protectedResults.length) {
 
         setError(
-          "Secure founder metrics are unavailable. Please sign into the Data Room to refresh your protected session."
+          "Secure founder metrics are unavailable. Please log out and back into your founder beta account to refresh protected access."
         );
 
       }
@@ -410,6 +389,11 @@ export default function FounderDashboard() {
       ? "Unavailable"
       : value;
 
+  const checkInSummary =
+    error && !hasDashboardMetrics
+      ? "Check-in count unavailable."
+      : `${completedCheckins} check-ins recorded so far.`;
+
   /* ---------------- NARRATIVE ---------------- */
 
   let tractionHeadline =
@@ -451,7 +435,7 @@ export default function FounderDashboard() {
       "Protected dashboard data is not loaded.";
 
     retentionMessage =
-      "Please sign into the Data Room to refresh your protected session.";
+      "Please log out and back into your founder beta account to refresh protected access.";
 
   }
 
@@ -493,13 +477,7 @@ Early Traction Story
 
 <p>{retentionMessage}</p>
 
-<p>
-
-{completedCheckins}
-{" "}
-check-ins recorded so far.
-
-</p>
+<p>{checkInSummary}</p>
 
 </CardContent>
 
