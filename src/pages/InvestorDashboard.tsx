@@ -84,6 +84,24 @@ const investorEndpoints = {
     `${API_BASE}/api/founder/pattern-frequency`,
 };
 
+const DATA_ROOM_TOKEN_KEY =
+  "klps.dataRoom.sessionToken";
+
+function getSecureDashboardHeaders() {
+  const token =
+    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY);
+
+  return token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
+}
+
+function hasSecureDashboardSession() {
+  return Boolean(
+    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY)
+  );
+}
+
  // patternData state moved inside the InvestorDashboard component to comply with React Hooks rules
 /* ---------------- FETCH ---------------- */
 
@@ -91,7 +109,11 @@ async function fetchInvestorResource<T>(
   url: string
 ): Promise<T[]> {
 
-  const response = await fetch(url);
+  const response =
+    await fetch(url, {
+      credentials: "include",
+      headers: getSecureDashboardHeaders(),
+    });
 
   if (!response.ok) {
 
@@ -149,6 +171,18 @@ export default function InvestorDashboard() {
       setLoading(true);
       setError("");
 
+      if (!hasSecureDashboardSession()) {
+        if (cancelled) return;
+
+        setData(defaultData);
+        setPatternData([]);
+        setError(
+          "Secure investor metrics require a Data Room session. Please sign into the Data Room to refresh your protected access."
+        );
+        setLoading(false);
+        return;
+      }
+
       const results =
         await Promise.allSettled([
 
@@ -200,15 +234,18 @@ export default function InvestorDashboard() {
 
       });
 
+      const protectedResults =
+        results.slice(0, 4);
+
       const failedCount =
-        results.filter(
+        protectedResults.filter(
           r => r.status === "rejected"
         ).length;
 
-      if (failedCount === results.length) {
+      if (failedCount === protectedResults.length) {
 
         setError(
-          "Investor metrics not returning yet."
+          "Secure investor metrics are unavailable. Please sign into the Data Room to refresh your protected session."
         );
 
       }
@@ -332,6 +369,19 @@ export default function InvestorDashboard() {
     ] >
     growthValues[0];
 
+  const hasDashboardMetrics =
+    data.sessionSummary.length > 0 ||
+    data.completionData.length > 0 ||
+    data.growthData.length > 0 ||
+    data.streakData.length > 0;
+
+  const metricValue = (
+    value: string | number
+  ) =>
+    error && !hasDashboardMetrics
+      ? "Unavailable"
+      : value;
+
   /* ---------------- NARRATIVE ---------------- */
 
   let tractionHeadline =
@@ -364,6 +414,19 @@ export default function InvestorDashboard() {
 
   }
 
+  if (error && !hasDashboardMetrics) {
+
+    tractionHeadline =
+      "Secure investor metrics are unavailable.";
+
+    growthMessage =
+      "Protected dashboard data is not loaded.";
+
+    retentionMessage =
+      "Please sign into the Data Room to refresh your protected session.";
+
+  }
+
   /* ---------------- UI ---------------- */
 
   return (
@@ -373,6 +436,14 @@ export default function InvestorDashboard() {
 <h1 className="text-3xl text-purple-900">
 Investor Dashboard
 </h1>
+
+{error && (
+  <Card className="border-amber-300 bg-amber-50">
+    <CardContent className="pt-6 text-sm text-amber-900">
+      {error}
+    </CardContent>
+  </Card>
+)}
 
 {/* STORY */}
 
@@ -427,31 +498,31 @@ KPI Summary
 
 <KpiCard
 label="Total Users"
-value={totalUsers}
+value={metricValue(totalUsers)}
 loading={loading}
 />
 
 <KpiCard
 label="Active Users"
-value={activeUsers}
+value={metricValue(activeUsers)}
 loading={loading}
 />
 
 <KpiCard
 label="Day 2 Retention"
-value={`${day2Retention}%`}
+value={metricValue(`${day2Retention}%`)}
 loading={loading}
 />
 
 <KpiCard
 label="Retention Health"
-value={retentionHealth}
+value={metricValue(retentionHealth)}
 loading={loading}
 />
 
 <KpiCard
 label="Longest Streak"
-value={longestStreak}
+value={metricValue(longestStreak)}
 loading={loading}
 />
 

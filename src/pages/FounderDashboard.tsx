@@ -92,13 +92,35 @@ const founderEndpoints = {
     `${API_BASE}/api/summary/word-cloud`, 
 };
 
+const DATA_ROOM_TOKEN_KEY =
+  "klps.dataRoom.sessionToken";
+
+function getSecureDashboardHeaders() {
+  const token =
+    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY);
+
+  return token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
+}
+
+function hasSecureDashboardSession() {
+  return Boolean(
+    sessionStorage.getItem(DATA_ROOM_TOKEN_KEY)
+  );
+}
+
 /* ---------------- FETCH ---------------- */
 
 async function fetchInvestorResource<T>(
   url: string
 ): Promise<T[]> {
 
-  const response = await fetch(url);
+  const response =
+    await fetch(url, {
+      credentials: "include",
+      headers: getSecureDashboardHeaders(),
+    });
 
   if (!response.ok) {
 
@@ -159,6 +181,21 @@ export default function FounderDashboard() {
       setLoading(true);
       setError("");
 
+      if (!hasSecureDashboardSession()) {
+        if (cancelled) return;
+
+        setData(defaultData);
+        setWordCloudData({
+          last7Days: [],
+          historical: []
+        });
+        setError(
+          "Secure founder metrics require a Data Room session. Please sign into the Data Room to refresh your protected access."
+        );
+        setLoading(false);
+        return;
+      }
+
       const results =
         await Promise.allSettled([
 
@@ -178,13 +215,22 @@ export default function FounderDashboard() {
             founderEndpoints.streakData
           ),
 
-          fetch(founderEndpoints.wordCloud)
-            .then(res => res.json())
+          fetch(founderEndpoints.wordCloud, {
+            credentials: "include",
+            headers: getSecureDashboardHeaders(),
+          })
+            .then(res => {
+              if (!res.ok) {
+                throw new Error(
+                  `${res.status} ${res.statusText}`
+                );
+              }
+              return res.json();
+            })
             .catch(() => ({
               last7Days: [],
               historical: []
           }))
-
         ]);
 
       if (cancelled) return;
@@ -224,15 +270,18 @@ export default function FounderDashboard() {
 
         );
 
+      const protectedResults =
+        results.slice(0, 4);
+
       const failedCount =
-        results.filter(
+        protectedResults.filter(
           r => r.status === "rejected"
         ).length;
 
-      if (failedCount === results.length) {
+      if (failedCount === protectedResults.length) {
 
         setError(
-          "Investor metrics not returning yet."
+          "Secure founder metrics are unavailable. Please sign into the Data Room to refresh your protected session."
         );
 
       }
@@ -348,6 +397,19 @@ export default function FounderDashboard() {
     ] >
     growthValues[0];
 
+  const hasDashboardMetrics =
+    data.sessionSummary.length > 0 ||
+    data.completionData.length > 0 ||
+    data.growthData.length > 0 ||
+    data.streakData.length > 0;
+
+  const metricValue = (
+    value: string | number
+  ) =>
+    error && !hasDashboardMetrics
+      ? "Unavailable"
+      : value;
+
   /* ---------------- NARRATIVE ---------------- */
 
   let tractionHeadline =
@@ -380,6 +442,19 @@ export default function FounderDashboard() {
 
   }
 
+  if (error && !hasDashboardMetrics) {
+
+    tractionHeadline =
+      "Secure founder metrics are unavailable.";
+
+    growthMessage =
+      "Protected dashboard data is not loaded.";
+
+    retentionMessage =
+      "Please sign into the Data Room to refresh your protected session.";
+
+  }
+
   /* ---------------- UI ---------------- */
 
   return (
@@ -389,6 +464,14 @@ export default function FounderDashboard() {
 <h1 className="text-3xl text-purple-900">
 Founder Dashboard
 </h1>
+
+{error && (
+  <Card className="border-amber-300 bg-amber-50">
+    <CardContent className="pt-6 text-sm text-amber-900">
+      {error}
+    </CardContent>
+  </Card>
+)}
 
 {/* STORY */}
 
@@ -428,31 +511,31 @@ check-ins recorded so far.
 
 <KpiCard
 label="Total Users"
-value={totalUsers}
+value={metricValue(totalUsers)}
 loading={loading}
 />
 
 <KpiCard
 label="Active Users"
-value={activeUsers}
+value={metricValue(activeUsers)}
 loading={loading}
 />
 
 <KpiCard
 label="Day 2 Retention"
-value={`${day2Retention}%`}
+value={metricValue(`${day2Retention}%`)}
 loading={loading}
 />
 
 <KpiCard
 label="Retention Health"
-value={retentionHealth}
+value={metricValue(retentionHealth)}
 loading={loading}
 />
 
 <KpiCard
 label="Longest Streak"
-value={longestStreak}
+value={metricValue(longestStreak)}
 loading={loading}
 />
 
