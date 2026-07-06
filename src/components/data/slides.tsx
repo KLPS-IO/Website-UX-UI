@@ -930,11 +930,11 @@ function Slide05() {
   ];
 
   const tomorrow = [
-    "Habits affecting my symptoms",
-    "Patterns I might be missing",
     "My personal baseline",
+    "Trigger detection around my cycle",
+    "Patterns I might be missing",
+    "Habits affecting my symptoms",
     "Food & nutrition insights",
-    "Trigger detection",
   ];
 
   return (
