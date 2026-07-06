@@ -1085,7 +1085,7 @@ function Slide05() {
             color: "white",
             fontWeight: 800,
             fontSize: 32,
-            marginLeft: 550,
+            marginLeft: 500,
           }}
         >
           Biometrics → Understanding → Action
