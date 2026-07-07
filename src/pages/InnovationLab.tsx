@@ -213,9 +213,9 @@ const InnovationLab = () => {
               <AnimatedHeadline
                 className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-7xl"
                 lines={[
-                  { text: "ENGINEERING", italic: true },
-                  { text: "the future of", italic: true },
-                  { text: "INTELLIGENT TEXTILES.", italic: true, muted: true },
+                  { text: "ENGINEERING", italic: true, brand: true },
+                  { text: "the future of", italic: true, brand: true },
+                  { text: "INTELLIGENT TEXTILES.", italic: true, muted: true, brand: true },
                 ]}
               />
               <p className="mt-8 max-w-xl text-lg text-muted-foreground">
