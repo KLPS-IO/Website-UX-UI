@@ -295,32 +295,21 @@ function Slide02() {
       <div
         style={{
           position: "absolute",
-          top: 150,
+          top: 180,
           left: 110,
           right: 110,
         }}
       >
-        <div
-          className="slide-kicker"
-          style={{
-            color: "var(--brand-magenta)",
-            marginBottom: 24,
-          }}
-        >
-          Why Now?
-        </div>
-
         <h2
           className="slide-title"
           style={{
             color: "var(--brand-ink)",
             maxWidth: 1300,
             marginBottom: 24,
-            fontSize: 78,
+            fontSize: 55,
           }}
         >
-          The future of fashion isn't just what you wear, but what your clothes
-          can actually do.
+          Future fashion will be what clothes can actually do.
         </h2>
 
         <div
@@ -365,7 +354,7 @@ function Slide02() {
 
         <div
           style={{
-            marginTop: 80,
+            marginTop: 30,
             padding: "34px 44px",
             borderRadius: 24,
             background:
@@ -381,10 +370,10 @@ function Slide02() {
               lineHeight: 1.35,
             }}
           >
-            The next generation of wearable technology won't be another device.
+            The next gen of wearables{" "}
             <span className="brand-text">
               {" "}
-              It will be woven into the textiles people already wear.
+              will be woven into the textiles we already wear.
             </span>
           </div>
         </div>
@@ -400,7 +389,7 @@ function Slide03() {
       name: "Emma Mendez",
       title: "Founder & CEO",
       statement:
-        "My experience in enterprise software, advanced materials and women's health uniquely combines all three in KLPS.",
+        "Experience in professional services, software engineering, advanced materials and women's health, uniquely combined into KLPS.",
       strengths: [
         "Enterprise Software",
         "Advanced Materials",
@@ -533,11 +522,11 @@ function Slide03() {
                   maxWidth: 1100,
                 }}
               >
-                My career began with working with advanced materials and
-                wearable technology, in VR film making, before I built
-                enterprise grade software at KPMG for highly regulated
-                organisations. Today, I'm applying that experience to build the
-                future of intelligent textiles for women's health.
+                My career began in working with advanced materials and wearable
+                technology, for VR film making. Then I built enterprise grade
+                software at KPMG for highly regulated organisations. Today, I'm
+                applying that experience to build the future of intelligent
+                textiles for women's health.
               </div>
             </div>
           ))}
@@ -930,11 +919,11 @@ function Slide05() {
   ];
 
   const tomorrow = [
-    "My personal baseline",
-    "Trigger detection around my cycle",
-    "Patterns I might be missing",
-    "Habits affecting my symptoms",
-    "Food & nutrition insights",
+    "Body changes over time",
+    "Bloating & abdominal changes",
+    "Cycle patterns",
+    "Lifestyle & habit insights",
+    "Personal goals & coaching",
   ];
 
   return (
@@ -1024,6 +1013,16 @@ function Slide05() {
                 </div>
               ))}
             </div>
+            <div
+              style={{
+                marginTop: 34,
+                fontSize: 20,
+                color: "#8b8686",
+                fontStyle: "italic",
+              }}
+            >
+              Readouts of basic biometrics that lack deep, personaliSed context
+            </div>
           </div>
 
           {/* WHAT WOMEN ASKED FOR */}
@@ -1085,7 +1084,7 @@ function Slide05() {
             color: "white",
             fontWeight: 800,
             fontSize: 32,
-            marginLeft: 500,
+            marginLeft: 430,
           }}
         >
           Biometrics → Understanding → Action
