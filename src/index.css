@@ -957,10 +957,10 @@ All colors MUST be HSL.
 
   /* Brand palette (from user) */
   --brand-orange: #ef9f32;
-  --brand-coral: #ec7769;
+  --brand-coral: #db4b3b;
   --brand-navy: #144464;
   --brand-purple: #945c8c;
-  --brand-sage: #b6d0ac;
+  --brand-sage: #4e9333;
   --brand-teal: #365c63;
 
   --background: 38 42% 97%;
@@ -1036,7 +1036,7 @@ All colors MUST be HSL.
 
 .card-gradient {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0) 46%),
+    linear-gradient(180deg, rgba(255, 170, 11, 0.363), rgba(255, 255, 255, 0) 46%),
     hsl(var(--card));
 }
 

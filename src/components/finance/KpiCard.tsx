@@ -52,14 +52,14 @@ export function KpiCard({
           </span>
           {Icon && (
             <span className={cn("rounded-lg bg-white/5 p-1.5", accentMap[accent].split(" ").pop())}>
-              <Icon className="h-4 w-4" />
+              <Icon className="h-7 w-7" />
             </span>
           )}
         </div>
         <div className="mt-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
           {value}
         </div>
-        <div className="mt-2 flex items-center gap-2 text-xs">
+        <div className="mt-2 flex items-center gap-2 text-lg">
           {typeof delta === "number" && (
             <span
               className={cn(
@@ -68,9 +68,9 @@ export function KpiCard({
               )}
             >
               {positive ? (
-                <ArrowUpRight className="h-3 w-3" />
+                <ArrowUpRight className="h-5 w-5" />
               ) : (
-                <ArrowDownRight className="h-3 w-3" />
+                <ArrowDownRight className="h-5 w-5" />
               )}
               {(delta * 100).toFixed(1)}%
             </span>
