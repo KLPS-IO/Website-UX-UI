@@ -174,6 +174,7 @@ const categories = [
   "All Documents",
   "Pitch Deck",
   "Financials",
+  "Finance OS",
   "IP Portfolio",
   "Market",
   "Legal",
@@ -826,8 +827,17 @@ const DataRoom = () => {
           counts[category] =
             category === "All Documents"
               ? documents.length
+              : category === "Finance OS"
+                ? 1
               : category === "FAQ"
                 ? faqItems.length
+                : category === "Financials"
+                  ? Math.max(
+                      1,
+                      documents.filter(
+                        (doc) => getDocumentCategory(doc) === category,
+                      ).length,
+                    )
                 : documents.filter(
                     (doc) => getDocumentCategory(doc) === category,
                   ).length;
@@ -837,6 +847,7 @@ const DataRoom = () => {
       ),
     [documents],
   );
+  const hasFinanceWorkspace = activeCategory === "Financials";
   const visibleDocuments = useMemo(
     () =>
       activeCategory === "All Documents"
@@ -1145,20 +1156,32 @@ const DataRoom = () => {
               <ul className="mt-4 space-y-1 text-sm">
                 {categories.map((category) => (
                   <li key={category}>
-                    <button
-                      type="button"
-                      onClick={() => setActiveCategory(category)}
-                      className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
-                        activeCategory === category
-                          ? "bg-white/5 text-foreground"
-                          : "text-muted-foreground hover:bg-white/[0.03] hover:text-foreground"
-                      }`}
-                    >
-                      <span>{category}</span>
-                      <span className="font-mono text-[10px]">
-                        {categoryCounts[category]}
-                      </span>
-                    </button>
+                    {category === "Finance OS" ? (
+                      <Link
+                        to="/data-room/finance/dashboard"
+                        className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-muted-foreground transition-colors hover:bg-white/[0.03] hover:text-foreground"
+                      >
+                        <span>{category}</span>
+                        <span className="font-mono text-[10px]">
+                          {categoryCounts[category]}
+                        </span>
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setActiveCategory(category)}
+                        className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors ${
+                          activeCategory === category
+                            ? "bg-white/5 text-foreground"
+                            : "text-muted-foreground hover:bg-white/[0.03] hover:text-foreground"
+                        }`}
+                      >
+                        <span>{category}</span>
+                        <span className="font-mono text-[10px]">
+                          {categoryCounts[category]}
+                        </span>
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -1362,6 +1385,57 @@ const DataRoom = () => {
                   ))}
                 </div>
 
+                <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  {nda.watermark}
+                </div>
+              </div>
+            ) : hasFinanceWorkspace ? (
+              <div className="glass overflow-hidden rounded-lg">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4">
+                  <h3 className="text-sm font-medium">Financials</h3>
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                    {nda.watermark}
+                  </span>
+                </div>
+                <div className="px-6 py-8">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
+                    Finance OS
+                  </div>
+                  <h3 className="mt-3 text-2xl font-light tracking-tight text-foreground">
+                    Financial Operating System
+                  </h3>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                    Live assumptions, evidence, cash flow, funding scenarios,
+                    reports, risks and AI-ready structured finance data for
+                    KLPS. This workspace is available to authorised founders and
+                    invited data room guests.
+                  </p>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                    {[
+                      ["Assumptions", "Traceable, versioned model inputs"],
+                      ["Evidence", "Quotes, research, contracts and invoices"],
+                      ["Reports", "Engine-generated investor outputs"],
+                    ].map(([title, body]) => (
+                      <div
+                        key={title}
+                        className="rounded-lg border border-border bg-white/[0.02] p-4"
+                      >
+                        <div className="text-sm font-medium text-foreground">
+                          {title}
+                        </div>
+                        <div className="mt-1 text-xs leading-5 text-muted-foreground">
+                          {body}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <Link
+                    to="/data-room/finance/dashboard"
+                    className="mt-6 inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.01]"
+                  >
+                    Open Finance OS
+                  </Link>
+                </div>
                 <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   {nda.watermark}
                 </div>

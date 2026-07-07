@@ -28,6 +28,8 @@ import DataRoom from "@/pages/DataRoom";
 import InnovationLab from "@/pages/InnovationLab";
 import { SlideDeck } from "./components/SlideDeck";
 import BodyDiscoverySurvey from "@/pages/BodyDiscoverySurvey";
+import FinanceApp from "@/pages/FinanceApp";
+import { FinanceProvider } from "@/contexts/FinanceContext";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,22 @@ const App = () => (
           <Route path="/pitch-deck-preview" element={<SlideDeck />} />
           <Route path="/pitchdeck-preview" element={<SlideDeck />} />
           <Route path="/mentor-deck" element={<SlideDeck />} />
+          <Route
+            path="/finance/*"
+            element={
+              <FinanceProvider>
+                <FinanceApp />
+              </FinanceProvider>
+            }
+          />
+          <Route
+            path="/data-room/finance/*"
+            element={
+              <FinanceProvider>
+                <FinanceApp />
+              </FinanceProvider>
+            }
+          />{" "}
           <Route
             path="/pitch-deck"
             element={
