@@ -452,6 +452,56 @@ All colors MUST be HSL.
 
 .slide-content { width: 1920px; height: 1080px; position: relative; }
 
+@page {
+  size: 1920px 1080px;
+  margin: 0;
+}
+
+.pdf-export-document {
+  width: 1920px;
+  background: #fff;
+}
+
+.pdf-export-page {
+  width: 1920px;
+  height: 1080px;
+  page-break-after: always;
+  break-after: page;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pdf-export-page:last-child {
+  page-break-after: auto;
+  break-after: auto;
+}
+
+.pdf-export-page *,
+.pdf-export-page *::before,
+.pdf-export-page *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.pdf-video-fallback {
+  display: none;
+}
+
+.pdf-export-document .pdf-video {
+  display: none !important;
+}
+
+.pdf-export-document .pdf-video-fallback {
+  display: block;
+}
+
+.pdf-export-document .brand-text {
+  background: none !important;
+  color: var(--brand-magenta) !important;
+  -webkit-background-clip: initial !important;
+  background-clip: initial !important;
+}
+
 .slide-title-xl { font-size: 132px; line-height: 0.95; letter-spacing: -0.05em; font-weight: 800; }
 .slide-title    { font-size: 104px; line-height: 1.0;  letter-spacing: -0.045em; font-weight: 800; }
 .slide-section  { font-size: 76px;  line-height: 1.05; letter-spacing: -0.035em; font-weight: 800; }

@@ -27,6 +27,7 @@ import FounderRoute from "@/components/FounderRoute";
 import DataRoom from "@/pages/DataRoom";
 import InnovationLab from "@/pages/InnovationLab";
 import { SlideDeck } from "./components/SlideDeck";
+import { SlideDeckPdfExport } from "./components/SlideDeckPdfExport";
 import BodyDiscoverySurvey from "@/pages/BodyDiscoverySurvey";
 import FinanceApp from "@/pages/FinanceApp";
 import { FinanceProvider } from "@/contexts/FinanceContext";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
           <Route path="/pitch-deck-preview" element={<SlideDeck />} />
+          <Route path="/pitch-deck-export" element={<SlideDeckPdfExport />} />
           <Route path="/pitchdeck-preview" element={<SlideDeck />} />
           <Route path="/mentor-deck" element={<SlideDeck />} />
           <Route

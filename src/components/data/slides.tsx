@@ -9,6 +9,7 @@ import garmentAsset from "@/assets/garmentklps.jpeg";
 import textileAsset from "@/assets/textile.png";
 import mcuAsset from "@/assets/mcu.png";
 import insightAsset from "@/assets/insight.mp4";
+import insightImageAsset from "@/assets/insight.png";
 import { AnimatedHeadline } from "../AnimatedHeadline";
 import grapheneVideo from "@/assets/graphene.mp4";
 import wireframeStatsAsset from "@/assets/wireframe-composition.png";
@@ -21,7 +22,7 @@ import ctfLogo from "@/assets/ctf-logo.png";
 import catapultLogo from "@/assets/DC_Logo_Housed_Dark_Red.png";
 import uom from "@/assets/uomlogo.jpg";
 import { Italic } from "lucide-react";
-const TOTAL = 14;
+const TOTAL = 11;
 
 const metricsStatusCopy: Record<SlideMetricsState["status"], string> = {
   loading: "Connecting to live research...",
@@ -200,12 +201,13 @@ function Slide01() {
         {/* Product video */}
         <div
           style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginTop: "-390px",
+            position: "absolute",
+            top: 250,
+            left: 780,
           }}
         >
           <video
+            className="pdf-video"
             autoPlay
             muted
             loop
@@ -218,6 +220,17 @@ function Slide01() {
           >
             <source src={klpsVideo} type="video/mp4" />
           </video>
+          <img
+            className="pdf-video-fallback"
+            src={garmentAsset}
+            alt=""
+            style={{
+              width: "430px",
+              borderRadius: "24px",
+              boxShadow: "0 30px 80px rgba(0,0,0,.12)",
+              objectFit: "cover",
+            }}
+          />
         </div>
       </div>
 
@@ -546,6 +559,7 @@ function Slide04() {
       t: "Conductive Fabric",
       d: "Washable conductive textiles designed to retain sensing performance through everyday wear.",
       media: grapheneVideo,
+      fallback: textileAsset,
       type: "video",
     },
     {
@@ -560,6 +574,7 @@ function Slide04() {
       t: "Insight Platform",
       d: "AI transforms garment signals into personalised health insights/ A coach built into the clothing itself.",
       media: insightAsset,
+      fallback: insightImageAsset,
       type: "video",
     },
   ];
@@ -695,21 +710,36 @@ function Slide04() {
                   }}
                 >
                   {s.type === "video" ? (
-                    <video
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        transform: isActive ? "scale(1.03)" : "scale(1)",
-                        transition: "transform 1.2s ease",
-                      }}
-                    >
-                      <source src={s.media} type="video/mp4" />
-                    </video>
+                    <>
+                      <video
+                        className="pdf-video"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          transform: isActive ? "scale(1.03)" : "scale(1)",
+                          transition: "transform 1.2s ease",
+                        }}
+                      >
+                        <source src={s.media} type="video/mp4" />
+                      </video>
+                      <img
+                        className="pdf-video-fallback"
+                        src={s.fallback}
+                        alt={s.t}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          transform: isActive ? "scale(1.03)" : "scale(1)",
+                          transition: "transform 1.2s ease",
+                        }}
+                      />
+                    </>
                   ) : (
                     <img
                       src={s.media}
@@ -2048,7 +2078,7 @@ function Slide10() {
     },
   ];
   return (
-    <SlideFrame variant="white" pageNumber={11} pageTotal={TOTAL}>
+    <SlideFrame variant="white" pageNumber={10} pageTotal={TOTAL}>
       <img
         src={blobPink}
         alt=""
@@ -2147,7 +2177,7 @@ function Slide11() {
   return (
     <SlideFrame
       variant="gradient"
-      pageNumber={12}
+      pageNumber={11}
       pageTotal={TOTAL}
       logoLight
       footerLight
