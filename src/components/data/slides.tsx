@@ -1822,7 +1822,7 @@ const allocation = [
     amount: "40%",
     value: "£100k",
     title: "Build",
-    desc: "University validation, engineers and smart textiles.",
+    desc: "TRL 4-5. University validation, engineers and smart textiles.",
   },
   {
     amount: "25%",
@@ -1834,7 +1834,7 @@ const allocation = [
     amount: "20%",
     value: "£50k",
     title: "Validate",
-    desc: "Convert waitlist into paying pilot customers.",
+    desc: "CRL 6-7. Convert waitlist into paying pilot customers.",
   },
   {
     amount: "15%",
@@ -1870,7 +1870,7 @@ const allocation = [
           className="slide-kicker"
           style={{
             color: "var(--brand-magenta)",
-            marginBottom: 24,
+            marginBottom: 14,
           }}
         >
           USE OF FUNDS
@@ -1883,8 +1883,8 @@ const allocation = [
             marginBottom: 10,
           }}
         >
-          Every pound moves us
-          <span className="brand-text"> towards commercial pilots.</span>
+          Every pound accelerates KLPS
+          <span className="brand-text"> Commercial Launch.</span>
         </h2>
 
         <p
@@ -1961,7 +1961,7 @@ const allocation = [
 
               <div
                 style={{
-                  marginTop: 24,
+                  marginTop: 4,
                   fontSize: 27,
                   lineHeight: 1.45,
                   color: "#5f5364",
