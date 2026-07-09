@@ -271,11 +271,11 @@ function Slide02() {
   const drivers = [
     {
       title: "Graphene Materials",
-      description: "- Conductive - Odorless - Washable",
+      description: "200 X Stronger Than Steel - More Conductive Than Copper - Odorless - Washable - Antibacterial",
     },
     {
       title: "Flexible Electronics",
-      description: "- Smaller - Printable - Invisible",
+      description: "Smaller - Printable - Invisible",
     },
     {
       title: "Consumer Behaviour",
@@ -356,6 +356,7 @@ function Slide02() {
               <div
                 style={{
                   fontSize: 30,
+                  fontWeight:  700,
                   lineHeight: 1.45,
                   color: "var(--brand-ink)",
                 }}
@@ -400,9 +401,8 @@ function Slide03() {
       statement: "Entrepreneur",
       strengths: [
         "Enterprise Software",
-        "Advanced Materials",
+        "Graphene Strategist",
         "FemTech Founder",
-        "Entrepreneur",
       ],
     },
   ];
@@ -549,8 +549,9 @@ function Slide04() {
   const steps = [
     {
       n: "01",
-      t: "Garment",
+      t: "Garments",
       d: "Everyday clothing becomes a passive, non-invasive health interface.",
+      o: "Shapewear, Sportswear, Fashion Forward",
       media: garmentAsset,
       type: "image",
     },
@@ -778,6 +779,16 @@ function Slide04() {
                   {s.t}
                 </div>
 
+                <div
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 800,
+                    color: "var(--brand-magenta)",
+                    marginBottom: 10,
+                  }}
+                >
+                  {s.o}
+                </div>
                 <div
                   style={{
                     fontSize: 30,
@@ -1847,32 +1858,32 @@ function Slide08() {
 
 // ----- 09: GTM -----
 function Slide09() {
-const allocation = [
-  {
-    amount: "40%",
-    value: "£100k",
-    title: "Build",
-    desc: "TRL 4-5. University validation, engineers and smart textiles.",
-  },
-  {
-    amount: "25%",
-    value: "£62.5k",
-    title: "Manufacture",
-    desc: "First 200 garments ready for commercial pilots.",
-  },
-  {
-    amount: "20%",
-    value: "£50k",
-    title: "Validate",
-    desc: "CRL 6-7. Convert waitlist into paying pilot customers.",
-  },
-  {
-    amount: "15%",
-    value: "£37.5k",
-    title: "Protect",
-    desc: "Patents, legal, compliance and operating runway.",
-  },
-];
+  const allocation = [
+    {
+      amount: "40%",
+      value: "£100k",
+      title: "Build",
+      desc: "TRL 4-5. University validation, engineers and smart textiles.",
+    },
+    {
+      amount: "25%",
+      value: "£62.5k",
+      title: "Manufacture",
+      desc: "First 200 garments ready for commercial pilots.",
+    },
+    {
+      amount: "20%",
+      value: "£50k",
+      title: "Validate",
+      desc: "CRL 6-7. Convert waitlist into paying pilot customers.",
+    },
+    {
+      amount: "15%",
+      value: "£37.5k",
+      title: "Protect",
+      desc: "Patents, legal, compliance and operating runway.",
+    },
+  ];
 
   return (
     <SlideFrame variant="white" pageNumber={9} pageTotal={TOTAL}>
@@ -2243,7 +2254,6 @@ function Slide11() {
     </SlideFrame>
   );
 }
-
 
 export interface SlideMetrics {
   tummyPercent?: number;
