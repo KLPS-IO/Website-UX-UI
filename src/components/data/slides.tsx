@@ -202,7 +202,7 @@ function Slide01() {
         <div
           style={{
             position: "absolute",
-            top: 250,
+            top: 450,
             left: 780,
           }}
         >
