@@ -3,9 +3,10 @@ import { useFinance } from "@/contexts/FinanceContext";
 import { currency } from "@/lib/finance-data";
 import { CheckCircle2, Clock, FileText } from "lucide-react";
 import type { ComponentType } from "react";
+import { EntityEvidenceLinks } from "@/components/finance/EntityEvidenceLinks";
 
 export default function DecisionLogPage() {
-  const { state } = useFinance();
+  const { decisions } = useFinance();
 
   return (
     <div>
@@ -16,7 +17,7 @@ export default function DecisionLogPage() {
       />
 
       <div className="space-y-4">
-        {state.decisions.map((decision) => (
+        {decisions.map((decision) => (
           <Surface key={decision.id}>
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
@@ -38,7 +39,10 @@ export default function DecisionLogPage() {
 
             <div className="mt-5 grid gap-4 md:grid-cols-3">
               <Detail icon={Clock} label="Owner / Date" value={`${decision.owner} · ${decision.date}`} />
-              <Detail icon={FileText} label="Linked Evidence" value={decision.linkedEvidence.join(", ")} />
+              <div className="rounded-lg border border-border bg-white/50 p-3">
+                <SectionTitle title="Linked Evidence" />
+                <div className="flex items-start gap-2"><FileText className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" /><EntityEvidenceLinks entityType="decisions" entityId={decision.id} /></div>
+              </div>
               <Detail icon={CheckCircle2} label="Outcome" value={decision.outcome} />
             </div>
           </Surface>

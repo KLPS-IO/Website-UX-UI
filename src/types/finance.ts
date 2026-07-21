@@ -28,7 +28,15 @@ export type EvidenceType =
   | "Prototype Cost"
   | "Document";
 
-export type RecordStatus = "Draft" | "Active" | "Needs Review" | "Archived" | "Verified";
+export type RecordStatus =
+  | "Unknown"
+  | "Estimated"
+  | "Actual"
+  | "Draft"
+  | "Active"
+  | "Needs Review"
+  | "Archived"
+  | "Verified";
 
 export interface AuditFields {
   created_at: string;
@@ -116,15 +124,64 @@ export interface RiskRecord extends AuditFields {
 }
 
 export interface Product {
+  /*
+   * Identity
+   */
   id: string;
   name: string;
+  version: string;
   status: "Live" | "Beta" | "Planned";
   launchDate: string;
+
+  /*
+   * Commercial
+   */
   sellingPrice: number;
+  subscriptionMonthly: number;
+  currency: string;
+
+  /*
+   * Manufacturing
+   */
   mfgCost: number;
   packaging: number;
   shipping: number;
-  subscriptionMonthly: number;
+
+  supplier: string;
+  manufacturingMethod: string;
+  minimumOrderQuantity: number;
+  leadTimeWeeks: number;
+
+  /*
+   * Product
+   */
+  productType: string;
+  targetCustomer: string;
+
+  /*
+   * Evidence
+   */
+  confidence: number;
+  confidenceLevel: ConfidenceLevel;
+  evidenceIds: string[];
+
+  source: string;
+
+  /*
+   * Ownership
+   */
+  owner: string;
+  lastReviewed: string;
+
+  /*
+   * Health
+   */
+  warnings?: string[];
+
+  /*
+   * Future
+   */
+  notes?: string;
 }
 
 export interface Hire {

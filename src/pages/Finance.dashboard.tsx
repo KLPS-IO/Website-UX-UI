@@ -23,6 +23,9 @@ import {
   Target,
   ShieldCheck,
   Sparkles,
+  Download,
+  FileSpreadsheet,
+  Printer,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
@@ -36,8 +39,20 @@ import {
   pct,
 } from "@/lib/finance-data";
 import { useFinanceModel } from "@/hooks/useFinanceModel";
+import { useFinance } from "@/contexts/FinanceContext";
+import {
+  exportFinanceExcel,
+  exportFinancePdf,
+  printFinanceReport,
+  type FinanceExportData,
+} from "@/lib/finance-exports";
+import { useState } from "react";
+import { getCompany } from "@/services/company/company";
 
 export default function DashboardPage() {
+  const [excelStatus, setExcelStatus] = useState<"idle" | "preparing">("idle");
+  const [exportError, setExportError] = useState("");
+  const finance = useFinance();
   const model = useFinanceModel();
   const k = model.kpis;
   const series = model.series;
@@ -45,6 +60,34 @@ export default function DashboardPage() {
   const expenseBreakdown = model.expenseBreakdown;
   const aiInsights = model.aiInsights;
   const activity = model.recentActivity;
+  const exportData = (): FinanceExportData => ({
+    generatedAt: new Date(),
+    company: getCompany(),
+    kpis: model.kpis,
+    series: model.series,
+    revenueMix: model.revenueMix,
+    expenseBreakdown: model.expenseBreakdown,
+    assumptions: finance.assumptions,
+    funding: finance.funding,
+    hires: finance.hires,
+    risks: finance.risks,
+  });
+
+  const exportButton =
+    "inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-foreground transition hover:border-brand-orange/40 hover:bg-brand-orange/10";
+
+  const downloadExcel = async () => {
+    setExcelStatus("preparing");
+    setExportError("");
+    try {
+      await exportFinanceExcel(exportData());
+    } catch (error) {
+      console.error("Excel export failed", error);
+      setExportError("Excel download failed. Please try again.");
+    } finally {
+      setExcelStatus("idle");
+    }
+  };
 
   return (
     <div>
@@ -53,22 +96,39 @@ export default function DashboardPage() {
         title="Dashboard"
         description="A live view of the KLPS financial model — every metric flows from the Assumptions ledger."
         actions={
-          <span className="inline-flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-sage" />
-            Model synced · {new Date().toLocaleString("en-GB")}
-          </span>
+          <>
+            <button type="button" onClick={() => exportFinancePdf(exportData())} className={exportButton} title="Download a professionally formatted PDF report">
+              <Download className="h-4 w-4 text-brand-orange" /> PDF
+            </button>
+            <button type="button" onClick={() => void downloadExcel()} disabled={excelStatus === "preparing"} className={`${exportButton} disabled:cursor-wait disabled:opacity-60`} title="Download the full model as an Excel workbook">
+              <FileSpreadsheet className="h-4 w-4 text-brand-sage" /> {excelStatus === "preparing" ? "Preparing…" : "Excel"}
+            </button>
+            <button type="button" onClick={() => printFinanceReport(exportData())} className={exportButton} title="Open a print-ready financial report">
+              <Printer className="h-4 w-4 text-brand-purple" /> Print
+            </button>
+            <span className="inline-flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-sage" />
+              Model synced · {new Date().toLocaleString("en-GB")}
+            </span>
+          </>
         }
       />
 
+      {exportError && (
+        <div role="alert" className="mb-4 rounded-lg border border-brand-coral/30 bg-brand-coral/10 px-4 py-3 text-sm text-brand-coral">
+          {exportError}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Cash on Hand" value={currencyShort(k.cash)} delta={0.06} hint="vs last month" icon={Banknote} accent="orange" index={0} />
-        <KpiCard label="Monthly Burn" value={currencyShort(k.burn)} delta={-0.04} hint="3-mo avg" icon={Flame} accent="coral" index={1} />
-        <KpiCard label="Runway" value={`${k.runway.toFixed(1)} mo`} delta={0.09} hint="extended" icon={Timer} accent="sage" index={2} />
-        <KpiCard label="Forecast Revenue (yr)" value={currencyShort(k.annualRev)} delta={k.growth} hint="12-mo" icon={TrendingUp} accent="purple" index={3} />
-        <KpiCard label="Gross Margin" value={pct(k.grossMargin)} delta={0.03} hint="blended" icon={Percent} accent="teal" index={4} />
-        <KpiCard label="Forecast Accuracy" value={pct(k.forecastAccuracy)} delta={0.02} hint="12-mo backtest" icon={Target} accent="navy" index={5} />
-        <KpiCard label="Confidence Score" value={`${k.confidence.toFixed(0)} / 100`} delta={0.05} hint="weighted" icon={ShieldCheck} accent="orange" index={6} />
-        <KpiCard label="MRR" value={currencyShort(k.mrr)} delta={k.growth / 12} hint="approx" icon={TrendingUp} accent="coral" index={7} />
+        <KpiCard label="Cash on Hand" value={k.cashKnown ? currencyShort(k.cash) : "Not available"} hint={k.cashKnown ? "Verified input" : "Not yet evidenced"} icon={Banknote} accent="orange" index={0} />
+        <KpiCard label="Monthly Burn" value={k.forecastReady ? currencyShort(k.burn) : "Not calculated"} hint="Evidence required" icon={Flame} accent="coral" index={1} />
+        <KpiCard label="Runway" value={k.forecastReady ? `${k.runway.toFixed(1)} mo` : "Not calculated"} hint="Evidence required" icon={Timer} accent="sage" index={2} />
+        <KpiCard label="Forecast Revenue (yr)" value={k.forecastReady ? currencyShort(k.annualRev) : "Not calculated"} hint="Evidence required" icon={TrendingUp} accent="purple" index={3} />
+        <KpiCard label="Gross Margin" value={k.forecastReady ? pct(k.grossMargin) : "Not calculated"} hint="Evidence required" icon={Percent} accent="teal" index={4} />
+        <KpiCard label="Forecast Accuracy" value={k.forecastAccuracyKnown ? pct(k.forecastAccuracy) : "Not available"} hint="No backtest evidence" icon={Target} accent="navy" index={5} />
+        <KpiCard label="Confidence Score" value={k.confidence > 0 ? `${k.confidence.toFixed(0)} / 100` : "Not yet evidenced"} hint="Assumption evidence" icon={ShieldCheck} accent="orange" index={6} />
+        <KpiCard label="MRR" value={k.forecastReady ? currencyShort(k.mrr) : "Not calculated"} hint="Evidence required" icon={TrendingUp} accent="coral" index={7} />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 xl:grid-cols-3">
@@ -113,7 +173,7 @@ export default function DashboardPage() {
                     <span className="h-2 w-2 rounded-full" style={{ background: chartTheme.colors[i] }} />
                     {r.name}
                   </span>
-                  <span className="font-medium">{pct(r.value / total, 0)}</span>
+                  <span className="font-medium">{total > 0 ? pct(r.value / total, 0) : "Not calculated"}</span>
                 </div>
               );
             })}
@@ -189,8 +249,8 @@ export default function DashboardPage() {
           <SectionTitle title="Recent Activity" hint={`${MONTHS}-mo horizon`} />
           <div className="mb-4 rounded-lg border border-brand-coral/20 bg-brand-coral/10 p-3">
             <div className="text-xs font-semibold uppercase tracking-wider text-brand-coral">Highest Risk</div>
-            <div className="mt-1 text-sm font-medium">{model.topRisks[0]?.risk}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{model.topRisks[0]?.mitigation}</div>
+            <div className="mt-1 text-sm font-medium">{model.topRisks[0]?.risk ?? "No verified risks recorded"}</div>
+            <div className="mt-1 text-xs text-muted-foreground">{model.topRisks[0]?.mitigation ?? "Add evidence-backed risks to the register."}</div>
           </div>
           <ul className="space-y-3">
             {activity.map((a) => (

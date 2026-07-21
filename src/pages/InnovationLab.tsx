@@ -94,7 +94,7 @@ const quickNav = [
   {
     href: "/data-room",
     title: "Investor Data Room",
-    desc: "Deck, financials, cap table, NDA flow.",
+    desc: "Deck, financials and cap table.",
   },
   {
     href: "#lab",
@@ -410,16 +410,13 @@ const InnovationLab = () => {
           <div>
             <div className="text-sm font-semibold tracking-[0.3em]">KPLS</div>
             <p className="mt-2 max-w-md text-m text-muted-foreground">
-              Confidential investor data room. All materials subject to NDA. ©{" "}
+              Secure, permissioned investor data room. ©{" "}
               {new Date().getFullYear()} KPLS Ltd.
             </p>
           </div>
           <div className="flex flex-wrap gap-6 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
             <a className="hover:text-foreground" href="https://klps.co.uk">
               Back to Home
-            </a>
-            <a className="hover:text-foreground" href="#overview">
-              NDA Terms
             </a>
             <a className="hover:text-foreground" href="#overview">
               Privacy

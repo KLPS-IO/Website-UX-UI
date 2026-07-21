@@ -17,6 +17,7 @@ import DocumentsPage from "@/pages/FInance.documents";
 import AIInsightsPage from "@/pages/Finance.ai-insights";
 import DecisionLogPage from "@/pages/Finance.decision-log";
 import RiskRegisterPage from "@/pages/Finance.risk-register";
+import CompanyPage from "@/pages/Finance.company";
 
 export default function FinanceApp() {
   return (
@@ -24,6 +25,7 @@ export default function FinanceApp() {
       <Routes>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="company" element={<CompanyPage />} />
         <Route path="assumptions" element={<AssumptionsPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="revenue" element={<RevenuePage />} />

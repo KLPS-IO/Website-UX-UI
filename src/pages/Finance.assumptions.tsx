@@ -1,6 +1,7 @@
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
 import { useFinance } from "@/contexts/FinanceContext";
-import { ExternalLink, History } from "lucide-react";
+import { History } from "lucide-react";
+import { EntityEvidenceLinks } from "@/components/finance/EntityEvidenceLinks";
 
 export default function AssumptionsPage() {
   const { assumptions: rows, updateAssumption } = useFinance();
@@ -81,13 +82,7 @@ export default function AssumptionsPage() {
                       <td className="px-5 py-3 text-muted-foreground">{a.owner}</td>
                       <td className="px-5 py-3 text-muted-foreground">{a.status}</td>
                       <td className="px-5 py-3">
-                        {a.evidenceIds.length ? (
-                          <a className="inline-flex items-center gap-1 text-brand-orange hover:underline" href="#">
-                            {a.evidenceIds.length} linked <ExternalLink className="h-3 w-3" />
-                          </a>
-                        ) : (
-                          <span className="text-muted-foreground/60">—</span>
-                        )}
+                        <EntityEvidenceLinks entityType="assumptions" entityId={a.id} />
                       </td>
                       <td className="px-5 py-3 text-muted-foreground">v{a.version}</td>
                       <td className="px-5 py-3 text-muted-foreground">{a.updated_at}</td>

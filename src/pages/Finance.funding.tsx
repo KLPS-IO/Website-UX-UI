@@ -2,6 +2,7 @@ import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHead
 import { KpiCard } from "@/components/finance/KpiCard";
 import { funding, currency, currencyShort } from "@/lib/finance-data";
 import { Landmark, PiggyBank, Users2 } from "lucide-react";
+import { EntityEvidenceLinks } from "@/components/finance/EntityEvidenceLinks";
 
 export default function FundingPage() {
   const received = funding.filter((f) => f.status === "Received").reduce((s, f) => s + f.amount, 0);
@@ -19,10 +20,10 @@ export default function FundingPage() {
       <PageHeader eyebrow="Capital" title="Funding" description="Grants, investments and planned rounds — with runway impact and dilution tracking." />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Raised to date" value={currencyShort(received)} icon={PiggyBank} accent="sage" />
-        <KpiCard label="Committed" value={currencyShort(committed)} icon={Landmark} accent="orange" />
-        <KpiCard label="Planned" value={currencyShort(planned)} icon={Landmark} accent="purple" />
-        <KpiCard label="Total dilution" value={`${(dilution * 100).toFixed(1)}%`} icon={Users2} accent="coral" />
+        <KpiCard label="Raised to date" value={funding.length ? currencyShort(received) : "Not yet evidenced"} icon={PiggyBank} accent="sage" />
+        <KpiCard label="Committed" value={funding.length ? currencyShort(committed) : "Not yet evidenced"} icon={Landmark} accent="orange" />
+        <KpiCard label="Planned" value={funding.length ? currencyShort(planned) : "Not yet evidenced"} icon={Landmark} accent="purple" />
+        <KpiCard label="Total dilution" value={funding.length ? `${(dilution * 100).toFixed(1)}%` : "Not yet evidenced"} icon={Users2} accent="coral" />
       </div>
 
       <Surface className="mt-6" padded={false}>
@@ -36,6 +37,7 @@ export default function FundingPage() {
                 <th className="px-5 py-3 font-medium">Date</th>
                 <th className="px-5 py-3 font-medium">Dilution</th>
                 <th className="px-5 py-3 font-medium">Status</th>
+                <th className="px-5 py-3 font-medium">Evidence</th>
               </tr>
             </thead>
             <tbody>
@@ -47,6 +49,7 @@ export default function FundingPage() {
                   <td className="px-5 py-3 text-muted-foreground">{f.date}</td>
                   <td className="px-5 py-3 text-muted-foreground">{f.dilution ? `${(f.dilution * 100).toFixed(1)}%` : "—"}</td>
                   <td className="px-5 py-3"><span className={`rounded-md px-2 py-1 text-xs font-medium ${statusStyle(f.status)}`}>{f.status}</span></td>
+                  <td className="px-5 py-3"><EntityEvidenceLinks entityType="funding" entityId={f.id} /></td>
                 </tr>
               ))}
             </tbody>

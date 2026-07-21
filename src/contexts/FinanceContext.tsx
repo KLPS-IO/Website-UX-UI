@@ -89,7 +89,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
             id: crypto.randomUUID(),
             type: "forecast.recalculated",
             title: "Revenue Forecast Recalculated",
-            what: "Financial Engine recalculated dashboard, KPIs, charts, reports and AI placeholders",
+            what: "Model input changed; verified evidence and status are required before forecast activation",
             who: "System",
             at: "just now",
             entityId: id,

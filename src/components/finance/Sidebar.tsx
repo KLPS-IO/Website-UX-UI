@@ -17,11 +17,13 @@ import {
   Sparkles,
   ClipboardCheck,
   AlertTriangle,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { to: "/finance/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/finance/company", label: "Company", icon: Building2 },
   { to: "/finance/assumptions", label: "Assumptions", icon: Sliders },
   { to: "/finance/products", label: "Products", icon: Package },
   { to: "/finance/revenue", label: "Revenue", icon: TrendingUp },

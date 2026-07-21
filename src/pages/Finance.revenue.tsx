@@ -2,7 +2,7 @@ import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, X
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
 import { ChartCard, chartTheme } from "@/components/finance/ChartCard";
 import { KpiCard } from "@/components/finance/KpiCard";
-import { A, currency, currencyShort, monthLabels, monthlyRevenue, MONTHS } from "@/lib/finance-data";
+import { A, currency, currencyShort, currentKpis, monthLabels, monthlyRevenue, MONTHS } from "@/lib/finance-data";
 import { TrendingUp, Users, Repeat, Building2 } from "lucide-react";
 
 export default function RevenuePage() {
@@ -12,16 +12,18 @@ export default function RevenuePage() {
   });
   const annual = data.slice(0, 12).reduce((s, r) => s + r.Total, 0);
   const year2 = data.slice(12, MONTHS).reduce((s, r) => s + r.Total, 0);
+  const forecastReady = currentKpis("base").forecastReady;
+  const unavailable = "Not yet evidenced";
 
   return (
     <div>
       <PageHeader eyebrow="Top-line" title="Revenue" description="Driven by waitlist, conversion, ASP, subscription uptake and enterprise contracts." />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Year 1 Revenue" value={currencyShort(annual)} hint="12-mo projection" icon={TrendingUp} accent="orange" />
-        <KpiCard label="Waitlist" value={A("waitlist").toLocaleString()} hint={`${(A("conv") * 100).toFixed(1)}% conversion`} icon={Users} accent="coral" />
-        <KpiCard label="Subscription Uptake" value={`${(A("sub_uptake") * 100).toFixed(0)}%`} hint={`${currency(A("sub_price"))}/mo ARPU`} icon={Repeat} accent="purple" />
-        <KpiCard label="Enterprise ARR" value={currencyShort(A("ent_rev") * A("ent_count"))} hint={`${A("ent_count")} contracts`} icon={Building2} accent="sage" />
+        <KpiCard label="Year 1 Revenue" value={forecastReady ? currencyShort(annual) : "Not calculated"} hint="Verified inputs required" icon={TrendingUp} accent="orange" />
+        <KpiCard label="Waitlist" value={forecastReady ? A("waitlist").toLocaleString() : unavailable} icon={Users} accent="coral" />
+        <KpiCard label="Subscription Uptake" value={forecastReady ? `${(A("sub_uptake") * 100).toFixed(0)}%` : unavailable} icon={Repeat} accent="purple" />
+        <KpiCard label="Enterprise ARR" value={forecastReady ? currencyShort(A("ent_rev") * A("ent_count")) : "Not calculated"} icon={Building2} accent="sage" />
       </div>
 
       <div className="mt-6">
@@ -60,14 +62,14 @@ export default function RevenuePage() {
         <Surface>
           <SectionTitle title="Revenue Model" hint="from Assumptions" />
           <ul className="space-y-2 text-sm">
-            <Row k="Waitlist" v={A("waitlist").toLocaleString()} />
-            <Row k="Conversion" v={`${(A("conv") * 100).toFixed(1)}%`} />
-            <Row k="ASP" v={currency(A("asp"))} />
-            <Row k="Subscription price" v={`${currency(A("sub_price"))}/mo`} />
-            <Row k="Subscription uptake" v={`${(A("sub_uptake") * 100).toFixed(0)}%`} />
-            <Row k="Enterprise ARR / contract" v={currency(A("ent_rev"))} />
-            <Row k="Enterprise contracts / yr" v={A("ent_count").toString()} />
-            <Row k="Monthly growth" v={`${(A("growth_mom") * 100).toFixed(1)}%`} />
+            <Row k="Waitlist" v={forecastReady ? A("waitlist").toLocaleString() : unavailable} />
+            <Row k="Conversion" v={forecastReady ? `${(A("conv") * 100).toFixed(1)}%` : unavailable} />
+            <Row k="ASP" v={forecastReady ? currency(A("asp")) : unavailable} />
+            <Row k="Subscription price" v={forecastReady ? `${currency(A("sub_price"))}/mo` : unavailable} />
+            <Row k="Subscription uptake" v={forecastReady ? `${(A("sub_uptake") * 100).toFixed(0)}%` : unavailable} />
+            <Row k="Enterprise ARR / contract" v={forecastReady ? currency(A("ent_rev")) : unavailable} />
+            <Row k="Enterprise contracts / yr" v={forecastReady ? A("ent_count").toString() : unavailable} />
+            <Row k="Monthly growth" v={forecastReady ? `${(A("growth_mom") * 100).toFixed(1)}%` : unavailable} />
           </ul>
         </Surface>
       </div>
@@ -89,10 +91,10 @@ function YearBar({ label, value, max }: { label: string; value: number; max: num
     <div>
       <div className="mb-1 flex justify-between text-sm">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-medium">{currency(value)}</span>
+        <span className="font-medium">{max > 0 ? currency(value) : "Not calculated"}</span>
       </div>
       <div className="h-3 overflow-hidden rounded-full bg-white/5">
-        <div className="h-full bg-gradient-to-r from-brand-orange to-brand-coral" style={{ width: `${(value / max) * 100}%` }} />
+        <div className="h-full bg-gradient-to-r from-brand-orange to-brand-coral" style={{ width: `${max > 0 ? (value / max) * 100 : 0}%` }} />
       </div>
     </div>
   );

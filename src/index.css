@@ -193,6 +193,81 @@ All colors MUST be HSL.
   }
 }
 
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  html.finance-page-printing,
+  .finance-page-printing body {
+    background: white !important;
+    color: #222831 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .finance-page-printing .finance-theme > aside,
+  .finance-page-printing .finance-theme > div > header {
+    display: none !important;
+  }
+
+  .finance-page-printing [data-finance-page-content] {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .finance-page-printing .finance-theme {
+    display: block !important;
+    min-height: auto !important;
+    background: white !important;
+  }
+
+  .finance-page-printing [data-finance-page-content] .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .finance-page-printing [data-finance-page-content] .grid > *,
+  .finance-page-printing [data-finance-page-content] table,
+  .finance-page-printing [data-finance-page-content] section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .finance-page-printing [data-finance-page-content] button {
+    display: none !important;
+  }
+
+  .finance-page-printing [data-finance-page-content] * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+.finance-page-exporting [data-finance-page-content] {
+  width: 794px !important;
+  max-width: 794px !important;
+  padding: 32px !important;
+  background: #f8f8f6 !important;
+}
+
+.finance-page-exporting [data-finance-page-content] .grid {
+  grid-template-columns: 1fr !important;
+}
+
+.finance-page-exporting [data-finance-page-content] button {
+  display: none !important;
+}
+
+.finance-page-exporting [data-finance-page-content] * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;;

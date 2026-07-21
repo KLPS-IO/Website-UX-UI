@@ -15,13 +15,13 @@ export default function HiringPage() {
 
   return (
     <div>
-      <PageHeader eyebrow="Team" title="Hiring Plan" description={`Payroll includes Employer NI + benefits of ${(A("hire_ramp") * 100).toFixed(0)}%.`} />
+      <PageHeader eyebrow="Team" title="Hiring Plan" description={hires.length ? `Payroll includes Employer NI + benefits of ${(A("hire_ramp") * 100).toFixed(0)}%.` : "No verified employee or payroll records have been added."} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Headcount (total)" value={totalHead.toString()} hint={`${activeHead} active`} icon={Users} accent="orange" />
-        <KpiCard label="Monthly Payroll (now)" value={currencyShort(monthlyNow)} accent="coral" />
-        <KpiCard label="Monthly Payroll (Y2)" value={currencyShort(monthlyEnd)} accent="purple" />
-        <KpiCard label="Year 1 Payroll" value={currencyShort(annual)} accent="sage" />
+        <KpiCard label="Headcount (total)" value={hires.length ? totalHead.toString() : "Not yet evidenced"} hint={hires.length ? `${activeHead} active` : undefined} icon={Users} accent="orange" />
+        <KpiCard label="Monthly Payroll (now)" value={hires.length ? currencyShort(monthlyNow) : "Not calculated"} accent="coral" />
+        <KpiCard label="Monthly Payroll (Y2)" value={hires.length ? currencyShort(monthlyEnd) : "Not calculated"} accent="purple" />
+        <KpiCard label="Year 1 Payroll" value={hires.length ? currencyShort(annual) : "Not calculated"} accent="sage" />
       </div>
 
       <Surface className="mt-6" padded={false}>

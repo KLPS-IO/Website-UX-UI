@@ -1,0 +1,32 @@
+import { API_BASE } from "@/config/api";
+
+const TOKEN_KEYS = ["klps.dataRoom.sessionToken", "klps.founderDashboard.sessionToken"];
+
+export class ApiError extends Error {
+  constructor(message: string, public readonly status: number) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+export async function authenticatedApi<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = TOKEN_KEYS.map((key) => sessionStorage.getItem(key)).find(Boolean);
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  });
+  const text = await response.text();
+  let body: unknown = {};
+  try { body = text ? JSON.parse(text) : {}; } catch { body = {}; }
+  if (!response.ok) {
+    const record = body && typeof body === "object" ? body as Record<string, unknown> : {};
+    throw new ApiError(String(record.message ?? record.error ?? `Request failed with ${response.status}`), response.status);
+  }
+  return body as T;
+}
+

@@ -1,6 +1,7 @@
 import { PageHeader, Surface } from "@/components/finance/PageHeader";
 import { useFinanceModel } from "@/hooks/useFinanceModel";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
+import { EntityEvidenceLinks } from "@/components/finance/EntityEvidenceLinks";
 
 export default function RiskRegisterPage() {
   const { topRisks } = useFinanceModel();
@@ -43,6 +44,7 @@ export default function RiskRegisterPage() {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 {risk.status}
               </div>
+              <div className="mt-4"><EntityEvidenceLinks entityType="risks" entityId={risk.id} /></div>
             </Surface>
           );
         })}

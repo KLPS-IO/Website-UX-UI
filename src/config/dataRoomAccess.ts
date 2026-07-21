@@ -1,7 +1,5 @@
 export const DATA_ROOM_FOUNDER_EMAIL = "emmamendez07@gmail.com";
 
-export const DATA_ROOM_NDA_VERSION = "KLPS NDA V1.0 - May 2026";
-
 export const DATA_ROOM_INVITE_CODE = "KLPS-ACCESS-2026";
 
 export const DATA_ROOM_AUTHORIZED_EMAILS = [
