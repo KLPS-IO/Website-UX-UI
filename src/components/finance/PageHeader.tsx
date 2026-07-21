@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { GlossaryText } from "./GlossaryTooltip";
 
 export function PageHeader({
   eyebrow,
@@ -23,14 +24,14 @@ export function PageHeader({
       <div>
         {eyebrow && (
           <div className="mb-2 text-xs font-medium uppercase tracking-[0.18em] text-brand-orange/80">
-            {eyebrow}
+            <GlossaryText>{eyebrow}</GlossaryText>
           </div>
         )}
         <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{description}</p>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground"><GlossaryText>{description}</GlossaryText></p>
         )}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -50,7 +51,7 @@ export function Surface({
   return (
     <div
       className={cn(
-        " relative overflow-hidden rounded-2xl border border-white/5 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset]",
+        "finance-pdf-block relative overflow-hidden rounded-2xl border border-white/5 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset]",
         padded && "p-5",
         className,
       )}
@@ -64,9 +65,9 @@ export function SectionTitle({ title, hint }: { title: string; hint?: string }) 
   return (
     <div className="mb-4 flex items-baseline justify-between">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-        {title}
+        <GlossaryText>{title}</GlossaryText>
       </h2>
-      {hint && <span className="text-xs text-muted-foreground/70">{hint}</span>}
+      {hint && <span className="text-xs text-muted-foreground/70"><GlossaryText>{hint}</GlossaryText></span>}
     </div>
   );
 }

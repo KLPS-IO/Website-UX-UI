@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
 import { KpiCard } from "@/components/finance/KpiCard";
 import { currentKpis, currency, currencyShort, pct, type Scenario } from "@/lib/finance-data";
+import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 
 const list: { key: Scenario; label: string; color: string }[] = [
   { key: "conservative", label: "Conservative", color: "var(--brand-coral)" },
@@ -73,7 +74,7 @@ export default function ScenariosPage() {
 function Row({ k, v }: { k: string; v: string }) {
   return (
     <li className="flex items-center justify-between border-b border-white/5 pb-2 last:border-0">
-      <span className="text-muted-foreground">{k}</span>
+      <span className="text-muted-foreground"><GlossaryText>{k}</GlossaryText></span>
       <span className="font-medium">{v}</span>
     </li>
   );

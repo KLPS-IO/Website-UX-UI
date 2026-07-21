@@ -4,6 +4,7 @@ import { chartTheme } from "@/components/finance/ChartCard";
 import { products, productMargin, currency, pct } from "@/lib/finance-data";
 import { Package } from "lucide-react";
 import { EntityEvidenceLinks } from "@/components/finance/EntityEvidenceLinks";
+import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 
 export default function ProductsPage() {
   return (
@@ -72,7 +73,7 @@ export default function ProductsPage() {
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground"><GlossaryText>{label}</GlossaryText></div>
       <div className={`mt-1 text-sm font-semibold ${accent ? "text-brand-orange" : ""}`}>{value}</div>
     </div>
   );

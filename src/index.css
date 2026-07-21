@@ -230,6 +230,8 @@ All colors MUST be HSL.
   }
 
   .finance-page-printing [data-finance-page-content] .grid > *,
+  .finance-page-printing [data-finance-page-content] .finance-pdf-block,
+  .finance-page-printing [data-finance-page-content] tr,
   .finance-page-printing [data-finance-page-content] table,
   .finance-page-printing [data-finance-page-content] section {
     break-inside: avoid;
@@ -256,6 +258,12 @@ All colors MUST be HSL.
 
 .finance-page-exporting [data-finance-page-content] .grid {
   grid-template-columns: 1fr !important;
+}
+
+.finance-page-exporting [data-finance-page-content] .finance-pdf-block,
+.finance-page-exporting [data-finance-page-content] tr {
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
 }
 
 .finance-page-exporting [data-finance-page-content] button {

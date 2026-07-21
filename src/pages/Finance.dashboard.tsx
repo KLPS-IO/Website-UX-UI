@@ -94,7 +94,7 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow="Finance OS"
         title="Dashboard"
-        description="A live view of the KLPS financial model — every metric flows from the Assumptions ledger."
+        description="A live view of the KLPS financial model - every metric flows from the Assumptions ledger."
         actions={
           <>
             <button type="button" onClick={() => exportFinancePdf(exportData())} className={exportButton} title="Download a professionally formatted PDF report">

@@ -2,6 +2,7 @@ import { PageHeader, Surface } from "@/components/finance/PageHeader";
 import { KpiCard } from "@/components/finance/KpiCard";
 import { currentKpis, currency, currencyShort, pct } from "@/lib/finance-data";
 import { Banknote, Flame, Timer, Percent, TrendingUp, Users, Repeat, Target, Gauge, ShieldCheck } from "lucide-react";
+import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 
 export default function KPIsPage() {
   const k = currentKpis("base");
@@ -42,8 +43,8 @@ export default function KPIsPage() {
 function Def({ k, v }: { k: string; v: string }) {
   return (
     <div className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
-      <div className="font-medium">{k}</div>
-      <div className="mt-1 text-xs text-muted-foreground">{v}</div>
+      <div className="font-medium"><GlossaryText>{k}</GlossaryText></div>
+      <div className="mt-1 text-xs text-muted-foreground"><GlossaryText>{v}</GlossaryText></div>
     </div>
   );
 }

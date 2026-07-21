@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GlossaryText } from "./GlossaryTooltip";
 
 export interface KpiCardProps {
   label: string;
@@ -37,7 +38,7 @@ export function KpiCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, delay: index * 0.04, ease: "easeOut" }}
-      className="card-gradient group relative overflow-hidden rounded-2xl border border-white/5 p-5 transition-colors hover:border-white/10"
+      className="finance-pdf-block card-gradient group relative overflow-hidden rounded-2xl border border-white/5 p-5 transition-colors hover:border-white/10"
     >
       <div
         className={cn(
@@ -48,7 +49,7 @@ export function KpiCard({
       <div className="relative">
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {label}
+            <GlossaryText>{label}</GlossaryText>
           </span>
           {Icon && (
             <span className={cn("rounded-lg bg-white/5 p-1.5", accentMap[accent].split(" ").pop())}>
@@ -75,7 +76,7 @@ export function KpiCard({
               {(delta * 100).toFixed(1)}%
             </span>
           )}
-          {hint && <span className="text-muted-foreground">{hint}</span>}
+          {hint && <span className="text-muted-foreground"><GlossaryText>{hint}</GlossaryText></span>}
         </div>
       </div>
     </motion.div>

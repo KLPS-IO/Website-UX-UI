@@ -4,6 +4,7 @@ import { PageHeader, SectionTitle, Surface } from "@/components/finance/PageHead
 import { ApiError } from "@/lib/authenticated-api";
 import { evidenceErrorMessage, evidenceService } from "@/services/evidence/evidence.service";
 import type { EvidenceItem } from "@/types/evidence";
+import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 
 const shown = (value: string | number | null | undefined, fallback = "Not yet evidenced") =>
   value === null || value === undefined || value === "" ? fallback : String(value);
@@ -125,6 +126,6 @@ function EvidenceDetail({ item, versions, loading, close }: { item: EvidenceItem
   );
 }
 
-function Stat({ label, value, detail, accent = false }: { label: string; value: string | number; detail: string; accent?: boolean }) { return <Surface><div className="text-xs uppercase tracking-widest text-muted-foreground">{label}</div><div className={`mt-2 text-3xl font-semibold ${accent ? "text-brand-orange" : ""}`}>{value}</div><p className="mt-2 text-xs text-muted-foreground">{detail}</p></Surface>; }
+function Stat({ label, value, detail, accent = false }: { label: string; value: string | number; detail: string; accent?: boolean }) { return <Surface><div className="text-xs uppercase tracking-widest text-muted-foreground"><GlossaryText>{label}</GlossaryText></div><div className={`mt-2 text-3xl font-semibold ${accent ? "text-brand-orange" : ""}`}>{value}</div><p className="mt-2 text-xs text-muted-foreground"><GlossaryText>{detail}</GlossaryText></p></Surface>; }
 function State({ title, message, action }: { title: string; message: string; action?: () => void }) { return <Surface><div className="flex items-start gap-3"><FileText className="h-5 w-5 text-brand-orange" /><div><h2 className="font-semibold">{title}</h2><p className="mt-1 text-sm text-muted-foreground">{message}</p>{action && <button onClick={action} className="mt-3 rounded-lg border border-border px-3 py-2 text-xs font-medium">Try again</button>}</div></div></Surface>; }
-function Field({ label, value }: { label: string; value: string | number }) { return <div><dt className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</dt><dd className="mt-1 break-words text-sm font-medium">{value}</dd></div>; }
+function Field({ label, value }: { label: string; value: string | number }) { return <div><dt className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"><GlossaryText>{label}</GlossaryText></dt><dd className="mt-1 break-words text-sm font-medium">{typeof value === "string" ? <GlossaryText>{value}</GlossaryText> : value}</dd></div>; }

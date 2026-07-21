@@ -1,6 +1,7 @@
 import { Building2, CalendarDays, CheckCircle2, CircleAlert, Clock3, FileCheck2, Landmark, ShieldCheck } from "lucide-react";
 import { PageHeader, SectionTitle, Surface } from "@/components/finance/PageHeader";
 import { getCompanyOverview } from "@/services/company/company";
+import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 
 const display = (value: string | number | null | undefined, fallback = "Not confirmed") =>
   value === null || value === undefined || value === "" ? fallback : String(value);
@@ -195,7 +196,7 @@ export default function CompanyPage() {
             <li key={warning.code} className="flex gap-3 rounded-lg border border-brand-orange/15 bg-brand-orange/[0.06] p-3">
               {warning.severity === "info" ? <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-brand-sage" /> : <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" />}
               <div>
-                <div className="text-sm font-medium">{warning.message}</div>
+                <div className="text-sm font-medium"><GlossaryText>{warning.message}</GlossaryText></div>
                 <div className="mt-1 text-[10px] uppercase tracking-widest text-muted-foreground">
                   {formatFieldLabel(warning.field)}
                 </div>
@@ -211,8 +212,8 @@ export default function CompanyPage() {
 function Field({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
-      <dt className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-sm font-medium text-foreground">{value}</dd>
+      <dt className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"><GlossaryText>{label}</GlossaryText></dt>
+      <dd className="mt-1 text-sm font-medium text-foreground">{typeof value === "string" ? <GlossaryText>{value}</GlossaryText> : value}</dd>
     </div>
   );
 }
@@ -229,9 +230,9 @@ function IconField({ icon: Icon, label, value }: { icon: typeof CalendarDays; la
 function StrategyList({ label, values, className = "" }: { label: string; values: string[]; className?: string }) {
   return (
     <div className={className}>
-      <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground"><GlossaryText>{label}</GlossaryText></div>
       <ul className="mt-2 flex flex-wrap gap-2">
-        {values.map((value) => <li key={value} className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm font-medium">{value}</li>)}
+        {values.map((value) => <li key={value} className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm font-medium"><GlossaryText>{value}</GlossaryText></li>)}
       </ul>
     </div>
   );

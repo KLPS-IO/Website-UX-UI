@@ -4,6 +4,7 @@ import { ChartCard, chartTheme } from "@/components/finance/ChartCard";
 import { KpiCard } from "@/components/finance/KpiCard";
 import { A, currency, currencyShort, currentKpis, monthLabels, monthlyRevenue, MONTHS } from "@/lib/finance-data";
 import { TrendingUp, Users, Repeat, Building2 } from "lucide-react";
+import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 
 export default function RevenuePage() {
   const data = monthLabels().map((m, i) => {
@@ -80,7 +81,7 @@ export default function RevenuePage() {
 function Row({ k, v }: { k: string; v: string }) {
   return (
     <li className="flex items-center justify-between border-b border-white/5 pb-2 last:border-0">
-      <span className="text-muted-foreground">{k}</span>
+      <span className="text-muted-foreground"><GlossaryText>{k}</GlossaryText></span>
       <span className="font-medium">{v}</span>
     </li>
   );

@@ -13,15 +13,31 @@ export async function exportCurrentFinancePagePdf(pathname: string) {
   const target = document.querySelector<HTMLElement>("[data-finance-page-content]");
   if (!target) throw new Error("Finance page content is unavailable.");
 
-  const canvas = await html2canvas(target, {
-    backgroundColor: "#f8f8f6",
-    scale: Math.min(2, window.devicePixelRatio || 1),
-    useCORS: true,
-    logging: false,
-    onclone: (clonedDocument) => {
-      clonedDocument.documentElement.classList.add("finance-page-exporting");
-    },
-  });
+  document.documentElement.classList.add("finance-page-exporting");
+  let canvas: HTMLCanvasElement;
+  let blockBounds: { top: number; bottom: number }[];
+  try {
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    const targetRect = target.getBoundingClientRect();
+    blockBounds = Array.from(target.querySelectorAll<HTMLElement>(".finance-pdf-block, tr"))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { top: rect.top - targetRect.top, bottom: rect.bottom - targetRect.top };
+      })
+      .filter(({ top, bottom }) => bottom > top && top >= 0)
+      .sort((a, b) => a.top - b.top);
+
+    canvas = await html2canvas(target, {
+      backgroundColor: "#f8f8f6",
+      scale: Math.min(2, window.devicePixelRatio || 1),
+      useCORS: true,
+      logging: false,
+    });
+    const scale = canvas.width / targetRect.width;
+    blockBounds = blockBounds.map(({ top, bottom }) => ({ top: Math.round(top * scale), bottom: Math.round(bottom * scale) }));
+  } finally {
+    document.documentElement.classList.remove("finance-page-exporting");
+  }
   const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -33,7 +49,14 @@ export async function exportCurrentFinancePagePdf(pathname: string) {
   let pageIndex = 0;
 
   while (sourceY < canvas.height) {
-    const sliceHeight = Math.min(pagePixelHeight, canvas.height - sourceY);
+    const idealEnd = Math.min(sourceY + pagePixelHeight, canvas.height);
+    let pageEnd = idealEnd;
+    if (idealEnd < canvas.height) {
+      const crossingBlock = blockBounds.find(({ top, bottom }) => top < idealEnd && bottom > idealEnd && bottom - top <= pagePixelHeight);
+      const minimumUsefulPage = sourceY + pagePixelHeight * 0.35;
+      if (crossingBlock && crossingBlock.top >= minimumUsefulPage) pageEnd = crossingBlock.top;
+    }
+    const sliceHeight = Math.max(1, pageEnd - sourceY);
     const pageCanvas = document.createElement("canvas");
     pageCanvas.width = canvas.width;
     pageCanvas.height = sliceHeight;

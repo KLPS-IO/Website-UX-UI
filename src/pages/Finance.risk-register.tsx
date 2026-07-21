@@ -2,6 +2,7 @@ import { PageHeader, Surface } from "@/components/finance/PageHeader";
 import { useFinanceModel } from "@/hooks/useFinanceModel";
 import { AlertTriangle, ShieldCheck } from "lucide-react";
 import { EntityEvidenceLinks } from "@/components/finance/EntityEvidenceLinks";
+import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 
 export default function RiskRegisterPage() {
   const { topRisks } = useFinanceModel();
@@ -56,7 +57,7 @@ export default function RiskRegisterPage() {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-border bg-white/50 p-3">
-      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"><GlossaryText>{label}</GlossaryText></div>
       <div className="mt-1 text-sm font-medium">{value}</div>
     </div>
   );
