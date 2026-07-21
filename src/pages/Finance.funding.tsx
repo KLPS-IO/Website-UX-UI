@@ -19,10 +19,10 @@ export default function FundingPage() {
       <PageHeader eyebrow="Capital" title="Funding" description="Grants, investments and planned rounds — with runway impact and dilution tracking." />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Raised to date" value={currencyShort(received)} icon={PiggyBank} accent="sage" />
-        <KpiCard label="Committed" value={currencyShort(committed)} icon={Landmark} accent="orange" />
-        <KpiCard label="Planned" value={currencyShort(planned)} icon={Landmark} accent="purple" />
-        <KpiCard label="Total dilution" value={`${(dilution * 100).toFixed(1)}%`} icon={Users2} accent="coral" />
+        <KpiCard label="Raised to date" value={funding.length ? currencyShort(received) : "Not yet evidenced"} icon={PiggyBank} accent="sage" />
+        <KpiCard label="Committed" value={funding.length ? currencyShort(committed) : "Not yet evidenced"} icon={Landmark} accent="orange" />
+        <KpiCard label="Planned" value={funding.length ? currencyShort(planned) : "Not yet evidenced"} icon={Landmark} accent="purple" />
+        <KpiCard label="Total dilution" value={funding.length ? `${(dilution * 100).toFixed(1)}%` : "Not yet evidenced"} icon={Users2} accent="coral" />
       </div>
 
       <Surface className="mt-6" padded={false}>

@@ -1,12 +1,12 @@
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
 import { ChartCard, chartTheme } from "@/components/finance/ChartCard";
-import { cashFlowSeries, currency, currencyShort, monthLabels, type Scenario } from "@/lib/finance-data";
+import { cashFlowSeries, currency, currencyShort, currentKpis, monthLabels, type Scenario } from "@/lib/finance-data";
 
 const scenarios: { key: Scenario; label: string; color: string; desc: string }[] = [
-  { key: "conservative", label: "Conservative", color: "#ec7769", desc: "-25% growth, planned funding delayed" },
+  { key: "conservative", label: "Conservative", color: "#ec7769", desc: "No adjustment configured" },
   { key: "base", label: "Base Case", color: "#ef9f32", desc: "Current assumptions as-is" },
-  { key: "best", label: "Best Case", color: "#b6d0ac", desc: "+25% growth, all funding closes" },
+  { key: "best", label: "Best Case", color: "#b6d0ac", desc: "No adjustment configured" },
 ];
 
 export default function ForecastsPage() {
@@ -28,6 +28,7 @@ export default function ForecastsPage() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {series.map(({ s, data }) => {
+          const ready = currentKpis(s.key).forecastReady;
           const rev = data.slice(0, 12).reduce((x, r) => x + r.revenue, 0);
           const end = data[data.length - 1].cash;
           return (
@@ -40,11 +41,11 @@ export default function ForecastsPage() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div>
                   <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Year 1 Rev</div>
-                  <div className="text-lg font-semibold">{currencyShort(rev)}</div>
+                  <div className="text-lg font-semibold">{ready ? currencyShort(rev) : "Not calculated"}</div>
                 </div>
                 <div>
                   <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Ending Cash</div>
-                  <div className="text-lg font-semibold" style={{ color: s.color }}>{currencyShort(end)}</div>
+                  <div className="text-lg font-semibold" style={{ color: s.color }}>{ready ? currencyShort(end) : "Not calculated"}</div>
                 </div>
               </div>
             </Surface>

@@ -2,6 +2,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Responsive
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
 import { ChartCard, chartTheme } from "@/components/finance/ChartCard";
 import { currency, currencyShort, expenseCategories, monthLabels, monthlyExpenses } from "@/lib/finance-data";
+import { currentKpis } from "@/lib/finance-data";
 
 export default function ExpensesPage() {
   const trend = monthLabels().map((m, i) => {
@@ -14,6 +15,7 @@ export default function ExpensesPage() {
     return { category: cat, value: total };
   });
   const grand = breakdown.reduce((s, r) => s + r.value, 0);
+  const forecastReady = currentKpis("base").forecastReady;
 
   return (
     <div>
@@ -50,7 +52,7 @@ export default function ExpensesPage() {
             </ResponsiveContainer>
           </div>
           <div className="mt-3 border-t border-white/5 pt-3 text-sm">
-            <div className="flex justify-between text-muted-foreground"><span>Total (yr 1)</span><span className="font-semibold text-foreground">{currency(grand)}</span></div>
+            <div className="flex justify-between text-muted-foreground"><span>Total (yr 1)</span><span className="font-semibold text-foreground">{forecastReady ? currency(grand) : "Not calculated"}</span></div>
           </div>
         </Surface>
       </div>

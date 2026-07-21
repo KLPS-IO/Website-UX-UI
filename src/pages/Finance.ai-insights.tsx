@@ -24,7 +24,7 @@ export default function AIInsightsPage() {
         description="Auto-generated recommendations, weaknesses and forecast risks — refreshed as the model changes."
         actions={
           <span className="inline-flex items-center gap-2 rounded-lg border border-brand-purple/30 bg-brand-purple/10 px-3 py-1.5 text-xs text-brand-purple">
-            <Sparkles className="h-3.5 w-3.5" /> Model: KLPS-analyst-v3
+            <Sparkles className="h-3.5 w-3.5" /> Evidence-gated V1
           </span>
         }
       />
@@ -82,15 +82,15 @@ export default function AIInsightsPage() {
         <ol className="space-y-3 text-sm">
           <li className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
             <span className="mr-2 rounded-md bg-brand-orange/15 px-2 py-0.5 text-xs font-medium text-brand-orange">1</span>
-            Commission a second-source manufacturing quote to reduce single-supplier risk.
+            Add verified current cash evidence and mark the assumption Actual or Verified.
           </li>
           <li className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
             <span className="mr-2 rounded-md bg-brand-orange/15 px-2 py-0.5 text-xs font-medium text-brand-orange">2</span>
-            Run a pricing A/B on the waitlist landing page to lift ASP confidence above 90.
+            Link evidence for pricing, demand, conversion and every intended revenue stream.
           </li>
           <li className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
             <span className="mr-2 rounded-md bg-brand-orange/15 px-2 py-0.5 text-xs font-medium text-brand-orange">3</span>
-            Stage the Growth Lead hire by 1 month to extend runway past the 15-month threshold.
+            Add verified unit costs and operating expenses before activating a forecast.
           </li>
         </ol>
       </Surface>

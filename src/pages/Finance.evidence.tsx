@@ -15,7 +15,10 @@ export default function EvidencePage() {
   const { assumptions } = useFinance();
   const linkedIds = new Set(evidence.map((e) => e.supports));
   const covered = assumptions.filter((a) => linkedIds.has(a.id)).length;
-  const coverage = covered / assumptions.length;
+  const coverage = assumptions.length ? covered / assumptions.length : 0;
+  const averageConfidence = evidence.length
+    ? evidence.reduce((sum, item) => sum + item.confidence, 0) / evidence.length
+    : null;
 
   return (
     <div>
@@ -38,9 +41,9 @@ export default function EvidencePage() {
         <Surface>
           <div className="text-xs uppercase tracking-widest text-muted-foreground">Avg Confidence</div>
           <div className="mt-2 text-3xl font-semibold text-brand-orange">
-            {(evidence.reduce((s, e) => s + e.confidence, 0) / evidence.length).toFixed(0)}
+            {averageConfidence === null ? "Not available" : averageConfidence.toFixed(0)}
           </div>
-          <p className="mt-2 text-xs text-muted-foreground">of 100 — weighted by evidence quality</p>
+          <p className="mt-2 text-xs text-muted-foreground">Evidence collection in progress</p>
         </Surface>
       </div>
 

@@ -38,10 +38,10 @@ export default function ScenariosPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Runway" value={`${k.runway.toFixed(1)} mo`} accent="orange" />
-        <KpiCard label="Y1 Revenue" value={currencyShort(k.annualRev)} accent="sage" />
-        <KpiCard label="Gross Margin" value={pct(k.grossMargin)} accent="purple" />
-        <KpiCard label="Growth (yr)" value={pct(k.growth)} accent="coral" />
+        <KpiCard label="Runway" value={k.forecastReady ? `${k.runway.toFixed(1)} mo` : "Not calculated"} accent="orange" />
+        <KpiCard label="Y1 Revenue" value={k.forecastReady ? currencyShort(k.annualRev) : "Not calculated"} accent="sage" />
+        <KpiCard label="Gross Margin" value={k.forecastReady ? pct(k.grossMargin) : "Not calculated"} accent="purple" />
+        <KpiCard label="Growth (yr)" value={k.forecastReady ? pct(k.growth) : "Not calculated"} accent="coral" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -54,13 +54,13 @@ export default function ScenariosPage() {
                 <h3 className="text-sm font-semibold">{s.label}</h3>
               </div>
               <ul className="space-y-2 text-sm">
-                <Row k="Runway" v={`${kx.runway.toFixed(1)} mo`} />
-                <Row k="Y1 Revenue" v={currency(kx.annualRev)} />
-                <Row k="Monthly Burn" v={currency(kx.burn)} />
-                <Row k="Gross Margin" v={pct(kx.grossMargin)} />
-                <Row k="Net Margin" v={pct(kx.netMargin)} />
-                <Row k="ARR" v={currency(kx.arr)} />
-                <Row k="Growth (yr)" v={pct(kx.growth)} />
+                <Row k="Runway" v={kx.forecastReady ? `${kx.runway.toFixed(1)} mo` : "Not calculated"} />
+                <Row k="Y1 Revenue" v={kx.forecastReady ? currency(kx.annualRev) : "Not calculated"} />
+                <Row k="Monthly Burn" v={kx.forecastReady ? currency(kx.burn) : "Not calculated"} />
+                <Row k="Gross Margin" v={kx.forecastReady ? pct(kx.grossMargin) : "Not calculated"} />
+                <Row k="Net Margin" v={kx.forecastReady ? pct(kx.netMargin) : "Not calculated"} />
+                <Row k="ARR" v={kx.forecastReady ? currency(kx.arr) : "Not calculated"} />
+                <Row k="Growth (yr)" v={kx.forecastReady ? pct(kx.growth) : "Not calculated"} />
               </ul>
             </Surface>
           );

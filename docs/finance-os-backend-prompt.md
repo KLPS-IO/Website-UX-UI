@@ -11,7 +11,7 @@ Core requirements:
 - Every mutation must create an immutable finance event such as `Manufacturing Cost Updated`, `Revenue Forecast Recalculated`, `Added Supplier Quote`, `Payroll Updated`, or `Funding Scenario Created`.
 - Reports must never calculate values directly. They should consume persisted/calculated Financial Engine outputs.
 - AI insight endpoints must return structured placeholders derived from financial model outputs, not hardcoded prose.
-- Data Room access rules must apply to Finance OS routes for founders, admins, and invited guests after NDA acceptance.
+- Data Room access rules must apply to Finance OS routes for founders, admins, and invited guests after authentication.
 
 Recommended API surface:
 

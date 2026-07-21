@@ -1,9 +1,6 @@
 import { PageHeader, Section } from "@/components/Section";
 import { API_BASE } from "@/config/api";
-import {
-  DATA_ROOM_NDA_VERSION,
-  normalizeAccessEmail,
-} from "@/config/dataRoomAccess";
+import { normalizeAccessEmail } from "@/config/dataRoomAccess";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -27,7 +24,6 @@ type DataRoomUser = {
     | "revoked_user";
   isAdmin?: boolean;
   isFounder?: boolean;
-  ndaAccepted?: boolean;
 };
 
 type DocumentItem = {
@@ -51,13 +47,6 @@ type AccessLog = {
   documentId?: string;
   timestamp?: string;
   at?: string;
-};
-
-type NdaContent = {
-  version: string;
-  title: string;
-  sections: { title: string; body: string }[];
-  watermark: string;
 };
 
 type SessionState = {
@@ -122,53 +111,7 @@ const stringValue = (value: unknown) =>
 const booleanValue = (value: unknown) =>
   typeof value === "boolean" ? value : undefined;
 
-const fallbackNda: NdaContent = {
-  version: DATA_ROOM_NDA_VERSION,
-  title: "KLPS One-Way Confidentiality & Non-Disclosure Agreement",
-  watermark: "Confidential Property of KLPS Ltd",
-  sections: [
-    {
-      title: "1. Parties and Purpose",
-      body: "This One-Way Confidentiality and Non-Disclosure Agreement applies between KLPS Ltd, company number to be added once registered details are finalised, with registered office address to be added once finalised, and the authorised recipient accessing the KLPS investor data room, R&D lab materials, documents, prototypes, commercial information, and related discussions.",
-    },
-    {
-      title: "2. Confidential Information",
-      body: "Confidential Information includes all non-public information disclosed by KLPS Ltd in any form, including business plans, financials, cap table information, designs, software, algorithms, textile systems, sensor concepts, prototypes, research, manufacturing processes, commercial strategy, investor materials, university or agency materials, and all derivative notes, analyses, summaries, extracts, compilations, copies, or materials created from or based on that information.",
-    },
-    {
-      title: "3. Use and Non-Disclosure",
-      body: "The recipient may use Confidential Information only to evaluate, advise on, invest in, manufacture for, partner with, or otherwise support KLPS Ltd in the specific authorised purpose. The recipient must keep the information confidential, protect it with at least reasonable care, and must not disclose it to any person except approved representatives who have a genuine need to know and are bound by equivalent confidentiality obligations.",
-    },
-    {
-      title: "4. No Implied Licence",
-      body: "No licence, assignment, ownership right, or other intellectual property right is granted or implied by disclosure. KLPS Ltd retains all rights, title, and interest in its Confidential Information, intellectual property, know-how, data, inventions, designs, prototypes, documentation, and related materials.",
-    },
-    {
-      title: "5. Reverse Engineering and AI Restrictions",
-      body: "The recipient must not reverse engineer, decompile, disassemble, reproduce, train artificial intelligence systems on, scrape, mine, upload into public or third-party AI tools, or attempt to derive the composition, structure, source, algorithms, designs, formulae, or underlying methods of any KLPS material, product, prototype, dataset, software, textile, sensor system, or technical disclosure.",
-    },
-    {
-      title: "6. Residual Knowledge",
-      body: "Nothing in this agreement restricts the recipient from using general knowledge, skills, and experience retained unaided in memory, provided that such use does not disclose or rely on KLPS Confidential Information, trade secrets, technical specifics, business plans, or protected intellectual property.",
-    },
-    {
-      title: "7. Non-Circumvention",
-      body: "The recipient must not use Confidential Information to bypass, compete unfairly with, solicit away from, or directly approach KLPS Ltd's investors, partners, manufacturers, suppliers, employees, contractors, universities, agencies, customers, or commercial opportunities for any purpose that harms or circumvents KLPS Ltd.",
-    },
-    {
-      title: "8. Data Room Protections",
-      body: "Access to the data room is personal, permissioned, and logged. The recipient must not share login details, copy files outside authorised channels, remove watermarks, alter metadata, or redistribute materials. Exported PDFs and shared files should include the footer watermark: Confidential Property of KLPS Ltd.",
-    },
-    {
-      title: "9. Assignment, Warranty, and Return",
-      body: "The recipient may not assign this agreement or transfer access without KLPS Ltd's written consent. Confidential Information is provided without warranty as to accuracy, completeness, fitness for purpose, or commercial outcome. On request, the recipient must return or destroy Confidential Information and confirm deletion of copies, subject only to legally required archival retention.",
-    },
-    {
-      title: "10. Duration and Remedies",
-      body: "Confidentiality obligations continue for five years from disclosure, and trade secret obligations continue for as long as the information remains a trade secret. The recipient acknowledges that unauthorised disclosure may cause irreparable harm and that KLPS Ltd may seek injunctive relief and other remedies available by law.",
-    },
-  ],
-};
+const DATA_ROOM_WATERMARK = "KPLS Investor Data Room";
 
 const categories = [
   "All Documents",
@@ -253,8 +196,7 @@ const normaliseCategoryName = (value?: string): DataRoomCategory | null => {
     return "IP Portfolio";
   if (normalized.includes("market") || normalized.includes("value proposition"))
     return "Market";
-  if (normalized.includes("legal") || normalized.includes("nda"))
-    return "Legal";
+  if (normalized.includes("legal")) return "Legal";
   if (normalized.includes("faq")) return "FAQ";
 
   return null;
@@ -283,9 +225,6 @@ const endpointSets = {
     "/api/session",
     "/api/data-room/auth/session",
   ],
-  ndaStatus: ["/api/data-room/nda/status", "/api/nda/status"],
-  ndaContent: ["/api/data-room/nda/current", "/api/nda/current"],
-  acceptNda: ["/api/data-room/nda/accept", "/api/nda/accept"],
   documents: ["/api/data-room/documents", "/api/documents"],
   documentAccess: (id: string) => [`/api/data-room/documents/${id}/url`],
   metrics: ["/api/research/metrics"],
@@ -313,9 +252,6 @@ function setSessionToken(token?: string) {
 
 function clearPrototypeAccess() {
   LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
-  Object.keys(localStorage)
-    .filter((key) => key.startsWith("klps.dataRoom.ndaAccepted."))
-    .forEach((key) => localStorage.removeItem(key));
 }
 
 const wait = (milliseconds: number) =>
@@ -417,12 +353,6 @@ const normaliseUser = (payload: unknown): DataRoomUser | null => {
       booleanValue(user.is_founder) ||
       role === "founder",
     ),
-    ndaAccepted: Boolean(
-      booleanValue(user.ndaAccepted) ||
-      booleanValue(user.nda_accepted) ||
-      booleanValue(root.ndaAccepted) ||
-      booleanValue(root.nda_accepted),
-    ),
   };
 };
 
@@ -492,35 +422,6 @@ const normaliseLogs = (payload: unknown): AccessLog[] => {
     timestamp: stringValue(log.timestamp),
     at: stringValue(log.at),
   }));
-};
-
-const normaliseNda = (payload: unknown): NdaContent => {
-  const root = isRecord(payload) ? payload : {};
-  const nda = isRecord(root.nda) ? root.nda : {};
-  const sections = Array.isArray(root.sections)
-    ? root.sections
-    : Array.isArray(nda.sections)
-      ? nda.sections
-      : fallbackNda.sections;
-
-  return {
-    version:
-      stringValue(root.version) ||
-      stringValue(nda.version) ||
-      fallbackNda.version,
-    title:
-      stringValue(root.title) || stringValue(nda.title) || fallbackNda.title,
-    watermark:
-      stringValue(root.watermark) ||
-      stringValue(root.watermarkText) ||
-      stringValue(nda.watermark) ||
-      stringValue(nda.watermark_text) ||
-      fallbackNda.watermark,
-    sections: sections.filter(isRecord).map((section) => ({
-      title: stringValue(section.title) || "NDA section",
-      body: stringValue(section.body) || "",
-    })),
-  };
 };
 
 function LoginGate({
@@ -706,110 +607,9 @@ function LoginGate({
   );
 }
 
-function NdaGate({
-  nda,
-  onAccepted,
-}: {
-  nda: NdaContent;
-  onAccepted: () => void;
-}) {
-  const [readToEnd, setReadToEnd] = useState(false);
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  const accept = async () => {
-    setSubmitting(true);
-    setError("");
-    try {
-      await apiRequest(endpointSets.acceptNda, {
-        method: "POST",
-        body: JSON.stringify({
-          nda_version: nda.version,
-          scroll_completed: readToEnd,
-          acceptance_method: "clickwrap",
-          accepted_button_label: "I agree",
-        }),
-      });
-      onAccepted();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Could not record NDA acceptance.",
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <main className="data-room-theme min-h-screen bg-obsidian px-6 py-12 text-foreground">
-      <div className="mx-auto max-w-4xl">
-        <div className="glass overflow-hidden rounded-lg">
-          <div className="border-b border-border px-6 py-5 md:px-8">
-            <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">
-              {nda.version}
-            </div>
-            <h1 className="mt-3 text-3xl font-light tracking-tight">
-              {nda.title}
-            </h1>
-          </div>
-
-          <div
-            onScroll={(event) => {
-              const target = event.currentTarget;
-              if (
-                target.scrollTop + target.clientHeight >=
-                target.scrollHeight - 12
-              ) {
-                setReadToEnd(true);
-              }
-            }}
-            className="relative max-h-[62vh] overflow-y-auto px-6 py-6 md:px-8"
-          >
-            <div className="pointer-events-none sticky top-1/3 z-0 text-center text-4xl font-semibold uppercase tracking-[0.3em] text-white/[0.035] md:text-6xl">
-              {nda.watermark}
-            </div>
-            <div className="relative z-10 -mt-20 space-y-5 text-sm leading-7 text-muted-foreground">
-              {nda.sections.map((section) => (
-                <section key={section.title}>
-                  <h2 className="text-base font-semibold text-foreground">
-                    {section.title}
-                  </h2>
-                  <p className="mt-2">{section.body}</p>
-                </section>
-              ))}
-              <div className="rounded-md border border-border bg-white/[0.03] p-4 text-xs leading-6">
-                Footer watermark for exported PDFs: "{nda.watermark}". Version
-                reference: {nda.version}.
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-border bg-obsidian/80 px-6 py-5 md:px-8">
-            <p className="text-xs leading-6 text-muted-foreground">
-              Scroll to the bottom of the agreement to enable acceptance. The
-              backend stores this acknowledgement once for this NDA version with
-              audit metadata.
-            </p>
-            {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
-            <button
-              onClick={accept}
-              disabled={!readToEnd || submitting}
-              className="mt-4 w-full rounded-full bg-foreground px-6 py-3 text-sm font-medium text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {submitting ? "Recording..." : "I agree"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </main>
-  );
-}
-
 const DataRoom = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<DataRoomUser | null>(null);
-  const [ndaAccepted, setNdaAccepted] = useState(false);
-  const [nda, setNda] = useState<NdaContent>(fallbackNda);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [metrics, setMetrics] = useState<ResearchMetrics | null>(null);
   const [logs, setLogs] = useState<AccessLog[]>([]);
@@ -867,26 +667,8 @@ const DataRoom = () => {
     setDocuments([]);
     setLogs([]);
 
-    const [ndaStatus, ndaContent] = await Promise.all([
-      apiRequest<unknown>(endpointSets.ndaStatus).catch(() => ({
-        accepted: nextUser.ndaAccepted,
-      })),
-      apiRequest<unknown>(endpointSets.ndaContent).catch(() => fallbackNda),
-    ]);
-
-    setNda(normaliseNda(ndaContent));
-    const ndaStatusRecord = isRecord(ndaStatus) ? ndaStatus : {};
-    const accepted = Boolean(
-      booleanValue(ndaStatusRecord.accepted) ||
-      booleanValue(ndaStatusRecord.ndaAccepted) ||
-      nextUser.ndaAccepted,
-    );
-    setNdaAccepted(accepted);
-
-    if (accepted) {
-      const docsPayload = await apiRequest<unknown>(endpointSets.documents);
-      setDocuments(normaliseDocuments(docsPayload));
-    }
+    const docsPayload = await apiRequest<unknown>(endpointSets.documents);
+    setDocuments(normaliseDocuments(docsPayload));
 
     try {
       setMetrics(await fetchSecureResearchMetrics());
@@ -920,12 +702,6 @@ const DataRoom = () => {
       })
       .finally(() => setLoading(false));
   }, []);
-
-  const acceptNda = async () => {
-    setNdaAccepted(true);
-    const docsPayload = await apiRequest<unknown>(endpointSets.documents);
-    setDocuments(normaliseDocuments(docsPayload));
-  };
 
   const authorizeUser = async (event: FormEvent) => {
     event.preventDefault();
@@ -1014,7 +790,6 @@ const DataRoom = () => {
     );
     sessionStorage.removeItem(TOKEN_KEY);
     setUser(null);
-    setNdaAccepted(false);
     setDocuments([]);
     setLogs([]);
     setActiveCategory("All Documents");
@@ -1051,14 +826,10 @@ const DataRoom = () => {
     return <LoginGate onVerified={handleVerifiedUser} />;
   }
 
-  if (!ndaAccepted) {
-    return <NdaGate nda={nda} onAccepted={acceptNda} />;
-  }
-
   return (
     <main className="data-room-theme min-h-screen bg-obsidian text-foreground">
       <PageHeader
-        eyebrow={`NDA Active · ${nda.version}`}
+        eyebrow="Authorised Investor Access"
         title="Investor Data Room."
         description="Versioned, permissioned documents covering KPLS fundraising, financials, IP and strategy."
       >
@@ -1386,7 +1157,7 @@ const DataRoom = () => {
                 </div>
 
                 <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  {nda.watermark}
+                  {DATA_ROOM_WATERMARK}
                 </div>
               </div>
             ) : hasFinanceWorkspace ? (
@@ -1394,7 +1165,7 @@ const DataRoom = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4">
                   <h3 className="text-sm font-medium">Financials</h3>
                   <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                    {nda.watermark}
+                    {DATA_ROOM_WATERMARK}
                   </span>
                 </div>
                 <div className="px-6 py-8">
@@ -1437,7 +1208,7 @@ const DataRoom = () => {
                   </Link>
                 </div>
                 <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  {nda.watermark}
+                  {DATA_ROOM_WATERMARK}
                 </div>
               </div>
             ) : (
@@ -1449,7 +1220,7 @@ const DataRoom = () => {
                       : activeCategory}
                   </h3>
                   <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                    {nda.watermark}
+                    {DATA_ROOM_WATERMARK}
                   </span>
                 </div>
                 {visibleDocuments.length > 0 ? (
@@ -1490,7 +1261,7 @@ const DataRoom = () => {
                   </div>
                 )}
                 <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  {nda.watermark}
+                  {DATA_ROOM_WATERMARK}
                 </div>
               </div>
             )}

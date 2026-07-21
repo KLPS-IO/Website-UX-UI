@@ -2,7 +2,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Lin
 import { PageHeader, Surface } from "@/components/finance/PageHeader";
 import { ChartCard, chartTheme } from "@/components/finance/ChartCard";
 import { KpiCard } from "@/components/finance/KpiCard";
-import { cashFlowSeries, currency, currencyShort } from "@/lib/finance-data";
+import { cashFlowSeries, currency, currencyShort, currentKpis } from "@/lib/finance-data";
 import { Banknote, TrendingDown, TrendingUp } from "lucide-react";
 
 export default function CashFlowPage() {
@@ -10,16 +10,17 @@ export default function CashFlowPage() {
   const minCash = Math.min(...series.map((s) => s.cash));
   const maxCash = Math.max(...series.map((s) => s.cash));
   const netAvg = series.reduce((s, r) => s + r.net, 0) / series.length;
+  const forecastReady = currentKpis("base").forecastReady;
 
   return (
     <div>
       <PageHeader eyebrow="Liquidity" title="Cash Flow" description="Auto-derived monthly cash flow from revenue, expenses and funding events." />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Peak Cash" value={currencyShort(maxCash)} icon={TrendingUp} accent="sage" />
-        <KpiCard label="Trough Cash" value={currencyShort(minCash)} icon={TrendingDown} accent="coral" />
-        <KpiCard label="Avg Monthly Net" value={currencyShort(netAvg)} accent="orange" icon={Banknote} />
-        <KpiCard label="Ending Cash" value={currencyShort(series[series.length - 1].cash)} accent="purple" />
+        <KpiCard label="Peak Cash" value={forecastReady ? currencyShort(maxCash) : "Not calculated"} icon={TrendingUp} accent="sage" />
+        <KpiCard label="Trough Cash" value={forecastReady ? currencyShort(minCash) : "Not calculated"} icon={TrendingDown} accent="coral" />
+        <KpiCard label="Avg Monthly Net" value={forecastReady ? currencyShort(netAvg) : "Not calculated"} accent="orange" icon={Banknote} />
+        <KpiCard label="Ending Cash" value={forecastReady ? currencyShort(series[series.length - 1].cash) : "Not calculated"} accent="purple" />
       </div>
 
       <div className="mt-6">

@@ -1,7 +1,7 @@
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
 import { chartTheme } from "@/components/finance/ChartCard";
-import { currency, currencyShort, monthLabels, pct } from "@/lib/finance-data";
+import { currency, currencyShort, monthLabels } from "@/lib/finance-data";
 import { useFinanceModel } from "@/hooks/useFinanceModel";
 import { Download, FileText } from "lucide-react";
 
@@ -26,13 +26,9 @@ export default function ReportsPage() {
       />
 
       <Surface>
-        <SectionTitle title="Executive Summary" hint="July 2026" />
+        <SectionTitle title="Executive Summary" hint="Current status" />
         <p className="text-sm leading-relaxed text-muted-foreground">
-          KLPS closes July 2026 with <span className="font-semibold text-foreground">{currencyShort(k.cash)}</span> cash and a{" "}
-          <span className="font-semibold text-foreground">{k.runway.toFixed(1)}-month runway</span>. The base-case forecast delivers{" "}
-          <span className="font-semibold text-foreground">{currencyShort(k.annualRev)}</span> Year 1 revenue at{" "}
-          <span className="font-semibold text-foreground">{pct(k.grossMargin)}</span> gross margin. Confidence across the model averages{" "}
-          <span className="font-semibold text-foreground">{k.confidence.toFixed(0)}/100</span>, driven by validated pricing and manufacturing evidence.
+          Early-stage model — evidence collection in progress. Cash is <span className="font-semibold text-foreground">{k.cashKnown ? currencyShort(k.cash) : "not yet evidenced"}</span>. Runway, revenue and margins are <span className="font-semibold text-foreground">{k.forecastReady ? "calculated from verified inputs" : "not calculated until minimum inputs are verified"}</span>. Model confidence is <span className="font-semibold text-foreground">{k.confidence > 0 ? `${k.confidence.toFixed(0)}/100` : "not yet evidenced"}</span>.
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">

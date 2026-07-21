@@ -1,0 +1,30 @@
+import type { Product } from "@/types/finance";
+
+export const defaultProducts: Product[] = [
+  {
+    id: "underwear-v1",
+    name: "KLPS Smart Underwear",
+    version: "V1",
+    status: "Planned",
+    launchDate: "",
+    sellingPrice: 0,
+    subscriptionMonthly: 0,
+    currency: "GBP",
+    mfgCost: 0,
+    packaging: 0,
+    shipping: 0,
+    supplier: "",
+    manufacturingMethod: "",
+    minimumOrderQuantity: 0,
+    leadTimeWeeks: 0,
+    productType: "Smart Textile",
+    targetCustomer: "Women",
+    confidence: 0,
+    confidenceLevel: "Unknown",
+    evidenceIds: [],
+    source: "",
+    owner: "Founder",
+    lastReviewed: "",
+    notes: "Current KLPS product concept. Commercial and operational inputs are not yet evidenced.",
+  },
+];

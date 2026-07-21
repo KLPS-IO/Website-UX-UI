@@ -28,16 +28,16 @@ export default function ProductsPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold">{p.name}</h3>
-                    <p className="text-xs text-muted-foreground">Launch · {p.launchDate}</p>
+                    <p className="text-xs text-muted-foreground">Launch · {p.launchDate || "Not scheduled"}</p>
                   </div>
                 </div>
                 <span className={`rounded-md px-2 py-1 text-xs font-medium ${statusColor}`}>{p.status}</span>
               </div>
 
               <div className="mt-4 grid grid-cols-3 gap-3 text-sm">
-                <Stat label="Price" value={currency(p.sellingPrice)} />
+                <Stat label="Price" value={p.confidenceLevel === "Unknown" ? "Not yet evidenced" : currency(p.sellingPrice)} />
                 <Stat label="Subscription" value={p.subscriptionMonthly ? `${currency(p.subscriptionMonthly)}/mo` : "—"} />
-                <Stat label="Margin" value={pct(m.marginPct, 0)} accent />
+                <Stat label="Margin" value={p.confidenceLevel === "Unknown" ? "Not calculated" : pct(m.marginPct, 0)} accent />
               </div>
 
               <div className="mt-4 text-xs text-muted-foreground">Cost breakdown</div>
