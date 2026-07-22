@@ -1,5 +1,5 @@
 export const evidenceDocumentCategories = [
-  "Corporate", "Finance", "Fundraising", "Product", "Technology",
+  "Read First", "Corporate", "Finance", "Fundraising", "Product", "Technology",
   "Intellectual Property", "Manufacturing", "Market", "Customers",
   "Research", "Regulatory", "Legal", "Team", "Press", "Archive",
 ] as const;
@@ -98,3 +98,19 @@ export type EvidenceFilters = Partial<{
 }>;
 
 export type EvidenceMetadataInput = Partial<Omit<EvidenceDto, "id" | "evidence_code" | "created_at" | "updated_at" | "created_by" | "updated_by" | "version" | "links">> & Pick<EvidenceDto, "title" | "evidence_type">;
+
+export type DocumentLinkEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "report" | "scenario" | "hire" | "document";
+
+export type DocumentUploadInput = {
+  file: File;
+  title: string;
+  document_category: EvidenceDocumentCategory;
+  document_date?: string;
+  description?: string;
+  source_organisation?: string;
+  linked_entity_type?: DocumentLinkEntityType;
+  linked_entity_id?: string;
+  relationship?: string;
+};
+
+export type DocumentAccessResponse = { status: "success"; action: "view" | "download"; signed_url: string; expires_at: string };

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 type Viewer = {
   name: string;
   initials: string;
+  role: string | null;
+  canWriteFinance: boolean;
 };
 
 const sessionPaths = [
@@ -42,7 +44,11 @@ const parseViewer = (payload: unknown): Viewer | null => {
     [firstName, lastName].filter(Boolean).join(" ") ||
     (text(user.email) ? readableEmailName(text(user.email)!) : undefined);
 
-  return fullName ? { name: fullName, initials: initialsFor(fullName) } : null;
+  const role = text(user.role) ?? null;
+  const isFounder = user.isFounder === true || user.is_founder === true;
+  const isAdmin = user.isAdmin === true || user.is_admin === true;
+  const canWriteFinance = isFounder || isAdmin || role === "founder" || role === "admin" || role === "founder_admin";
+  return fullName ? { name: fullName, initials: initialsFor(fullName), role, canWriteFinance } : null;
 };
 
 export function useDataRoomViewer() {
@@ -50,7 +56,7 @@ export function useDataRoomViewer() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const token = sessionStorage.getItem("klps.dataRoom.sessionToken");
+    const token = sessionStorage.getItem("klps.dataRoom.sessionToken") ?? sessionStorage.getItem("klps.founderDashboard.sessionToken");
 
     const load = async () => {
       for (const path of sessionPaths) {

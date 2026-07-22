@@ -2,6 +2,8 @@ import { ApiError } from "@/lib/authenticated-api";
 import { evidenceRepository } from "@/repositories/evidenceRepository";
 import type { EvidenceEntityType, EvidenceFilters, EvidenceMetadataInput } from "@/types/evidence";
 import { mapEvidenceDto } from "./evidence.adapter";
+import { buildDocumentUploadFormData } from "./document-upload";
+import type { DocumentUploadInput } from "@/types/evidence";
 
 export const isBackendUuid = (id: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id);
 
@@ -31,5 +33,9 @@ export const evidenceService = {
     if (!isBackendUuid(entityId)) return [];
     return (await evidenceRepository.linked(entityType, entityId)).evidence.map(mapEvidenceDto);
   },
+  async uploadDocument(input: DocumentUploadInput) {
+    const response = await evidenceRepository.uploadDocument(buildDocumentUploadFormData(input));
+    return { evidence: mapEvidenceDto(response.evidence), link: response.link };
+  },
+  accessDocument: evidenceRepository.accessDocument,
 };
-

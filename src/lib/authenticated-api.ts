@@ -3,7 +3,7 @@ import { API_BASE } from "@/config/api";
 const TOKEN_KEYS = ["klps.dataRoom.sessionToken", "klps.founderDashboard.sessionToken"];
 
 export class ApiError extends Error {
-  constructor(message: string, public readonly status: number) {
+  constructor(message: string, public readonly status: number, public readonly code?: string, public readonly payload?: Record<string, unknown>) {
     super(message);
     this.name = "ApiError";
   }
@@ -11,11 +11,12 @@ export class ApiError extends Error {
 
 export async function authenticatedApi<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = TOKEN_KEYS.map((key) => sessionStorage.getItem(key)).find(Boolean);
+  const multipart = options.body instanceof FormData;
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(!multipart ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
@@ -25,8 +26,7 @@ export async function authenticatedApi<T>(path: string, options: RequestInit = {
   try { body = text ? JSON.parse(text) : {}; } catch { body = {}; }
   if (!response.ok) {
     const record = body && typeof body === "object" ? body as Record<string, unknown> : {};
-    throw new ApiError(String(record.message ?? record.error ?? `Request failed with ${response.status}`), response.status);
+    throw new ApiError(String(record.message ?? record.error ?? `Request failed with ${response.status}`), response.status, typeof record.code === "string" ? record.code : undefined, record);
   }
   return body as T;
 }
-
