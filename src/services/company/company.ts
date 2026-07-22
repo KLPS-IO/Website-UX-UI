@@ -1,25 +1,18 @@
-import { companyDefaults } from "@/types/company.defaults";
-import type { CompanyOverview, CompanyRecord } from "@/types/company";
-import { getCompanyHealth } from "./company.health";
+import { companyRepository } from "@/repositories/companyRepository";
+import type { CompanyUpdatePayload } from "@/types/company";
+import { mapEvidenceDto } from "@/services/evidence/evidence.adapter";
+import { mapCompanyDto, mapCompanyHealthDto, mapCompanyVersionDto } from "./company.adapter";
 
-const cloneCompany = (): CompanyRecord => ({
-  ...companyDefaults,
-  registeredOffice: { ...companyDefaults.registeredOffice },
-  sicCodes: [...companyDefaults.sicCodes],
-  industry: [...companyDefaults.industry],
-  evidenceIds: [...companyDefaults.evidenceIds],
-  vatEvidenceIds: [...companyDefaults.vatEvidenceIds],
-  seisEvidenceIds: [...companyDefaults.seisEvidenceIds],
-  currentFundingSources: [...companyDefaults.currentFundingSources],
-  futureRevenueSources: [...companyDefaults.futureRevenueSources],
-  milestones: companyDefaults.milestones.map((milestone) => ({ ...milestone })),
-});
-
-export function getCompany(): CompanyRecord {
-  return cloneCompany();
-}
-
-export function getCompanyOverview(): CompanyOverview {
-  const company = cloneCompany();
-  return { company, ...getCompanyHealth(company) };
-}
+export const companyService = {
+  async getCompany() {
+    const dto = (await companyRepository.getCompany()).company;
+    return dto ? mapCompanyDto(dto) : null;
+  },
+  async updateCompany(payload: CompanyUpdatePayload) {
+    if (!payload.change_reason.trim()) throw new Error("A change reason is required.");
+    return mapCompanyDto((await companyRepository.updateCompany(payload)).company);
+  },
+  async getCompanyVersions() { return (await companyRepository.getCompanyVersions()).versions.map(mapCompanyVersionDto); },
+  async getCompanyHealth() { return mapCompanyHealthDto((await companyRepository.getCompanyHealth()).health); },
+  async getCompanyEvidence() { return (await companyRepository.getCompanyEvidence()).evidence.map(mapEvidenceDto); },
+};

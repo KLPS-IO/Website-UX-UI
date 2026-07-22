@@ -7,12 +7,14 @@ export const evidenceDocumentCategories = [
 export type EvidenceDocumentCategory = (typeof evidenceDocumentCategories)[number];
 export type EvidenceVerificationStatus = "Unknown" | "Unverified" | "Under Review" | "Verified" | "Rejected" | "Expired";
 export type EvidenceDocumentStatus = "Draft" | "Active" | "Superseded" | "Archived" | "Expired";
-export type EvidenceEntityType = "assumptions" | "products" | "decisions" | "risks" | "funding" | "reports" | "scenarios" | "hires" | "documents";
+export type EvidenceEntityType = "assumptions" | "products" | "decisions" | "risks" | "funding" | "reports" | "scenarios" | "hires" | "documents" | "company";
 
 export interface EvidenceLinkDto {
   id: string;
   entity_type: EvidenceEntityType;
   entity_id: string;
+  relationship_type?: string | null;
+  relationship?: string | null;
   created_at?: string;
 }
 
@@ -96,4 +98,3 @@ export type EvidenceFilters = Partial<{
 }>;
 
 export type EvidenceMetadataInput = Partial<Omit<EvidenceDto, "id" | "evidence_code" | "created_at" | "updated_at" | "created_by" | "updated_by" | "version" | "links">> & Pick<EvidenceDto, "title" | "evidence_type">;
-

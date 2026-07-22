@@ -47,7 +47,6 @@ import {
   type FinanceExportData,
 } from "@/lib/finance-exports";
 import { useState } from "react";
-import { getCompany } from "@/services/company/company";
 
 export default function DashboardPage() {
   const [excelStatus, setExcelStatus] = useState<"idle" | "preparing">("idle");
@@ -62,7 +61,7 @@ export default function DashboardPage() {
   const activity = model.recentActivity;
   const exportData = (): FinanceExportData => ({
     generatedAt: new Date(),
-    company: getCompany(),
+    company: finance.company!,
     kpis: model.kpis,
     series: model.series,
     revenueMix: model.revenueMix,
@@ -77,6 +76,7 @@ export default function DashboardPage() {
     "inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-foreground transition hover:border-brand-orange/40 hover:bg-brand-orange/10";
 
   const downloadExcel = async () => {
+    if (!finance.company) { setExportError("Canonical Company data must load before exporting."); return; }
     setExcelStatus("preparing");
     setExportError("");
     try {
@@ -97,13 +97,13 @@ export default function DashboardPage() {
         description="A live view of the KLPS financial model - every metric flows from the Assumptions ledger."
         actions={
           <>
-            <button type="button" onClick={() => exportFinancePdf(exportData())} className={exportButton} title="Download a professionally formatted PDF report">
+            <button type="button" disabled={!finance.company} onClick={() => finance.company && exportFinancePdf(exportData())} className={`${exportButton} disabled:cursor-not-allowed disabled:opacity-50`} title="Download a professionally formatted PDF report">
               <Download className="h-4 w-4 text-brand-orange" /> PDF
             </button>
-            <button type="button" onClick={() => void downloadExcel()} disabled={excelStatus === "preparing"} className={`${exportButton} disabled:cursor-wait disabled:opacity-60`} title="Download the full model as an Excel workbook">
+            <button type="button" onClick={() => void downloadExcel()} disabled={excelStatus === "preparing" || !finance.company} className={`${exportButton} disabled:cursor-wait disabled:opacity-60`} title="Download the full model as an Excel workbook">
               <FileSpreadsheet className="h-4 w-4 text-brand-sage" /> {excelStatus === "preparing" ? "Preparing…" : "Excel"}
             </button>
-            <button type="button" onClick={() => printFinanceReport(exportData())} className={exportButton} title="Open a print-ready financial report">
+            <button type="button" disabled={!finance.company} onClick={() => finance.company && printFinanceReport(exportData())} className={`${exportButton} disabled:cursor-not-allowed disabled:opacity-50`} title="Open a print-ready financial report">
               <Printer className="h-4 w-4 text-brand-purple" /> Print
             </button>
             <span className="inline-flex items-center gap-2 rounded-lg border border-white/5 bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground">
