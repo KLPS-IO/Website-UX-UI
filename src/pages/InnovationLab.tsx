@@ -13,11 +13,9 @@ import { Section, StatCard } from "@/components/Section";
 import { AnimatedHeadline } from "@/components/AnimatedHeadline";
 const navItems = [
   { href: "#overview", label: "Overview" },
+  { href: "/innovation-lab/growth/mission-control", label: "Growth" },
   { href: "#founder", label: "Founder" },
   { href: "/data-room", label: "Data Room" },
-  { href: "#lab", label: "R&D Lab" },
-  { href: "#ecosystem", label: "Ecosystem" },
-  { href: "#funding", label: "Funding" },
   { href: "#vault", label: "Vault" },
 ];
 

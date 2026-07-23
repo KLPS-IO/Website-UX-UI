@@ -31,6 +31,8 @@ import { SlideDeckPdfExport } from "./components/SlideDeckPdfExport";
 import BodyDiscoverySurvey from "@/pages/BodyDiscoverySurvey";
 import FinanceApp from "@/pages/FinanceApp";
 import { FinanceProvider } from "@/contexts/FinanceContext";
+import DataRoomGuidePage from "@/pages/DataRoomGuide";
+import GrowthApp from "@/pages/growth/GrowthApp";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
+          <Route path="/innovation-lab/growth/*" element={<GrowthApp />} />
           <Route path="/pitch-deck-preview" element={<SlideDeck />} />
           <Route path="/pitch-deck-export" element={<SlideDeckPdfExport />} />
           <Route path="/pitchdeck-preview" element={<SlideDeck />} />
@@ -73,6 +76,7 @@ const App = () => (
             }
           />
           <Route path="/data-room" element={<DataRoom />} />
+          <Route path="/data-room/guide" element={<DataRoomGuidePage />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/beta-login" element={<BetaLogin />} />
           <Route path="/beta-dashboard" element={<DashboardLayout />}>

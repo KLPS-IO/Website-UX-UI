@@ -193,6 +193,98 @@ All colors MUST be HSL.
   }
 }
 
+@layer components {
+  .guide-action {
+    @apply inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium transition hover:border-brand-orange;
+  }
+
+  .guide-list {
+    @apply list-disc space-y-2 pl-5;
+  }
+}
+
+/* Growth OS uses its own light workspace theme without changing Innovation Lab or Finance. */
+.growth-theme {
+  background: #e8ebef !important;
+  color: #1f2b35 !important;
+}
+
+.growth-theme [class*="bg-[#09070d]"],
+.growth-theme [class*="bg-[#0d0a12]"] {
+  background-color: rgba(232, 235, 239, 0.97) !important;
+}
+
+.growth-theme [class*="bg-white/"] {
+  background-color: rgba(247, 248, 249, 0.94) !important;
+}
+
+.growth-theme [class*="bg-black/"] {
+  background-color: rgba(31, 43, 53, 0.055) !important;
+}
+
+.growth-theme button[class*="bg-black/"] {
+  background-color: rgba(0, 0, 0, 0.45) !important;
+}
+
+.growth-theme [class*="border-white/"] {
+  border-color: rgba(31, 43, 53, 0.17) !important;
+}
+
+.growth-theme [class~="text-white"] {
+  color: #1f2b35 !important;
+}
+
+.growth-theme [class*="text-white/"] {
+  color: #52616d !important;
+}
+
+.growth-theme [class~="bg-[#df3fae]"][class~="text-white"],
+.growth-theme .bg-gradient-to-br.text-white {
+  color: #ffffff !important;
+}
+
+.growth-theme [class*="text-[#35d3c8]"] {
+  color: #087f7a !important;
+}
+
+.growth-theme [class*="text-[#f15bbe]"] {
+  color: #a91876 !important;
+}
+
+.growth-theme [class*="text-[#c8a6eb]"] {
+  color: #704293 !important;
+}
+
+.growth-theme aside,
+.growth-theme header {
+  background-color: rgba(224, 228, 233, 0.97) !important;
+  box-shadow: 0 1px 0 rgba(31, 43, 53, 0.12);
+}
+
+.growth-theme > .pointer-events-none {
+  opacity: 0.32;
+}
+
+.growth-theme main section,
+.growth-theme main article {
+  box-shadow: 0 12px 34px -26px rgba(31, 43, 53, 0.55);
+}
+
+.growth-theme nav a {
+  color: #465662 !important;
+}
+
+.growth-theme nav a:hover {
+  background-color: rgba(255, 255, 255, 0.62) !important;
+  color: #1f2b35 !important;
+}
+
+.growth-theme nav a[aria-current="page"] {
+  background-color: rgba(223, 63, 174, 0.13) !important;
+  color: #7d1458 !important;
+  box-shadow: inset 3px 0 0 #c5268d;
+}
+
 @media print {
   @page {
     size: A4 portrait;

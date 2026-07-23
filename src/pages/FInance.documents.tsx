@@ -8,6 +8,7 @@ import { ApiError } from "@/lib/authenticated-api";
 import { documentApiErrorMessage, documentFolderDisplay, validateDocumentUpload } from "@/services/evidence/document-upload";
 import { evidenceService } from "@/services/evidence/evidence.service";
 import { evidenceDocumentCategories, type DocumentLinkEntityType, type DocumentUploadInput, type EvidenceDocumentCategory, type EvidenceItem, type EvidenceVerificationStatus } from "@/types/evidence";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 type QueueStatus = "Ready" | "Validating" | "Uploading" | "Complete" | "Failed";
 type QueueItem = {
@@ -15,6 +16,7 @@ type QueueItem = {
   description: string; sourceOrganisation: string; linkMode: boolean; entityType: DocumentLinkEntityType | "";
   entityId: string; relationship: string; status: QueueStatus; errors: string[]; resultMessage: string;
 };
+type UploadPrefill = { title: string; category: EvidenceDocumentCategory; sourceOrganisation: string; linkMode: boolean; entityType: DocumentLinkEntityType; relationship: string };
 
 const inputClass = "w-full rounded-lg border border-border bg-white/70 px-3 py-2 text-sm outline-none focus:border-brand-orange/50";
 const buttonClass = "inline-flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium transition hover:border-brand-orange/40 disabled:cursor-not-allowed disabled:opacity-50";
@@ -23,8 +25,13 @@ const formatDate = (value: string) => value ? new Date(value).toLocaleDateString
 
 export default function DocumentsPage() {
   const viewer = useDataRoomViewer();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { company, refreshCompany } = useFinance();
   const [documents, setDocuments] = useState<EvidenceItem[]>([]);
+  const [readFirstDocuments, setReadFirstDocuments] = useState<EvidenceItem[]>([]);
+  const [readFirstLoading, setReadFirstLoading] = useState(true);
+  const [readFirstError, setReadFirstError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
   const [category, setCategory] = useState<EvidenceDocumentCategory | "">("");
@@ -33,6 +40,7 @@ export default function DocumentsPage() {
   const [sourceOrganisation, setSourceOrganisation] = useState("");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [uploadPrefill, setUploadPrefill] = useState<UploadPrefill | null>(null);
   const [accessError, setAccessError] = useState("");
   const [versionsFor, setVersionsFor] = useState<EvidenceItem | null>(null);
   const [versions, setVersions] = useState<EvidenceItem[]>([]);
@@ -46,11 +54,26 @@ export default function DocumentsPage() {
     finally { setLoading(false); }
   }, [category, keyword, verification, sourceOrganisation]);
 
+  const loadReadFirst = useCallback(async () => {
+    setReadFirstLoading(true); setReadFirstError(false);
+    try { setReadFirstDocuments(await evidenceService.listWithLinks({ evidence_type: "document", category: "Read First", limit: 100 })); }
+    catch { setReadFirstDocuments([]); setReadFirstError(true); }
+    finally { setReadFirstLoading(false); }
+  }, []);
+
   useEffect(() => { const timer = window.setTimeout(() => void loadDocuments(), 250); return () => window.clearTimeout(timer); }, [loadDocuments]);
+  useEffect(() => { void loadReadFirst(); }, [loadReadFirst]);
+  useEffect(() => {
+    const state = location.state as { documentUploadPrefill?: UploadPrefill } | null;
+    if (!state?.documentUploadPrefill) return;
+    setUploadPrefill(state.documentUploadPrefill); setUploadOpen(true);
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.pathname, location.state, navigate]);
 
   const grouped = useMemo(() => evidenceDocumentCategories.map((name) => ({ name, documents: documents.filter((document) => document.category === name) })), [documents]);
   const sources = useMemo(() => Array.from(new Set(documents.map((document) => document.sourceOrganisation).filter((value): value is string => Boolean(value)))).sort(), [documents]);
   const unauthorised = error instanceof ApiError && (error.status === 401 || error.status === 403);
+  const guideDocument = readFirstDocuments.find((document) => document.title.toLowerCase().includes("data room guide"));
 
   const accessFile = async (item: EvidenceItem, action: "view" | "download") => {
     setAccessError("");
@@ -79,6 +102,14 @@ export default function DocumentsPage() {
       <PageHeader eyebrow="Data room" title="Documents" description="Canonical Finance evidence documents stored privately and accessed through short-lived secure links."
         actions={viewer?.canWriteFinance ? <button onClick={() => setUploadOpen(true)} className="inline-flex items-center gap-2 rounded-lg bg-brand-orange px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-brand-orange/90"><Upload className="h-4 w-4" /> Upload</button> : <span className="text-xs text-muted-foreground">Upload requires founder/admin access</span>} />
 
+      <Surface className="mb-6 border-brand-orange/25 bg-brand-orange/[0.05]">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div><SectionTitle title="Read First" hint={readFirstLoading ? "Loading · 00_READ_FIRST" : `${readFirstDocuments.length} documents · 00_READ_FIRST`} /><p className="max-w-2xl text-sm leading-6 text-muted-foreground">Start here. These documents help investors and authorised reviewers understand the folder structure, key contacts, document ownership and update schedule.</p>{!readFirstLoading && !readFirstError && readFirstDocuments.length === 0 && <p className="mt-3 text-sm">Upload the KLPS Data Room Guide to explain how the data room should be navigated and interpreted.</p>}{readFirstError && <p className="mt-3 text-sm text-brand-coral">Read First documents are temporarily unavailable.</p>}</div>
+          <div className="flex shrink-0 flex-wrap gap-2">{!readFirstLoading && !readFirstError && (guideDocument ? <button className={buttonClass} disabled={!guideDocument.hasR2Object} onClick={() => void accessFile(guideDocument, "view")}><Eye className="h-4 w-4" /> Open Data Room Guide</button> : <Link className={buttonClass} to="/data-room/guide">Create Data Room Guide</Link>)}</div>
+        </div>
+        {readFirstDocuments.length > 0 && <ul className="mt-4 grid gap-3 md:grid-cols-2">{readFirstDocuments.map((document) => <li key={document.id} className="rounded-lg border border-brand-orange/15 bg-background/60 p-3"><div className="text-xs font-semibold text-brand-orange">{document.code}</div><div className="mt-1 truncate text-sm font-medium" title={document.title}>{document.title}</div><div className="mt-2 text-xs text-muted-foreground">{document.documentStatus} · {document.verificationStatus} · {document.links === null ? "Links not loaded" : `${document.links.length} links`}</div></li>)}</ul>}
+      </Surface>
+
       <Surface className="mb-6">
         <SectionTitle title="Document Filters" />
         <div className="grid gap-3 md:grid-cols-4">
@@ -93,7 +124,7 @@ export default function DocumentsPage() {
       {loading && <DocumentState title="Loading documents" message="Retrieving canonical document evidence…" />}
       {!loading && error && <DocumentState title={unauthorised ? "Unauthorised" : "Documents unavailable"} message={unauthorised ? "You are not authorised to view Finance documents." : documentApiErrorMessage(error)} action={loadDocuments} />}
       {!loading && !error && documents.length === 0 && <DocumentState title={category ? `No documents in ${category}` : "No documents yet"} message="The canonical Evidence API returned no matching document records." />}
-      {!loading && !error && documents.length > 0 && <div className="space-y-6">{grouped.filter((group) => group.documents.length > 0).map((group) => (
+      {!loading && !error && documents.length > 0 && <div className="space-y-6">{grouped.filter((group) => group.name !== "Read First" && group.documents.length > 0).map((group) => (
         <Surface key={group.name} padded={false}>
           <div className="border-b border-white/5 px-5 py-4"><SectionTitle title={group.name} hint={`${group.documents.length} · ${documentFolderDisplay[group.name]}`} /></div>
           <div className="overflow-x-auto"><table className="w-full min-w-[1050px] text-sm"><thead><tr className="text-left text-[10px] uppercase tracking-wider text-muted-foreground"><th className="px-5 py-3">Document</th><th className="px-3 py-3">Source</th><th className="px-3 py-3">File</th><th className="px-3 py-3">Status</th><th className="px-3 py-3">Updated</th><th className="px-3 py-3">Links</th><th className="px-5 py-3 text-right">Actions</th></tr></thead><tbody>{group.documents.map((item) => (
@@ -102,15 +133,15 @@ export default function DocumentsPage() {
         </Surface>
       ))}</div>}
 
-      <UploadDialog open={uploadOpen} setOpen={setUploadOpen} queue={queue} setQueue={setQueue} companyId={company?.id ?? null} documents={documents} afterUploads={async (linkedCompany) => { await loadDocuments(); if (linkedCompany) await refreshCompany(); }} />
+      <UploadDialog open={uploadOpen} setOpen={setUploadOpen} queue={queue} setQueue={setQueue} companyId={company?.id ?? null} documents={documents} prefill={uploadPrefill} afterUploads={async (linkedCompany) => { await Promise.all([loadDocuments(), loadReadFirst()]); if (linkedCompany) await refreshCompany(); }} />
       <VersionDialog item={versionsFor} setItem={setVersionsFor} versions={versions} loading={versionsLoading} />
     </div>
   );
 }
 
-function UploadDialog({ open, setOpen, queue, setQueue, companyId, documents, afterUploads }: { open: boolean; setOpen: (value: boolean) => void; queue: QueueItem[]; setQueue: React.Dispatch<React.SetStateAction<QueueItem[]>>; companyId: string | null; documents: EvidenceItem[]; afterUploads: (linkedCompany: boolean) => Promise<void> }) {
+function UploadDialog({ open, setOpen, queue, setQueue, companyId, documents, prefill, afterUploads }: { open: boolean; setOpen: (value: boolean) => void; queue: QueueItem[]; setQueue: React.Dispatch<React.SetStateAction<QueueItem[]>>; companyId: string | null; documents: EvidenceItem[]; prefill: UploadPrefill | null; afterUploads: (linkedCompany: boolean) => Promise<void> }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const addFiles = (files: File[]) => setQueue((current) => [...current, ...files.map((file): QueueItem => ({ queueId: crypto.randomUUID(), file, title: file.name.replace(/\.[^.]+$/, ""), category: "", documentDate: "", description: "", sourceOrganisation: "", linkMode: false, entityType: "", entityId: "", relationship: "", status: "Ready", errors: [], resultMessage: "" }))]);
+  const addFiles = (files: File[]) => setQueue((current) => [...current, ...files.map((file): QueueItem => ({ queueId: crypto.randomUUID(), file, title: prefill?.title ?? file.name.replace(/\.[^.]+$/, ""), category: prefill?.category ?? "", documentDate: "", description: "", sourceOrganisation: prefill?.sourceOrganisation ?? "", linkMode: prefill?.linkMode ?? false, entityType: prefill?.entityType ?? "", entityId: prefill?.entityType === "company" ? companyId ?? "" : "", relationship: prefill?.relationship ?? "", status: "Ready", errors: [], resultMessage: "" }))]);
   const update = (id: string, changes: Partial<QueueItem>) => setQueue((current) => current.map((item) => item.queueId === id ? { ...item, ...changes } : item));
   const onDrop = (event: DragEvent<HTMLDivElement>) => { event.preventDefault(); addFiles(Array.from(event.dataTransfer.files)); };
 
