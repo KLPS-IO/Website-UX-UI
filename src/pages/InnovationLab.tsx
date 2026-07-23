@@ -148,8 +148,8 @@ const InnovationLab = () => {
           <div className="flex min-w-0 items-center gap-8">
             <a href="https://klps.co.uk" className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-accent shadow-[0_0_12px_hsl(var(--accent))]" />
-              <span className="text-m font-semibold tracking-[0.35em] text-foreground">
-                KPLS
+              <span className="text-sm font-semibold tracking-[0.35em] text-foreground">
+                KLPS
               </span>
             </a>
             <nav className="hidden items-center gap-1 lg:flex">
@@ -157,7 +157,7 @@ const InnovationLab = () => {
                 <NavLink
                   key={item.label}
                   href={item.href}
-                  className={`rounded-full px-3 py-1.5 text-m font-medium tracking-wide transition-colors ${
+                  className={`rounded-full px-3 py-1.5 text-sm font-medium tracking-wide transition-colors ${
                     index === 0
                       ? "bg-white/5 text-foreground"
                       : "text-muted-foreground hover:text-foreground"
@@ -175,13 +175,13 @@ const InnovationLab = () => {
             </span>
             <a
               href="https://klps.co.uk"
-              className="rounded-full border border-border bg-white/[0.03] px-4 py-1.5 text-m font-medium text-foreground transition-colors hover:bg-white/[0.08]"
+              className="rounded-full border border-border bg-white/[0.03] px-4 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.08]"
             >
               Back to Home
             </a>
             <Link
               to="/data-room"
-              className="hidden rounded-full bg-foreground px-4 py-1.5 text-m font-medium text-primary-foreground transition-transform hover:scale-[1.02] sm:inline-flex"
+              className="hidden rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-primary-foreground transition-transform hover:scale-[1.02] sm:inline-flex"
             >
               Access Vault
             </Link>
@@ -202,21 +202,21 @@ const InnovationLab = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-obsidian/70 via-obsidian/90 to-obsidian" />
           </div>
 
-          <div className="mx-auto max-w-7xl px-6 pt-16 md:pt-24">
-            <div className="max-w-4xl animate-fade-up">
-              <div className="mb-6 inline-flex items-center gap-2 md:text-lg rounded-full border border-border bg-white/[0.03] px-3 py-1 text-[10px] font-mono uppercase tracking-[0.25em] text-muted-foreground">
+          <div className="mx-auto max-w-7xl px-6 pb-8 pt-14 md:pb-12 md:pt-20">
+            <div className="max-w-5xl animate-fade-up">
+              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-white/[0.03] px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 <span className="size-1 rounded-full bg-accent shadow-[0_0_8px_hsl(var(--accent))]" />
                 Next-generation wearable infrastructure
               </div>
               <AnimatedHeadline
-                className="text-balance text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-5xl lg:text-7xl"
+                className="text-balance text-[clamp(2.75rem,5.5vw,4.75rem)] font-light leading-[1.02] tracking-[-0.035em] text-foreground"
                 lines={[
                   { text: "ENGINEERING", italic: true, brand: true },
                   { text: "the future of", italic: true, brand: true },
                   { text: "INTELLIGENT TEXTILES.", italic: true, muted: true, brand: true },
                 ]}
               />
-              <p className="mt-8 max-w-xl text-lg text-muted-foreground">
+              <p className="mt-7 max-w-xl text-base leading-7 text-muted-foreground md:text-lg">
                 Everything in this room is built on customer discovery,
                 technical validation and measurable demand.
               </p>
@@ -236,7 +236,7 @@ const InnovationLab = () => {
               </div>
             </div>
 
-            <div className="mt-24 overflow-hidden rounded-2xl border border-border bg-border pb-0">
+            <div className="mt-20 overflow-hidden rounded-2xl border border-border bg-border pb-0">
               <div className="grid gap-px md:grid-cols-[0.85fr_1fr_1fr]">
                 <div className="bg-obsidian p-6 md:p-8">
                   <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
