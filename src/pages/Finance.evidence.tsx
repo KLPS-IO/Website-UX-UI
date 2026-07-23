@@ -22,7 +22,7 @@ export default function EvidencePage() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try { setItems(await evidenceService.list({ limit: 100 })); }
+    try { setItems(await evidenceService.listWithLinks({ limit: 100 })); }
     catch (reason) { setError(reason); }
     finally { setLoading(false); }
   }, []);
@@ -44,7 +44,7 @@ export default function EvidencePage() {
   const averageConfidence = useMemo(() => items.length
     ? Math.round(items.reduce((sum, item) => sum + item.confidencePercent, 0) / items.length)
     : null, [items]);
-  const linked = items.filter((item) => item.links.length > 0).length;
+  const linked = items.filter((item) => item.links !== null && item.links.length > 0).length;
   const unauthorised = error instanceof ApiError && (error.status === 401 || error.status === 403);
 
   return (
@@ -83,7 +83,7 @@ export default function EvidencePage() {
                       <div className="mt-3 flex items-center gap-2">
                         <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/5"><div className="h-full bg-brand-sage" style={{ width: `${item.confidencePercent}%` }} /></div>
                         <span className="inline-flex items-center gap-1 text-xs text-brand-sage"><ShieldCheck className="h-3 w-3" /> {item.confidencePercent}%</span>
-                        <span className="text-xs text-muted-foreground">{item.links.length} links</span>
+                        <span className="text-xs text-muted-foreground">{item.links === null ? "Links not loaded" : `${item.links.length} links`}</span>
                       </div>
                     </div>
                   </div>
@@ -119,7 +119,7 @@ function EvidenceDetail({ item, versions, loading, close }: { item: EvidenceItem
           <Field label="Expiry date" value={date(item.expiryDate)} /><Field label="Folder path" value={shown(item.folderPath)} />
         </dl></Surface>
         <Surface className="mt-4"><SectionTitle title="Audit" /><dl className="grid gap-4 sm:grid-cols-2"><Field label="Created" value={date(item.createdAt)} /><Field label="Updated" value={date(item.updatedAt)} /><Field label="Created by" value={shown(item.createdBy)} /><Field label="Updated by" value={shown(item.updatedBy)} /><Field label="Record version" value={`v${item.version}`} /><Field label="Change reason" value={shown(item.changeReason)} /></dl></Surface>
-        <Surface className="mt-4"><SectionTitle title="Links" hint={`${item.links.length}`} />{item.links.length ? <ul className="space-y-2">{item.links.map((link) => <li key={link.id} className="rounded-lg border border-border p-3 text-sm"><span className="font-medium">{link.entity_type}</span><div className="mt-1 break-all text-xs text-muted-foreground">{link.entity_id}</div></li>)}</ul> : <p className="text-sm text-muted-foreground">No linked backend records.</p>}</Surface>
+        <Surface className="mt-4"><SectionTitle title="Links" hint={item.links === null ? "Not loaded" : `${item.links.length}`} />{item.links === null ? <p className="text-sm text-muted-foreground">Link information was not loaded.</p> : item.links.length ? <ul className="space-y-2">{item.links.map((link) => <li key={link.id} className="rounded-lg border border-border p-3 text-sm"><span className="font-medium">{link.entity_type === "company" ? "Company" : link.entity_type}</span><div className="mt-1 break-all text-xs text-muted-foreground">{link.entity_id}</div><div className="mt-1 text-xs text-muted-foreground">{link.relationship ?? link.relationship_type ?? "Linked"}</div></li>)}</ul> : <p className="text-sm text-muted-foreground">No linked backend records.</p>}</Surface>
         <Surface className="mt-4"><SectionTitle title="Version History" hint={`${versions.length}`} />{versions.length ? <ul className="space-y-2">{versions.map((version) => <li key={`${version.id}-${version.version}`} className="flex justify-between rounded-lg border border-border p-3 text-sm"><span>Record v{version.version} · File v{version.fileVersion}</span><span className="text-muted-foreground">{date(version.updatedAt)}</span></li>)}</ul> : <p className="text-sm text-muted-foreground">No version history returned.</p>}</Surface>
       </aside>
     </div>

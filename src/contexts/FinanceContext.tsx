@@ -57,7 +57,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
         return;
       }
       const [health, versions, evidence] = await Promise.all([
-        companyService.getCompanyHealth(), companyService.getCompanyVersions(), companyService.getCompanyEvidence(),
+        companyService.getCompanyHealth(), companyService.getCompanyVersions(), companyService.getCompanyEvidence(record.id),
       ]);
       setCompany(record); setCompanyHealth(health); setCompanyVersions(versions); setCompanyEvidence(evidence);
     } catch (error) {

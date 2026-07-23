@@ -14,5 +14,5 @@ export const companyService = {
   },
   async getCompanyVersions() { return (await companyRepository.getCompanyVersions()).versions.map(mapCompanyVersionDto); },
   async getCompanyHealth() { return mapCompanyHealthDto((await companyRepository.getCompanyHealth()).health); },
-  async getCompanyEvidence() { return (await companyRepository.getCompanyEvidence()).evidence.map(mapEvidenceDto); },
+  async getCompanyEvidence(companyId: string) { return (await companyRepository.getCompanyEvidence()).evidence.map((dto) => mapEvidenceDto(dto, { entityType: "company", entityId: companyId })); },
 };

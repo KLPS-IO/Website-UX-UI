@@ -226,7 +226,7 @@ export default function CompanyPage() {
             <li key={item.id} className="rounded-lg border border-white/5 bg-white/[0.02] p-3">
               <div className="flex flex-wrap items-center gap-2"><span className="font-semibold text-brand-orange">{item.code}</span><span className="text-sm font-medium">{item.title}</span></div>
               <div className="mt-2 text-xs text-muted-foreground">{display(item.category)} · {item.type} · {item.verificationStatus} · {item.documentStatus}</div>
-              <div className="mt-1 text-xs text-muted-foreground">Confidence {item.confidencePercent}% · {display(item.sourceOrganisation)} · Relationship: {display(item.links.find((link) => link.entity_type === "company" && link.entity_id === company.id)?.relationship_type ?? item.links.find((link) => link.entity_type === "company" && link.entity_id === company.id)?.relationship)}</div>
+              <div className="mt-1 text-xs text-muted-foreground">Confidence {item.confidencePercent}% · {display(item.sourceOrganisation)} · Relationship: {display(item.links?.find((link) => link.entity_type === "company" && link.entity_id === company.id)?.relationship_type ?? item.links?.find((link) => link.entity_type === "company" && link.entity_id === company.id)?.relationship)}</div>
             </li>
           ))}</ul> : <p className="text-sm text-muted-foreground">No evidence is linked to this canonical Company UUID.</p>}
           {linkMessage && <p role="status" className="mt-3 text-xs text-brand-orange">{linkMessage}</p>}

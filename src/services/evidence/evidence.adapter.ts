@@ -1,9 +1,18 @@
-import type { EvidenceDto, EvidenceItem } from "@/types/evidence";
+import type { EvidenceDto, EvidenceEntityType, EvidenceItem, EvidenceLinkDto } from "@/types/evidence";
 
 export const confidenceToPercent = (confidence: number) =>
   Math.round(Math.min(1, Math.max(0, Number.isFinite(confidence) ? confidence : 0)) * 100);
 
-export function mapEvidenceDto(dto: EvidenceDto): EvidenceItem {
+export function mapEvidenceDto(dto: EvidenceDto, linkedContext?: { entityType: EvidenceEntityType; entityId: string }): EvidenceItem {
+  let links: EvidenceLinkDto[] | null = null;
+  if (Array.isArray(dto.links)) links = dto.links;
+  else if (dto.link_id && linkedContext) links = [{
+    id: dto.link_id,
+    entity_type: linkedContext.entityType,
+    entity_id: linkedContext.entityId,
+    relationship: dto.relationship ?? null,
+    created_at: dto.linked_at,
+  }];
   return {
     id: dto.id,
     code: dto.evidence_code,
@@ -34,7 +43,6 @@ export function mapEvidenceDto(dto: EvidenceDto): EvidenceItem {
     updatedBy: dto.updated_by,
     version: dto.version,
     changeReason: dto.change_reason,
-    links: dto.links ?? [],
+    links,
   };
 }
-

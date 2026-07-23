@@ -48,7 +48,11 @@ export interface EvidenceDto {
   updated_by: string | null;
   version: number;
   change_reason: string;
-  links: EvidenceLinkDto[];
+  links?: EvidenceLinkDto[];
+  link_id?: string;
+  relationship?: string | null;
+  link_notes?: string | null;
+  linked_at?: string;
 }
 
 export interface EvidenceItem {
@@ -81,7 +85,8 @@ export interface EvidenceItem {
   updatedBy: string | null;
   version: number;
   changeReason: string;
-  links: EvidenceLinkDto[];
+  /** null means the list endpoint omitted link data; [] means the API confirmed no links. */
+  links: EvidenceLinkDto[] | null;
 }
 
 export type EvidenceFilters = Partial<{
