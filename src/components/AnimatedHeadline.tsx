@@ -146,7 +146,7 @@ function WordParticles({
     <span
       ref={wrapRef}
       className={`relative inline-block align-baseline
-        ${italic ? "italic" : ""}
+        ${italic ? "-mr-[0.12em] pr-[0.12em] italic" : ""}
         ${muted ? "text-muted-foreground" : ""}
         ${brand ? "brand-text" : ""}`}
     >
