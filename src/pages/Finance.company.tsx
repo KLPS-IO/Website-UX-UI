@@ -1,4 +1,4 @@
-import { Building2, CalendarDays, CheckCircle2, CircleAlert, Clock3, FileCheck2, Landmark, ShieldCheck } from "lucide-react";
+import { Building2, CalendarDays, CheckCircle2, CircleAlert, Clock3, FileCheck2, Landmark, PieChart, ShieldCheck } from "lucide-react";
 import { PageHeader, SectionTitle, Surface } from "@/components/finance/PageHeader";
 import { GlossaryText } from "@/components/finance/GlossaryTooltip";
 import { useFinance } from "@/contexts/FinanceContext";
@@ -6,6 +6,7 @@ import { ApiError } from "@/lib/authenticated-api";
 import { evidenceErrorMessage, evidenceService } from "@/services/evidence/evidence.service";
 import type { EvidenceItem } from "@/types/evidence";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const display = (value: string | number | null | undefined, fallback = "Not confirmed") =>
   value === null || value === undefined || value === "" ? fallback : String(value);
@@ -122,6 +123,25 @@ export default function CompanyPage() {
           </div>
         </Surface>
       </div>
+
+      <Surface className="mt-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <SectionTitle title="Ownership & Share Capital" hint="Verified incorporation snapshot" />
+            <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+              <Field label="Shareholders" value="1 shareholder" />
+              <Field label="Issued shares" value="1 ordinary share" />
+              <Field label="Ownership" value="100% founder owned" />
+              <Field label="Nominal capital" value="£1 total" />
+              <Field label="Option pool" value="None" />
+              <Field label="External investors" value="None" />
+            </div>
+          </div>
+          <Link to="../cap-table" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-brand-purple/25 bg-brand-purple/10 px-3 py-2 text-sm font-semibold text-brand-purple transition hover:border-brand-purple/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple">
+            <PieChart className="h-4 w-4" /> Open Cap Table
+          </Link>
+        </div>
+      </Surface>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Surface>

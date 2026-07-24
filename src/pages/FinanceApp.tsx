@@ -18,6 +18,7 @@ import AIInsightsPage from "@/pages/Finance.ai-insights";
 import DecisionLogPage from "@/pages/Finance.decision-log";
 import RiskRegisterPage from "@/pages/Finance.risk-register";
 import CompanyPage from "@/pages/Finance.company";
+import CapTablePage from "@/pages/Finance.cap-table";
 
 export default function FinanceApp() {
   return (
@@ -26,6 +27,7 @@ export default function FinanceApp() {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="company" element={<CompanyPage />} />
+        <Route path="cap-table" element={<CapTablePage />} />
         <Route path="assumptions" element={<AssumptionsPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="revenue" element={<RevenuePage />} />

@@ -334,6 +334,27 @@ All colors MUST be HSL.
     display: none !important;
   }
 
+  .finance-page-printing .cap-table-desktop-table {
+    display: block !important;
+  }
+
+  .finance-page-printing .cap-table-desktop-table table {
+    min-width: 0 !important;
+    font-size: 9px !important;
+  }
+
+  .finance-page-printing .cap-table-mobile-cards {
+    display: none !important;
+  }
+
+  .finance-page-printing .cap-table-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .finance-page-printing .cap-table-two-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
   .finance-page-printing [data-finance-page-content] * {
     animation: none !important;
     transition: none !important;
@@ -360,6 +381,33 @@ All colors MUST be HSL.
 
 .finance-page-exporting [data-finance-page-content] button {
   display: none !important;
+}
+
+.finance-page-exporting .cap-table-desktop-table {
+  display: block !important;
+}
+
+.finance-page-exporting .cap-table-desktop-table table {
+  min-width: 0 !important;
+  font-size: 9px !important;
+}
+
+.finance-page-exporting .cap-table-desktop-table th,
+.finance-page-exporting .cap-table-desktop-table td {
+  padding-left: 6px !important;
+  padding-right: 6px !important;
+}
+
+.finance-page-exporting .cap-table-mobile-cards {
+  display: none !important;
+}
+
+.finance-page-exporting [data-finance-page-content] .cap-table-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.finance-page-exporting [data-finance-page-content] .cap-table-two-column {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
 .finance-page-exporting [data-finance-page-content] * {

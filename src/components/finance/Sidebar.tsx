@@ -19,6 +19,7 @@ import {
   ClipboardCheck,
   AlertTriangle,
   Building2,
+  PieChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const nav = [
   { to: "/data-room/guide", label: "Read First", icon: BookOpen, canonical: true },
   { to: "/finance/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/finance/company", label: "Company", icon: Building2 },
+  { to: "/finance/cap-table", label: "Cap Table", icon: PieChart },
   { to: "/finance/assumptions", label: "Assumptions", icon: Sliders },
   { to: "/finance/products", label: "Products", icon: Package },
   { to: "/finance/revenue", label: "Revenue", icon: TrendingUp },
