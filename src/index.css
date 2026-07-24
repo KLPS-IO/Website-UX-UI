@@ -195,7 +195,7 @@ All colors MUST be HSL.
 
 @layer components {
   .guide-action {
-    @apply inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium transition hover:border-brand-orange;
+    @apply inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium transition hover:border-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   .guide-list {

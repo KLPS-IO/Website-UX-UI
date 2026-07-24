@@ -831,21 +831,28 @@ const DataRoom = () => {
       <PageHeader
         eyebrow="Authorised Investor Access"
         title="Investor Data Room."
-        description="Versioned, permissioned documents covering KPLS fundraising, financials, IP and strategy."
+        description="Versioned, permissioned documents covering KLPS fundraising, financials, IP and strategy."
       >
-        <Link
-          to="/innovation-lab"
-          className="inline-flex rounded-full border border-border bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.08]"
-        >
-          Return to Innovation Lab
-        </Link>
-
-        <Link
-          to="/pitch-deck"
-          className="inline-flex rounded-full border border-border bg-white/[0.03] ml-5 px-5 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-white/[0.08]"
-        >
-          Pitch Deck
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            to="/innovation-lab"
+            className="inline-flex rounded-full border border-border bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Return to Innovation Lab
+          </Link>
+          <Link
+            to="/pitch-deck"
+            className="inline-flex rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-accent/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            Pitch Deck
+          </Link>
+          <Link
+            to="/data-room/guide"
+            className="inline-flex rounded-full border border-border bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          >
+            How to Use This Data Room
+          </Link>
+        </div>
       </PageHeader>
 
       <Section>

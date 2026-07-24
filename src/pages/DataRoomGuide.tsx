@@ -54,11 +54,14 @@ export default function DataRoomGuidePage() {
 
   return <div className="finance-theme min-h-screen bg-background text-foreground">
     <header className="print:hidden flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background/90 px-4 py-3 md:px-8">
-      <Link to="/data-room/finance/documents" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="h-4 w-4" /> Return to Documents</Link>
+      <div className="flex flex-wrap gap-2">
+        <Link to="/finance/dashboard" className="guide-action"><ArrowLeft className="h-4 w-4" /> Return to Finance Dashboard</Link>
+        <Link to="/data-room/finance/documents" className="guide-action"><Folder className="h-4 w-4" /> Open Documents</Link>
+      </div>
       <div className="flex flex-wrap gap-2">
         <button className="guide-action" onClick={printCurrentFinancePage}><Printer className="h-4 w-4" /> Print</button>
         <button className="guide-action" onClick={() => void exportCurrentFinancePagePdf("/data-room/guide")}><Download className="h-4 w-4" /> Export PDF</button>
-        <button className="guide-action bg-brand-orange text-primary-foreground" onClick={uploadGuide}><Upload className="h-4 w-4" /> Upload to Read First</button>
+        {viewer.canWriteFinance && <button className="guide-action bg-brand-orange text-primary-foreground" onClick={uploadGuide}><Upload className="h-4 w-4" /> Upload Guide</button>}
       </div>
     </header>
 

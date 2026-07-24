@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
+  BookOpen,
   LayoutDashboard,
   Sliders,
   Package,
@@ -22,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const nav = [
+  { to: "/data-room/guide", label: "Read First", icon: BookOpen, canonical: true },
   { to: "/finance/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/finance/company", label: "Company", icon: Building2 },
   { to: "/finance/assumptions", label: "Assumptions", icon: Sliders },
@@ -42,13 +44,13 @@ const nav = [
   { to: "/finance/ai-insights", label: "AI Insights", icon: Sparkles },
 ] as const;
 
-export function FinanceSidebar() {
+export function FinanceSidebar({ className, onNavigate }: { className?: string; onNavigate?: () => void }) {
   const { pathname } = useLocation();
   const inDataRoom = pathname.startsWith("/data-room/finance");
   const basePath = inDataRoom ? "/data-room/finance" : "/finance";
   const path = pathname.replace(/^\/data-room/, "") || "/finance/dashboard";
   return (
-    <aside className="hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col">
+    <aside className={cn("hidden w-64 shrink-0 border-r border-sidebar-border bg-sidebar lg:flex lg:flex-col", className)}>
       <div className="flex items-center gap-2.5 px-5 py-5">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-orange to-brand-coral text-primary-foreground shadow-lg shadow-brand-orange/20">
           <span className="text-sm font-bold">K</span>
@@ -69,14 +71,17 @@ export function FinanceSidebar() {
         </div>
         <ul className="space-y-0.5">
           {nav.map((item) => {
-            const active = path === item.to;
+            const canonical = "canonical" in item && item.canonical;
+            const active = canonical ? pathname === item.to : path === item.to;
             const Icon = item.icon;
             return (
               <li key={item.to}>
                 <NavLink
-                  to={`${basePath}${item.to.replace("/finance", "")}`}
+                  to={canonical ? item.to : `${basePath}${item.to.replace("/finance", "")}`}
+                  onClick={onNavigate}
+                  aria-label={item.label}
                   className={cn(
-                    "group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+                    "group flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar",
                     active
                       ? "bg-sidebar-accent text-sidebar-accent-foreground"
                       : "text-sidebar-foreground/80 hover:bg-white/[0.03] hover:text-sidebar-foreground",

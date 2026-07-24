@@ -1,11 +1,12 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { FinanceSidebar } from "./Sidebar";
-import { Bell, Search } from "lucide-react";
+import { Bell, Menu, Search, X } from "lucide-react";
 import { useDataRoomViewer } from "@/hooks/useDataRoomViewer";
 import { FinancePageExportActions } from "./PageExportActions";
 import { useLocation } from "react-router-dom";
 
 export function FinanceLayout({ children }: { children: ReactNode }) {
+  const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const viewer = useDataRoomViewer();
   const { pathname } = useLocation();
   const isDashboard = pathname.endsWith("/dashboard");
@@ -13,8 +14,36 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
   return (
     <div className="finance-theme surface-glow flex min-h-screen w-full text-foreground">
         <FinanceSidebar />
+        {mobileNavigationOpen && <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            type="button"
+            className="absolute inset-0 bg-foreground/35 backdrop-blur-sm"
+            onClick={() => setMobileNavigationOpen(false)}
+            aria-label="Close Finance navigation"
+          />
+          <div className="relative h-full w-[min(18rem,86vw)] shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setMobileNavigationOpen(false)}
+              className="absolute right-3 top-3 z-10 rounded-lg border border-sidebar-border bg-sidebar p-2 text-sidebar-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+              aria-label="Close Finance navigation"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <FinanceSidebar className="flex h-full w-full flex-col lg:hidden" onNavigate={() => setMobileNavigationOpen(false)} />
+          </div>
+        </div>}
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur-xl md:px-8">
+            <button
+              type="button"
+              onClick={() => setMobileNavigationOpen(true)}
+              className="rounded-lg border border-border bg-white/70 p-2 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange lg:hidden"
+              aria-label="Open Finance navigation"
+              aria-expanded={mobileNavigationOpen}
+            >
+              <Menu className="h-4 w-4" />
+            </button>
             <div className="flex flex-1 items-center gap-2">
               <div className="hidden max-w-sm flex-1 items-center gap-2 rounded-lg border border-border bg-white/70 px-3 py-1.5 text-sm text-muted-foreground md:flex">
                 <Search className="h-3.5 w-3.5" />
