@@ -7,8 +7,8 @@ import createch from "@/assets/ctf-logo.png";
 import niyoLogo from "@/assets/niyo-group-logo-l.png";
 import ffrLogo from "@/assets/ffr-logo.jpg";
 import bfflogo from "@/assets/bff-logo.webp";
-import bel from "@/assets/barclays-eagle-labs-logo.png";
-import wmca from "@/assets/wmca.webp";
+import bel from "@/assets/barclays-eagle-labs-logo-transparent.png";
+import wmca from "@/assets/wmca-transparent.png";
 import { Section, StatCard } from "@/components/Section";
 import { AnimatedHeadline } from "@/components/AnimatedHeadline";
 const navItems = [
@@ -279,25 +279,36 @@ const InnovationLab = () => {
                   </article>
                 ))}
               </div>
-              <p className="font-mono text-[10px] py-30 uppercase tracking-[0.2em] text-accent">
-                Sponsored By:
-              </p>
-              <div className="overflow-hidden border-t border-border bg-obsidian py-8">
-                <div className="flex animate-marquee items-center gap-24 max-w-full">
-                  {[bel, wmca, bel, wmca, bel, wmca, bel, wmca].map(
-                    (partnerLogo, index) => (
-                      <div
-                        key={index}
-                        className="flex min-w-[300px] items-center justify-center"
-                      >
-                        <img
-                          src={partnerLogo}
-                          alt=""
-                          className="h-auto max-h-16 max-w-[240px] object-contain"
-                        />
+              <div className="border-t border-border bg-obsidian px-6 py-8 md:px-8 md:py-10">
+                <div className="mb-6 flex items-center gap-4">
+                  <p className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
+                    Sponsored by
+                  </p>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+                <div className="relative overflow-hidden py-3 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+                  <div className="flex w-max animate-marquee items-center gap-20 motion-reduce:animate-none">
+                    {[0, 1, 2, 3].map((set) => (
+                      <div key={set} className="flex shrink-0 items-center gap-20" aria-hidden={set > 0}>
+                        <div className="flex h-32 w-80 shrink-0 items-center justify-center">
+                          <img
+                            src={bel}
+                            alt={set === 0 ? "Barclays Eagle Labs" : ""}
+                            className="h-24 w-full object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.28)]"
+                            loading="lazy"
+                          />
+                        </div>
+                        <div className="flex h-32 w-96 shrink-0 items-center justify-center">
+                          <img
+                            src={wmca}
+                            alt={set === 0 ? "West Midlands Combined Authority" : ""}
+                            className="h-32 w-full scale-[2.35] object-contain drop-shadow-[0_8px_18px_rgba(0,0,0,0.28)]"
+                            loading="lazy"
+                          />
+                        </div>
                       </div>
-                    ),
-                  )}
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

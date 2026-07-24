@@ -73,7 +73,10 @@ export default function DocumentsPage() {
   const grouped = useMemo(() => evidenceDocumentCategories.map((name) => ({ name, documents: documents.filter((document) => document.category === name) })), [documents]);
   const sources = useMemo(() => Array.from(new Set(documents.map((document) => document.sourceOrganisation).filter((value): value is string => Boolean(value)))).sort(), [documents]);
   const unauthorised = error instanceof ApiError && (error.status === 401 || error.status === 403);
-  const guideDocument = readFirstDocuments.find((document) => document.title.toLowerCase().includes("data room guide"));
+  const guideDocument = readFirstDocuments.find((document) => {
+    const title = document.title.toLowerCase();
+    return title.includes("read me first") || title.includes("data room guide");
+  });
 
   const accessFile = async (item: EvidenceItem, action: "view" | "download") => {
     setAccessError("");
@@ -105,7 +108,7 @@ export default function DocumentsPage() {
       <Surface className="mb-6 border-brand-orange/25 bg-brand-orange/[0.05]">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div><SectionTitle title="Read First" hint={readFirstLoading ? "Loading · 00_READ_FIRST" : `${readFirstDocuments.length} documents · 00_READ_FIRST`} /><p className="max-w-2xl text-sm leading-6 text-muted-foreground">Start here. These documents help investors and authorised reviewers understand the folder structure, key contacts, document ownership and update schedule.</p>{!readFirstLoading && !readFirstError && readFirstDocuments.length === 0 && <p className="mt-3 text-sm">Upload the KLPS Data Room Guide to explain how the data room should be navigated and interpreted.</p>}{readFirstError && <p className="mt-3 text-sm text-brand-coral">Read First documents are temporarily unavailable.</p>}</div>
-          <div className="flex shrink-0 flex-wrap gap-2">{!readFirstLoading && !readFirstError && (guideDocument ? <button className={buttonClass} disabled={!guideDocument.hasR2Object} onClick={() => void accessFile(guideDocument, "view")}><Eye className="h-4 w-4" /> Open Data Room Guide</button> : <Link className={buttonClass} to="/data-room/guide">Create Data Room Guide</Link>)}</div>
+          <div className="flex shrink-0 flex-wrap gap-2">{!readFirstLoading && !readFirstError && (guideDocument ? <button className={buttonClass} disabled={!guideDocument.hasR2Object} onClick={() => void accessFile(guideDocument, "view")}><Eye className="h-4 w-4" /> Open Read Me First</button> : <Link className={buttonClass} to="/data-room/guide">Create Read Me First</Link>)}</div>
         </div>
         {readFirstDocuments.length > 0 && <ul className="mt-4 grid gap-3 md:grid-cols-2">{readFirstDocuments.map((document) => <li key={document.id} className="rounded-lg border border-brand-orange/15 bg-background/60 p-3"><div className="text-xs font-semibold text-brand-orange">{document.code}</div><div className="mt-1 truncate text-sm font-medium" title={document.title}>{document.title}</div><div className="mt-2 text-xs text-muted-foreground">{document.documentStatus} · {document.verificationStatus} · {document.links === null ? "Links not loaded" : `${document.links.length} links`}</div></li>)}</ul>}
       </Surface>
