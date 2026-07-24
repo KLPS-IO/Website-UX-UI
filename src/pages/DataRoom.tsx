@@ -1,6 +1,8 @@
 import { PageHeader, Section } from "@/components/Section";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { API_BASE } from "@/config/api";
 import { normalizeAccessEmail } from "@/config/dataRoomAccess";
+import { X } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -616,6 +618,8 @@ const DataRoom = () => {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
   const [error, setError] = useState("");
+  const [guideOpen, setGuideOpen] = useState(false);
+  const guideCloseTimer = useRef<number | null>(null);
   const [activeCategory, setActiveCategory] =
     useState<DataRoomCategory>("All Documents");
 
@@ -660,6 +664,19 @@ const DataRoom = () => {
     [activeCategory, documents],
   );
   const showingFaq = activeCategory === "FAQ";
+  const keepGuideOpen = () => {
+    if (guideCloseTimer.current !== null) window.clearTimeout(guideCloseTimer.current);
+    guideCloseTimer.current = null;
+    setGuideOpen(true);
+  };
+  const scheduleGuideClose = () => {
+    if (guideCloseTimer.current !== null) window.clearTimeout(guideCloseTimer.current);
+    guideCloseTimer.current = window.setTimeout(() => setGuideOpen(false), 180);
+  };
+
+  useEffect(() => () => {
+    if (guideCloseTimer.current !== null) window.clearTimeout(guideCloseTimer.current);
+  }, []);
 
   const loadSecureData = async (nextUser: DataRoomUser) => {
     setError("");
@@ -846,12 +863,47 @@ const DataRoom = () => {
           >
             Pitch Deck
           </Link>
-          <Link
-            to="/data-room/guide"
-            className="inline-flex rounded-full border border-border bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-          >
-            How to Use This Data Room
-          </Link>
+          <Popover open={guideOpen} onOpenChange={setGuideOpen}>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                onMouseEnter={keepGuideOpen}
+                onMouseLeave={scheduleGuideClose}
+                className="inline-flex rounded-full border border-border bg-white/[0.03] px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/[0.08] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-label="How to Use This Data Room"
+              >
+                How to Use This Data Room
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              side="bottom"
+              sideOffset={10}
+              onMouseEnter={keepGuideOpen}
+              onMouseLeave={scheduleGuideClose}
+              className="data-room-theme w-[min(24rem,calc(100vw-2rem))] rounded-2xl border-white/10 bg-obsidian p-0 text-foreground shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
+            >
+              <div className="relative border-b border-white/10 px-5 py-4 pr-12">
+                <div className="mb-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-accent">Investor orientation</div>
+                <h2 className="text-base font-semibold text-foreground">How to Use This Data Room</h2>
+                <button
+                  type="button"
+                  onClick={() => setGuideOpen(false)}
+                  className="absolute right-3 top-3 rounded-md p-2 text-muted-foreground transition hover:bg-white/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  aria-label="Close data room guidance"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="space-y-3 px-5 py-4 text-xs leading-5 text-muted-foreground">
+                <p className="font-medium text-foreground">Everything you need to learn about KLPS is in one secure place.</p>
+                <p>At the top of the page, you’ll see live customer research showing the latest validation and market insights. These numbers update as new research is completed.</p>
+                <p>Use the Pitch Deck button to view our latest investor presentation at any time.</p>
+                <p>Browse the Categories to explore key documents including our market research, financials, IP, legal information and FAQs.</p>
+                <p>For a deeper look at the business, open Finance OS. It contains our live financial model, assumptions, forecasts and the key metrics behind our growth strategy.</p>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </PageHeader>
 

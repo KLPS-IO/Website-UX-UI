@@ -1,5 +1,5 @@
-import { ArrowLeft, CheckCircle2, Download, ExternalLink, Folder, Mail, Printer, ShieldCheck, Upload } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, CheckCircle2, Download, ExternalLink, Folder, Mail, Printer, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { PageHeader, SectionTitle, Surface } from "@/components/finance/PageHeader";
 import { exportCurrentFinancePagePdf, printCurrentFinancePage } from "@/lib/finance-page-export";
 import { useDataRoomViewer } from "@/hooks/useDataRoomViewer";
@@ -33,16 +33,7 @@ const evidenceControls = [
 ] as const;
 
 export default function DataRoomGuidePage() {
-  const navigate = useNavigate();
   const viewer = useDataRoomViewer();
-  const uploadGuide = () => navigate("/data-room/finance/documents", { state: { documentUploadPrefill: {
-    title: "KLPS Data Room — Read Me First",
-    category: "Read First",
-    sourceOrganisation: "KLPS Ltd",
-    linkMode: true,
-    entityType: "company",
-    relationship: "Provides the canonical orientation guide for authorised Data Room review",
-  } } });
 
   if (!viewer) return <div className="finance-theme flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
     <Surface className="max-w-lg">
@@ -61,7 +52,6 @@ export default function DataRoomGuidePage() {
       <div className="flex flex-wrap gap-2">
         <button className="guide-action" onClick={printCurrentFinancePage}><Printer className="h-4 w-4" /> Print</button>
         <button className="guide-action" onClick={() => void exportCurrentFinancePagePdf("/data-room/guide")}><Download className="h-4 w-4" /> Export PDF</button>
-        {viewer.canWriteFinance && <button className="guide-action bg-brand-orange text-primary-foreground" onClick={uploadGuide}><Upload className="h-4 w-4" /> Upload Guide</button>}
       </div>
     </header>
 
