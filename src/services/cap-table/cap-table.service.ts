@@ -39,7 +39,7 @@ export const verifiedCapTableSnapshot: CapTableSnapshot = {
     title: "Application to Register a Company (IN01)",
     includes: ["Statement of Capital", "Initial Shareholdings", "Person with Significant Control information"],
     sourceOrganisation: "Companies House",
-    status: "Verified source document",
+    status: "Verified – Companies House",
   },
   audit: {
     preparedFor: "KLPS Ltd",
