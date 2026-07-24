@@ -31,7 +31,7 @@ export interface CapTableSnapshot {
   version: string;
   effectiveDate: string;
   currency: "GBP";
-  status: "Current";
+  status: "Verified";
   holdings: CapTableHolding[];
   equityInstruments: EquityInstrumentStatus;
   rights: {

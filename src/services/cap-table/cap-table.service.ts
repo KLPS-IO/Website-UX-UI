@@ -10,7 +10,7 @@ export const verifiedCapTableSnapshot: CapTableSnapshot = {
   version: "1.0",
   effectiveDate: "2025-05-08",
   currency: "GBP",
-  status: "Current",
+  status: "Verified",
   holdings: [{
     shareholder: "Emma Mendez",
     shareClass: "Ordinary",
