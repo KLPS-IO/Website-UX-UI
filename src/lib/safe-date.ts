@@ -1,0 +1,66 @@
+const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
+const ISO_TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+/**
+ * Parses canonical ISO dates and timestamps without accepting ambiguous
+ * locale strings such as 24/07/2026.
+ */
+export function parseSafeDate(value: unknown): Date | null {
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? null : new Date(value.getTime());
+  }
+  if (typeof value !== "string") return null;
+
+  const input = value.trim();
+  if (!input) return null;
+
+  const dateOnly = ISO_DATE.exec(input);
+  if (dateOnly) {
+    const year = Number(dateOnly[1]);
+    const month = Number(dateOnly[2]);
+    const day = Number(dateOnly[3]);
+    const parsed = new Date(year, month - 1, day);
+    return parsed.getFullYear() === year &&
+      parsed.getMonth() === month - 1 &&
+      parsed.getDate() === day
+      ? parsed
+      : null;
+  }
+
+  if (!ISO_TIMESTAMP.test(input)) return null;
+  const parsed = new Date(input);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+export function formatSafeDate(
+  value: unknown,
+  fallback = "Not confirmed",
+  options: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  },
+): string {
+  const parsed = parseSafeDate(value);
+  return parsed
+    ? new Intl.DateTimeFormat("en-GB", options).format(parsed)
+    : fallback;
+}
+
+/** A sortable value for valid dates; unknown and malformed values sort last. */
+export function safeDateSortValue(value: unknown): number {
+  return parseSafeDate(value)?.getTime() ?? Number.POSITIVE_INFINITY;
+}
+
+/** Canonical value for an HTML date input, or an empty value when unknown. */
+export function safeDateInputValue(value: unknown): string {
+  if (typeof value === "string" && ISO_DATE.test(value.trim()) && parseSafeDate(value)) {
+    return value.trim();
+  }
+  const parsed = parseSafeDate(value);
+  if (!parsed) return "";
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}

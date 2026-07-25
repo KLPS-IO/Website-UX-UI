@@ -1,5 +1,6 @@
 import type { FinancialAssumption, Funding, Hire, RiskRecord } from "@/types/finance";
 import type { CompanyRecord } from "@/types/company";
+import { formatSafeDate, parseSafeDate } from "@/lib/safe-date";
 import { jsPDF } from "jspdf";
 
 type CashFlowRow = {
@@ -53,8 +54,11 @@ const money = (value: number) =>
 
 const percent = (value: number) => `${(value * 100).toFixed(1)}%`;
 const reportDate = (date: Date) =>
-  date.toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" });
-const fileDate = (date: Date) => date.toISOString().slice(0, 10);
+  formatSafeDate(date, "Not confirmed", { day: "2-digit", month: "long", year: "numeric" });
+const fileDate = (date: Date) => {
+  const parsed = parseSafeDate(date);
+  return parsed ? parsed.toISOString().slice(0, 10) : "date-not-confirmed";
+};
 
 const summaryRows = (data: FinanceExportData): [string, string][] => [
   ["Cash on hand", data.kpis.cashKnown ? money(data.kpis.cash) : "Not yet evidenced"],
@@ -80,9 +84,7 @@ const assumptionValue = (assumption: FinancialAssumption) =>
 const unknown = (value: string | number | null | undefined, fallback = "Not confirmed") =>
   value === null || value === undefined || value === "" ? fallback : String(value);
 const companyDate = (value: string | null) =>
-  value
-    ? new Date(`${value}T00:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })
-    : "Not confirmed";
+  formatSafeDate(value, "Not confirmed", { day: "numeric", month: "long", year: "numeric" });
 
 const companyRows = (company: CompanyRecord): [string, string][] => [
   ["Company name", company.companyName],

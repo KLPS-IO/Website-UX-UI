@@ -5,12 +5,13 @@ import { PageHeader, SectionTitle, Surface } from "@/components/finance/PageHead
 import { ApiError } from "@/lib/authenticated-api";
 import { expenseErrorMessage } from "@/services/expenses/expense.service";
 import { useExpenses } from "@/hooks/useExpenses";
+import { formatSafeDate } from "@/lib/safe-date";
 import type { Expense } from "@/types/expense";
 
 const money = (value: number | null, fallback = "Not confirmed") =>
   value === null ? fallback : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
-const date = (value: string | null) =>
-  value ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${value}T00:00:00`)) : "Not confirmed";
+const expenseDate = (value: unknown, fallback = "Not confirmed") =>
+  formatSafeDate(value, fallback, { day: "numeric", month: "short", year: "numeric" });
 const actualCost = (expense: Expense) =>
   expense.costType === "Actual transaction" ||
   expense.costType === "One-off programme cost" ||
@@ -127,8 +128,8 @@ function ExpenseCard({ expense }: { expense: Expense }) {
       <Detail label="Cost type" value={expense.costType} />
       <Detail label="Status" value={expense.currentStatus} />
       <Detail label="Frequency" value={expense.frequency ?? "Not confirmed"} />
-      <Detail label="Transaction date" value={date(expense.transactionDate)} />
-      <Detail label="Service period" value={expense.servicePeriodStart ? `${date(expense.servicePeriodStart)} to ${date(expense.servicePeriodEnd)}` : "Not confirmed"} />
+      <Detail label="Transaction date" value={expenseDate(expense.transactionDate)} />
+      <Detail label="Service period" value={expense.servicePeriodStart ? `${expenseDate(expense.servicePeriodStart)} to ${expenseDate(expense.servicePeriodEnd)}` : "Not confirmed"} />
       <Detail label="Net amount" value={money(expense.netAmount)} />
       <Detail label="VAT amount" value={money(expense.vatAmount, expense.evidenceStatus === "Under Review" ? "To evidence" : "Not confirmed")} />
       <Detail label="Recurring run-rate" value={money(expense.recurringRunRateNet)} />
