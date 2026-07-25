@@ -1,4 +1,5 @@
-import type { Expense, ExpenseDto } from "@/types/expense";
+import { toFiniteMoney } from "@/lib/safe-money";
+import type { Expense, ExpenseDto, ExpenseMetrics, ExpenseMetricsDto, ExpenseMoneyMetricDto } from "@/types/expense";
 
 export const mapExpenseDto = (dto: ExpenseDto): Expense => ({
   id: dto.id,
@@ -12,23 +13,24 @@ export const mapExpenseDto = (dto: ExpenseDto): Expense => ({
   servicePeriodStart: dto.service_period_start,
   servicePeriodEnd: dto.service_period_end,
   currency: dto.currency,
-  netAmount: dto.net_amount,
-  creditAdjustment: dto.credit_adjustment,
-  vatAmount: dto.vat_amount,
-  vatRate: dto.vat_rate,
-  grossAmount: dto.gross_amount,
-  supplierCostAmount: dto.supplier_cost_amount,
+  netAmount: toFiniteMoney(dto.net_amount),
+  creditAdjustment: toFiniteMoney(dto.credit_adjustment),
+  vatAmount: toFiniteMoney(dto.vat_amount),
+  vatRate: toFiniteMoney(dto.vat_rate),
+  grossAmount: toFiniteMoney(dto.gross_amount),
+  supplierCostAmount: toFiniteMoney(dto.supplier_cost_amount),
   supplierCostBasis: dto.supplier_cost_basis,
-  recurringRunRateNet: dto.recurring_run_rate_net,
-  recurringRunRateVatRate: dto.recurring_run_rate_vat_rate,
-  klpsAllocationAmount: dto.klps_allocation_amount,
-  klpsAllocationPercentage: dto.klps_allocation_percentage,
+  recurringRunRateNet: toFiniteMoney(dto.recurring_run_rate_net),
+  recurringRunRateVatRate: toFiniteMoney(dto.recurring_run_rate_vat_rate),
+  klpsAllocationAmount: toFiniteMoney(dto.klps_allocation_amount),
+  klpsAllocationPercentage: toFiniteMoney(dto.klps_allocation_percentage),
   currentStatus: dto.current_status,
   paidBy: dto.paid_by,
   paymentChannel: dto.payment_channel,
   reimbursementStatus: dto.reimbursement_status,
   companyCashOutflow: dto.company_cash_outflow,
   businessExpenseStatus: dto.business_expense_status,
+  financialTreatment: dto.financial_treatment,
   evidenceStatus: dto.evidence_status,
   evidenceReference: dto.evidence_reference,
   evidenceId: dto.evidence_id,
@@ -37,4 +39,27 @@ export const mapExpenseDto = (dto: ExpenseDto): Expense => ({
   updatedAt: dto.updated_at,
   version: dto.version,
   changeReason: dto.change_reason,
+});
+
+const mapMetric = (metric: ExpenseMoneyMetricDto) => ({
+  amount: toFiniteMoney(metric.amount),
+  knownCount: metric.known_count,
+  excludedUnknownCount: metric.excluded_unknown_count,
+});
+
+export const mapExpenseMetricsDto = (dto: ExpenseMetricsDto): ExpenseMetrics => ({
+  verifiedActualSpend: mapMetric(dto.verified_actual_spend),
+  totalFounderFundedBusinessSpend: mapMetric(dto.founder_funded_business_spend),
+  companyBankCashSpend: mapMetric(dto.company_bank_cash_spend),
+  recurringMonthlyRunRateNet: mapMetric(dto.recurring_monthly_run_rate_net),
+  actualNet: mapMetric(dto.actual_net),
+  actualVat: mapMetric(dto.actual_vat),
+  actualGross: mapMetric(dto.actual_gross),
+  categoryTotals: dto.category_totals.map((category) => ({
+    financialTreatment: category.financial_treatment,
+    amount: toFiniteMoney(category.amount),
+    knownCount: category.known_count,
+  })),
+  awaitingEvidenceCount: dto.awaiting_evidence_count,
+  sharedAllocationPendingCount: dto.shared_allocation_pending_count,
 });

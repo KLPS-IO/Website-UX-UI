@@ -1,11 +1,14 @@
 import { ApiError } from "@/lib/authenticated-api";
 import { expenseRepository } from "@/repositories/expenseRepository";
-import { mapExpenseDto } from "./expense.adapter";
+import { mapExpenseDto, mapExpenseMetricsDto } from "./expense.adapter";
 
 export const expenseService = {
   async list() {
     const response = await expenseRepository.list();
-    return response.expenses.map(mapExpenseDto);
+    return {
+      expenses: response.expenses.map(mapExpenseDto),
+      metrics: mapExpenseMetricsDto(response.expense_metrics),
+    };
   },
 };
 

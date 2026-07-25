@@ -6,22 +6,13 @@ import { ApiError } from "@/lib/authenticated-api";
 import { expenseErrorMessage } from "@/services/expenses/expense.service";
 import { useExpenses } from "@/hooks/useExpenses";
 import { formatSafeDate } from "@/lib/safe-date";
+import { formatMoney } from "@/lib/safe-money";
 import type { Expense } from "@/types/expense";
 
-const money = (value: number | null, fallback = "Not confirmed") =>
-  value === null ? fallback : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(value);
 const expenseDate = (value: unknown, fallback = "Not confirmed") =>
   formatSafeDate(value, fallback, { day: "numeric", month: "short", year: "numeric" });
-const actualCost = (expense: Expense) =>
-  expense.costType === "Actual transaction" ||
-  expense.costType === "One-off programme cost" ||
-  (expense.costType === "Recurring operating cost" && expense.transactionDate !== null);
 const founderFunded = (expense: Expense) =>
   expense.paidBy?.toLowerCase() === "founder" || expense.paymentChannel?.toLowerCase().includes("founder") === true;
-const sumKnown = (items: Expense[], pick: (item: Expense) => number | null) => {
-  const values = items.map(pick).filter((value): value is number => value !== null);
-  return values.length ? values.reduce((total, value) => total + value, 0) : null;
-};
 
 const statusLabels = (expense: Expense) => {
   const labels: string[] = [];
@@ -35,7 +26,7 @@ const statusLabels = (expense: Expense) => {
 };
 
 export default function ExpensesPage() {
-  const { expenses, loading, error } = useExpenses();
+  const { expenses, metrics, loading, error } = useExpenses();
   const [filters, setFilters] = useState({
     keyword: "", category: "", supplier: "", costType: "", evidence: "", payment: "", cadence: "", funding: "", cash: "",
   });
@@ -55,15 +46,16 @@ export default function ExpensesPage() {
       && (!filters.cash || (filters.cash === "Company cash") === (expense.companyCashOutflow === true));
   }), [expenses, filters]);
 
-  const actual = expenses.filter(actualCost);
-  const cards = [
-    ["Verified actual spend", money(sumKnown(actual.filter((item) => item.evidenceStatus === "Verified"), (item) => item.grossAmount)), "Confirmed gross", CheckCircle2],
-    ["Founder-funded spend", money(sumKnown(actual.filter(founderFunded), (item) => item.grossAmount)), "Known gross costs", UserRound],
-    ["Company-bank cash spend", money(sumKnown(actual.filter((item) => item.companyCashOutflow === true), (item) => item.grossAmount), "None recorded"), "Confirmed company outflow", Landmark],
-    ["Recurring monthly run-rate", money(sumKnown(expenses.filter((item) => item.frequency === "Monthly"), (item) => item.recurringRunRateNet)), "Confirmed net", WalletCards],
-    ["Costs awaiting evidence", String(expenses.filter((item) => item.evidenceStatus !== "Verified").length), "Records", Receipt],
-    ["Shared allocation pending", String(expenses.filter((item) => item.costType === "Recurring shared cost" && item.klpsAllocationAmount === null).length), "Records", AlertCircle],
-  ] as const;
+  const metricHint = (known: number, excluded: number, basis: string) =>
+    `${basis} · ${known} known${excluded ? ` · ${excluded} excluded as unknown` : ""}`;
+  const cards = metrics ? [
+    ["Verified actual spend", formatMoney(metrics.verifiedActualSpend.amount), metricHint(metrics.verifiedActualSpend.knownCount, metrics.verifiedActualSpend.excludedUnknownCount, "Business allocated"), CheckCircle2],
+    ["Total Founder-Funded Business Spend", formatMoney(metrics.totalFounderFundedBusinessSpend.amount), metricHint(metrics.totalFounderFundedBusinessSpend.knownCount, metrics.totalFounderFundedBusinessSpend.excludedUnknownCount, "Recognised business costs"), UserRound],
+    ["Company-bank cash spend", formatMoney(metrics.companyBankCashSpend.amount, metrics.companyBankCashSpend.knownCount === 0 ? "None recorded" : "Not confirmed"), metricHint(metrics.companyBankCashSpend.knownCount, metrics.companyBankCashSpend.excludedUnknownCount, "Confirmed company outflow"), Landmark],
+    ["Recurring monthly run-rate", formatMoney(metrics.recurringMonthlyRunRateNet.amount), metricHint(metrics.recurringMonthlyRunRateNet.knownCount, metrics.recurringMonthlyRunRateNet.excludedUnknownCount, "Confirmed net"), WalletCards],
+    ["Costs awaiting evidence", String(metrics.awaitingEvidenceCount), "Records excluded where amounts are unknown", Receipt],
+    ["Shared allocation pending", String(metrics.sharedAllocationPendingCount), "Records", AlertCircle],
+  ] as const : [];
 
   return (
     <div>
@@ -73,7 +65,7 @@ export default function ExpensesPage() {
       {!loading && error && <State title={error instanceof ApiError && [401, 403].includes(error.status) ? "Access unavailable" : "Expenses unavailable"} body={expenseErrorMessage(error)} alert />}
       {!loading && !error && expenses.length === 0 && <State title="No current costs recorded" body="No canonical expense records have been returned by the backend. No placeholder records are shown." />}
 
-      {!loading && !error && expenses.length > 0 && <>
+      {!loading && !error && expenses.length > 0 && metrics && <>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {cards.map(([label, value, hint, Icon]) => <Surface key={label}><div className="flex items-start justify-between gap-3"><div><div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</div><div className="mt-3 text-2xl font-semibold">{value}</div><div className="mt-1 text-xs text-muted-foreground">{hint}</div></div><Icon className="h-5 w-5 text-brand-orange" /></div></Surface>)}
         </div>
@@ -81,6 +73,12 @@ export default function ExpensesPage() {
         <div className="my-5 rounded-xl border border-brand-purple/20 bg-brand-purple/[0.07] p-4 text-sm">
           <strong>Founder-funded treatment:</strong> Founder-funded expenses are recognised as business costs but do not reduce KLPS bank cash unless reimbursed or paid by the company.
         </div>
+        <Surface className="mb-5">
+          <SectionTitle title="Recognised Spend by Financial Treatment" hint="Known business allocations only" />
+          {metrics.categoryTotals.length ? <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {metrics.categoryTotals.map((category) => <div key={category.financialTreatment} className="rounded-xl border border-border bg-background/50 p-4"><div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{category.financialTreatment}</div><div className="mt-2 text-lg font-semibold">{formatMoney(category.amount)}</div><div className="mt-1 text-xs text-muted-foreground">{category.knownCount} known record{category.knownCount === 1 ? "" : "s"}</div></div>)}
+          </div> : <p className="text-sm text-muted-foreground">No classified amount is confirmed.</p>}
+        </Surface>
         {expenses.every((expense) => expense.evidenceId === null) && (
           <div role="status" className="mb-5 rounded-xl border border-brand-orange/25 bg-brand-orange/10 p-4 text-sm">
             <strong>No evidence links yet.</strong> Evidence references may be recorded, but no canonical Evidence UUID is currently linked to these expenses.
@@ -114,7 +112,7 @@ export default function ExpensesPage() {
 function ExpenseCard({ expense }: { expense: Expense }) {
   const allocation = expense.klpsAllocationPercentage === null
     ? "Allocation pending"
-    : `${(expense.klpsAllocationPercentage * 100).toFixed(0)}% · ${money(expense.klpsAllocationAmount)}`;
+    : `${(expense.klpsAllocationPercentage * 100).toFixed(0)}% · ${formatMoney(expense.klpsAllocationAmount)}`;
   return <Surface>
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div className="min-w-0">
@@ -122,7 +120,7 @@ function ExpenseCard({ expense }: { expense: Expense }) {
         <h2 className="mt-3 break-words text-lg font-semibold">{expense.name}</h2>
         <p className="mt-1 break-words text-sm text-muted-foreground">{expense.supplierName ?? "Supplier not confirmed"} · {expense.category}</p>
       </div>
-      <div className="shrink-0 text-left lg:text-right"><div className="text-xs text-muted-foreground">Gross amount</div><div className="mt-1 text-xl font-semibold">{money(expense.grossAmount, expense.currentStatus === "Not yet purchased" ? "Not yet purchased" : "Not confirmed")}</div></div>
+      <div className="shrink-0 text-left lg:text-right"><div className="text-xs text-muted-foreground">Gross amount</div><div className="mt-1 text-xl font-semibold">{formatMoney(expense.grossAmount, expense.currentStatus === "Not yet purchased" ? "Not yet purchased" : "Not confirmed")}</div></div>
     </div>
     <dl className="mt-5 grid gap-x-6 gap-y-4 border-t border-border pt-5 sm:grid-cols-2 lg:grid-cols-4">
       <Detail label="Cost type" value={expense.costType} />
@@ -130,14 +128,15 @@ function ExpenseCard({ expense }: { expense: Expense }) {
       <Detail label="Frequency" value={expense.frequency ?? "Not confirmed"} />
       <Detail label="Transaction date" value={expenseDate(expense.transactionDate)} />
       <Detail label="Service period" value={expense.servicePeriodStart ? `${expenseDate(expense.servicePeriodStart)} to ${expenseDate(expense.servicePeriodEnd)}` : "Not confirmed"} />
-      <Detail label="Net amount" value={money(expense.netAmount)} />
-      <Detail label="VAT amount" value={money(expense.vatAmount, expense.evidenceStatus === "Under Review" ? "To evidence" : "Not confirmed")} />
-      <Detail label="Recurring run-rate" value={money(expense.recurringRunRateNet)} />
+      <Detail label="Net amount" value={formatMoney(expense.netAmount)} />
+      <Detail label="VAT amount" value={formatMoney(expense.vatAmount, expense.evidenceStatus === "Under Review" ? "To evidence" : "Not confirmed")} />
+      <Detail label="Recurring run-rate" value={formatMoney(expense.recurringRunRateNet)} />
       <Detail label="Payment source" value={founderFunded(expense) ? (expense.paymentChannel ?? "Founder-funded") : (expense.paymentChannel ?? "Not confirmed")} />
       <Detail label="Company-bank cash outflow" value={expense.companyCashOutflow === null ? "Not confirmed" : expense.companyCashOutflow ? "Yes — paid from KLPS bank" : "No"} />
       <Detail label="Business allocation" value={allocation} />
       <Detail label="Reimbursement" value={expense.reimbursementStatus ?? "Not confirmed"} />
       <Detail label="Evidence status" value={expense.evidenceStatus} />
+      <Detail label="Financial treatment" value={expense.financialTreatment} />
       <Detail label="Change reason" value={expense.changeReason} />
     </dl>
     {expense.notes && <p className="mt-4 rounded-lg bg-background/60 p-3 text-sm leading-6 text-muted-foreground">{expense.notes}</p>}

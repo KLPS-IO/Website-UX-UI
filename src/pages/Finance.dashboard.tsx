@@ -73,6 +73,8 @@ export default function DashboardPage() {
     funding: finance.funding,
     hires: finance.hires,
     risks: finance.risks,
+    currentExpenses: currentCosts.expenses,
+    expenseMetrics: currentCosts.metrics,
   });
 
   const exportButton =

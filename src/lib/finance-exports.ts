@@ -1,5 +1,6 @@
 import type { FinancialAssumption, Funding, Hire, RiskRecord } from "@/types/finance";
 import type { CompanyRecord } from "@/types/company";
+import type { Expense, ExpenseMetrics } from "@/types/expense";
 import { formatSafeDate, parseSafeDate } from "@/lib/safe-date";
 import { jsPDF } from "jspdf";
 
@@ -43,6 +44,8 @@ export type FinanceExportData = {
   funding: Funding[];
   hires: Hire[];
   risks: RiskRecord[];
+  currentExpenses: Expense[];
+  expenseMetrics: ExpenseMetrics | null;
 };
 
 const money = (value: number) =>
@@ -186,6 +189,22 @@ export async function exportFinanceExcel(data: FinanceExportData) {
   revenue.getColumn(2).numFmt = '£#,##0'; revenue.getColumn(3).numFmt = '0.0%';
   const expenses = addSheet("Expenses", data.kpis.forecastReady ? [["Category", "12-month forecast"], ...data.expenseBreakdown.map((r) => [r.category, r.value])] : [["Status"], ["Not calculated — minimum verified inputs are not active."]], data.kpis.forecastReady ? [24, 22] : [68]);
   expenses.getColumn(2).numFmt = '£#,##0';
+  const currentCosts = addSheet("Current Costs", [
+    ["Status", `Evidence collection in progress · ${data.expenseMetrics?.awaitingEvidenceCount ?? "Not confirmed"} record(s) awaiting evidence`],
+    [],
+    ["Expense", "Supplier", "Treatment", "Net", "VAT", "Gross", "Business allocation", "Evidence"],
+    ...data.currentExpenses.map((expense) => [
+      expense.name,
+      expense.supplierName ?? "Not confirmed",
+      expense.financialTreatment,
+      expense.netAmount ?? "Not confirmed",
+      expense.vatAmount ?? "Not confirmed",
+      expense.grossAmount ?? "Not confirmed",
+      expense.klpsAllocationAmount ?? "Not confirmed",
+      expense.evidenceStatus,
+    ]),
+  ], [34, 26, 24, 16, 16, 16, 20, 18], 3);
+  [4, 5, 6, 7].forEach((column) => { currentCosts.getColumn(column).numFmt = '£#,##0.00;[Red]-£#,##0.00'; });
   addSheet("Assumptions", [["Category", "Assumption", "Value", "Status", "Confidence", "Evidence level", "Source", "Owner", "Last updated", "Notes"], ...data.assumptions.map((a) => [a.category, a.name, assumptionValue(a), a.status, a.confidence ? `${a.confidence}/100` : "Not yet evidenced", a.confidenceLevel, a.source || "Not yet evidenced", a.owner, a.updated_at, a.notes])], [18, 30, 22, 16, 20, 20, 28, 20, 16, 42]);
   const funding = addSheet("Funding", [["Name", "Type", "Amount", "Date", "Status", "Dilution"], ...data.funding.map((f) => [f.name, f.type, f.amount, f.date, f.status, f.dilution ?? ""] )], [28, 16, 18, 16, 16, 14]);
   funding.getColumn(3).numFmt = '£#,##0'; funding.getColumn(6).numFmt = '0.0%';

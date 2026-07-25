@@ -1,3 +1,19 @@
+export type MoneyDto = number | string | null;
+
+export type FinancialTreatment =
+  | "Operating Expense"
+  | "R&D Materials"
+  | "R&D Services"
+  | "Professional Services"
+  | "Business Development"
+  | "Marketing"
+  | "Premises"
+  | "Capital Expenditure"
+  | "Cost of Goods Sold"
+  | "Tax and Statutory"
+  | "Other"
+  | "To Classify";
+
 /** Network DTO. Field names and nullability match finance_os.expenses. */
 export interface ExpenseDto {
   id: string;
@@ -11,23 +27,24 @@ export interface ExpenseDto {
   service_period_start: string | null;
   service_period_end: string | null;
   currency: string;
-  net_amount: number | null;
-  credit_adjustment: number | null;
-  vat_amount: number | null;
-  vat_rate: number | null;
-  gross_amount: number | null;
-  supplier_cost_amount: number | null;
+  net_amount: MoneyDto;
+  credit_adjustment: MoneyDto;
+  vat_amount: MoneyDto;
+  vat_rate: MoneyDto;
+  gross_amount: MoneyDto;
+  supplier_cost_amount: MoneyDto;
   supplier_cost_basis: string | null;
-  recurring_run_rate_net: number | null;
-  recurring_run_rate_vat_rate: number | null;
-  klps_allocation_amount: number | null;
-  klps_allocation_percentage: number | null;
+  recurring_run_rate_net: MoneyDto;
+  recurring_run_rate_vat_rate: MoneyDto;
+  klps_allocation_amount: MoneyDto;
+  klps_allocation_percentage: MoneyDto;
   current_status: string;
   paid_by: string | null;
   payment_channel: string | null;
   reimbursement_status: string | null;
   company_cash_outflow: boolean | null;
   business_expense_status: string | null;
+  financial_treatment: FinancialTreatment;
   evidence_status: string;
   evidence_reference: string | null;
   evidence_id: string | null;
@@ -70,6 +87,7 @@ export interface Expense {
   reimbursementStatus: string | null;
   companyCashOutflow: boolean | null;
   businessExpenseStatus: string | null;
+  financialTreatment: FinancialTreatment;
   evidenceStatus: string;
   evidenceReference: string | null;
   evidenceId: string | null;
@@ -78,4 +96,42 @@ export interface Expense {
   updatedAt: string;
   version: number;
   changeReason: string;
+}
+
+export interface ExpenseMoneyMetricDto {
+  amount: number | null;
+  known_count: number;
+  excluded_unknown_count: number;
+}
+
+export interface ExpenseMetricsDto {
+  verified_actual_spend: ExpenseMoneyMetricDto;
+  founder_funded_business_spend: ExpenseMoneyMetricDto;
+  company_bank_cash_spend: ExpenseMoneyMetricDto;
+  recurring_monthly_run_rate_net: ExpenseMoneyMetricDto;
+  actual_net: ExpenseMoneyMetricDto;
+  actual_vat: ExpenseMoneyMetricDto;
+  actual_gross: ExpenseMoneyMetricDto;
+  category_totals: Array<{ financial_treatment: FinancialTreatment; amount: number; known_count: number }>;
+  awaiting_evidence_count: number;
+  shared_allocation_pending_count: number;
+}
+
+export interface ExpenseMoneyMetric {
+  amount: number | null;
+  knownCount: number;
+  excludedUnknownCount: number;
+}
+
+export interface ExpenseMetrics {
+  verifiedActualSpend: ExpenseMoneyMetric;
+  totalFounderFundedBusinessSpend: ExpenseMoneyMetric;
+  companyBankCashSpend: ExpenseMoneyMetric;
+  recurringMonthlyRunRateNet: ExpenseMoneyMetric;
+  actualNet: ExpenseMoneyMetric;
+  actualVat: ExpenseMoneyMetric;
+  actualGross: ExpenseMoneyMetric;
+  categoryTotals: Array<{ financialTreatment: FinancialTreatment; amount: number | null; knownCount: number }>;
+  awaitingEvidenceCount: number;
+  sharedAllocationPendingCount: number;
 }
