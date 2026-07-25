@@ -7,7 +7,7 @@ export const evidenceDocumentCategories = [
 export type EvidenceDocumentCategory = (typeof evidenceDocumentCategories)[number];
 export type EvidenceVerificationStatus = "Unknown" | "Unverified" | "Under Review" | "Verified" | "Rejected" | "Expired";
 export type EvidenceDocumentStatus = "Draft" | "Active" | "Superseded" | "Archived" | "Expired";
-export type EvidenceEntityType = "assumptions" | "products" | "decisions" | "risks" | "funding" | "reports" | "scenarios" | "hires" | "documents" | "company";
+export type EvidenceEntityType = "assumptions" | "products" | "decisions" | "risks" | "funding" | "reports" | "scenarios" | "hires" | "documents" | "company" | "expense";
 
 export interface EvidenceLinkDto {
   id: string;
@@ -104,7 +104,7 @@ export type EvidenceFilters = Partial<{
 
 export type EvidenceMetadataInput = Partial<Omit<EvidenceDto, "id" | "evidence_code" | "created_at" | "updated_at" | "created_by" | "updated_by" | "version" | "links">> & Pick<EvidenceDto, "title" | "evidence_type">;
 
-export type DocumentLinkEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "report" | "scenario" | "hire" | "document";
+export type DocumentLinkEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "report" | "scenario" | "hire" | "document" | "expense";
 
 export type DocumentUploadInput = {
   file: File;

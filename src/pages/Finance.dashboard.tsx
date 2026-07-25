@@ -26,6 +26,7 @@ import {
   Download,
   FileSpreadsheet,
   Printer,
+  Receipt,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { PageHeader, Surface, SectionTitle } from "@/components/finance/PageHeader";
@@ -47,11 +48,13 @@ import {
   type FinanceExportData,
 } from "@/lib/finance-exports";
 import { useState } from "react";
+import { useExpenses } from "@/hooks/useExpenses";
 
 export default function DashboardPage() {
   const [excelStatus, setExcelStatus] = useState<"idle" | "preparing">("idle");
   const [exportError, setExportError] = useState("");
   const finance = useFinance();
+  const currentCosts = useExpenses();
   const model = useFinanceModel();
   const k = model.kpis;
   const series = model.series;
@@ -117,6 +120,14 @@ export default function DashboardPage() {
       {exportError && (
         <div role="alert" className="mb-4 rounded-lg border border-brand-coral/30 bg-brand-coral/10 px-4 py-3 text-sm text-brand-coral">
           {exportError}
+        </div>
+      )}
+
+      {!currentCosts.loading && !currentCosts.error && currentCosts.expenses.length > 0 && (
+        <div role="status" className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-brand-sage/25 bg-brand-sage/10 px-4 py-3 text-sm">
+          <Receipt className="h-4 w-4 text-brand-sage" />
+          <span className="font-medium">Current cost records loaded</span>
+          <span className="text-muted-foreground">· {currentCosts.expenses.length} canonical records available in Expenses. Dashboard forecasts are unchanged.</span>
         </div>
       )}
 
