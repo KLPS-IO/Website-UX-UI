@@ -388,6 +388,85 @@ All colors MUST be HSL.
   display: block !important;
 }
 
+.finance-page-exporting .expense-filters,
+.finance-page-printing .expense-filters {
+  display: none !important;
+}
+
+.finance-page-exporting .expense-summary-grid,
+.finance-page-printing .expense-summary-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.finance-page-exporting .expense-summary-grid .finance-pdf-block,
+.finance-page-printing .expense-summary-grid .finance-pdf-block {
+  min-height: 92px;
+  padding: 12px !important;
+  box-shadow: none !important;
+}
+
+.finance-page-exporting .expense-founder-note,
+.finance-page-printing .expense-founder-note {
+  margin: 10px 0 !important;
+  padding: 10px 12px !important;
+  font-size: 11px !important;
+}
+
+.finance-page-exporting .expense-report-list,
+.finance-page-printing .expense-report-list {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.finance-page-exporting .expense-card,
+.finance-page-printing .expense-card {
+  overflow: visible !important;
+  border-color: #d8dce0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+.finance-page-exporting .expense-card > div:first-child,
+.finance-page-printing .expense-card > div:first-child {
+  padding: 12px 14px !important;
+}
+
+.finance-page-exporting .expense-card-summary,
+.finance-page-printing .expense-card-summary {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 8px 12px !important;
+  margin-top: 10px !important;
+  padding-top: 10px !important;
+}
+
+.finance-page-exporting .expense-disclosure,
+.finance-page-printing .expense-disclosure {
+  padding: 12px 14px !important;
+}
+
+.finance-page-exporting .expense-card-details,
+.finance-page-printing .expense-card-details {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 9px 14px !important;
+}
+
+.finance-page-exporting .expense-card dt,
+.finance-page-printing .expense-card dt {
+  font-size: 8px !important;
+  letter-spacing: 0.05em !important;
+}
+
+.finance-page-exporting .expense-card dd,
+.finance-page-printing .expense-card dd,
+.finance-page-exporting .expense-card p,
+.finance-page-printing .expense-card p {
+  font-size: 10px !important;
+  line-height: 1.35 !important;
+}
+
 .finance-page-exporting .cap-table-desktop-table {
   display: block !important;
 }

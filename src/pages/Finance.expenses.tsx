@@ -152,12 +152,12 @@ export default function ExpensesPage() {
     {!loading && !error && expenses.length === 0 && <State title="No current costs recorded" body="No canonical expense records have been returned by the backend." />}
 
     {!loading && !error && expenses.length > 0 && metrics && <>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{cards.map(([label, value, hint, Icon]) =>
+      <div className="expense-summary-grid grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{cards.map(([label, value, hint, Icon]) =>
         <Surface key={label}><div className="flex items-start justify-between gap-3"><div><div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</div><div className="mt-3 text-2xl font-semibold">{value}</div><div className="mt-1 text-xs text-muted-foreground">{hint}</div></div><Icon className="h-5 w-5 text-brand-orange" /></div></Surface>)}
       </div>
-      <div className="my-5 rounded-xl border border-brand-purple/20 bg-brand-purple/[0.07] p-4 text-sm"><strong>Founder-funded treatment:</strong> Founder-funded expenses are recognised as business costs but do not reduce KLPS bank cash unless reimbursed or paid by the company.</div>
+      <div className="expense-founder-note my-5 rounded-xl border border-brand-purple/20 bg-brand-purple/[0.07] p-4 text-sm"><strong>Founder-funded treatment:</strong> Founder-funded expenses are recognised as business costs but do not reduce KLPS bank cash unless reimbursed or paid by the company.</div>
 
-      <Surface className="mb-5">
+      <Surface className="expense-filters mb-5">
         <SectionTitle title="Filter Current Costs" hint={`${filtered.length} of ${expenses.length} records`} />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <label className="relative xl:col-span-2"><span className="sr-only">Search expenses</span><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><input value={filters.keyword} onChange={(event) => setFilters({ ...filters, keyword: event.target.value })} className="w-full rounded-lg border border-border bg-background py-2.5 pl-9 pr-3 text-sm" placeholder="Search name, supplier or notes" /></label>
@@ -174,7 +174,7 @@ export default function ExpensesPage() {
 
       {evidenceError && <div role="alert" className="mb-4 rounded-lg border border-brand-coral/25 bg-brand-coral/10 p-3 text-sm text-brand-coral">{evidenceError}</div>}
       {filtered.length === 0 ? <State title="No matching expenses" body="No canonical records match the selected filters." /> :
-        <div className="space-y-3">{filtered.map((expense) => <ExpenseCard key={expense.id} expense={expense} open={openId === expense.id} setOpen={() => setOpenId(openId === expense.id ? null : expense.id)} evidence={evidenceByExpense[expense.id] ?? []} evidenceLoading={evidenceLoading} canUpload={viewer?.canWriteFinance === true} upload={() => { setQueue([]); setUploadExpense(expense); }} openVersions={async (item) => { setVersionsFor(item); setVersions([]); setVersionsLoading(true); try { setVersions(await evidenceService.versions(item.id)); } finally { setVersionsLoading(false); } }} />)}</div>}
+        <div className="expense-report-list space-y-3">{filtered.map((expense) => <ExpenseCard key={expense.id} expense={expense} open={openId === expense.id} setOpen={() => setOpenId(openId === expense.id ? null : expense.id)} evidence={evidenceByExpense[expense.id] ?? []} evidenceLoading={evidenceLoading} canUpload={viewer?.canWriteFinance === true} upload={() => { setQueue([]); setUploadExpense(expense); }} openVersions={async (item) => { setVersionsFor(item); setVersions([]); setVersionsLoading(true); try { setVersions(await evidenceService.versions(item.id)); } finally { setVersionsLoading(false); } }} />)}</div>}
     </>}
 
     <UploadDialog open={Boolean(uploadExpense)} setOpen={(open) => { if (!open) { setUploadExpense(null); setQueue([]); } }} queue={queue} setQueue={setQueue} companyId={null} documents={availableDocuments} prefill={uploadExpense ? uploadMetadata(uploadExpense) : null} afterUploads={async () => { await refreshSelectedEvidence(); }} />
@@ -208,13 +208,13 @@ function ExpenseCard({ expense, open, setOpen, evidence, evidenceLoading, canUpl
         </div>
         <div className="flex items-center justify-between gap-4 lg:block lg:text-right"><div><div className="text-[11px] uppercase tracking-wider text-muted-foreground">Gross</div><div className="mt-1 text-lg font-semibold">{formatMoney(expense.grossAmount, expense.currentStatus === "Not yet purchased" ? "Not yet purchased" : "Not confirmed")}</div></div><button type="button" onClick={setOpen} aria-expanded={open} aria-controls={`expense-${expense.id}`} className={actionClass}><span>{open ? "Collapse" : "Details"}</span><ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} /></button></div>
       </div>
-      <dl className="mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-6">
+      <dl className="expense-card-summary mt-4 grid gap-3 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-6">
         <Detail label="Cost type" value={expense.costType} /><Detail label="Status" value={expense.currentStatus} /><Detail label="Transaction date" value={expenseDate(expense.transactionDate)} /><Detail label="Treatment" value={expense.financialTreatment} /><Detail label="Evidence" value={evidenceLoading ? "Loading…" : hasEvidence ? `${evidence.length} linked` : "Evidence needed"} />
       </dl>
       {!hasEvidence && !evidenceLoading && <div className="mt-4 flex flex-wrap items-center gap-3 rounded-lg border border-brand-orange/25 bg-brand-orange/10 p-3 text-sm"><AlertCircle className="h-4 w-4 shrink-0 text-brand-orange" /><span className="min-w-0 flex-1 break-words">Evidence required{expense.evidenceReference ? ` · ${expense.evidenceReference}` : ""}</span>{canUpload && <button type="button" onClick={upload} className="inline-flex items-center gap-2 rounded-lg bg-brand-orange px-3 py-2 text-xs font-semibold text-white"><Upload className="h-4 w-4" /> Upload evidence</button>}</div>}
     </div>
     <div id={`expense-${expense.id}`} className={cn("expense-disclosure border-t border-border px-4 py-5 sm:px-5", !open && "hidden")}>
-      <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="expense-card-details grid gap-x-6 gap-y-4 sm:grid-cols-2 lg:grid-cols-4">
         <Detail label="Frequency" value={expense.frequency ?? "Not confirmed"} /><Detail label="Service period" value={expense.servicePeriodStart ? `${expenseDate(expense.servicePeriodStart)} to ${expenseDate(expense.servicePeriodEnd)}` : "Not confirmed"} /><Detail label="Net amount" value={formatMoney(expense.netAmount)} /><Detail label="VAT amount" value={formatMoney(expense.vatAmount, expense.evidenceStatus === "Under Review" ? "To evidence" : "Not confirmed")} /><Detail label="Recurring run-rate" value={formatMoney(expense.recurringRunRateNet)} /><Detail label="Payment source" value={founderFunded(expense) ? expense.paymentChannel ?? "Founder-funded" : expense.paymentChannel ?? "Not confirmed"} /><Detail label="Company-bank cash outflow" value={expense.companyCashOutflow === null ? "Not confirmed" : expense.companyCashOutflow ? "Yes — paid from KLPS bank" : "No"} /><Detail label="Business allocation" value={allocation} /><Detail label="Reimbursement" value={expense.reimbursementStatus ?? "Not confirmed"} /><Detail label="Evidence status" value={expense.evidenceStatus} /><Detail label="Change reason" value={expense.changeReason} /><Detail label="Receipt or invoice reference" value={expense.evidenceReference ?? "Not confirmed"} />
       </dl>
       {expense.notes && <p className="mt-4 rounded-lg bg-background/60 p-3 text-sm leading-6 text-muted-foreground">{expense.notes}</p>}
