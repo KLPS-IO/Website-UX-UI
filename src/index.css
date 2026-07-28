@@ -1403,3 +1403,68 @@ All colors MUST be HSL.
   background-clip: text;
   color: transparent;
 }
+/* R&D Lab light theme with the existing restrained magenta identity. */
+.rd-lab-light {
+  background: #f7f4f8 !important;
+  color: #251d29 !important;
+}
+
+.rd-lab-light [class*="bg-[#100c13]"] {
+  background: #f7f4f8 !important;
+}
+
+.rd-lab-light .rd-roadmap-card {
+  background: #251d29 !important;
+  color: #fff !important;
+}
+
+.rd-lab-light .rd-roadmap-card h3 {
+  color: #fff !important;
+}
+
+.rd-lab-light .rd-roadmap-card [class*="text-white/"] {
+  color: #bdb4c1 !important;
+}
+
+.rd-lab-light [class*="bg-white/"],
+.rd-lab-light [class*="from-white/"] {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.rd-lab-light [class*="bg-black/"] {
+  background-color: #fff !important;
+}
+
+.rd-lab-light [class*="border-white/"] {
+  border-color: rgba(58, 42, 65, 0.14) !important;
+}
+
+.rd-lab-light [class*="text-white"] {
+  color: #34293a !important;
+}
+
+.rd-lab-light [class*="text-white/25"],
+.rd-lab-light [class*="text-white/30"],
+.rd-lab-light [class*="text-white/35"],
+.rd-lab-light [class*="text-white/40"],
+.rd-lab-light [class*="text-white/45"],
+.rd-lab-light [class*="text-white/50"],
+.rd-lab-light [class*="text-white/55"] {
+  color: #756a7a !important;
+}
+
+.rd-lab-light [class*="text-white/60"],
+.rd-lab-light [class*="text-white/65"],
+.rd-lab-light [class*="text-white/70"],
+.rd-lab-light [class*="text-white/80"] {
+  color: #574b5d !important;
+}
+
+.rd-lab-light [class*="bg-[#df3fae]"] {
+  color: #fff !important;
+}
+
+.rd-lab-light input,
+.rd-lab-light select {
+  color: #251d29 !important;
+}

@@ -33,6 +33,10 @@ import FinanceApp from "@/pages/FinanceApp";
 import { FinanceProvider } from "@/contexts/FinanceContext";
 import DataRoomGuidePage from "@/pages/DataRoomGuide";
 import GrowthApp from "@/pages/growth/GrowthApp";
+import GrowthLogin from "@/pages/growth/GrowthLogin";
+import RdLabOverview from "@/pages/rd-lab/RdLabOverview";
+import RdLabLogin from "@/pages/rd-lab/RdLabLogin";
+import RdLabWorkspace from "@/pages/rd-lab/RdLabWorkspace";
 
 const queryClient = new QueryClient();
 
@@ -41,12 +45,24 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <BrowserRouter
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
+          <Route
+            path="/innovation-lab/growth/login"
+            element={<GrowthLogin />}
+          />
           <Route path="/innovation-lab/growth/*" element={<GrowthApp />} />
+          <Route path="/rd-lab" element={<RdLabOverview />} />
+          <Route path="/rd-lab/login" element={<RdLabLogin />} />
+          <Route
+            path="/rd-lab/work-packages/wp1-textile-sensing"
+            element={<RdLabWorkspace />}
+          />
           <Route path="/pitch-deck-preview" element={<SlideDeck />} />
           <Route path="/pitch-deck-export" element={<SlideDeckPdfExport />} />
           <Route path="/pitchdeck-preview" element={<SlideDeck />} />

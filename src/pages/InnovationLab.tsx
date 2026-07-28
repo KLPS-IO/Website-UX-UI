@@ -95,7 +95,7 @@ const quickNav = [
     desc: "Deck, financials and cap table.",
   },
   {
-    href: "#lab",
+    href: "/rd-lab",
     title: "IP & R&D Lab",
     desc: "Patents, prototypes, materials, roadmap.",
   },
@@ -227,12 +227,12 @@ const InnovationLab = () => {
                 >
                   Enter Data Room
                 </Link>
-                <a
-                  href="#lab"
+                <Link
+                  to="/rd-lab"
                   className="rounded-full border border-border bg-white/[0.03] px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.06]"
                 >
-                  Explore R&D Lab
-                </a>
+                  Enter R&D Lab
+                </Link>
               </div>
             </div>
 
