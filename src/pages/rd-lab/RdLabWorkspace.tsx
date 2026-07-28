@@ -13,11 +13,13 @@ import {
 } from "@/pages/FInance.documents";
 import type { EvidenceItem } from "@/types/evidence";
 import type {
+  ProcurementProgress as ProcurementProgressModel,
   RdRecord,
   RdResource,
   RdSummary,
   RdWorkPackage,
 } from "@/types/rd-lab";
+import { ProcurementProgress } from "@/components/rd-lab/ProcurementProgress";
 
 const tabs = [
   "Overview",
@@ -82,6 +84,10 @@ export default function RdLabWorkspace() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [evidence, setEvidence] = useState<EvidenceItem[]>([]);
+  const [procurementProgress, setProcurementProgress] =
+    useState<ProcurementProgressModel | null>(null);
+  const [progressLoading, setProgressLoading] = useState(true);
+  const [progressError, setProgressError] = useState("");
   useEffect(() => {
     (async () => {
       try {
@@ -94,6 +100,13 @@ export default function RdLabWorkspace() {
         setWp(w.work_package);
         setSummary(s.summary);
         setSuppliers(sups);
+        rdLabService
+          .procurementProgress(w.work_package.id)
+          .then((result) => setProcurementProgress(result.procurement_progress))
+          .catch(() =>
+            setProgressError("Procurement progress could not be loaded."),
+          )
+          .finally(() => setProgressLoading(false));
         setEvidence(
           await evidenceService.linked("rd_work_package", w.work_package.id),
         );
@@ -126,6 +139,12 @@ export default function RdLabWorkspace() {
       ),
     [records, search],
   );
+  const refreshProgress = async () => {
+    if (!wp) return;
+    const result = await rdLabService.procurementProgress(wp.id);
+    setProcurementProgress(result.procurement_progress);
+    setProgressError("");
+  };
   if (checking) return <State text="Checking secure founder session…" />;
   if (!wp) return <State text={error || "WP1 is unavailable."} />;
   const metrics = [
@@ -191,13 +210,15 @@ export default function RdLabWorkspace() {
               <p className="mt-4 max-w-4xl leading-7 text-white/55">
                 {wp.objective}
               </p>
-              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-white/35">
-                <span>Last updated: {formatSafeDate(wp.updated_at)}</span>
-                <span>Overall progress: Not calculated</span>
-                <span>
-                  Next action: establish the first verified supplier record
-                </span>
+              <div className="mt-5 text-xs text-white/35">
+                Last updated: {formatSafeDate(wp.updated_at)}
               </div>
+              <ProcurementProgress
+                compact
+                progress={procurementProgress}
+                loading={progressLoading}
+                error={progressError}
+              />
             </div>
             <div className="min-w-56 rounded-2xl border border-white/10 bg-black/15 p-4">
               <div className="text-xs text-white/35">STATUS</div>
@@ -227,7 +248,12 @@ export default function RdLabWorkspace() {
         <section className="mt-6">
           {active === "Overview" ? (
             <>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+              <ProcurementProgress
+                progress={procurementProgress}
+                loading={progressLoading}
+                error={progressError}
+              />
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
                 {metrics.map(([label, value]) => (
                   <Card key={label as string}>
                     <div className="text-xs text-white/35">{label}</div>
@@ -284,9 +310,10 @@ export default function RdLabWorkspace() {
               setSearch={setSearch}
               addOpen={addOpen}
               setAddOpen={setAddOpen}
-              reload={async () =>
-                setRecords(await rdLabService.list(resourceFor[active]!))
-              }
+              reload={async () => {
+                setRecords(await rdLabService.list(resourceFor[active]!));
+                await refreshProgress();
+              }}
             />
           )}
         </section>
@@ -299,9 +326,10 @@ export default function RdLabWorkspace() {
         companyId={null}
         documents={evidence}
         prefill={prefill}
-        afterUploads={async () =>
-          setEvidence(await evidenceService.linked("rd_work_package", wp.id))
-        }
+        afterUploads={async () => {
+          setEvidence(await evidenceService.linked("rd_work_package", wp.id));
+          await refreshProgress();
+        }}
       />
     </main>
   );

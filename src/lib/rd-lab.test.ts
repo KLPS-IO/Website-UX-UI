@@ -37,5 +37,20 @@ test("workspace preserves honest empty, loading, unauthorised and unknown-money 
   assert.match(workspace, /\[401,\s*403\]/);
   assert.match(workspace, /No .* recorded/);
   assert.match(workspace, /formatMoney\(summary\?\.(minimum|likely|maximum)_amount\)/);
-  assert.match(workspace, /Overall progress: Not calculated/);
+  assert.match(workspace, /procurementProgress/);
+});
+
+test("Procurement Progress renders canonical stages responsively without percentages", () => {
+  const component = source("src/components/rd-lab/ProcurementProgress.tsx");
+  const workspace = source("src/pages/rd-lab/RdLabWorkspace.tsx");
+  assert.match(component, /Loading procurement progress/);
+  assert.match(component, /Procurement progress is not available/);
+  assert.match(component, /progress\.current_stage/);
+  assert.match(component, /progress\.next_action/);
+  assert.match(component, /progress\.blocking_reason/);
+  assert.match(component, /md:grid-cols-7/);
+  assert.doesNotMatch(component, /overflow-x/);
+  assert.doesNotMatch(component, /percentage|progress-bar|animate-\[|transition-all/);
+  assert.match(workspace, /<ProcurementProgress[\s\S]*compact/);
+  assert.match(workspace, /<ProcurementProgress[\s\S]*progress=/);
 });
