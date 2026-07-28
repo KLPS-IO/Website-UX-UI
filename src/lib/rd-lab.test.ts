@@ -61,3 +61,51 @@ test("Procurement Progress renders canonical stages responsively without percent
   assert.match(workspace, /<ProcurementProgress[\s\S]*compact/);
   assert.match(workspace, /<ProcurementProgress[\s\S]*progress=/);
 });
+
+test("WP1 supplier verification is limited to the approved four-organisation sprint", () => {
+  const config = source("src/config/rdProcurement.ts");
+  const workspace = source("src/pages/rd-lab/RdLabWorkspace.tsx");
+  for (const supplier of [
+    "University of Manchester / GEIC",
+    "Henry Royce Institute",
+    "Interactive Wear",
+    "Ohmatex",
+  ])
+    assert.match(config, new RegExp(supplier.replace("/", "\\/")));
+  assert.match(workspace, /Select a Sprint 1 organisation/);
+  assert.doesNotMatch(workspace, /\["relevant_capability", "Relevant capability"\]/);
+});
+
+test("supplier workflow uses the approved sequential statuses and evidence-led notes", () => {
+  const config = source("src/config/rdProcurement.ts");
+  for (const status of [
+    "Research",
+    "Verified",
+    "Contacted",
+    "Discovery Meeting",
+    "RFQ Sent",
+    "Quote Received",
+    "Comparison",
+    "Selected",
+    "Closed",
+  ])
+    assert.match(config, new RegExp(`"${status}"`));
+  assert.match(config, /Verified:\n/);
+  assert.match(config, /Supplier to Confirm:\n/);
+  assert.match(config, /Unknown:/);
+});
+
+test("supplier interactions, findings and actions remain linked to canonical suppliers", () => {
+  const workspace = source("src/pages/rd-lab/RdLabWorkspace.tsx");
+  assert.match(workspace, /technical_learning/);
+  assert.match(workspace, /commercial_learning/);
+  assert.match(workspace, /\["supplier_id", "Supplier", "supplier"\]/);
+  assert.match(workspace, /Verified Fact/);
+  assert.match(workspace, /Supplier Confirmed/);
+  assert.match(workspace, /Founder Assumption/);
+  assert.match(workspace, /Reasonable Inference/);
+  assert.match(workspace, /Upload linked evidence/);
+  assert.match(workspace, /rd_supplier/);
+  assert.match(workspace, /rd_rfq/);
+  assert.match(workspace, /rd_quotation/);
+});

@@ -15,21 +15,21 @@ function supportingText(stage: ProcurementProgressStage) {
   const counts = stage.supporting_counts;
   switch (stage.key) {
     case "research":
-      return `${counts.suppliers_identified} suppliers`;
+      return `${counts.suppliers_identified} identified · ${counts.suppliers_verified ?? 0} verified`;
     case "supplier_engagement":
-      return `${counts.suppliers_contacted} contacted`;
+      return `${counts.suppliers_contacted} contacted · ${counts.discovery_meetings_completed ?? 0} meetings`;
     case "rfqs":
-      return `${counts.rfqs_sent} sent`;
+      return `${counts.rfqs_created ?? 0} prepared · ${counts.rfqs_sent} sent`;
     case "quotations":
       return stage.target_count
         ? `${counts.valid_quotations} of ${stage.target_count} valid`
         : `${counts.valid_quotations} valid`;
     case "comparison":
-      return `${counts.recommendations_recorded} recommendations`;
+      return `${counts.recommendations_recorded} recommendations · ${counts.selection_decisions_recorded ?? 0} decisions`;
     case "finance_os_mapping":
       return `${counts.mappings_complete} mapped`;
     case "complete":
-      return `${counts.critical_actions_open} critical actions`;
+      return `${counts.linked_evidence_count ?? 0} evidence · ${counts.critical_actions_open} critical actions`;
     default:
       return `${stage.completed_count} recorded`;
   }

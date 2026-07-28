@@ -20,6 +20,12 @@ import type {
   RdWorkPackage,
 } from "@/types/rd-lab";
 import { ProcurementProgress } from "@/components/rd-lab/ProcurementProgress";
+import {
+  EVIDENCE_LED_RESEARCH_NOTE_TEMPLATE,
+  PROCUREMENT_STATUSES,
+  SUPPLIER_CATEGORIES,
+  WP1_SUPPLIER_VERIFICATION_SPRINT,
+} from "@/config/rdProcurement";
 
 const tabs = [
   "Overview",
@@ -82,6 +88,8 @@ export default function RdLabWorkspace() {
   const [search, setSearch] = useState("");
   const [addOpen, setAddOpen] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [evidencePrefill, setEvidencePrefill] =
+    useState<UploadPrefill | null>(null);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [evidence, setEvidence] = useState<EvidenceItem[]>([]);
   const [procurementProgress, setProcurementProgress] =
@@ -153,7 +161,7 @@ export default function RdLabWorkspace() {
       label: "Suppliers",
       values: [
         ["Identified", progressSummary?.suppliers_identified],
-        ["Shortlisted", progressSummary?.suppliers_shortlisted],
+        ["Verified", progressSummary?.suppliers_verified],
       ],
     },
     {
@@ -197,7 +205,10 @@ export default function RdLabWorkspace() {
           </Link>
           <div className="flex gap-2">
             <button
-              onClick={() => setUploadOpen(true)}
+              onClick={() => {
+                setEvidencePrefill(null);
+                setUploadOpen(true);
+              }}
               className="rounded-lg border border-white/10 px-3 py-2 text-xs text-white/65"
             >
               <FileUp className="mr-2 inline h-4 w-4" />
@@ -346,8 +357,42 @@ export default function RdLabWorkspace() {
               addOpen={addOpen}
               setAddOpen={setAddOpen}
               reload={async () => {
-                setRecords(await rdLabService.list(resourceFor[active]!));
+                const refreshed = await rdLabService.list(
+                  resourceFor[active]!,
+                );
+                setRecords(refreshed);
+                if (resourceFor[active] === "suppliers")
+                  setSuppliers(refreshed);
                 await refreshProgress();
+              }}
+              uploadEvidence={(resource, record) => {
+                const entityType = {
+                  suppliers: "rd_supplier",
+                  rfqs: "rd_rfq",
+                  quotations: "rd_quotation",
+                }[resource];
+                if (!entityType) return;
+                const name = String(
+                  record.organisation_name ??
+                    record.rfq_code ??
+                    record.quote_reference ??
+                    "R&D record",
+                );
+                setEvidencePrefill({
+                  title: `${name} Evidence`,
+                  category:
+                    resource === "quotations" ? "Finance" : "Technology",
+                  sourceOrganisation:
+                    resource === "suppliers"
+                      ? String(record.organisation_name ?? "")
+                      : "",
+                  description: `Canonical evidence supporting ${name} in KLPS WP1.`,
+                  linkMode: true,
+                  entityType,
+                  entityId: record.id,
+                  relationship: `Supports WP1 ${resource.replace("_", " ")} record`,
+                });
+                setUploadOpen(true);
               }}
             />
           )}
@@ -360,7 +405,7 @@ export default function RdLabWorkspace() {
         setQueue={setQueue}
         companyId={null}
         documents={evidence}
-        prefill={prefill}
+        prefill={evidencePrefill ?? prefill}
         afterUploads={async () => {
           setEvidence(await evidenceService.linked("rd_work_package", wp.id));
           await refreshProgress();
@@ -382,6 +427,7 @@ function ResourceView({
   addOpen,
   setAddOpen,
   reload,
+  uploadEvidence,
 }: {
   title: string;
   resource: RdResource;
@@ -394,6 +440,7 @@ function ResourceView({
   addOpen: boolean;
   setAddOpen: (v: boolean) => void;
   reload: () => Promise<void>;
+  uploadEvidence: (resource: RdResource, record: RdRecord) => void;
 }) {
   return (
     <>
@@ -428,6 +475,9 @@ function ResourceView({
           </p>
         </Card>
       )}
+      {resource === "suppliers" && (
+        <SupplierSprintScope suppliers={suppliers} />
+      )}
       {addOpen && (
         <RecordForm
           resource={resource}
@@ -449,8 +499,15 @@ function ResourceView({
         <p className="mt-8 text-white/40">Loading…</p>
       ) : records.length ? (
         <div className="mt-5 grid gap-3 lg:grid-cols-2">
-          {records.map((record) => (
-            <Card key={record.id}>
+          {records.map((record) =>
+            resource === "suppliers" ? (
+              <SupplierRecordCard
+                key={record.id}
+                record={record}
+                uploadEvidence={() => uploadEvidence(resource, record)}
+              />
+            ) : (
+              <Card key={record.id}>
               <div className="text-xs text-[#f36bc5]">
                 {String(
                   record.status ??
@@ -484,8 +541,19 @@ function ResourceView({
                 v{String(record.version ?? 1)} ·{" "}
                 {String(record.change_reason ?? "Audit reason recorded")}
               </div>
-            </Card>
-          ))}
+              {["rfqs", "quotations"].includes(resource) && (
+                <button
+                  type="button"
+                  onClick={() => uploadEvidence(resource, record)}
+                  className="mt-4 inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold"
+                >
+                  <FileUp className="mr-2 h-4 w-4" />
+                  Upload linked evidence
+                </button>
+              )}
+              </Card>
+            ),
+          )}
         </div>
       ) : (
         <Card className="mt-5">
@@ -505,11 +573,15 @@ function ResourceView({
 
 const formFields: Record<RdResource, Array<[string, string, string?]>> = {
   suppliers: [
-    ["organisation_name", "Organisation name"],
-    ["category", "Category"],
+    ["organisation_name", "Organisation name", "sprint-supplier"],
+    ["organisation_aliases", "Known trading identities", "aliases"],
+    ["category", "Supplier category", "supplier-category"],
     ["country", "Country"],
-    ["relevant_capability", "Relevant capability"],
-    ["procurement_status", "Procurement status"],
+    ["existing_relationship", "Existing relationship"],
+    ["priority_tier", "Priority tier"],
+    ["procurement_status", "Procurement status", "procurement-status"],
+    ["source_reference", "Verified source URL", "url"],
+    ["research_notes", "Evidence-led research notes", "research-notes"],
   ],
   contacts: [],
   interactions: [
@@ -517,6 +589,11 @@ const formFields: Record<RdResource, Array<[string, string, string?]>> = {
     ["interaction_type", "Interaction type"],
     ["occurred_at", "Occurred at", "datetime-local"],
     ["summary", "Summary"],
+    ["technical_learning", "Technical finding"],
+    ["commercial_learning", "Commercial finding"],
+    ["actions", "CEO action"],
+    ["follow_up_date", "Follow-up date", "date"],
+    ["status", "Interaction status"],
   ],
   rfqs: [
     ["supplier_id", "Supplier", "supplier"],
@@ -532,11 +609,14 @@ const formFields: Record<RdResource, Array<[string, string, string?]>> = {
     ["maximum_amount", "Maximum amount", "number"],
   ],
   findings: [
+    ["supplier_id", "Supplier", "supplier"],
     ["title", "Title"],
     ["finding", "Finding"],
-    ["status", "Status"],
+    ["source_type", "Evidence basis", "evidence-basis"],
+    ["status", "Finding status"],
   ],
   actions: [
+    ["supplier_id", "Supplier", "supplier"],
     ["title", "Action title"],
     ["owner", "Owner"],
     ["priority", "Priority"],
@@ -561,7 +641,15 @@ function RecordForm({
   suppliers: RdRecord[];
   done: () => Promise<void>;
 }) {
-  const [value, setValue] = useState<Record<string, string>>({});
+  const [value, setValue] = useState<Record<string, string>>(
+    resource === "suppliers"
+      ? {
+          procurement_status: "Research",
+          priority_tier: "Supplier Verification Sprint 1",
+          research_notes: EVIDENCE_LED_RESEARCH_NOTE_TEMPLATE,
+        }
+      : {},
+  );
   const [error, setError] = useState("");
   return (
     <form
@@ -575,6 +663,14 @@ function RecordForm({
           change_reason:
             value.change_reason || "Initial WP1 operational record",
         };
+        if (resource === "suppliers") {
+          payload.organisation_aliases = value.organisation_aliases
+            ? value.organisation_aliases
+                .split(",")
+                .map((item) => item.trim())
+                .filter(Boolean)
+            : [];
+        }
         for (const k of ["minimum_amount", "likely_amount", "maximum_amount"])
           if (payload[k] === "") payload[k] = null;
         if (
@@ -610,12 +706,96 @@ function RecordForm({
                   </option>
                 ))}
               </select>
+            ) : type === "sprint-supplier" ? (
+              <select
+                required
+                value={value[key] ?? ""}
+                onChange={(e) =>
+                  setValue({ ...value, [key]: e.target.value })
+                }
+                className={`${inputClass} mt-1`}
+              >
+                <option value="">Select a Sprint 1 organisation</option>
+                {WP1_SUPPLIER_VERIFICATION_SPRINT.map((supplier) => (
+                  <option
+                    key={supplier.canonicalName}
+                    value={supplier.canonicalName}
+                  >
+                    {supplier.displayName}
+                  </option>
+                ))}
+              </select>
+            ) : type === "supplier-category" ? (
+              <select
+                required
+                value={value[key] ?? ""}
+                onChange={(e) =>
+                  setValue({ ...value, [key]: e.target.value })
+                }
+                className={`${inputClass} mt-1`}
+              >
+                <option value="">Select a verified category</option>
+                {SUPPLIER_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            ) : type === "procurement-status" ? (
+              <select
+                required
+                value={value[key] ?? "Research"}
+                onChange={(e) =>
+                  setValue({ ...value, [key]: e.target.value })
+                }
+                className={`${inputClass} mt-1`}
+              >
+                {PROCUREMENT_STATUSES.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            ) : type === "evidence-basis" ? (
+              <select
+                required
+                value={value[key] ?? ""}
+                onChange={(e) =>
+                  setValue({ ...value, [key]: e.target.value })
+                }
+                className={`${inputClass} mt-1`}
+              >
+                <option value="">Select evidence basis</option>
+                {[
+                  "Verified Fact",
+                  "Supplier Confirmed",
+                  "Reasonable Inference",
+                  "Founder Assumption",
+                  "Unknown",
+                ].map((basis) => (
+                  <option key={basis} value={basis}>
+                    {basis}
+                  </option>
+                ))}
+              </select>
+            ) : type === "research-notes" ? (
+              <textarea
+                required
+                rows={7}
+                value={value[key] ?? ""}
+                onChange={(e) =>
+                  setValue({ ...value, [key]: e.target.value })
+                }
+                className={`${inputClass} mt-1 resize-y`}
+              />
             ) : (
               <input
                 required={
                   ![
                     "country",
-                    "relevant_capability",
+                    "organisation_aliases",
+                    "existing_relationship",
+                    "priority_tier",
                     "minimum_amount",
                     "likely_amount",
                     "maximum_amount",
@@ -651,6 +831,146 @@ function RecordForm({
         Save canonical record
       </button>
     </form>
+  );
+}
+function SupplierRecordCard({
+  record,
+  uploadEvidence,
+}: {
+  record: RdRecord;
+  uploadEvidence: () => void;
+}) {
+  const aliases = Array.isArray(record.organisation_aliases)
+    ? record.organisation_aliases.filter(
+        (value): value is string => typeof value === "string",
+      )
+    : [];
+  const source =
+    typeof record.source_reference === "string"
+      ? record.source_reference
+      : null;
+  const notes =
+    typeof record.research_notes === "string" ? record.research_notes : null;
+
+  return (
+    <Card>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="text-xs font-semibold text-[#b52a8b]">
+            {String(record.procurement_status ?? "Research")}
+          </div>
+          <h3 className="mt-1 text-lg font-semibold">
+            {String(record.organisation_name)}
+          </h3>
+          {aliases.length > 0 && (
+            <p className="mt-1 text-sm text-white/45">
+              Also known as: {aliases.join(", ")}
+            </p>
+          )}
+        </div>
+        <div className="rounded-full bg-[#df3fae]/10 px-3 py-1 text-xs font-semibold text-[#8f1d6e]">
+          {String(record.priority_tier ?? "Priority not confirmed")}
+        </div>
+      </div>
+      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+        <div>
+          <dt className="font-semibold">Category</dt>
+          <dd className="mt-0.5 text-white/45">
+            {String(record.category ?? "Not confirmed")}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Country</dt>
+          <dd className="mt-0.5 text-white/45">
+            {String(record.country ?? "Not confirmed")}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Existing relationship</dt>
+          <dd className="mt-0.5 text-white/45">
+            {String(record.existing_relationship ?? "Not confirmed")}
+          </dd>
+        </div>
+        <div>
+          <dt className="font-semibold">Evidence source</dt>
+          <dd className="mt-0.5">
+            {source ? (
+              <a
+                href={source}
+                target="_blank"
+                rel="noreferrer"
+                className="font-semibold text-[#8f1d6e] underline underline-offset-2"
+              >
+                Open verified source
+              </a>
+            ) : (
+              <span className="text-white/45">Not yet evidenced</span>
+            )}
+          </dd>
+        </div>
+      </dl>
+      {notes && (
+        <div className="mt-4 whitespace-pre-line rounded-xl border border-white/10 bg-white/[.035] p-3 text-sm leading-6 text-white/55">
+          {notes}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={uploadEvidence}
+        className="mt-4 inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold"
+      >
+        <FileUp className="mr-2 h-4 w-4" />
+        Upload linked evidence
+      </button>
+      <div className="mt-4 text-xs text-white/25">
+        v{String(record.version ?? 1)} ·{" "}
+        {String(record.change_reason ?? "Audit reason recorded")}
+      </div>
+    </Card>
+  );
+}
+function SupplierSprintScope({ suppliers }: { suppliers: RdRecord[] }) {
+  const recordedNames = new Set(
+    suppliers.map((supplier) =>
+      String(supplier.organisation_name ?? "").toLowerCase(),
+    ),
+  );
+
+  return (
+    <Card className="mt-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-[.16em] text-[#b52a8b]">
+            Supplier Verification Sprint 1
+          </div>
+          <h3 className="mt-1 text-lg font-semibold">
+            Four-organisation research boundary
+          </h3>
+        </div>
+        <p className="max-w-xl text-sm text-white/45">
+          No organisations should be added outside this scope until this sprint
+          is complete.
+        </p>
+      </div>
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {WP1_SUPPLIER_VERIFICATION_SPRINT.map((supplier) => {
+          const recorded = recordedNames.has(
+            supplier.canonicalName.toLowerCase(),
+          );
+          return (
+            <li
+              key={supplier.canonicalName}
+              className="rounded-xl border border-white/10 bg-white/[.035] px-3 py-3"
+            >
+              <div className="font-semibold">{supplier.displayName}</div>
+              <div className="mt-1 text-xs text-white/45">
+                {recorded ? "Canonical record created" : "Awaiting record"}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </Card>
   );
 }
 function Instructions() {

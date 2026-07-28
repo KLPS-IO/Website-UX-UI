@@ -4,6 +4,18 @@ export type RdRecord = Record<string, unknown> & {
   updated_at?: string;
   version?: number;
 };
+export type RdSupplier = RdRecord & {
+  organisation_name: string;
+  organisation_aliases?: string[] | null;
+  category: string;
+  country?: string | null;
+  website?: string | null;
+  existing_relationship?: string | null;
+  priority_tier?: string | null;
+  procurement_status: string;
+  source_reference?: string | null;
+  research_notes?: string | null;
+};
 export type RdWorkPackage = RdRecord & {
   code: string;
   title: string;
@@ -54,6 +66,7 @@ export type ProcurementProgress = {
   stages: ProcurementProgressStage[];
   summary: {
     suppliers_identified: number;
+    suppliers_verified?: number;
     suppliers_shortlisted: number;
     suppliers_contacted: number;
     meetings_held: number;
