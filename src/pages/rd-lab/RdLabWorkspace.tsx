@@ -147,13 +147,36 @@ export default function RdLabWorkspace() {
   };
   if (checking) return <State text="Checking secure founder session…" />;
   if (!wp) return <State text={error || "WP1 is unavailable."} />;
-  const metrics = [
-    ["Suppliers identified", summary?.suppliers_identified],
-    ["Suppliers contacted", summary?.suppliers_contacted],
-    ["Meetings held", summary?.meetings_held],
-    ["RFQs sent", summary?.rfqs_sent],
-    ["Quotes received", summary?.quotations_received],
-    ["Open actions", summary?.open_actions],
+  const progressSummary = procurementProgress?.summary;
+  const operationalMetrics = [
+    {
+      label: "Suppliers",
+      values: [
+        ["Identified", progressSummary?.suppliers_identified],
+        ["Shortlisted", progressSummary?.suppliers_shortlisted],
+      ],
+    },
+    {
+      label: "Engagement",
+      values: [
+        ["Contacted", progressSummary?.suppliers_contacted],
+        ["Meetings held", progressSummary?.meetings_held],
+      ],
+    },
+    {
+      label: "Commercial evidence",
+      values: [
+        ["RFQs sent", progressSummary?.rfqs_sent],
+        ["Quotations received", progressSummary?.quotations_received],
+      ],
+    },
+    {
+      label: "Actions",
+      values: [
+        ["Open actions", summary?.open_actions],
+        ["Critical actions", progressSummary?.critical_actions_open],
+      ],
+    },
   ];
   const prefill: UploadPrefill = {
     title: "WP1 Textile Sensing Evidence",
@@ -253,20 +276,32 @@ export default function RdLabWorkspace() {
                 loading={progressLoading}
                 error={progressError}
               />
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-                {metrics.map(([label, value]) => (
-                  <Card key={label as string}>
-                    <div className="text-xs text-white/35">{label}</div>
-                    <div className="mt-3 text-2xl font-semibold">
-                      {value ?? 0}
-                    </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {operationalMetrics.map((metric) => (
+                  <Card key={metric.label} className="p-4">
+                    <h2 className="text-sm font-semibold text-[#171219]">
+                      {metric.label}
+                    </h2>
+                    <dl className="mt-3 space-y-2">
+                      {metric.values.map(([label, value]) => (
+                        <div
+                          key={label as string}
+                          className="flex items-center justify-between gap-4 text-sm"
+                        >
+                          <dt className="text-[#5f5563]">{label}</dt>
+                          <dd className="font-semibold text-[#171219]">
+                            {value ?? "Not loaded"}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
                   </Card>
                 ))}
               </div>
-              <div className="mt-5 grid gap-4 lg:grid-cols-3">
-                <Card>
+              <div className="mt-4 grid items-stretch gap-4 lg:grid-cols-3">
+                <Card className="h-full">
                   <h2 className="font-semibold">Current cost range</h2>
-                  <div className="mt-5 space-y-3 text-sm text-white/55">
+                  <div className="mt-4 space-y-2 text-sm text-white/55">
                     <Row
                       label="Minimum"
                       value={formatMoney(summary?.minimum_amount)}
@@ -281,17 +316,17 @@ export default function RdLabWorkspace() {
                     />
                   </div>
                 </Card>
-                <Card>
+                <Card className="h-full">
                   <h2 className="font-semibold">Major risks</h2>
-                  <p className="mt-4 text-sm leading-6 text-white/45">
-                    No canonical risks have been recorded for WP1 yet.
+                  <p className="mt-3 text-sm leading-6 text-white/45">
+                    No canonical procurement risks recorded.
                   </p>
                 </Card>
-                <Card>
+                <Card className="h-full">
                   <h2 className="font-semibold">Next action</h2>
-                  <p className="mt-4 text-sm leading-6 text-white/45">
-                    Add supplier research or create the first CEO action to
-                    establish the next evidence-led step.
+                  <p className="mt-3 text-sm leading-6 text-white/45">
+                    {procurementProgress?.next_action ??
+                      (progressError ? "Not available" : "Loading…")}
                   </p>
                 </Card>
               </div>

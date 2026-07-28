@@ -4,7 +4,8 @@ import test from "node:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const source = (path: string) => readFileSync(join(process.cwd(), path), "utf8");
+const source = (path: string) =>
+  readFileSync(join(process.cwd(), path), "utf8");
 
 test("R&D routes separate public, login and protected workspace entry points", () => {
   const app = source("src/App.tsx");
@@ -36,7 +37,10 @@ test("workspace preserves honest empty, loading, unauthorised and unknown-money 
   assert.match(workspace, /Checking secure founder session/);
   assert.match(workspace, /\[401,\s*403\]/);
   assert.match(workspace, /No .* recorded/);
-  assert.match(workspace, /formatMoney\(summary\?\.(minimum|likely|maximum)_amount\)/);
+  assert.match(
+    workspace,
+    /formatMoney\(summary\?\.(minimum|likely|maximum)_amount\)/,
+  );
   assert.match(workspace, /procurementProgress/);
 });
 
@@ -50,7 +54,10 @@ test("Procurement Progress renders canonical stages responsively without percent
   assert.match(component, /progress\.blocking_reason/);
   assert.match(component, /md:grid-cols-7/);
   assert.doesNotMatch(component, /overflow-x/);
-  assert.doesNotMatch(component, /percentage|progress-bar|animate-\[|transition-all/);
+  assert.doesNotMatch(
+    component,
+    /percentage|progress-bar|animate-\[|transition-all/,
+  );
   assert.match(workspace, /<ProcurementProgress[\s\S]*compact/);
   assert.match(workspace, /<ProcurementProgress[\s\S]*progress=/);
 });
