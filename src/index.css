@@ -1406,7 +1406,8 @@ All colors MUST be HSL.
 /* R&D Lab light theme with the existing restrained magenta identity. */
 .rd-lab-light {
   background: #f7f4f8 !important;
-  color: #251d29 !important;
+  color: #171219 !important;
+  font-size: 17px;
 }
 
 .rd-lab-light [class*="bg-[#100c13]"] {
@@ -1440,7 +1441,7 @@ All colors MUST be HSL.
 }
 
 .rd-lab-light [class*="text-white"] {
-  color: #34293a !important;
+  color: #171219 !important;
 }
 
 .rd-lab-light [class*="text-white/25"],
@@ -1450,21 +1451,49 @@ All colors MUST be HSL.
 .rd-lab-light [class*="text-white/45"],
 .rd-lab-light [class*="text-white/50"],
 .rd-lab-light [class*="text-white/55"] {
-  color: #756a7a !important;
+  color: #3e3542 !important;
 }
 
 .rd-lab-light [class*="text-white/60"],
 .rd-lab-light [class*="text-white/65"],
 .rd-lab-light [class*="text-white/70"],
 .rd-lab-light [class*="text-white/80"] {
-  color: #574b5d !important;
+  color: #2d2530 !important;
 }
 
-.rd-lab-light [class*="bg-[#df3fae]"] {
+.rd-lab-light [class*="bg-[#df3fae]"]:not([class*="/20"]) {
   color: #fff !important;
+}
+
+.rd-lab-light [class*="bg-[#df3fae]/20"] {
+  color: #171219 !important;
+}
+
+.rd-lab-light [class~="text-xs"] {
+  font-size: 0.875rem !important;
+  line-height: 1.35rem !important;
+}
+
+.rd-lab-light [class~="text-sm"] {
+  font-size: 1rem !important;
+  line-height: 1.55rem !important;
+}
+
+.rd-lab-light [class~="text-base"] {
+  font-size: 1.0625rem !important;
+  line-height: 1.65rem !important;
+}
+
+.rd-lab-light [class~="text-lg"] {
+  font-size: 1.1875rem !important;
+}
+
+.rd-lab-light input::placeholder {
+  color: #5f5563 !important;
+  opacity: 1;
 }
 
 .rd-lab-light input,
 .rd-lab-light select {
-  color: #251d29 !important;
+  color: #171219 !important;
 }
