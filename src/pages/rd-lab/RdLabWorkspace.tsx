@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, FileUp, LogOut, Plus, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  Eye,
+  FileUp,
+  LogOut,
+  Plus,
+  ShieldCheck,
+} from "lucide-react";
 import { ApiError } from "@/lib/authenticated-api";
 import { formatMoney } from "@/lib/safe-money";
 import { formatSafeDate } from "@/lib/safe-date";
@@ -96,6 +104,7 @@ export default function RdLabWorkspace() {
     useState<ProcurementProgressModel | null>(null);
   const [progressLoading, setProgressLoading] = useState(true);
   const [progressError, setProgressError] = useState("");
+  const [evidenceRevision, setEvidenceRevision] = useState(0);
   useEffect(() => {
     (async () => {
       try {
@@ -394,6 +403,7 @@ export default function RdLabWorkspace() {
                 });
                 setUploadOpen(true);
               }}
+              evidenceRevision={evidenceRevision}
             />
           )}
         </section>
@@ -409,6 +419,7 @@ export default function RdLabWorkspace() {
         afterUploads={async () => {
           setEvidence(await evidenceService.linked("rd_work_package", wp.id));
           await refreshProgress();
+          setEvidenceRevision((current) => current + 1);
         }}
       />
     </main>
@@ -428,6 +439,7 @@ function ResourceView({
   setAddOpen,
   reload,
   uploadEvidence,
+  evidenceRevision,
 }: {
   title: string;
   resource: RdResource;
@@ -441,6 +453,7 @@ function ResourceView({
   setAddOpen: (v: boolean) => void;
   reload: () => Promise<void>;
   uploadEvidence: (resource: RdResource, record: RdRecord) => void;
+  evidenceRevision: number;
 }) {
   return (
     <>
@@ -506,6 +519,7 @@ function ResourceView({
                 key={record.id}
                 record={record}
                 uploadEvidence={() => uploadEvidence(resource, record)}
+                evidenceRevision={evidenceRevision}
               />
             ) : (
               <Card key={record.id}>
@@ -848,9 +862,11 @@ function RecordForm({
 function SupplierRecordCard({
   record,
   uploadEvidence,
+  evidenceRevision,
 }: {
   record: RdRecord;
   uploadEvidence: () => void;
+  evidenceRevision: number;
 }) {
   const aliases = Array.isArray(record.organisation_aliases)
     ? record.organisation_aliases.filter(
@@ -926,6 +942,10 @@ function SupplierRecordCard({
           {notes}
         </div>
       )}
+      <SupplierEvidenceList
+        supplierId={record.id}
+        refreshKey={evidenceRevision}
+      />
       <button
         type="button"
         onClick={uploadEvidence}
@@ -939,6 +959,156 @@ function SupplierRecordCard({
         {String(record.change_reason ?? "Audit reason recorded")}
       </div>
     </Card>
+  );
+}
+function SupplierEvidenceList({
+  supplierId,
+  refreshKey,
+}: {
+  supplierId: string;
+  refreshKey: number;
+}) {
+  const [items, setItems] = useState<EvidenceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError("");
+    evidenceService
+      .linked("rd_supplier", supplierId)
+      .then((result) => {
+        if (active) setItems(result);
+      })
+      .catch(() => {
+        if (active)
+          setError("Linked evidence could not be loaded. Check Documents.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [refreshKey, supplierId]);
+
+  const access = async (
+    item: EvidenceItem,
+    action: "view" | "download",
+  ) => {
+    setError("");
+    try {
+      const result = await evidenceService.accessDocument(item.id, action);
+      if (action === "view") {
+        window.open(result.signed_url, "_blank", "noopener,noreferrer");
+        return;
+      }
+      const anchor = document.createElement("a");
+      anchor.href = result.signed_url;
+      anchor.download = item.originalFilename ?? "";
+      anchor.rel = "noopener";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+    } catch {
+      setError("The evidence file could not be opened.");
+    }
+  };
+
+  return (
+    <section
+      className="mt-4 rounded-xl border border-white/10 bg-[#faf8fb] p-4"
+      aria-label="Linked supplier evidence"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h4 className="font-semibold">Uploaded evidence</h4>
+        <span className="rounded-full bg-[#eadde7] px-2.5 py-1 text-xs font-semibold text-[#3b102f]">
+          {loading ? "Checking…" : `${items.length} linked`}
+        </span>
+      </div>
+      {loading ? (
+        <p className="mt-2 text-sm text-white/45">
+          Checking canonical Evidence records…
+        </p>
+      ) : items.length === 0 ? (
+        <p className="mt-2 text-sm text-white/45">
+          No uploaded evidence is linked to this supplier.
+        </p>
+      ) : (
+        <>
+          <p className="mt-2 text-sm text-white/45">
+            Review these records before uploading another file.
+          </p>
+          <ul className="mt-3 space-y-2">
+            {items.map((item) => {
+              const relationship =
+                item.links?.find(
+                  (link) =>
+                    link.entity_type === "rd_supplier" &&
+                    link.entity_id === supplierId,
+                )?.relationship ?? "Linked to supplier";
+              return (
+                <li
+                  key={item.id}
+                  className="rounded-lg border border-white/10 bg-white p-3"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold text-[#8f1d6e]">
+                        {item.code}
+                      </div>
+                      <div className="mt-0.5 break-words font-semibold">
+                        {item.title}
+                      </div>
+                      <div
+                        className="mt-1 break-all text-sm text-white/45"
+                        title={item.originalFilename ?? undefined}
+                      >
+                        {item.originalFilename ?? "No filename recorded"}
+                      </div>
+                      <div className="mt-1 text-xs text-white/45">
+                        {item.category ?? "Category not confirmed"} ·{" "}
+                        {item.verificationStatus} ·{" "}
+                        {formatSafeDate(item.createdAt)}
+                      </div>
+                      <div className="mt-1 text-xs text-white/45">
+                        {relationship}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      <button
+                        type="button"
+                        disabled={!item.hasR2Object}
+                        onClick={() => void access(item, "view")}
+                        className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold disabled:opacity-45"
+                      >
+                        <Eye className="mr-1.5 h-4 w-4" />
+                        View
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!item.hasR2Object}
+                        onClick={() => void access(item, "download")}
+                        className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold disabled:opacity-45"
+                      >
+                        <Download className="mr-1.5 h-4 w-4" />
+                        Download
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+    </section>
   );
 }
 function SupplierSprintScope({ suppliers }: { suppliers: RdRecord[] }) {
