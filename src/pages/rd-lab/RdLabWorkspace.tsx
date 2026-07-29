@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -6,9 +6,14 @@ import {
   Download,
   Eye,
   FileUp,
+  GripVertical,
+  Link2,
   LogOut,
   Plus,
   ShieldCheck,
+  Trash2,
+  Unlink,
+  X,
 } from "lucide-react";
 import { ApiError } from "@/lib/authenticated-api";
 import { formatMoney } from "@/lib/safe-money";
@@ -20,7 +25,7 @@ import {
   type QueueItem,
   type UploadPrefill,
 } from "@/pages/FInance.documents";
-import type { EvidenceItem } from "@/types/evidence";
+import type { EvidenceEntityType, EvidenceItem } from "@/types/evidence";
 import type {
   ProcurementProgress as ProcurementProgressModel,
   RdRecord,
@@ -351,6 +356,18 @@ export default function RdLabWorkspace() {
                   </p>
                 </Card>
               </div>
+              <LinkedEvidenceList
+                entityType="rd_work_package"
+                entityId={wp.id}
+                contextLabel="work package"
+                refreshKey={evidenceRevision}
+                onChanged={async () => {
+                  setEvidence(
+                    await evidenceService.linked("rd_work_package", wp.id),
+                  );
+                  await refreshProgress();
+                }}
+              />
             </>
           ) : active === "Instructions" ? (
             <Instructions />
@@ -405,6 +422,10 @@ export default function RdLabWorkspace() {
                 setUploadOpen(true);
               }}
               evidenceRevision={evidenceRevision}
+              onEvidenceChanged={async () => {
+                await refreshProgress();
+                setEvidenceRevision((current) => current + 1);
+              }}
             />
           )}
         </section>
@@ -441,6 +462,7 @@ function ResourceView({
   reload,
   uploadEvidence,
   evidenceRevision,
+  onEvidenceChanged,
 }: {
   title: string;
   resource: RdResource;
@@ -455,6 +477,7 @@ function ResourceView({
   reload: () => Promise<void>;
   uploadEvidence: (resource: RdResource, record: RdRecord) => void;
   evidenceRevision: number;
+  onEvidenceChanged: () => Promise<void>;
 }) {
   return (
     <>
@@ -521,6 +544,7 @@ function ResourceView({
                 record={record}
                 uploadEvidence={() => uploadEvidence(resource, record)}
                 evidenceRevision={evidenceRevision}
+                onEvidenceChanged={onEvidenceChanged}
               />
             ) : (
               <Card key={record.id}>
@@ -864,10 +888,12 @@ function SupplierRecordCard({
   record,
   uploadEvidence,
   evidenceRevision,
+  onEvidenceChanged,
 }: {
   record: RdRecord;
   uploadEvidence: () => void;
   evidenceRevision: number;
+  onEvidenceChanged: () => Promise<void>;
 }) {
   const aliases = Array.isArray(record.organisation_aliases)
     ? record.organisation_aliases.filter(
@@ -943,9 +969,12 @@ function SupplierRecordCard({
           {notes}
         </div>
       )}
-      <SupplierEvidenceList
-        supplierId={record.id}
+      <LinkedEvidenceList
+        entityType="rd_supplier"
+        entityId={record.id}
+        contextLabel="supplier"
         refreshKey={evidenceRevision}
+        onChanged={onEvidenceChanged}
       />
       <button
         type="button"
@@ -962,23 +991,40 @@ function SupplierRecordCard({
     </Card>
   );
 }
-function SupplierEvidenceList({
-  supplierId,
+function LinkedEvidenceList({
+  entityType,
+  entityId,
+  contextLabel,
   refreshKey,
+  onChanged,
 }: {
-  supplierId: string;
+  entityType: EvidenceEntityType;
+  entityId: string;
+  contextLabel: string;
   refreshKey: number;
+  onChanged?: () => Promise<void> | void;
 }) {
   const [items, setItems] = useState<EvidenceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [order, setOrder] = useState<"manual" | "evidence-date" | "upload-date" | "title">(
+    () => (localStorage.getItem(`rd-lab:evidence-order:${entityType}:${entityId}`) as "manual" | "evidence-date" | "upload-date" | "title" | null) ?? "manual",
+  );
+  const [draggedLinkId, setDraggedLinkId] = useState<string | null>(null);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [deletionItem, setDeletionItem] = useState<EvidenceItem | null>(null);
+  const [deletionDetails, setDeletionDetails] = useState<EvidenceItem | null>(null);
+  const [deletionLoading, setDeletionLoading] = useState(false);
+  const [showLinks, setShowLinks] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const closeDeletionRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError("");
     evidenceService
-      .linked("rd_supplier", supplierId)
+      .linked(entityType, entityId)
       .then((result) => {
         if (active) setItems(result);
       })
@@ -992,7 +1038,148 @@ function SupplierEvidenceList({
     return () => {
       active = false;
     };
-  }, [refreshKey, supplierId]);
+  }, [entityId, entityType, refreshKey]);
+
+  useEffect(() => {
+    localStorage.setItem(`rd-lab:evidence-order:${entityType}:${entityId}`, order);
+  }, [entityId, entityType, order]);
+
+  useEffect(() => {
+    if (!deletionItem) return;
+    closeDeletionRef.current?.focus();
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !deletionLoading) {
+        setDeletionItem(null);
+        setDeletionDetails(null);
+        setShowLinks(false);
+        setDeleteConfirmation("");
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [deletionItem, deletionLoading]);
+
+  const linkFor = useCallback(
+    (item: EvidenceItem) =>
+      item.links?.find(
+        (link) =>
+          link.entity_type === entityType &&
+          link.entity_id === entityId,
+      ),
+    [entityId, entityType],
+  );
+
+  const displayedItems = useMemo(() => {
+    const result = [...items];
+    if (order === "manual") {
+      return result.sort(
+        (a, b) =>
+          (linkFor(a)?.display_order ?? Number.MAX_SAFE_INTEGER) -
+          (linkFor(b)?.display_order ?? Number.MAX_SAFE_INTEGER),
+      );
+    }
+    if (order === "title") {
+      return result.sort((a, b) => a.title.localeCompare(b.title));
+    }
+    const value = (item: EvidenceItem) =>
+      Date.parse(
+        order === "evidence-date"
+          ? item.documentDate ?? ""
+          : item.createdAt,
+      );
+    return result.sort((a, b) => {
+      const aDate = value(a);
+      const bDate = value(b);
+      if (!Number.isFinite(aDate)) return Number.isFinite(bDate) ? 1 : 0;
+      if (!Number.isFinite(bDate)) return -1;
+      return aDate - bDate;
+    });
+  }, [items, linkFor, order]);
+
+  const reorder = async (targetLinkId: string) => {
+    if (!draggedLinkId || draggedLinkId === targetLinkId || order !== "manual") return;
+    const current = [...displayedItems];
+    const from = current.findIndex((item) => linkFor(item)?.id === draggedLinkId);
+    const to = current.findIndex((item) => linkFor(item)?.id === targetLinkId);
+    if (from < 0 || to < 0) return;
+    const previous = items;
+    const [moved] = current.splice(from, 1);
+    current.splice(to, 0, moved);
+    setItems(current);
+    setSavingOrder(true);
+    setError("");
+    try {
+      await evidenceService.reorderLinks(
+        entityType,
+        entityId,
+        current.map((item) => linkFor(item)?.id).filter((id): id is string => Boolean(id)),
+      );
+      setItems(await evidenceService.linked(entityType, entityId));
+    } catch {
+      setItems(previous);
+      setError("The evidence order could not be saved. Reload and try again.");
+    } finally {
+      setDraggedLinkId(null);
+      setSavingOrder(false);
+    }
+  };
+
+  const openDeletion = async (item: EvidenceItem) => {
+    setDeletionItem(item);
+    setDeletionDetails(null);
+    setDeletionLoading(true);
+    setShowLinks(false);
+    setDeleteConfirmation("");
+    setError("");
+    try {
+      setDeletionDetails(await evidenceService.get(item.id));
+    } catch {
+      setDeletionItem(null);
+      setError("The linked records could not be checked safely.");
+    } finally {
+      setDeletionLoading(false);
+    }
+  };
+
+  const closeDeletion = () => {
+    if (deletionLoading) return;
+    setDeletionItem(null);
+    setDeletionDetails(null);
+    setShowLinks(false);
+    setDeleteConfirmation("");
+  };
+
+  const refreshAfterDeletion = async () => {
+    setItems(await evidenceService.linked(entityType, entityId));
+    await onChanged?.();
+    closeDeletion();
+  };
+
+  const removeCurrentLink = async () => {
+    if (!deletionItem) return;
+    const linkId = linkFor(deletionItem)?.id;
+    if (!linkId) return;
+    setDeletionLoading(true);
+    try {
+      await evidenceService.unlink(deletionItem.id, linkId);
+      await refreshAfterDeletion();
+    } catch {
+      setError("The evidence link could not be removed.");
+      setDeletionLoading(false);
+    }
+  };
+
+  const deleteEverywhere = async () => {
+    if (!deletionItem || deleteConfirmation !== "DELETE EVERYWHERE") return;
+    setDeletionLoading(true);
+    try {
+      await evidenceService.deleteEverywhere(deletionItem.id);
+      await refreshAfterDeletion();
+    } catch {
+      setError("The canonical evidence record could not be deleted.");
+      setDeletionLoading(false);
+    }
+  };
 
   const access = async (
     item: EvidenceItem,
@@ -1027,8 +1214,24 @@ function SupplierEvidenceList({
             aria-hidden="true"
           />
         </span>
-        <span className="rounded-full bg-[#eadde7] px-2.5 py-1 text-xs font-semibold text-[#3b102f]">
-          {loading ? "Checking…" : `${items.length} linked`}
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-[#eadde7] px-2.5 py-1 text-xs font-semibold text-[#3b102f]">
+            {loading ? "Checking…" : `${items.length} linked`}
+          </span>
+          <label className="flex items-center gap-1.5 text-xs font-semibold" onClick={(event) => event.stopPropagation()}>
+            Order:
+            <select
+              value={order}
+              onChange={(event) => setOrder(event.target.value as typeof order)}
+              aria-label="Order uploaded evidence"
+              className="rounded-lg border border-[#d9ced7] bg-white px-2 py-1 text-[#211b20]"
+            >
+              <option value="manual">Manual</option>
+              <option value="evidence-date">Evidence Date</option>
+              <option value="upload-date">Upload Date</option>
+              <option value="title">Title (A–Z)</option>
+            </select>
+          </label>
         </span>
       </summary>
       <div className="border-t border-white/10 px-4 pb-4 pt-3">
@@ -1043,23 +1246,37 @@ function SupplierEvidenceList({
         ) : (
           <>
             <p className="text-sm text-white/45">
-              Review these records before uploading another file.
+              Arrange evidence in the order that best tells the technical and procurement story for this {contextLabel}. Evidence can be reordered without affecting upload dates or other linked records.
             </p>
             <ul className="mt-3 space-y-2">
-            {items.map((item) => {
+            {displayedItems.map((item) => {
+              const canonicalLink = linkFor(item);
               const relationship =
-                item.links?.find(
-                  (link) =>
-                    link.entity_type === "rd_supplier" &&
-                    link.entity_id === supplierId,
-                )?.relationship ?? "Linked to supplier";
+                canonicalLink?.relationship ?? "Linked to supplier";
               return (
                 <li
-                  key={item.id}
-                  className="rounded-lg border border-white/10 bg-white p-3"
+                  key={canonicalLink?.id ?? item.id}
+                  draggable={order === "manual" && !savingOrder}
+                  onDragStart={() => setDraggedLinkId(canonicalLink?.id ?? null)}
+                  onDragOver={(event) => {
+                    if (order === "manual") event.preventDefault();
+                  }}
+                  onDrop={() => canonicalLink?.id && void reorder(canonicalLink.id)}
+                  onDragEnd={() => setDraggedLinkId(null)}
+                  className={`rounded-lg border border-white/10 bg-white p-3 ${draggedLinkId === canonicalLink?.id ? "opacity-55" : ""}`}
                 >
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
+                    <div className="flex min-w-0 gap-2">
+                      <button
+                        type="button"
+                        disabled={order !== "manual" || savingOrder}
+                        className="mt-0.5 h-8 cursor-grab rounded-md p-1.5 text-[#675d65] hover:bg-[#f3edf2] disabled:cursor-default disabled:opacity-30"
+                        aria-label={`Drag to reorder ${item.title}`}
+                        title={order === "manual" ? "Drag to reorder" : "Select Manual Order to reorder"}
+                      >
+                        <GripVertical className="h-5 w-5" aria-hidden="true" />
+                      </button>
+                      <div className="min-w-0">
                       <div className="text-xs font-semibold text-[#8f1d6e]">
                         {item.code}
                       </div>
@@ -1079,6 +1296,7 @@ function SupplierEvidenceList({
                       </div>
                       <div className="mt-1 text-xs text-white/45">
                         {relationship}
+                      </div>
                       </div>
                     </div>
                     <div className="flex shrink-0 flex-wrap gap-2">
@@ -1100,6 +1318,22 @@ function SupplierEvidenceList({
                         <Download className="mr-1.5 h-4 w-4" />
                         Download
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => void openDeletion(item)}
+                        className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold"
+                      >
+                        <Unlink className="mr-1.5 h-4 w-4" />
+                        Remove Link
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void openDeletion(item)}
+                        className="inline-flex items-center rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700"
+                      >
+                        <Trash2 className="mr-1.5 h-4 w-4" />
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </li>
@@ -1114,8 +1348,123 @@ function SupplierEvidenceList({
           </p>
         )}
       </div>
+      {deletionItem && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 p-4"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeDeletion();
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="evidence-delete-title"
+            className="w-full max-w-xl rounded-2xl border border-[#ddd2da] bg-white p-5 text-[#211b20] shadow-2xl"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[.14em] text-[#a6227d]">
+                  Canonical Evidence
+                </div>
+                <h3 id="evidence-delete-title" className="mt-1 text-xl font-bold">
+                  Remove or delete {deletionItem.code}
+                </h3>
+              </div>
+              <button ref={closeDeletionRef} type="button" onClick={closeDeletion} className="rounded-lg p-2 hover:bg-[#f3edf2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#df3fae]" aria-label="Close evidence deletion dialog">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {deletionLoading && !deletionDetails ? (
+              <p className="mt-4">Checking every canonical relationship…</p>
+            ) : deletionDetails ? (
+              <>
+                <p className="mt-4">
+                  This evidence is linked to <strong>{deletionDetails.links?.length ?? 0} records</strong>.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowLinks((current) => !current)}
+                  className="mt-3 inline-flex items-center rounded-lg border border-[#d9ced7] px-3 py-2 text-sm font-semibold"
+                >
+                  <Link2 className="mr-2 h-4 w-4" />
+                  View linked records
+                </button>
+                {showLinks && (
+                  <ul className="mt-3 space-y-2 rounded-xl bg-[#f7f2f6] p-3">
+                    {(deletionDetails.links ?? []).map((link) => (
+                      <li key={link.id} className="text-sm">
+                        <strong>{evidenceEntityLabel(link.entity_type)}</strong>
+                        <span className="block text-[#675d65]">{link.relationship ?? "Relationship not described"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="mt-5 grid gap-3">
+                  <button
+                    type="button"
+                    disabled={deletionLoading}
+                    onClick={() => void removeCurrentLink()}
+                    className="rounded-xl bg-[#e13aad] px-4 py-3 font-bold text-white disabled:opacity-50"
+                  >
+                    {(deletionDetails.links?.length ?? 0) > 1
+                      ? `Remove link from this ${contextLabel} only`
+                      : "Remove final link and delete evidence"}
+                  </button>
+                  {(deletionDetails.links?.length ?? 0) === 1 && (
+                    <p className="text-sm text-[#675d65]">
+                      This is the last relationship, so removing it will also delete the canonical evidence record and stored file.
+                    </p>
+                  )}
+                  <div className="rounded-xl border border-red-200 bg-red-50 p-3">
+                    <div className="font-bold text-red-800">Delete everywhere</div>
+                    <p className="mt-1 text-sm text-red-700">
+                      This removes the canonical record, every relationship and the stored file. Type DELETE EVERYWHERE to confirm.
+                    </p>
+                    <input
+                      value={deleteConfirmation}
+                      onChange={(event) => setDeleteConfirmation(event.target.value)}
+                      className="mt-3 w-full rounded-lg border border-red-200 bg-white px-3 py-2"
+                      aria-label="Type DELETE EVERYWHERE to confirm canonical deletion"
+                    />
+                    <button
+                      type="button"
+                      disabled={deletionLoading || deleteConfirmation !== "DELETE EVERYWHERE"}
+                      onClick={() => void deleteEverywhere()}
+                      className="mt-3 rounded-lg bg-red-700 px-3 py-2 text-sm font-bold text-white disabled:opacity-40"
+                    >
+                      Delete everywhere
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </section>
+        </div>
+      )}
     </details>
   );
+}
+
+function evidenceEntityLabel(entityType: string) {
+  return ({
+    rd_work_package: "Work Package",
+    rd_supplier: "Supplier",
+    rd_rfq: "RFQ",
+    rd_quotation: "Quotation",
+    expense: "Finance OS Expense",
+    decision: "Decision Log",
+    company: "Company",
+    funding: "Funding",
+    report: "Report",
+    assumption: "Assumption",
+    product: "Product",
+    risk: "Risk Register",
+    scenario: "Scenario",
+    hire: "Hiring",
+    document: "Document",
+    kpi: "KPI",
+  } as Record<string, string>)[entityType] ?? entityType.replaceAll("_", " ");
 }
 function SupplierSprintScope({ suppliers }: { suppliers: RdRecord[] }) {
   const recordedNames = new Set(

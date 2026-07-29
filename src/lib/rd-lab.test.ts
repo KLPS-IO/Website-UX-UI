@@ -109,3 +109,19 @@ test("supplier interactions, findings and actions remain linked to canonical sup
   assert.match(workspace, /rd_rfq/);
   assert.match(workspace, /rd_quotation/);
 });
+
+test("linked evidence supports contextual ordering, unlinking and confirmed canonical deletion", () => {
+  const workspace = source("src/pages/rd-lab/RdLabWorkspace.tsx");
+  const repository = source("src/repositories/evidenceRepository.ts");
+  assert.match(workspace, /Order uploaded evidence/);
+  assert.match(workspace, /Evidence Date/);
+  assert.match(workspace, /Upload Date/);
+  assert.match(workspace, /Title \(A–Z\)/);
+  assert.match(workspace, /draggable=\{order === "manual"/);
+  assert.match(workspace, /Remove Link/);
+  assert.match(workspace, /DELETE EVERYWHERE/);
+  assert.match(workspace, /rd_work_package/);
+  assert.match(workspace, /rd_supplier/);
+  assert.match(repository, /evidence-links\/order/);
+  assert.match(repository, /confirmation: "DELETE EVERYWHERE"/);
+});

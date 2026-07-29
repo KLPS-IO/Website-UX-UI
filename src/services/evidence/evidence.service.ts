@@ -48,6 +48,8 @@ export const evidenceService = {
     return evidenceRepository.link(evidenceId, entityType, entityId);
   },
   unlink: evidenceRepository.unlink,
+  reorderLinks: evidenceRepository.reorderLinks,
+  deleteEverywhere: evidenceRepository.deleteEverywhere,
   async linked(entityType: EvidenceEntityType, entityId: string) {
     if (!isBackendUuid(entityId)) return [];
     return (await evidenceRepository.linked(entityType, entityId)).evidence.map((dto) => mapEvidenceDto(dto, { entityType, entityId }));

@@ -7,7 +7,7 @@ export const evidenceDocumentCategories = [
 export type EvidenceDocumentCategory = (typeof evidenceDocumentCategories)[number];
 export type EvidenceVerificationStatus = "Unknown" | "Unverified" | "Under Review" | "Verified" | "Rejected" | "Expired";
 export type EvidenceDocumentStatus = "Draft" | "Active" | "Superseded" | "Archived" | "Expired";
-export type EvidenceEntityType = "assumptions" | "products" | "decisions" | "risks" | "funding" | "reports" | "scenarios" | "hires" | "documents" | "company" | "expense" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
+export type EvidenceEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "kpi" | "report" | "scenario" | "hire" | "document" | "expense" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
 
 export interface EvidenceLinkDto {
   id: string;
@@ -16,6 +16,9 @@ export interface EvidenceLinkDto {
   relationship_type?: string | null;
   relationship?: string | null;
   created_at?: string;
+  display_order?: number;
+  pinned?: boolean;
+  hidden?: boolean;
 }
 
 /** Network DTO. Field names deliberately match the canonical backend contract. */
@@ -35,6 +38,7 @@ export interface EvidenceDto {
   last_reviewed_date: string | null;
   next_review_date: string | null;
   expiry_date: string | null;
+  document_date: string | null;
   r2_object_key: string | null;
   original_filename: string | null;
   mime_type: string | null;
@@ -53,6 +57,9 @@ export interface EvidenceDto {
   relationship?: string | null;
   link_notes?: string | null;
   linked_at?: string;
+  display_order?: number;
+  pinned?: boolean;
+  hidden?: boolean;
 }
 
 export interface EvidenceItem {
@@ -72,6 +79,7 @@ export interface EvidenceItem {
   lastReviewedDate: string | null;
   nextReviewDate: string | null;
   expiryDate: string | null;
+  documentDate: string | null;
   hasR2Object: boolean;
   originalFilename: string | null;
   mimeType: string | null;

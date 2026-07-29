@@ -12,6 +12,9 @@ export function mapEvidenceDto(dto: EvidenceDto, linkedContext?: { entityType: E
     entity_id: linkedContext.entityId,
     relationship: dto.relationship ?? null,
     created_at: dto.linked_at,
+    display_order: dto.display_order,
+    pinned: dto.pinned,
+    hidden: dto.hidden,
   }];
   return {
     id: dto.id,
@@ -30,6 +33,7 @@ export function mapEvidenceDto(dto: EvidenceDto, linkedContext?: { entityType: E
     lastReviewedDate: dto.last_reviewed_date,
     nextReviewDate: dto.next_review_date,
     expiryDate: dto.expiry_date,
+    documentDate: dto.document_date,
     hasR2Object: Boolean(dto.r2_object_key),
     originalFilename: dto.original_filename,
     mimeType: dto.mime_type,
