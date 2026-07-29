@@ -1263,48 +1263,59 @@ function LinkedEvidenceList({
                   }}
                   onDrop={() => canonicalLink?.id && void reorder(canonicalLink.id)}
                   onDragEnd={() => setDraggedLinkId(null)}
-                  className={`rounded-lg border border-white/10 bg-white p-3 ${draggedLinkId === canonicalLink?.id ? "opacity-55" : ""}`}
+                  className={`overflow-hidden rounded-xl border border-[#e2d9e0] bg-white shadow-[0_1px_2px_rgba(40,22,35,.04)] ${draggedLinkId === canonicalLink?.id ? "opacity-55" : ""}`}
                 >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex min-w-0 gap-2">
+                  <div className="flex min-w-0 items-start gap-3 p-4">
                       <button
                         type="button"
                         disabled={order !== "manual" || savingOrder}
-                        className="mt-0.5 h-8 cursor-grab rounded-md p-1.5 text-[#675d65] hover:bg-[#f3edf2] disabled:cursor-default disabled:opacity-30"
+                        className="mt-0.5 h-9 shrink-0 cursor-grab rounded-lg p-2 text-[#746a72] hover:bg-[#f3edf2] disabled:cursor-default disabled:opacity-30"
                         aria-label={`Drag to reorder ${item.title}`}
                         title={order === "manual" ? "Drag to reorder" : "Select Manual Order to reorder"}
                       >
                         <GripVertical className="h-5 w-5" aria-hidden="true" />
                       </button>
                       <div className="min-w-0">
-                      <div className="text-xs font-semibold text-[#8f1d6e]">
-                        {item.code}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-sm font-bold text-[#9c1f76]">
+                            {item.code}
+                          </span>
+                          <span className="rounded-full bg-[#f4e8f1] px-2.5 py-1 text-xs font-semibold text-[#5c204d]">
+                            {item.verificationStatus}
+                          </span>
+                        </div>
+                        <h4 className="mt-1.5 max-w-3xl break-words text-lg font-bold leading-6 text-[#211b20]">
+                          {item.title}
+                        </h4>
+                        <p
+                          className="mt-2 truncate text-sm text-[#625962]"
+                          title={item.originalFilename ?? undefined}
+                        >
+                          {item.originalFilename ?? "No filename recorded"}
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#625962]">
+                          <span>{item.category ?? "Category not confirmed"}</span>
+                          <span>
+                            Evidence date:{" "}
+                            {item.documentDate
+                              ? formatSafeDate(item.documentDate)
+                              : "Not confirmed"}
+                          </span>
+                          <span>
+                            Uploaded: {formatSafeDate(item.createdAt)}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm font-medium text-[#443c43]">
+                          {relationship}
+                        </p>
                       </div>
-                      <div className="mt-0.5 break-words font-semibold">
-                        {item.title}
-                      </div>
-                      <div
-                        className="mt-1 break-all text-sm text-white/45"
-                        title={item.originalFilename ?? undefined}
-                      >
-                        {item.originalFilename ?? "No filename recorded"}
-                      </div>
-                      <div className="mt-1 text-xs text-white/45">
-                        {item.category ?? "Category not confirmed"} ·{" "}
-                        {item.verificationStatus} ·{" "}
-                        {formatSafeDate(item.createdAt)}
-                      </div>
-                      <div className="mt-1 text-xs text-white/45">
-                        {relationship}
-                      </div>
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap gap-2">
+                  </div>
+                  <div className="flex flex-wrap gap-2 border-t border-[#eee6ec] bg-[#fcfafc] px-4 py-3 sm:pl-16">
                       <button
                         type="button"
                         disabled={!item.hasR2Object}
                         onClick={() => void access(item, "view")}
-                        className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold disabled:opacity-45"
+                        className="inline-flex flex-1 items-center justify-center rounded-lg border border-[#dcd3da] bg-white px-3 py-2 text-sm font-semibold text-[#282127] hover:bg-[#f7f2f6] disabled:opacity-45 sm:flex-none"
                       >
                         <Eye className="mr-1.5 h-4 w-4" />
                         View
@@ -1313,7 +1324,7 @@ function LinkedEvidenceList({
                         type="button"
                         disabled={!item.hasR2Object}
                         onClick={() => void access(item, "download")}
-                        className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold disabled:opacity-45"
+                        className="inline-flex flex-1 items-center justify-center rounded-lg border border-[#dcd3da] bg-white px-3 py-2 text-sm font-semibold text-[#282127] hover:bg-[#f7f2f6] disabled:opacity-45 sm:flex-none"
                       >
                         <Download className="mr-1.5 h-4 w-4" />
                         Download
@@ -1321,7 +1332,7 @@ function LinkedEvidenceList({
                       <button
                         type="button"
                         onClick={() => void openDeletion(item)}
-                        className="inline-flex items-center rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold"
+                        className="inline-flex flex-1 items-center justify-center rounded-lg border border-[#dcd3da] bg-white px-3 py-2 text-sm font-semibold text-[#282127] hover:bg-[#f7f2f6] sm:flex-none"
                       >
                         <Unlink className="mr-1.5 h-4 w-4" />
                         Remove Link
@@ -1329,12 +1340,11 @@ function LinkedEvidenceList({
                       <button
                         type="button"
                         onClick={() => void openDeletion(item)}
-                        className="inline-flex items-center rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700"
+                        className="inline-flex flex-1 items-center justify-center rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 sm:flex-none"
                       >
                         <Trash2 className="mr-1.5 h-4 w-4" />
                         Delete
                       </button>
-                    </div>
                   </div>
                 </li>
               );
