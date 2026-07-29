@@ -810,7 +810,7 @@ function RecordForm({
           </label>
         ))}
         <label className="text-xs text-white/50 md:col-span-2">
-          Change reason
+          Reason for this entry
           <input
             required
             minLength={5}
@@ -868,7 +868,7 @@ function SupplierRecordCard({
             </p>
           )}
         </div>
-        <div className="rd-priority-pill rounded-full bg-[#df3fae]/10 px-3 py-1 text-xs font-semibold text-[#4b153b]">
+        <div className="rd-priority-pill rounded-full px-3 py-1 text-xs font-semibold">
           {String(record.priority_tier ?? "Priority not confirmed")}
         </div>
       </div>
