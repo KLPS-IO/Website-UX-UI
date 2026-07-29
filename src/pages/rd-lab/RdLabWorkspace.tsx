@@ -487,6 +487,7 @@ function ResourceView({
             setAddOpen(false);
             await reload();
           }}
+          cancel={() => setAddOpen(false)}
         />
       )}
       <input
@@ -635,11 +636,13 @@ function RecordForm({
   wp,
   suppliers,
   done,
+  cancel,
 }: {
   resource: RdResource;
   wp: RdWorkPackage;
   suppliers: RdRecord[];
   done: () => Promise<void>;
+  cancel: () => void;
 }) {
   const [value, setValue] = useState<Record<string, string>>(
     resource === "suppliers"
@@ -827,9 +830,18 @@ function RecordForm({
           {error}
         </p>
       )}
-      <button className="mt-4 rounded-lg bg-[#df3fae] px-4 py-2 text-sm font-semibold">
-        Save canonical record
-      </button>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <button className="rounded-lg bg-[#df3fae] px-4 py-2 text-sm font-semibold">
+          Save canonical record
+        </button>
+        <button
+          type="button"
+          onClick={cancel}
+          className="rounded-lg border border-white/10 bg-white px-4 py-2 text-sm font-semibold text-[#2d2530]"
+        >
+          Close without saving
+        </button>
+      </div>
     </form>
   );
 }
