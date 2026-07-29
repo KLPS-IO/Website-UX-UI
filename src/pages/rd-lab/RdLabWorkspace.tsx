@@ -906,6 +906,8 @@ function SupplierRecordCard({
       : null;
   const notes =
     typeof record.research_notes === "string" ? record.research_notes : null;
+  const [notesExpanded, setNotesExpanded] = useState(false);
+  const notesNeedExpansion = Boolean(notes && notes.length > 360);
 
   return (
     <Card>
@@ -965,8 +967,34 @@ function SupplierRecordCard({
         </div>
       </dl>
       {notes && (
-        <div className="mt-4 whitespace-pre-line rounded-xl border border-white/10 bg-white/[.035] p-3 text-sm leading-6 text-white/55">
-          {notes}
+        <div className="mt-4 rounded-xl border border-white/10 bg-white/[.035] p-3">
+          <div
+            id={`supplier-notes-${record.id}`}
+            className={`relative whitespace-pre-line text-sm leading-6 text-white/55 ${
+              notesNeedExpansion && !notesExpanded
+                ? "max-h-36 overflow-hidden"
+                : ""
+            }`}
+          >
+            {notes}
+            {notesNeedExpansion && !notesExpanded && (
+              <span
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent"
+                aria-hidden="true"
+              />
+            )}
+          </div>
+          {notesNeedExpansion && (
+            <button
+              type="button"
+              onClick={() => setNotesExpanded((current) => !current)}
+              aria-expanded={notesExpanded}
+              aria-controls={`supplier-notes-${record.id}`}
+              className="mt-2 rounded-md px-1 py-1 text-sm font-bold text-[#18743b] underline decoration-[#18743b]/40 underline-offset-4 hover:text-[#0f5c2c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#18743b]"
+            >
+              {notesExpanded ? "See less" : "See more"}
+            </button>
+          )}
         </div>
       )}
       <LinkedEvidenceList
