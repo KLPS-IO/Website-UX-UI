@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
+  ChevronDown,
   Download,
   Eye,
   FileUp,
@@ -1017,30 +1018,34 @@ function SupplierEvidenceList({
   };
 
   return (
-    <section
-      className="mt-4 rounded-xl border border-white/10 bg-[#faf8fb] p-4"
-      aria-label="Linked supplier evidence"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h4 className="font-semibold">Uploaded evidence</h4>
+    <details className="group mt-4 rounded-xl border border-white/10 bg-[#faf8fb]">
+      <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-2 rounded-xl px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#df3fae] [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-2 font-semibold">
+          Uploaded evidence
+          <ChevronDown
+            className="h-4 w-4 transition-transform group-open:rotate-180"
+            aria-hidden="true"
+          />
+        </span>
         <span className="rounded-full bg-[#eadde7] px-2.5 py-1 text-xs font-semibold text-[#3b102f]">
           {loading ? "Checking…" : `${items.length} linked`}
         </span>
-      </div>
-      {loading ? (
-        <p className="mt-2 text-sm text-white/45">
-          Checking canonical Evidence records…
-        </p>
-      ) : items.length === 0 ? (
-        <p className="mt-2 text-sm text-white/45">
-          No uploaded evidence is linked to this supplier.
-        </p>
-      ) : (
-        <>
-          <p className="mt-2 text-sm text-white/45">
-            Review these records before uploading another file.
+      </summary>
+      <div className="border-t border-white/10 px-4 pb-4 pt-3">
+        {loading ? (
+          <p className="text-sm text-white/45">
+            Checking canonical Evidence records…
           </p>
-          <ul className="mt-3 space-y-2">
+        ) : items.length === 0 ? (
+          <p className="text-sm text-white/45">
+            No uploaded evidence is linked to this supplier.
+          </p>
+        ) : (
+          <>
+            <p className="text-sm text-white/45">
+              Review these records before uploading another file.
+            </p>
+            <ul className="mt-3 space-y-2">
             {items.map((item) => {
               const relationship =
                 item.links?.find(
@@ -1100,15 +1105,16 @@ function SupplierEvidenceList({
                 </li>
               );
             })}
-          </ul>
-        </>
-      )}
-      {error && (
-        <p role="alert" className="mt-2 text-sm text-red-700">
-          {error}
-        </p>
-      )}
-    </section>
+            </ul>
+          </>
+        )}
+        {error && (
+          <p role="alert" className="mt-2 text-sm text-red-700">
+            {error}
+          </p>
+        )}
+      </div>
+    </details>
   );
 }
 function SupplierSprintScope({ suppliers }: { suppliers: RdRecord[] }) {
