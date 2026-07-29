@@ -1046,6 +1046,11 @@ function LinkedEvidenceList({
   const [showLinks, setShowLinks] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const closeDeletionRef = useRef<HTMLButtonElement>(null);
+  const [previewItem, setPreviewItem] = useState<EvidenceItem | null>(null);
+  const [previewHtml, setPreviewHtml] = useState("");
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState("");
+  const closePreviewRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -1086,6 +1091,16 @@ function LinkedEvidenceList({
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [deletionItem, deletionLoading]);
+
+  useEffect(() => {
+    if (!previewItem) return;
+    closePreviewRef.current?.focus();
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPreviewItem(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [previewItem]);
 
   const linkFor = useCallback(
     (item: EvidenceItem) =>
@@ -1217,6 +1232,30 @@ function LinkedEvidenceList({
     try {
       const result = await evidenceService.accessDocument(item.id, action);
       if (action === "view") {
+        const isWordDocument =
+          item.mimeType ===
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+          item.originalFilename?.toLowerCase().endsWith(".docx");
+        if (isWordDocument) {
+          setPreviewItem(item);
+          setPreviewHtml("");
+          setPreviewError("");
+          setPreviewLoading(true);
+          try {
+            const mammoth = await import("mammoth");
+            const converted = await mammoth.convertToHtml({
+              arrayBuffer: await (await evidenceService.previewDocument(item.id)).arrayBuffer(),
+            });
+            setPreviewHtml(converted.value);
+          } catch {
+            setPreviewError(
+              "This Word document could not be previewed. You can still use Download.",
+            );
+          } finally {
+            setPreviewLoading(false);
+          }
+          return;
+        }
         window.open(result.signed_url, "_blank", "noopener,noreferrer");
         return;
       }
@@ -1477,6 +1516,84 @@ function LinkedEvidenceList({
                 </div>
               </>
             ) : null}
+          </section>
+        </div>
+      )}
+      {previewItem && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-3 sm:p-6"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setPreviewItem(null);
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="evidence-preview-title"
+            className="flex h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-[#ddd2da] bg-white text-[#211b20] shadow-2xl"
+          >
+            <header className="flex items-start justify-between gap-4 border-b border-[#e8e0e6] px-4 py-3 sm:px-6">
+              <div className="min-w-0">
+                <div className="text-xs font-bold uppercase tracking-[.14em] text-[#9c1f76]">
+                  {previewItem.code} · Document preview
+                </div>
+                <h3
+                  id="evidence-preview-title"
+                  className="mt-1 truncate text-lg font-bold"
+                  title={previewItem.title}
+                >
+                  {previewItem.title}
+                </h3>
+              </div>
+              <button
+                ref={closePreviewRef}
+                type="button"
+                onClick={() => setPreviewItem(null)}
+                className="shrink-0 rounded-lg p-2 hover:bg-[#f3edf2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#df3fae]"
+                aria-label="Close document preview"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </header>
+            <div className="min-h-0 flex-1 bg-[#f1edf0] p-3 sm:p-5">
+              {previewLoading ? (
+                <div className="flex h-full items-center justify-center rounded-xl bg-white text-sm font-semibold text-[#625962]">
+                  Preparing secure Word preview…
+                </div>
+              ) : previewError ? (
+                <div
+                  role="alert"
+                  className="flex h-full items-center justify-center rounded-xl bg-white p-6 text-center text-sm font-semibold text-red-700"
+                >
+                  {previewError}
+                </div>
+              ) : (
+                <iframe
+                  title={`${previewItem.title} preview`}
+                  sandbox=""
+                  srcDoc={`<!doctype html><html><head><meta charset="utf-8"><style>html{background:#fff}body{box-sizing:border-box;max-width:850px;min-height:100%;margin:0 auto;padding:48px 56px;color:#211b20;font:16px/1.65 Arial,sans-serif}h1,h2,h3,h4{line-height:1.25}p{margin:0 0 1em}table{width:100%;border-collapse:collapse}td,th{border:1px solid #d8d0d6;padding:8px;text-align:left}img{max-width:100%;height:auto}@media(max-width:640px){body{padding:24px 20px}}</style></head><body>${previewHtml}</body></html>`}
+                  className="h-full w-full rounded-xl border border-[#ddd2da] bg-white"
+                />
+              )}
+            </div>
+            <footer className="flex flex-wrap justify-end gap-2 border-t border-[#e8e0e6] bg-white px-4 py-3 sm:px-6">
+              <button
+                type="button"
+                onClick={() => void access(previewItem, "download")}
+                className="inline-flex items-center rounded-lg border border-[#dcd3da] px-3 py-2 text-sm font-semibold hover:bg-[#f7f2f6]"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </button>
+              <button
+                type="button"
+                onClick={() => setPreviewItem(null)}
+                className="rounded-lg bg-[#df3fae] px-4 py-2 text-sm font-bold text-white"
+              >
+                Close
+              </button>
+            </footer>
           </section>
         </div>
       )}

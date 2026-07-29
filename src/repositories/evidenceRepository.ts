@@ -1,4 +1,4 @@
-import { authenticatedApi } from "@/lib/authenticated-api";
+import { authenticatedApi, authenticatedBlob } from "@/lib/authenticated-api";
 import type { DocumentAccessResponse, EvidenceDto, EvidenceEntityType, EvidenceFilters, EvidenceLinkDto, EvidenceMetadataInput } from "@/types/evidence";
 
 type EvidenceResponse = { status: "success"; evidence: EvidenceDto };
@@ -35,4 +35,5 @@ export const evidenceRepository = {
   linked: (entityType: EvidenceEntityType, entityId: string) => authenticatedApi<EvidenceListResponse>(`/api/finance/evidence/linked/${entityType}/${entityId}`),
   uploadDocument: (formData: FormData) => authenticatedApi<{ status: "success"; evidence: EvidenceDto; link: EvidenceLinkDto | null }>("/api/finance/evidence/upload", { method: "POST", body: formData }),
   accessDocument: (evidenceId: string, action: "view" | "download") => authenticatedApi<DocumentAccessResponse>(`/api/finance/evidence/${evidenceId}/access`, { method: "POST", body: JSON.stringify({ action }) }),
+  previewDocument: (evidenceId: string) => authenticatedBlob(`/api/finance/evidence/${evidenceId}/content`),
 };

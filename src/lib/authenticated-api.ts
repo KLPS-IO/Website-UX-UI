@@ -30,3 +30,22 @@ export async function authenticatedApi<T>(path: string, options: RequestInit = {
   }
   return body as T;
 }
+
+export async function authenticatedBlob(path: string): Promise<Blob> {
+  const token = TOKEN_KEYS.map((key) => sessionStorage.getItem(key)).find(Boolean);
+  const response = await fetch(`${API_BASE}${path}`, {
+    credentials: "include",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) {
+    let body: Record<string, unknown> = {};
+    try { body = await response.json() as Record<string, unknown>; } catch { /* Non-JSON storage error. */ }
+    throw new ApiError(
+      String(body.message ?? body.error ?? `Request failed with ${response.status}`),
+      response.status,
+      typeof body.code === "string" ? body.code : undefined,
+      body,
+    );
+  }
+  return response.blob();
+}

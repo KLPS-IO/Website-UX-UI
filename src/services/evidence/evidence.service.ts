@@ -59,4 +59,5 @@ export const evidenceService = {
     return { evidence: mapEvidenceDto(response.evidence), link: response.link };
   },
   accessDocument: evidenceRepository.accessDocument,
+  previewDocument: evidenceRepository.previewDocument,
 };
