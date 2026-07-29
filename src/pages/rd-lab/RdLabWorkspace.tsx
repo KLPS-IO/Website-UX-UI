@@ -868,7 +868,7 @@ function SupplierRecordCard({
             </p>
           )}
         </div>
-        <div className="rounded-full bg-[#df3fae]/10 px-3 py-1 text-xs font-semibold text-[#8f1d6e]">
+        <div className="rd-priority-pill rounded-full bg-[#df3fae]/10 px-3 py-1 text-xs font-semibold text-[#4b153b]">
           {String(record.priority_tier ?? "Priority not confirmed")}
         </div>
       </div>

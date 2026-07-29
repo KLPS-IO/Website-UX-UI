@@ -1469,6 +1469,11 @@ All colors MUST be HSL.
   color: #171219 !important;
 }
 
+.rd-lab-light .rd-priority-pill {
+  background: #f8dced !important;
+  color: #3b102f !important;
+}
+
 .rd-lab-light [class~="text-xs"] {
   font-size: 0.875rem !important;
   line-height: 1.35rem !important;
