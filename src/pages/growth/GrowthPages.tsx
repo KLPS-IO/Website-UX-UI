@@ -439,5 +439,34 @@ function QuickRecordDialog({ title, fields, defaults, save, close }: { title: st
   const [value, setValue] = useState(defaults);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"><form onSubmit={async (event) => { event.preventDefault(); setSaving(true); setError(""); try { await save(value); } catch (reason) { setError(reason instanceof Error ? reason.message : "Record could not be saved."); } finally { setSaving(false); } }} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-white/10 bg-[#151019] p-6"><div className="flex justify-between gap-3"><h2 className="text-xl font-bold text-white">{title}</h2><button type="button" onClick={close} aria-label={`Close ${title}`}><X className="h-5 w-5 text-white/60" /></button></div>{error && <InlineMessage tone="error">{error}</InlineMessage>}<div className="mt-5 grid gap-3">{fields.map(([key,label,type]) => <label key={key} className="text-sm font-semibold text-white/70">{label}<input required={["platform","snapshot_date","title","category","question"].includes(key)} type={type ?? "text"} value={value[key] ?? ""} onChange={(event) => setValue({ ...value, [key]:event.target.value })} className="mt-1 w-full rounded-xl border border-white/15 bg-black/20 p-3 text-white" /></label>)}</div><div className="mt-5 flex justify-end gap-2"><SecondaryButton onClick={close}>Cancel</SecondaryButton><ActionButton disabled={saving}>{saving ? "Saving…" : "Save"}</ActionButton></div></form></div>;
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1f2b35]/45 p-4">
+    <form
+      onSubmit={async (event) => { event.preventDefault(); setSaving(true); setError(""); try { await save(value); } catch (reason) { setError(reason instanceof Error ? reason.message : "Record could not be saved."); } finally { setSaving(false); } }}
+      className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#c7ced4] bg-[#f7f8f9] p-6 shadow-2xl"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="text-2xl font-bold tracking-tight text-[#1f2b35]">{title}</h2>
+        <button type="button" onClick={close} aria-label={`Close ${title}`} className="rounded-lg border border-[#c7ced4] bg-white p-2 text-[#354550] transition hover:border-[#c5268d] hover:text-[#a91876] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#df3fae]/25">
+          <X className="h-5 w-5" />
+        </button>
+      </div>
+      {error && <InlineMessage tone="error">{error}</InlineMessage>}
+      <div className="mt-6 grid gap-4">
+        {fields.map(([key,label,type]) => <label key={key} className="text-[15px] font-bold text-[#26343f]">
+          {label}
+          <input
+            required={["platform","snapshot_date","title","category","question"].includes(key)}
+            type={type ?? "text"}
+            value={value[key] ?? ""}
+            onChange={(event) => setValue({ ...value, [key]:event.target.value })}
+            className="mt-2 w-full rounded-xl border border-[#bfc8cf] bg-white p-3.5 text-base font-medium text-[#1f2b35] outline-none transition placeholder:text-[#78858f] focus:border-[#c5268d] focus:ring-2 focus:ring-[#df3fae]/20"
+          />
+        </label>)}
+      </div>
+      <div className="mt-6 flex flex-wrap justify-end gap-3">
+        <SecondaryButton onClick={close}>Cancel</SecondaryButton>
+        <ActionButton disabled={saving}>{saving ? "Saving…" : "Save"}</ActionButton>
+      </div>
+    </form>
+  </div>;
 }
