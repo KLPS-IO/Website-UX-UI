@@ -1,5 +1,5 @@
 import {
-  ArrowRight, BarChart3, CalendarDays, ChevronRight, Clock3, Lightbulb,
+  AlertCircle, ArrowRight, BarChart3, CalendarDays, ChevronRight, Clock3, Lightbulb,
   MessageCircle, Play, Sparkles, Target, TrendingUp, Users, X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -390,7 +390,17 @@ function GrowthState({ text }: { text: string }) {
 }
 
 function GrowthError({ message, retry }: { message: string; retry: () => void }) {
-  return <div className="rounded-2xl border border-red-400/25 bg-red-500/10 p-6 text-center"><p className="text-sm text-red-100">{message}</p><button type="button" onClick={retry} className="mt-4 rounded-xl bg-[#df3fae] px-4 py-2 text-sm font-bold text-white">Try again</button></div>;
+  const readableMessage = message === "Request failed with 500"
+    ? "Mission Control could not load. The Growth OS database update may still be pending."
+    : message;
+  return <section role="alert" aria-live="assertive" className="rounded-2xl border border-[#d96666] bg-[#fff4f4] p-6 shadow-[0_12px_35px_-28px_rgba(133,24,24,0.45)] md:p-8">
+    <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f8dada] text-[#9e2525]"><AlertCircle className="h-6 w-6" aria-hidden="true" /></span>
+      <h2 className="mt-4 text-xl font-bold text-[#231f25]">Mission Control is temporarily unavailable</h2>
+      <p className="mt-2 text-base font-medium leading-7 text-[#5b3434]">{readableMessage}</p>
+      <button type="button" onClick={retry} className="mt-5 rounded-xl bg-[#df3fae] px-6 py-3 text-base font-bold text-white shadow-sm transition hover:bg-[#c8329a] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#df3fae]/25">Try again</button>
+    </div>
+  </section>;
 }
 
 function InlineMessage({ tone, children }: { tone: "error" | "success"; children: React.ReactNode }) {
