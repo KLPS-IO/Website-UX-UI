@@ -27,6 +27,17 @@ test("successful LinkedIn return refreshes connections with identity-only copy",
   );
 });
 
+test("successful Meta return is allowlisted and states discovery-only access", async () => {
+  const result = await processLinkedInOAuthReturn(
+    "https://klps.co.uk/innovation-lab/growth/settings?social_provider=facebook&social_status=connected",
+    async () => undefined,
+    () => undefined,
+  );
+  assert.equal(result?.provider,"facebook");
+  assert.match(result?.message ?? "",/Page and linked Instagram professional discovery/);
+  assert.match(result?.message ?? "",/Publishing is not enabled/);
+});
+
 test("every controlled LinkedIn failure maps to fixed safe copy", () => {
   for (const [errorCode,message] of Object.entries(
     LINKEDIN_OAUTH_ERROR_MESSAGES,
