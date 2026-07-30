@@ -1,4 +1,4 @@
-import { Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -16,14 +16,19 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-6">
-            {/* <a 
-              href="mailto:hello@femtech.com" 
-              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-smooth"
+          <div aria-label="Legal" className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            <Link
+              to="/privacy"
+              className="rounded-sm text-sm font-semibold text-muted-foreground underline-offset-4 transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
             >
-              <Mail className="w-4 h-4" />
-              <span className="text-sm">Contact Us</span>
-            </a> */}
+              Privacy Policy
+            </Link>
+            <Link
+              to="/terms"
+              className="rounded-sm text-sm font-semibold text-muted-foreground underline-offset-4 transition-colors hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4"
+            >
+              Terms of Service
+            </Link>
           </div>
         </div>
  

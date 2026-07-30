@@ -427,9 +427,12 @@ const InnovationLab = () => {
             <a className="hover:text-foreground" href="https://klps.co.uk">
               Back to Home
             </a>
-            <a className="hover:text-foreground" href="#overview">
-              Privacy
-            </a>
+            <Link className="hover:text-foreground" to="/privacy">
+              Privacy Policy
+            </Link>
+            <Link className="hover:text-foreground" to="/terms">
+              Terms of Service
+            </Link>
             <a className="hover:text-foreground" href="#overview">
               Security
             </a>

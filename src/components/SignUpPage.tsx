@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Checkbox } from './ui/checkbox';
+import { Link } from 'react-router-dom';
 
 interface SignUpPageProps {
   onSignUp: () => void;
@@ -134,13 +135,13 @@ export function SignUpPage({ onSignUp, onBack }: SignUpPageProps) {
                 />
                 <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed">
                   I agree to the{' '}
-                  <button type="button" className="text-purple-600 hover:underline">
+                  <Link to="/terms" className="text-purple-600 hover:underline">
                     Terms of Service
-                  </button>{' '}
+                  </Link>{' '}
                   and{' '}
-                  <button type="button" className="text-purple-600 hover:underline">
+                  <Link to="/privacy" className="text-purple-600 hover:underline">
                     Privacy Policy
-                  </button>
+                  </Link>
                 </label>
               </div>
 
