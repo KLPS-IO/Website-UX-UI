@@ -60,6 +60,20 @@ test("Growth OS Community reuses canonical waitlist data through founder APIs", 
   assert.doesNotMatch(community, /fake|demo person/i);
 });
 
+test("Growth OS social connections use the authenticated backend and expose no secrets", () => {
+  const service = source("src/services/growth/growth.service.ts");
+  const connections = source("src/components/growth/SocialConnections.tsx");
+  const pages = source("src/pages/growth/GrowthPages.tsx");
+  assert.match(service,/\/api\/growth\/social\/providers/);
+  assert.match(service,/\/api\/growth\/social\/oauth\/.*\/start/);
+  assert.match(connections,/Official APIs only/);
+  assert.match(connections,/Developer setup checklist/);
+  assert.match(connections,/Setup required/);
+  assert.match(pages,/<SocialConnections \/>/);
+  assert.doesNotMatch(connections,/client_secret|access_token|refresh_token/i);
+  assert.doesNotMatch(service,/localStorage.*social|sessionStorage.*social/i);
+});
+
 test("workspace preserves honest empty, loading, unauthorised and unknown-money states", () => {
   const workspace = source("src/pages/rd-lab/RdLabWorkspace.tsx");
   assert.match(workspace, /Checking secure founder session/);

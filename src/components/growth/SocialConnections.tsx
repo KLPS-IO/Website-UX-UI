@@ -1,0 +1,72 @@
+import { AlertCircle, Check, ChevronDown, ChevronUp, Link2, RefreshCw, ShieldCheck, Unplug } from "lucide-react";
+import { useEffect, useState } from "react";
+import { growthService } from "@/services/growth/growth.service";
+import type { SocialProviderOverview } from "@/types/growth";
+
+const dateTime = (value: string | null | undefined) => {
+  if (!value || Number.isNaN(Date.parse(value))) return "Not yet checked";
+  return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+};
+
+export function SocialConnections() {
+  const [providers,setProviders] = useState<SocialProviderOverview[]>([]);
+  const [expanded,setExpanded] = useState<string | null>(null);
+  const [working,setWorking] = useState<string | null>(null);
+  const [loading,setLoading] = useState(true);
+  const [error,setError] = useState("");
+  const [notice,setNotice] = useState("");
+
+  const load = async () => {
+    setLoading(true); setError("");
+    try { setProviders(await growthService.socialProviders()); }
+    catch (reason) { setError(reason instanceof Error ? reason.message : "Connections could not be loaded."); }
+    finally { setLoading(false); }
+  };
+  useEffect(() => { void load(); }, []);
+
+  const connect = async (provider: SocialProviderOverview) => {
+    setWorking(provider.provider); setError(""); setNotice("");
+    try {
+      if (!provider.availability.available) {
+        setExpanded(provider.provider);
+        setNotice(`${provider.name} needs developer setup before it can connect.`);
+        return;
+      }
+      const oauth = await growthService.beginSocialOAuth(provider.provider);
+      window.location.assign(oauth.authorization_url);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : `${provider.name} could not begin connecting.`);
+      setExpanded(provider.provider);
+    } finally { setWorking(null); }
+  };
+
+  const disconnect = async (provider: SocialProviderOverview) => {
+    if (!window.confirm(`Disconnect ${provider.name}? Scheduled publishing will remain blocked until it is reconnected.`)) return;
+    setWorking(provider.provider); setError("");
+    try {
+      await growthService.disconnectSocialProvider(provider.provider);
+      setNotice(`${provider.name} disconnected. Stored tokens were removed.`);
+      await load();
+    } catch (reason) { setError(reason instanceof Error ? reason.message : `${provider.name} could not be disconnected.`); }
+    finally { setWorking(null); }
+  };
+
+  return <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><div className="text-xs font-bold uppercase tracking-[.1em] text-[#35d3c8]">Official APIs only</div><h2 className="mt-2 text-lg font-bold text-white">Connections</h2><p className="mt-1 max-w-2xl text-sm leading-6 text-white/60">Connect platforms progressively using secure OAuth. Tokens stay encrypted on the backend and publishing always requires founder approval.</p></div><ShieldCheck className="h-6 w-6 shrink-0 text-[#35d3c8]" /></div>
+    {error && <div role="alert" className="mt-4 rounded-xl border border-red-400/25 bg-red-500/10 p-3 text-sm text-red-100">{error} <button type="button" onClick={() => void load()} className="ml-2 underline">Retry</button></div>}
+    {notice && <div role="status" className="mt-4 rounded-xl border border-[#35d3c8]/25 bg-[#35d3c8]/10 p-3 text-sm text-[#8ff4ed]">{notice}</div>}
+    {loading ? <p className="mt-5 text-sm text-white/55">Checking platform availability…</p> : <div className="mt-5 space-y-3">{providers.map(provider => {
+      const connection = provider.connection;
+      const connected = connection?.status === "connected";
+      const open = expanded === provider.provider;
+      return <article key={provider.provider} className="overflow-hidden rounded-xl border border-white/10 bg-black/10">
+        <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center">
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${connected ? "bg-[#35d3c8]/15 text-[#35d3c8]" : "bg-white/[.06] text-white/55"}`}>{connected ? <Check className="h-5 w-5" /> : <Link2 className="h-5 w-5" />}</div>
+          <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-bold text-white">{provider.name}</h3><span className={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase ${connected ? "bg-[#35d3c8]/15 text-[#8ff4ed]" : provider.availability.available ? "bg-[#df3fae]/15 text-[#ff9edb]" : "bg-amber-400/10 text-amber-200"}`}>{connection?.status ? connection.status.replaceAll("_"," ") : provider.availability.available ? "Ready to connect" : "Setup required"}</span></div><p className="mt-1 text-sm text-white/50">{connection?.provider_account_name ?? provider.availability.reason}</p><p className="mt-1 text-xs text-white/35">Last healthy check: {dateTime(connection?.last_successful_check_at)}</p></div>
+          <div className="flex flex-wrap gap-2">{connected ? <><button type="button" disabled={working === provider.provider} onClick={() => void connect(provider)} className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm font-semibold text-white"><RefreshCw className="h-4 w-4" />Reconnect</button><button type="button" disabled={working === provider.provider} onClick={() => void disconnect(provider)} className="inline-flex items-center gap-2 rounded-xl border border-red-400/25 px-3 py-2 text-sm font-semibold text-red-200"><Unplug className="h-4 w-4" />Disconnect</button></> : <button type="button" disabled={working === provider.provider} onClick={() => void connect(provider)} className="rounded-xl bg-[#df3fae] px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{working === provider.provider ? "Checking…" : "Connect"}</button>}<button type="button" onClick={() => setExpanded(open ? null : provider.provider)} aria-expanded={open} aria-controls={`social-setup-${provider.provider}`} className="inline-flex items-center gap-2 rounded-xl border border-white/15 px-3 py-2 text-sm font-semibold text-white">{open ? "Hide details" : "View details"}{open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</button></div>
+        </div>
+        {open && <div id={`social-setup-${provider.provider}`} className="border-t border-white/10 p-4"><div className="grid gap-5 lg:grid-cols-2"><div><h4 className="text-sm font-bold text-white">Capabilities</h4><div className="mt-2 flex flex-wrap gap-2">{provider.capabilities.map(item => <span key={item} className="rounded-full bg-white/[.06] px-2.5 py-1 text-xs text-white/65">{item.replaceAll("_"," ")}</span>)}</div><h4 className="mt-5 text-sm font-bold text-white">Required permissions</h4><div className="mt-2 flex flex-wrap gap-2">{provider.required_permissions.length ? provider.required_permissions.map(item => <code key={item} className="rounded bg-black/25 px-2 py-1 text-xs text-white/60">{item}</code>) : <span className="text-sm text-white/45">Defined when this future provider is activated.</span>}</div></div><div><h4 className="text-sm font-bold text-white">Developer setup checklist</h4><ul className="mt-2 space-y-2">{provider.setup_checklist.map((item,index) => <li key={`${item.label}-${index}`} className="flex gap-2 rounded-lg bg-white/[.035] p-3"><span className="mt-0.5">{item.status === "configured" ? <Check className="h-4 w-4 text-[#35d3c8]" /> : <AlertCircle className="h-4 w-4 text-amber-300" />}</span><div><div className="text-sm font-semibold text-white">{item.label}</div><p className="mt-1 text-xs leading-5 text-white/50">{item.detail}</p><span className="mt-1 block text-[10px] font-bold uppercase tracking-[.06em] text-white/35">{item.status.replaceAll("_"," ")}</span></div></li>)}</ul>{provider.availability.missing_environment.length > 0 && <div className="mt-3 rounded-lg border border-amber-300/20 bg-amber-300/[.06] p-3"><div className="text-xs font-bold uppercase text-amber-200">Backend variables still needed</div><div className="mt-2 flex flex-wrap gap-2">{provider.availability.missing_environment.map(name => <code key={name} className="rounded bg-black/25 px-2 py-1 text-xs text-amber-100">{name}</code>)}</div></div>}</div></div></div>}
+      </article>;
+    })}</div>}
+  </section>;
+}

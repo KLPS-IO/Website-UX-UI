@@ -134,3 +134,38 @@ export type CommunityPeopleResponse = {
   page_size: number;
   total: number;
 };
+
+export type SocialConnection = {
+  id: string;
+  provider: string;
+  provider_account_name: string | null;
+  status: "disconnected" | "connecting" | "connected" | "unhealthy" | "expired" | "revoked";
+  granted_scopes: string[];
+  discovered_capabilities: string[];
+  last_successful_check_at: string | null;
+  last_error_code: string | null;
+  last_error_at: string | null;
+  connected_at: string | null;
+  token_expires_at: string | null;
+};
+
+export type SocialSetupItem = {
+  label: string;
+  detail: string;
+  status: "required" | "configured" | "external_review" | "future";
+};
+
+export type SocialProviderOverview = {
+  provider: "linkedin" | "facebook" | "instagram" | "x" | "tiktok" | "snapchat";
+  name: string;
+  connection: SocialConnection | null;
+  availability: {
+    available: boolean;
+    missing_environment: string[];
+    reason: string;
+  };
+  required_permissions: string[];
+  capabilities: string[];
+  approval_required: true;
+  setup_checklist: SocialSetupItem[];
+};

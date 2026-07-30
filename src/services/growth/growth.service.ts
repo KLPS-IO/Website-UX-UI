@@ -8,6 +8,7 @@ import type {
   GrowthResource,
   GrowthStrategy,
   MissionControl,
+  SocialProviderOverview,
 } from "@/types/growth";
 
 export const growthService = {
@@ -127,4 +128,17 @@ export const growthService = {
     (await authenticatedApi<{ status: "success"; summary: GrowthRecord }>(
       "/api/growth/traction/summary",
     )).summary,
+  socialProviders: async () =>
+    (await authenticatedApi<{ status: "success"; providers: SocialProviderOverview[] }>(
+      "/api/growth/social/providers",
+    )).providers,
+  beginSocialOAuth: async (provider: string) =>
+    (await authenticatedApi<{
+      status: "success";
+      oauth: { authorization_url: string; expires_in_seconds: number };
+    }>(`/api/growth/social/oauth/${provider}/start`, { method: "POST" })).oauth,
+  disconnectSocialProvider: async (provider: string) =>
+    authenticatedApi(`/api/growth/social/connections/${provider}/disconnect`, {
+      method: "POST",
+    }),
 };
