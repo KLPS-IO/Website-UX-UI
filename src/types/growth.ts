@@ -27,6 +27,34 @@ export type GrowthMission = GrowthRecord & {
   status: "planned" | "active" | "completed" | "skipped";
   sprint_id: string | null;
   campaign_id: string | null;
+  candidate_type?: string | null;
+  candidate_key?: string | null;
+  source_module?: string | null;
+  related_entity_type?: string | null;
+  related_entity_id?: string | null;
+  completion_condition?: Record<string, unknown> | null;
+  cooldown_metadata?: Record<string, unknown> | null;
+  completion_verification?: "outcome_verified" | "manual_closed" | null;
+  manual_close_reason?: string | null;
+};
+
+export type MissionCandidate = {
+  candidate_type: string;
+  deduplication_key: string;
+  title: string;
+  description: string;
+  why_it_matters: string;
+  expected_outcome: string;
+  estimated_minutes: number;
+  urgency: "low" | "medium" | "high" | "urgent";
+  importance: number;
+  source_module: string;
+  related_entity_type: string | null;
+  related_entity_id: string | null;
+  completion_condition: Record<string, unknown>;
+  cooldown: Record<string, number>;
+  deadline_at: string | null;
+  score: number;
 };
 
 export type MetricValue = {
@@ -39,6 +67,8 @@ export type MissionControl = {
   active_sprint: GrowthRecord | null;
   active_campaign: GrowthRecord | null;
   today_mission: GrowthMission | null;
+  recommended_candidate: MissionCandidate | null;
+  ranked_candidates: MissionCandidate[];
   growth_snapshot: {
     followers: number | null;
     reach: number | null;
@@ -68,6 +98,9 @@ export type MissionControl = {
     related_record_id: string | null;
     priority: string;
     estimated_minutes: number;
+    expected_outcome?: string;
+    candidate_key?: string | null;
+    source_module?: string | null;
   };
   ranked_opportunities: Array<GrowthRecord & {
     type: string;

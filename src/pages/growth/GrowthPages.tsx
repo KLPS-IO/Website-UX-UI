@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { GrowthKpiCard, GrowthPanel } from "@/components/growth/GrowthWidgets";
 import { CommunityWorkspace } from "@/components/growth/CommunityWorkspace";
 import { SocialConnections } from "@/components/growth/SocialConnections";
+import { ApiError } from "@/lib/authenticated-api";
 import { growthService } from "@/services/growth/growth.service";
 import type { GrowthMission, GrowthRecord, GrowthStrategy, MissionControl } from "@/types/growth";
 
@@ -24,6 +25,8 @@ export function MissionControlPage() {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [missionForm, setMissionForm] = useState(false);
+  const [manualCloseOpen, setManualCloseOpen] = useState(false);
+  const [completionWarning, setCompletionWarning] = useState("");
   const [missionDate, setMissionDate] = useState(new Date().toISOString().slice(0, 10));
 
   const load = async () => {
@@ -39,10 +42,16 @@ export function MissionControlPage() {
     if (!data?.today_mission) return;
     setSaving(true); setNotice(""); setError("");
     try {
-      await growthService.updateMission(data.today_mission.id, { status, ...extra });
-      setNotice(status === "completed" ? "Mission completed." : status === "skipped" ? "Mission skipped." : "Mission updated.");
+      if (status === "completed") await growthService.completeMission(data.today_mission.id);
+      else await growthService.updateMission(data.today_mission.id, { status, ...extra });
+      setNotice(status === "completed" ? "Mission completed and its saved outcome verified." : status === "skipped" ? "Mission skipped. The next current recommendation is ready." : "Mission updated.");
       await load();
-    } catch (reason) { setError(reason instanceof Error ? reason.message : "Mission could not be updated."); }
+    } catch (reason) {
+      if (reason instanceof ApiError && reason.code === "mission_completion_confirmation_required") {
+        setCompletionWarning(reason.message);
+        setManualCloseOpen(true);
+      } else setError(reason instanceof Error ? reason.message : "Mission could not be updated.");
+    }
     finally { setSaving(false); }
   };
 
@@ -50,29 +59,45 @@ export function MissionControlPage() {
     if (!data) return;
     setSaving(true); setError(""); setNotice("");
     try {
-      const suggestion = data.coach_message;
-      await growthService.create("missions", {
-        title: suggested ? suggestion.title : "Plan today’s growth priority",
-        description: suggested ? suggestion.explanation : "Define and complete the most valuable growth action for today.",
-        reason: suggested ? suggestion.explanation : "Keep the daily growth plan focused and accountable.",
-        expected_outcome: "A recorded, reviewable growth action.",
-        estimated_minutes: suggested ? suggestion.estimated_minutes : 20,
-        priority: suggested && ["low", "medium", "high", "urgent"].includes(suggestion.priority) ? suggestion.priority : "medium",
-        mission_date: missionDate,
-        status: "planned",
-        ...(data.active_sprint?.id ? { sprint_id: data.active_sprint.id } : {}),
-        ...(data.active_campaign?.id ? { campaign_id: data.active_campaign.id } : {}),
-      });
+      if (suggested && data.recommended_candidate) {
+        await growthService.acceptMissionCandidate(data.recommended_candidate, missionDate);
+      } else {
+        await growthService.create("missions", {
+          title: "Plan today’s growth priority",
+          description: "Define and complete the most valuable evidence-backed growth action for today.",
+          reason: "Keep the daily growth plan focused and accountable.",
+          expected_outcome: "A founder-defined growth priority completed with its outcome recorded.",
+          estimated_minutes: 20,
+          priority: "medium",
+          mission_date: missionDate,
+          status: "planned",
+          ...(data.active_sprint?.id ? { sprint_id: data.active_sprint.id } : {}),
+          ...(data.active_campaign?.id ? { campaign_id: data.active_campaign.id } : {}),
+        });
+      }
       setMissionForm(false);
-      setNotice("Mission created.");
+      setNotice(suggested ? "Suggested mission saved." : "Mission created.");
       await load();
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Mission could not be created."); }
     finally { setSaving(false); }
   };
 
+  const dismissRecommendation = async () => {
+    if (!data?.recommended_candidate) return;
+    setSaving(true); setError(""); setNotice("");
+    try {
+      await growthService.dismissMissionCandidate(data.recommended_candidate);
+      setNotice("Recommendation dismissed for now. Mission Control has recalculated the next action.");
+      await load();
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Recommendation could not be dismissed.");
+    } finally { setSaving(false); }
+  };
+
   if (loading && !data) return <GrowthState text="Loading your Growth OS brief…" />;
   if (error && !data) return <GrowthError message={error} retry={() => void load()} />;
   const mission = data?.today_mission;
+  const recommendation = data?.recommended_candidate;
   const snapshot = [
     ["Followers", valueOrDash(data?.growth_snapshot.followers), reportingDetail(data, "followers"), Users, "purple"],
     ["Reach", valueOrDash(data?.growth_snapshot.reach), reportingDetail(data, "reach"), BarChart3, "turquoise"],
@@ -92,7 +117,7 @@ export function MissionControlPage() {
         <div className="p-6 md:p-8">
           <div className="flex items-center gap-2 text-xs font-medium text-[#a91876]"><span className="h-2 w-2 rounded-full bg-[#df3fae]" /> Morning brief</div>
           <h2 className="mt-4 text-2xl font-semibold text-white">Good morning, Emma.</h2>
-          <div className="mt-6 text-xs font-bold uppercase tracking-[0.1em] text-white/60">Today’s mission</div>
+          <div className="mt-6 text-xs font-bold uppercase tracking-[0.1em] text-white/60">{mission ? "Today’s saved mission" : recommendation ? "Recommended next action" : "Today’s mission"}</div>
           {mission ? <>
             <p className="mt-2 max-w-xl text-xl font-semibold leading-8 text-white">{mission.title}</p>
             {mission.description && <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">{mission.description}</p>}
@@ -107,19 +132,29 @@ export function MissionControlPage() {
               {!["completed", "skipped"].includes(mission.status) && <SecondaryButton disabled={saving} onClick={() => void missionAction("skipped")}>Skip</SecondaryButton>}
               {!["completed", "skipped"].includes(mission.status) && <SecondaryButton disabled={saving} onClick={() => setMissionForm(true)}>Reschedule</SecondaryButton>}
             </div>
-          </> : <>
-            <p className="mt-2 max-w-xl text-xl font-semibold leading-8 text-white">No mission has been planned for today.</p>
-            <div className="mt-7 flex flex-wrap gap-2">
-              <ActionButton onClick={() => setMissionForm(true)}>Create mission</ActionButton>
-              <SecondaryButton disabled={!data?.coach_message} onClick={() => void createMission(true)}>Use suggested mission</SecondaryButton>
+          </> : recommendation ? <>
+            <p className="mt-2 max-w-xl text-xl font-semibold leading-8 text-white">{recommendation.title}</p>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-white/65">{recommendation.description}</p>
+            <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/60">
+              <span className="inline-flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#a91876]" /> {recommendation.estimated_minutes} minutes</span>
+              <span className="capitalize">{recommendation.source_module}</span>
+              <span className="capitalize">{recommendation.urgency} priority</span>
             </div>
+            <div className="mt-7 flex flex-wrap gap-2">
+              <ActionButton disabled={saving} onClick={() => void createMission(true)}>Use suggested mission</ActionButton>
+              <SecondaryButton disabled={saving} onClick={() => setMissionForm(true)}>Choose another date</SecondaryButton>
+              <SecondaryButton disabled={saving} onClick={() => void dismissRecommendation()}>Dismiss for now</SecondaryButton>
+            </div>
+          </> : <>
+            <p className="mt-2 max-w-xl text-xl font-semibold leading-8 text-white">No current action is supported by saved Growth OS data.</p>
+            <div className="mt-7"><ActionButton onClick={() => setMissionForm(true)}>Create a founder-defined mission</ActionButton></div>
           </>}
         </div>
         <div className="border-t border-[#df3fae]/15 bg-[#df3fae]/[0.07] p-6 md:p-8 lg:border-l lg:border-t-0">
           <div className="text-xs font-bold uppercase tracking-[0.1em] text-[#a91876]">Why this matters</div>
-          <p className="mt-3 text-sm font-medium leading-6 text-white">{mission?.reason ?? data?.coach_message.explanation ?? "No reason has been recorded yet."}</p>
+          <p className="mt-3 text-sm font-medium leading-6 text-white">{mission?.reason ?? recommendation?.why_it_matters ?? "No reason has been recorded yet."}</p>
           <div className="mt-7 text-xs font-bold uppercase tracking-[0.1em] text-[#087f7a]">Expected outcome</div>
-          <p className="mt-3 text-sm leading-6 text-white/70">{mission?.expected_outcome ?? "Not yet defined."}</p>
+          <p className="mt-3 text-sm leading-6 text-white/70">{mission?.expected_outcome ?? recommendation?.expected_outcome ?? "Not yet defined."}</p>
         </div>
       </div>
     </section>
@@ -141,7 +176,26 @@ export function MissionControlPage() {
       ["Campaign Status", String(data?.active_campaign?.name ?? "None active"), String(data?.active_campaign?.status ?? "Not set")],
       ["Waitlist", valueOrDash(data?.growth_snapshot.waitlist_signups_attributed), "Latest attributed sign-ups"],
     ].map(([label, value, status]) => <div key={label} className="border-l-2 border-[#35d3c8]/40 pl-4"><div className="text-xs font-bold uppercase tracking-[0.08em] text-white/60">{label}</div><div className="mt-2 text-sm font-semibold text-white">{value}</div><div className="mt-1 text-xs text-[#087f7a]">{status}</div></div>)}</div></GrowthPanel></div>
-    {missionForm && <MissionDateDialog date={missionDate} setDate={setMissionDate} close={() => setMissionForm(false)} save={() => mission ? void missionAction("planned", { mission_date: missionDate }) : void createMission(false)} saving={saving} />}
+    {missionForm && <MissionDateDialog date={missionDate} setDate={setMissionDate} close={() => setMissionForm(false)} save={() => mission ? void missionAction("planned", { mission_date: missionDate }) : void createMission(Boolean(recommendation))} saving={saving} />}
+    {manualCloseOpen && mission && <ManualCloseDialog
+      warning={completionWarning}
+      saving={saving}
+      close={() => setManualCloseOpen(false)}
+      confirm={async (reason) => {
+        setSaving(true); setError("");
+        try {
+          await growthService.completeMission(mission.id, {
+            manual_close: true,
+            manual_close_reason: reason,
+          });
+          setManualCloseOpen(false);
+          setNotice("Mission manually closed with the founder reason recorded.");
+          await load();
+        } catch (failure) {
+          setError(failure instanceof Error ? failure.message : "Mission could not be manually closed.");
+        } finally { setSaving(false); }
+      }}
+    />}
   </div>;
 }
 
@@ -357,6 +411,36 @@ function MissionDateDialog({ date, setDate, close, save, saving }: { date: strin
       <div className="flex items-start justify-between gap-4"><div><div className="text-xs font-bold uppercase tracking-[.12em] text-[#a91876]">Daily mission</div><h2 id="mission-date-title" className="mt-2 text-xl font-bold text-white">Choose mission date</h2></div><button type="button" onClick={close} aria-label="Close mission dialog" className="rounded-lg p-2 text-white/60 hover:bg-white/10"><X className="h-5 w-5" /></button></div>
       <label className="mt-5 block text-sm font-semibold text-white/70">Mission date<input type="date" value={date} onChange={(event) => setDate(event.target.value)} className="mt-2 w-full rounded-xl border border-white/15 bg-black/25 px-3 py-3 text-white" /></label>
       <div className="mt-5 flex justify-end gap-2"><SecondaryButton onClick={close}>Cancel</SecondaryButton><ActionButton disabled={saving || !date} onClick={save}>{saving ? "Saving…" : "Save mission"}</ActionButton></div>
+    </section>
+  </div>;
+}
+
+function ManualCloseDialog({ warning, saving, close, confirm }: {
+  warning: string;
+  saving: boolean;
+  close: () => void;
+  confirm: (reason: string) => Promise<void>;
+}) {
+  const [reason, setReason] = useState("");
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1f2b35]/45 p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
+    <section role="dialog" aria-modal="true" aria-labelledby="manual-close-title" className="w-full max-w-lg rounded-2xl border border-[#c7ced4] bg-[#f7f8f9] p-6 shadow-2xl">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className="text-sm font-bold uppercase tracking-[0.08em] text-[#a91876]">Outcome not yet verified</div>
+          <h2 id="manual-close-title" className="mt-2 text-2xl font-bold text-[#1f2b35]">Confirm manual close</h2>
+        </div>
+        <button type="button" onClick={close} aria-label="Close manual mission confirmation" className="rounded-lg border border-[#c7ced4] bg-white p-2 text-[#354550] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#df3fae]/25"><X className="h-5 w-5" /></button>
+      </div>
+      <p className="mt-4 text-base font-medium leading-7 text-[#52616d]">{warning}</p>
+      <label className="mt-5 block text-[15px] font-bold text-[#26343f]">
+        Why are you closing this mission manually?
+        <textarea value={reason} onChange={(event) => setReason(event.target.value)} className="mt-2 min-h-28 w-full rounded-xl border border-[#bfc8cf] bg-white p-3.5 text-base text-[#1f2b35] outline-none focus:border-[#c5268d] focus:ring-2 focus:ring-[#df3fae]/20" />
+      </label>
+      <p className="mt-2 text-sm leading-6 text-[#52616d]">This reason is saved with the mission. It does not mark the operational outcome as verified.</p>
+      <div className="mt-6 flex flex-wrap justify-end gap-3">
+        <SecondaryButton disabled={saving} onClick={close}>Cancel</SecondaryButton>
+        <ActionButton disabled={saving || reason.trim().length < 5} onClick={() => void confirm(reason.trim())}>{saving ? "Closing…" : "Confirm manual close"}</ActionButton>
+      </div>
     </section>
   </div>;
 }

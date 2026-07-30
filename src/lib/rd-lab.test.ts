@@ -42,7 +42,7 @@ test("Growth OS Mission Control and Strategy use persisted canonical endpoints",
   assert.match(pages, /Mark complete/);
   assert.match(pages, /Skip/);
   assert.match(pages, /Reschedule/);
-  assert.match(pages, /No mission has been planned for today/);
+  assert.match(pages, /No current action is supported by saved Growth OS data/);
   assert.match(pages, /beforeunload/);
   assert.match(pages, /Strategy could not be saved/);
   assert.doesNotMatch(pages, /Question-based videos currently outperform/);

@@ -4,6 +4,7 @@ import type {
   CommunityPerson,
   CommunitySummary,
   GrowthMission,
+  MissionCandidate,
   GrowthRecord,
   GrowthResource,
   GrowthStrategy,
@@ -58,6 +59,45 @@ export const growthService = {
     )).record,
   updateMission: (id: string, payload: Partial<GrowthMission>) =>
     growthService.update<GrowthMission>("missions", id, payload),
+  acceptMissionCandidate: async (candidate: MissionCandidate, missionDate: string) =>
+    (await authenticatedApi<{ status: "success"; mission: GrowthMission }>(
+      "/api/growth/mission-candidates/accept",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          candidate_key: candidate.deduplication_key,
+          mission_date: missionDate,
+        }),
+      },
+    )).mission,
+  dismissMissionCandidate: async (candidate: MissionCandidate) =>
+    (await authenticatedApi<{
+      status: "success";
+      dismissal: {
+        id: string;
+        candidate_key: string;
+        candidate_type: string;
+        dismissed_at: string;
+      };
+    }>("/api/growth/mission-candidates/dismiss", {
+      method: "POST",
+      body: JSON.stringify({
+        candidate_key: candidate.deduplication_key,
+        candidate_type: candidate.candidate_type,
+      }),
+    })).dismissal,
+  completeMission: async (
+    id: string,
+    payload: { manual_close?: boolean; manual_close_reason?: string } = {},
+  ) =>
+    authenticatedApi<{
+      status: "success";
+      mission: GrowthMission;
+      evaluation: { satisfied: boolean; message: string };
+    }>(`/api/growth/missions/${id}/complete`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
   communitySummary: async () =>
     (await authenticatedApi<{ status: "success"; summary: CommunitySummary }>(
       "/api/growth/community/summary",
