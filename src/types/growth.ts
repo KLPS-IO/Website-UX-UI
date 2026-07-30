@@ -139,6 +139,7 @@ export type SocialConnection = {
   id: string;
   provider: string;
   provider_account_name: string | null;
+  provider_account_type: "member" | "organization" | null;
   status: "disconnected" | "connecting" | "connected" | "unhealthy" | "expired" | "revoked";
   granted_scopes: string[];
   discovered_capabilities: string[];

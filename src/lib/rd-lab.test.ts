@@ -74,6 +74,18 @@ test("Growth OS social connections use the authenticated backend and expose no s
   assert.doesNotMatch(service,/localStorage.*social|sessionStorage.*social/i);
 });
 
+test("LinkedIn OAuth return refreshes identity connection and removes result parameters", () => {
+  const oauth = source("src/lib/growth-social-oauth-return.ts");
+  const connections = source("src/components/growth/SocialConnections.tsx");
+  assert.match(oauth,/processLinkedInOAuthReturn/);
+  assert.match(oauth,/await refreshConnections\(\)/);
+  assert.match(oauth,/replaceHistory\(removeSocialOAuthResultParameters\(href\)\)/);
+  assert.match(connections,/window\.history\.replaceState/);
+  assert.match(connections,/Identity connected/);
+  assert.match(connections,/LinkedIn member identity only\. Publishing is not enabled\./);
+  assert.doesNotMatch(`${oauth}${connections}`,/localStorage|sessionStorage/);
+});
+
 test("workspace preserves honest empty, loading, unauthorised and unknown-money states", () => {
   const workspace = source("src/pages/rd-lab/RdLabWorkspace.tsx");
   assert.match(workspace, /Checking secure founder session/);
