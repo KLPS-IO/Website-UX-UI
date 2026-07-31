@@ -343,7 +343,7 @@ export function DataDeletionInstructions() {
 
       <Section title="Disconnect Facebook or Instagram">
         <p>
-          If you can access KLPS Growth OS, open <strong>Settings</strong>, find{" "}
+          If you can access KLPS Funnel OS, open <strong>Settings</strong>, find{" "}
           <strong>Social Connections</strong>, and select <strong>Disconnect</strong>{" "}
           beside Facebook or Instagram. This ends the KLPS connection and removes the
           stored access tokens used by that connection.

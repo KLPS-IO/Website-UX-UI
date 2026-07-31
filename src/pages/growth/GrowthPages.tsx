@@ -94,7 +94,7 @@ export function MissionControlPage() {
     } finally { setSaving(false); }
   };
 
-  if (loading && !data) return <GrowthState text="Loading your Growth OS brief…" />;
+  if (loading && !data) return <GrowthState text="Loading your Funnel OS brief…" />;
   if (error && !data) return <GrowthError message={error} retry={() => void load()} />;
   const mission = data?.today_mission;
   const recommendation = data?.recommended_candidate;
@@ -146,7 +146,7 @@ export function MissionControlPage() {
               <SecondaryButton disabled={saving} onClick={() => void dismissRecommendation()}>Dismiss for now</SecondaryButton>
             </div>
           </> : <>
-            <p className="mt-2 max-w-xl text-xl font-semibold leading-8 text-white">No current action is supported by saved Growth OS data.</p>
+            <p className="mt-2 max-w-xl text-xl font-semibold leading-8 text-white">No current action is supported by saved Funnel OS data.</p>
             <div className="mt-7"><ActionButton onClick={() => setMissionForm(true)}>Create a founder-defined mission</ActionButton></div>
           </>}
         </div>
@@ -361,7 +361,7 @@ export function SettingsPage() {
   const [linkForm, setLinkForm] = useState({ label:"",destination_url:"",source:"",medium:"social",campaign:"" });
   useEffect(() => { void Promise.all([growthService.workspace().then(setWorkspace),growthService.trackedLinks().then(setLinks)]).catch(() => undefined); }, []);
   const update = async (payload: Record<string, unknown>) => { setSaving(true); setWorkspace(await growthService.updateWorkspace(payload)); setNotice("Settings saved."); setSaving(false); };
-  return <div><PageIntro eyebrow="Workspace preferences" title="Settings" description="Prepare how Growth OS should work for you as integrations become available." />{notice && <InlineMessage tone="success">{notice}</InlineMessage>}<div className="space-y-4">
+  return <div><PageIntro eyebrow="Workspace preferences" title="Settings" description="Prepare how Funnel OS should work for you as integrations become available." />{notice && <InlineMessage tone="success">{notice}</InlineMessage>}<div className="space-y-4">
     <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5"><h2 className="text-sm font-semibold text-white">Timezone</h2><input defaultValue={String(workspace?.timezone ?? "Europe/London")} onBlur={(event) => void update({ timezone:event.target.value })} className="mt-3 w-full rounded-xl border border-white/15 bg-black/20 p-3 text-white" /><span className="mt-2 block text-xs text-[#704293]">{saving ? "Saving…" : "Saved on change"}</span></section>
     <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5"><h2 className="text-sm font-semibold text-white">Default platforms</h2><input defaultValue={Array.isArray(workspace?.default_platforms) ? workspace.default_platforms.join(", ") : ""} onBlur={(event) => void update({ default_platforms:event.target.value.split(",").map(v=>v.trim()).filter(Boolean) })} placeholder="Instagram, TikTok, LinkedIn" className="mt-3 w-full rounded-xl border border-white/15 bg-black/20 p-3 text-white" /></section>
     <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5"><h2 className="text-sm font-semibold text-white">Tracked links</h2><p className="mt-1 text-sm text-white/55">Build truthful UTM links for owned-demand attribution. Public URLs use a safe code, not an internal record ID.</p><div className="mt-4 grid gap-3 md:grid-cols-2">{Object.entries(linkForm).map(([key,value]) => <label key={key} className="text-xs font-bold uppercase text-white/50">{key.replaceAll("_"," ")}<input value={value} onChange={event => setLinkForm(current => ({...current,[key]:event.target.value}))} className="mt-1 w-full rounded-xl border border-white/15 bg-black/20 p-3 text-sm font-normal normal-case text-white" /></label>)}</div><div className="mt-5"><ActionButton onClick={async () => { const created=await growthService.createTrackedLink(linkForm); setLinks(current => [created,...current]); setLinkForm({ label:"",destination_url:"",source:"",medium:"social",campaign:"" }); setNotice("Tracked link created."); }}>Create tracked link</ActionButton></div>{links.length ? <div className="mt-5 space-y-2">{links.map(item => <div key={item.id} className="rounded-xl border border-white/10 p-3"><div className="font-semibold text-white">{String(item.label)}</div><button onClick={() => navigator.clipboard.writeText(String(item.generated_url))} className="mt-1 break-all text-left text-xs text-[#35d3c8] underline">{String(item.generated_url)}</button></div>)}</div> : <p className="mt-5 text-sm text-white/50">No tracked links created.</p>}</section>
@@ -391,7 +391,7 @@ function GrowthState({ text }: { text: string }) {
 
 function GrowthError({ message, retry }: { message: string; retry: () => void }) {
   const readableMessage = message === "Request failed with 500"
-    ? "Mission Control could not load. The Growth OS database update may still be pending."
+    ? "Mission Control could not load. The Funnel OS database update may still be pending."
     : message;
   return <section role="alert" aria-live="assertive" className="rounded-2xl border border-[#d96666] bg-[#fff4f4] p-6 shadow-[0_12px_35px_-28px_rgba(133,24,24,0.45)] md:p-8">
     <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
@@ -516,7 +516,7 @@ function ContentDialog({ item, close, saved }: { item: GrowthRecord | null; clos
       <label className="mt-6 block text-[15px] font-bold text-[#26343f]">Workflow stage<select value={status} onChange={(event) => setStatus(event.target.value)} className="mt-2 w-full rounded-xl border border-[#bfc8cf] bg-white p-3.5 text-base font-medium text-[#1f2b35] outline-none transition focus:border-[#c5268d] focus:ring-2 focus:ring-[#df3fae]/20">{studioSteps.map(([label, key]) => <option value={key} key={key}>{label}</option>)}</select></label>
       <div className="mt-5 grid gap-5">{contentFields.map(([key, label, type]) => <label key={key} className="text-[15px] font-bold text-[#26343f]">{label}{["research_notes", "talking_points", "script", "caption", "result_summary", "repurpose_notes"].includes(key) ? <textarea value={value[key]} onChange={(event) => setValue({ ...value, [key]: event.target.value })} className="mt-2 min-h-24 w-full rounded-xl border border-[#bfc8cf] bg-white p-3.5 text-base font-medium text-[#1f2b35] outline-none transition focus:border-[#c5268d] focus:ring-2 focus:ring-[#df3fae]/20" /> : <input type={type ?? "text"} value={value[key]} onChange={(event) => setValue({ ...value, [key]: event.target.value })} className="mt-2 w-full rounded-xl border border-[#bfc8cf] bg-white p-3.5 text-base font-medium text-[#1f2b35] outline-none transition focus:border-[#c5268d] focus:ring-2 focus:ring-[#df3fae]/20" />}</label>)}</div>
       <div className="mt-5 flex flex-wrap gap-2"><SecondaryButton onClick={prepareBrief}>Prepare content brief</SecondaryButton><SecondaryButton disabled={contentStatuses.indexOf(status as never) <= 0} onClick={() => move(-1)}>Move back</SecondaryButton><SecondaryButton disabled={contentStatuses.indexOf(status as never) >= contentStatuses.length - 1} onClick={() => move(1)}>Move forward</SecondaryButton>{item && <SecondaryButton onClick={() => setStatus("archived")}>Archive</SecondaryButton>}<ActionButton disabled={saving} onClick={() => void save()}>{saving ? "Saving…" : "Save content"}</ActionButton></div>
-      <p className="mt-4 text-sm font-medium leading-6 text-[#52616d]">Scheduling is internal planning only. Growth OS does not automatically publish to social platforms.</p>
+      <p className="mt-4 text-sm font-medium leading-6 text-[#52616d]">Scheduling is internal planning only. Funnel OS does not automatically publish to social platforms.</p>
     </section>
   </div>;
 }

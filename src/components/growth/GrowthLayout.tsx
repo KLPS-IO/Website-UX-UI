@@ -37,7 +37,8 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, [pathname]);
+    document.title = `${page} | Funnel OS | KLPS`;
+  }, [page, pathname]);
 
   const sidebar = (
     <>
@@ -47,11 +48,11 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
           className="flex items-center gap-3"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#df3fae] to-[#945c8c] text-sm font-bold text-white shadow-[0_0_25px_-5px_rgba(223,63,174,0.7)]">
-            G
+            F
           </span>
           <span>
             <span className="block text-sm font-semibold text-white">
-              Growth OS
+              Funnel OS
             </span>
             <span className="block font-mono text-[9px] uppercase tracking-[0.2em] text-white/35">
               Phase 1
@@ -61,7 +62,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
         <button
           className="text-white/60 lg:hidden"
           onClick={() => setMobileOpen(false)}
-          aria-label="Close Growth navigation"
+          aria-label="Close Funnel navigation"
         >
           <X className="h-5 w-5" />
         </button>
@@ -126,7 +127,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
           <button
             className="rounded-lg border border-white/10 p-2 text-white/60 lg:hidden"
             onClick={() => setMobileOpen(true)}
-            aria-label="Open Growth navigation"
+            aria-label="Open Funnel navigation"
           >
             <Menu className="h-4 w-4" />
           </button>
@@ -135,7 +136,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
               {page}
             </div>
             <div className="text-[10px] text-white/35">
-              KLPS Innovation Lab · Growth
+              KLPS Innovation Lab · Funnel
             </div>
           </div>
           <div className="hidden items-center gap-2 rounded-full border border-[#945c8c]/25 bg-[#945c8c]/10 px-3 py-1.5 text-xs text-[#c8a6eb] sm:flex">
@@ -144,7 +145,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
           </div>
           <button
             type="button"
-            aria-label="Sign out of Growth OS"
+            aria-label="Sign out of Funnel OS"
             title="Sign out"
             className="rounded-lg border border-white/10 p-2 text-white/55 transition hover:text-white"
             onClick={async () => {

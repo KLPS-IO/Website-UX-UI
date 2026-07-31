@@ -28,7 +28,7 @@ export default function GrowthApp() {
           navigate("/innovation-lab/growth/login", { replace: true });
           return;
         }
-        setError("Growth OS could not verify the founder session.");
+        setError("Funnel OS could not verify the founder session.");
       })
       .finally(() => setChecking(false));
   }, [navigate]);

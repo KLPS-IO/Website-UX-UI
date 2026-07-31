@@ -22,7 +22,7 @@ test("founder login uses standard autocomplete and no browser token storage", ()
   assert.doesNotMatch(`${login}${service}`, /localStorage|sessionStorage/);
 });
 
-test("Growth OS uses the shared founder password login and protected session gate", () => {
+test("Funnel OS uses the shared founder password login and protected session gate", () => {
   const app = source("src/App.tsx");
   const growth = source("src/pages/growth/GrowthApp.tsx");
   const login = source("src/pages/growth/GrowthLogin.tsx");
@@ -32,7 +32,7 @@ test("Growth OS uses the shared founder password login and protected session gat
   assert.match(growth, /\/innovation-lab\/growth\/login/);
 });
 
-test("Growth OS Mission Control and Strategy use persisted canonical endpoints", () => {
+test("Funnel OS Mission Control and Strategy use persisted canonical endpoints", () => {
   const pages = source("src/pages/growth/GrowthPages.tsx");
   const service = source("src/services/growth/growth.service.ts");
   assert.match(service, /\/api\/growth\/mission-control/);
@@ -42,25 +42,25 @@ test("Growth OS Mission Control and Strategy use persisted canonical endpoints",
   assert.match(pages, /Mark complete/);
   assert.match(pages, /Skip/);
   assert.match(pages, /Reschedule/);
-  assert.match(pages, /No current action is supported by saved Growth OS data/);
+  assert.match(pages, /No current action is supported by saved Funnel OS data/);
   assert.match(pages, /beforeunload/);
   assert.match(pages, /Strategy could not be saved/);
   assert.doesNotMatch(pages, /Question-based videos currently outperform/);
   assert.doesNotMatch(pages, /Phase 1 · Static coach/);
 });
 
-test("Growth OS Community reuses canonical waitlist data through founder APIs", () => {
+test("Funnel OS Community reuses canonical waitlist data through founder APIs", () => {
   const service = source("src/services/growth/growth.service.ts");
   const community = source("src/components/growth/CommunityWorkspace.tsx");
   assert.match(service, /\/api\/growth\/community\/summary/);
   assert.match(service, /\/api\/growth\/community\/people/);
   assert.match(community, /Future waitlist sign-ups will appear automatically/);
-  assert.match(community, /Archive Growth profile/);
+  assert.match(community, /Archive Funnel profile/);
   assert.match(community, /Nothing was sent/);
   assert.doesNotMatch(community, /fake|demo person/i);
 });
 
-test("Growth OS social connections use the authenticated backend and expose no secrets", () => {
+test("Funnel OS social connections use the authenticated backend and expose no secrets", () => {
   const service = source("src/services/growth/growth.service.ts");
   const connections = source("src/components/growth/SocialConnections.tsx");
   const pages = source("src/pages/growth/GrowthPages.tsx");

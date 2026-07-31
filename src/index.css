@@ -203,7 +203,7 @@ All colors MUST be HSL.
   }
 }
 
-/* Growth OS uses its own light workspace theme without changing Innovation Lab or Finance. */
+/* Funnel OS uses its own light workspace theme without changing Innovation Lab or Finance. */
 .growth-theme {
   background: #e8ebef !important;
   color: #1f2b35 !important;

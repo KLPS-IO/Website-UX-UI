@@ -2,9 +2,9 @@ export const LINKEDIN_OAUTH_ERROR_MESSAGES = {
   access_denied:
     "LinkedIn connection was cancelled. Any existing healthy connection is unchanged.",
   invalid_state:
-    "This LinkedIn connection request is invalid or has already been used. Start a new connection from Growth OS.",
+    "This LinkedIn connection request is invalid or has already been used. Start a new connection from Funnel OS.",
   expired_state:
-    "This LinkedIn connection request expired. Start a new connection from Growth OS.",
+    "This LinkedIn connection request expired. Start a new connection from Funnel OS.",
   missing_code:
     "LinkedIn did not return the information needed to complete the connection. Please try again.",
   provider_exchange_failed:
@@ -19,9 +19,9 @@ const META_OAUTH_ERROR_MESSAGES = {
   access_denied:
     "Meta connection was cancelled. Any existing healthy connection is unchanged.",
   invalid_state:
-    "This Meta connection request is invalid or has already been used. Start a new connection from Growth OS.",
+    "This Meta connection request is invalid or has already been used. Start a new connection from Funnel OS.",
   expired_state:
-    "This Meta connection request expired. Start a new connection from Growth OS.",
+    "This Meta connection request expired. Start a new connection from Funnel OS.",
   missing_code:
     "Meta did not return the information needed to complete the connection. Please try again.",
   provider_exchange_failed:
