@@ -26,10 +26,12 @@ test("Funnel OS uses the shared founder password login and protected session gat
   const app = source("src/App.tsx");
   const growth = source("src/pages/growth/GrowthApp.tsx");
   const login = source("src/pages/growth/GrowthLogin.tsx");
-  assert.match(app, /path="\/innovation-lab\/growth\/login"/);
+  assert.match(app, /path="\/innovation-lab\/funnel\/login"/);
+  assert.match(app, /path="\/innovation-lab\/growth\/\*"/);
+  assert.match(app, /LegacyGrowthRouteRedirect/);
   assert.match(login, /FounderPasswordLogin/);
   assert.match(growth, /rdLabService\s*\.\s*session\(\)/);
-  assert.match(growth, /\/innovation-lab\/growth\/login/);
+  assert.match(growth, /\/innovation-lab\/funnel\/login/);
 });
 
 test("Funnel OS Mission Control and Strategy use persisted canonical endpoints", () => {

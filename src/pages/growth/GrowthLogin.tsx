@@ -11,7 +11,7 @@ export default function GrowthLogin() {
       eyebrow="KLPS Funnel OS"
       title="Founder Sign In"
       description="Funnel OS is a private founder workspace. Sign in with the same founder email and password used for the R&D Lab."
-      destination="/innovation-lab/growth/mission-control"
+      destination="/innovation-lab/funnel/mission-control"
       returnTo="/innovation-lab"
       returnLabel="Return to Innovation Lab"
       accent="purple"

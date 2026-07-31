@@ -25,7 +25,7 @@ export default function GrowthApp() {
           reason instanceof ApiError &&
           (reason.status === 401 || reason.status === 403)
         ) {
-          navigate("/innovation-lab/growth/login", { replace: true });
+          navigate("/innovation-lab/funnel/login", { replace: true });
           return;
         }
         setError("Funnel OS could not verify the founder session.");
@@ -70,13 +70,13 @@ export default function GrowthApp() {
         <Route
           path="overview"
           element={
-            <Navigate to="/innovation-lab/growth/mission-control" replace />
+            <Navigate to="/innovation-lab/funnel/mission-control" replace />
           }
         />
         <Route
           path="*"
           element={
-            <Navigate to="/innovation-lab/growth/mission-control" replace />
+            <Navigate to="/innovation-lab/funnel/mission-control" replace />
           }
         />
       </Routes>

@@ -44,7 +44,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
     <>
       <div className="flex h-16 items-center justify-between border-b border-white/[0.08] px-5">
         <Link
-          to="/innovation-lab/growth/mission-control"
+          to="/innovation-lab/funnel/mission-control"
           className="flex items-center gap-3"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#df3fae] to-[#945c8c] text-sm font-bold text-white shadow-[0_0_25px_-5px_rgba(223,63,174,0.7)]">
@@ -76,7 +76,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
             <li key={slug}>
               <NavLink
                 onClick={() => setMobileOpen(false)}
-                to={`/innovation-lab/growth/${slug}`}
+                to={`/innovation-lab/funnel/${slug}`}
                 className={({ isActive }) =>
                   cn(
                     "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition",
@@ -150,7 +150,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
             className="rounded-lg border border-white/10 p-2 text-white/55 transition hover:text-white"
             onClick={async () => {
               await rdLabService.logout();
-              navigate("/innovation-lab/growth/login", { replace: true });
+              navigate("/innovation-lab/funnel/login", { replace: true });
             }}
           >
             <LogOut className="h-4 w-4" />

@@ -12,7 +12,7 @@ test("successful LinkedIn return refreshes connections with identity-only copy",
   let refreshes=0;
   let replacement="";
   const result=await processLinkedInOAuthReturn(
-    "https://klps.co.uk/innovation-lab/growth/settings?keep=yes&social_provider=linkedin&social_status=connected",
+    "https://klps.co.uk/innovation-lab/funnel/settings?keep=yes&social_provider=linkedin&social_status=connected",
     async () => { refreshes += 1; },
     (url) => { replacement=url; },
   );
@@ -23,13 +23,13 @@ test("successful LinkedIn return refreshes connections with identity-only copy",
   assert.doesNotMatch(result?.message ?? "",/publishing enabled/i);
   assert.equal(
     replacement,
-    "/innovation-lab/growth/settings?keep=yes",
+    "/innovation-lab/funnel/settings?keep=yes",
   );
 });
 
 test("successful Meta return is allowlisted and states discovery-only access", async () => {
   const result = await processLinkedInOAuthReturn(
-    "https://klps.co.uk/innovation-lab/growth/settings?social_provider=facebook&social_status=connected",
+    "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=facebook&social_status=connected",
     async () => undefined,
     () => undefined,
   );
@@ -64,9 +64,9 @@ test("unknown provider, status and error values are ignored without echoing them
 test("OAuth parameters are removed while unrelated query and hash values survive", () => {
   assert.equal(
     removeSocialOAuthResultParameters(
-      "https://klps.co.uk/innovation-lab/growth/settings?tab=connections&social_provider=linkedin&social_status=failed&social_error=access_denied#linkedin",
+      "https://klps.co.uk/innovation-lab/funnel/settings?tab=connections&social_provider=linkedin&social_status=failed&social_error=access_denied#linkedin",
     ),
-    "/innovation-lab/growth/settings?tab=connections#linkedin",
+    "/innovation-lab/funnel/settings?tab=connections#linkedin",
   );
 });
 
@@ -74,7 +74,7 @@ test("failed re-authorisation refreshes rather than removing an existing connect
   const existingConnection={ provider:"linkedin",status:"connected",name:"Emma Mendez" };
   let visibleConnection=existingConnection;
   const result=await processLinkedInOAuthReturn(
-    "https://klps.co.uk/innovation-lab/growth/settings?social_provider=linkedin&social_status=failed&social_error=access_denied",
+    "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=linkedin&social_status=failed&social_error=access_denied",
     async () => { visibleConnection=existingConnection; },
     () => undefined,
   );

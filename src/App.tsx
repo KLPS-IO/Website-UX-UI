@@ -2,7 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BetaLogin from "./pages/BetaLogin";
@@ -45,6 +51,16 @@ import {
 
 const queryClient = new QueryClient();
 
+function LegacyGrowthRouteRedirect() {
+  const { pathname, search, hash } = useLocation();
+  const funnelPath = pathname.replace(
+    /^\/innovation-lab\/growth(?=\/|$)/,
+    "/innovation-lab/funnel",
+  );
+
+  return <Navigate to={`${funnelPath}${search}${hash}`} replace />;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -61,10 +77,14 @@ const App = () => (
           <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
           <Route
-            path="/innovation-lab/growth/login"
+            path="/innovation-lab/funnel/login"
             element={<GrowthLogin />}
           />
-          <Route path="/innovation-lab/growth/*" element={<GrowthApp />} />
+          <Route path="/innovation-lab/funnel/*" element={<GrowthApp />} />
+          <Route
+            path="/innovation-lab/growth/*"
+            element={<LegacyGrowthRouteRedirect />}
+          />
           <Route path="/rd-lab" element={<RdLabOverview />} />
           <Route path="/rd-lab/login" element={<RdLabLogin />} />
           <Route

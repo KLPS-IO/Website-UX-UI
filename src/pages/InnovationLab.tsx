@@ -13,7 +13,7 @@ import { Section, StatCard } from "@/components/Section";
 import { AnimatedHeadline } from "@/components/AnimatedHeadline";
 const navItems = [
   { href: "#overview", label: "Overview" },
-  { href: "/innovation-lab/growth/mission-control", label: "Funnel" },
+  { href: "/innovation-lab/funnel/mission-control", label: "Funnel" },
   { href: "#founder", label: "Founder" },
   { href: "/data-room", label: "Data Room" },
   { href: "#vault", label: "Vault" },
