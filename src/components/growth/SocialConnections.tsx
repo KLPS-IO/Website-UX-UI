@@ -12,7 +12,7 @@ const dateTime = (value: string | null | undefined) => {
   return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 };
 
-export function SocialConnections() {
+export function SocialConnections({ allowedProviders }: { allowedProviders?: string[] }) {
   const [providers,setProviders] = useState<SocialProviderOverview[]>([]);
   const [expanded,setExpanded] = useState<string | null>(null);
   const [working,setWorking] = useState<string | null>(null);
@@ -62,12 +62,16 @@ export function SocialConnections() {
     finally { setWorking(null); }
   };
 
+  const visibleProviders = allowedProviders
+    ? providers.filter((provider) => allowedProviders.includes(provider.provider))
+    : providers;
+
   return <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5">
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><div className="text-xs font-bold uppercase tracking-[.1em] text-[#35d3c8]">Official APIs only</div><h2 className="mt-2 text-lg font-bold text-white">Connections</h2><p className="mt-1 max-w-2xl text-sm leading-6 text-white/60">Connect identities progressively using secure OAuth. Tokens stay encrypted on the backend. Publishing, messaging, advertising and content management are not enabled.</p></div><ShieldCheck className="h-6 w-6 shrink-0 text-[#35d3c8]" /></div>
     {oauthResult && <div role={oauthResult.tone === "error" ? "alert" : "status"} className={`mt-4 rounded-xl border p-3 text-sm font-semibold ${oauthResult.tone === "error" ? "border-amber-300/25 bg-amber-300/10 text-amber-100" : "border-[#087f7a]/25 bg-[#d9f1ef] text-[#075e5a]"}`}>{oauthResult.message}</div>}
     {error && <div role="alert" className="mt-4 rounded-xl border border-red-400/25 bg-red-500/10 p-3 text-sm text-red-100">{error} <button type="button" onClick={() => void load()} className="ml-2 underline">Retry</button></div>}
     {notice && <div role="status" className="mt-4 rounded-xl border border-[#087f7a]/25 bg-[#d9f1ef] p-3 text-sm font-semibold text-[#075e5a]">{notice}</div>}
-    {loading ? <p className="mt-5 text-sm text-white/55">Checking platform availability…</p> : <div className="mt-5 space-y-3">{providers.map(provider => {
+    {loading ? <p className="mt-5 text-sm text-white/55">Checking platform availability…</p> : <div className="mt-5 space-y-3">{visibleProviders.map(provider => {
       const connection = provider.connection;
       const connected = connection?.status === "connected";
       const linkedInMemberConnected = provider.provider === "linkedin" && connected && connection.provider_account_type === "member";

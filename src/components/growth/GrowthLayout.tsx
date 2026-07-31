@@ -26,7 +26,7 @@ const growthNav = [
   ["settings", "Settings", Settings],
 ] as const;
 
-export function GrowthLayout({ children }: { children: ReactNode }) {
+export function GrowthLayout({ children, reviewerMode = false }: { children: ReactNode; reviewerMode?: boolean }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const viewer = useDataRoomViewer();
   const navigate = useNavigate();
@@ -34,6 +34,9 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
   const page =
     growthNav.find(([slug]) => pathname.endsWith(`/${slug}`))?.[1] ??
     "Mission Control";
+  const visibleNav = reviewerMode
+    ? growthNav.filter(([slug]) => slug === "settings")
+    : growthNav;
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -72,7 +75,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
           Workspace
         </div>
         <ul className="space-y-1">
-          {growthNav.map(([slug, label, Icon]) => (
+          {visibleNav.map(([slug, label, Icon]) => (
             <li key={slug}>
               <NavLink
                 onClick={() => setMobileOpen(false)}
@@ -141,7 +144,7 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
           </div>
           <div className="hidden items-center gap-2 rounded-full border border-[#945c8c]/25 bg-[#945c8c]/10 px-3 py-1.5 text-xs text-[#c8a6eb] sm:flex">
             <Sparkles className="h-3.5 w-3.5" />
-            {viewer?.name ?? "Founder workspace"}
+            {reviewerMode ? "Meta reviewer" : viewer?.name ?? "Founder workspace"}
           </div>
           <button
             type="button"
@@ -157,6 +160,14 @@ export function GrowthLayout({ children }: { children: ReactNode }) {
           </button>
         </header>
         <main className="mx-auto max-w-[1500px] px-4 py-7 md:px-8 md:py-10">
+          {reviewerMode && (
+            <aside className="mb-6 rounded-xl border border-[#35d3c8]/25 bg-[#35d3c8]/[0.07] px-4 py-3" aria-label="Meta App Review Workspace">
+              <div className="text-sm font-bold text-[#087f7a]">Meta App Review Workspace</div>
+              <p className="mt-1 text-xs leading-5 text-white/60">
+                This isolated workspace is provided for Meta&apos;s review of the Facebook connection flow.
+              </p>
+            </aside>
+          )}
           {children}
         </main>
       </div>

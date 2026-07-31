@@ -353,14 +353,21 @@ export function CommunityPage() {
   </div>;
 }
 
-export function SettingsPage() {
+export function SettingsPage({ reviewerMode = false }: { reviewerMode?: boolean }) {
   const [workspace, setWorkspace] = useState<GrowthRecord | null>(null);
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState("");
   const [links, setLinks] = useState<GrowthRecord[]>([]);
   const [linkForm, setLinkForm] = useState({ label:"",destination_url:"",source:"",medium:"social",campaign:"" });
-  useEffect(() => { void Promise.all([growthService.workspace().then(setWorkspace),growthService.trackedLinks().then(setLinks)]).catch(() => undefined); }, []);
+  useEffect(() => {
+    if (reviewerMode) return;
+    void Promise.all([growthService.workspace().then(setWorkspace),growthService.trackedLinks().then(setLinks)]).catch(() => undefined);
+  }, [reviewerMode]);
   const update = async (payload: Record<string, unknown>) => { setSaving(true); setWorkspace(await growthService.updateWorkspace(payload)); setNotice("Settings saved."); setSaving(false); };
+  if (reviewerMode) return <div>
+    <PageIntro eyebrow="Meta App Review Workspace" title="Settings" description="Review the isolated Facebook connection flow." />
+    <SocialConnections allowedProviders={["facebook"]} />
+  </div>;
   return <div><PageIntro eyebrow="Workspace preferences" title="Settings" description="Prepare how Funnel OS should work for you as integrations become available." />{notice && <InlineMessage tone="success">{notice}</InlineMessage>}<div className="space-y-4">
     <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5"><h2 className="text-sm font-semibold text-white">Timezone</h2><input defaultValue={String(workspace?.timezone ?? "Europe/London")} onBlur={(event) => void update({ timezone:event.target.value })} className="mt-3 w-full rounded-xl border border-white/15 bg-black/20 p-3 text-white" /><span className="mt-2 block text-xs text-[#704293]">{saving ? "Saving…" : "Saved on change"}</span></section>
     <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5"><h2 className="text-sm font-semibold text-white">Default platforms</h2><input defaultValue={Array.isArray(workspace?.default_platforms) ? workspace.default_platforms.join(", ") : ""} onBlur={(event) => void update({ default_platforms:event.target.value.split(",").map(v=>v.trim()).filter(Boolean) })} placeholder="Instagram, TikTok, LinkedIn" className="mt-3 w-full rounded-xl border border-white/15 bg-black/20 p-3 text-white" /></section>

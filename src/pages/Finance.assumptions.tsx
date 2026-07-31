@@ -82,7 +82,7 @@ export default function AssumptionsPage() {
                       <td className="px-5 py-3 text-muted-foreground">{a.owner}</td>
                       <td className="px-5 py-3 text-muted-foreground">{a.status}</td>
                       <td className="px-5 py-3">
-                        <EntityEvidenceLinks entityType="assumptions" entityId={a.id} />
+                        <EntityEvidenceLinks entityType="assumption" entityId={a.id} />
                       </td>
                       <td className="px-5 py-3 text-muted-foreground">v{a.version}</td>
                       <td className="px-5 py-3 text-muted-foreground">{a.updated_at}</td>

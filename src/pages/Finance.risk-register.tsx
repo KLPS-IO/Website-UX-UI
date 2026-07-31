@@ -45,7 +45,7 @@ export default function RiskRegisterPage() {
                 <ShieldCheck className="h-3.5 w-3.5" />
                 {risk.status}
               </div>
-              <div className="mt-4"><EntityEvidenceLinks entityType="risks" entityId={risk.id} /></div>
+              <div className="mt-4"><EntityEvidenceLinks entityType="risk" entityId={risk.id} /></div>
             </Surface>
           );
         })}

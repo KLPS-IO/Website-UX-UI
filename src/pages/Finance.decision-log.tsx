@@ -41,7 +41,7 @@ export default function DecisionLogPage() {
               <Detail icon={Clock} label="Owner / Date" value={`${decision.owner} · ${decision.date}`} />
               <div className="rounded-lg border border-border bg-white/50 p-3">
                 <SectionTitle title="Linked Evidence" />
-                <div className="flex items-start gap-2"><FileText className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" /><EntityEvidenceLinks entityType="decisions" entityId={decision.id} /></div>
+                <div className="flex items-start gap-2"><FileText className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" /><EntityEvidenceLinks entityType="decision" entityId={decision.id} /></div>
               </div>
               <Detail icon={CheckCircle2} label="Outcome" value={decision.outcome} />
             </div>

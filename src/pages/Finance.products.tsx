@@ -60,7 +60,7 @@ export default function ProductsPage() {
                 <div className="h-full rounded-full bg-gradient-to-r from-brand-orange via-brand-coral to-brand-sage" style={{ width: `${Math.max(0, m.marginPct * 100)}%` }} />
               </div>
               <div className="mt-4 border-t border-white/5 pt-3">
-                <EntityEvidenceLinks entityType="products" entityId={p.id} />
+                <EntityEvidenceLinks entityType="product" entityId={p.id} />
               </div>
             </Surface>
           );

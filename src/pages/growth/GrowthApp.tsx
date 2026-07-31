@@ -16,10 +16,12 @@ export default function GrowthApp() {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     rdLabService
       .session()
+      .then((session) => setRole(session.user.role))
       .catch((reason: unknown) => {
         if (
           reason instanceof ApiError &&
@@ -57,26 +59,28 @@ export default function GrowthApp() {
     );
   }
 
+  const reviewerMode = role === "meta_reviewer";
+
   return (
-    <GrowthLayout>
+    <GrowthLayout reviewerMode={reviewerMode}>
       <Routes>
-        <Route index element={<Navigate to="mission-control" replace />} />
-        <Route path="mission-control" element={<MissionControlPage />} />
-        <Route path="strategy" element={<StrategyPage />} />
-        <Route path="studio" element={<StudioPage />} />
-        <Route path="intelligence" element={<IntelligencePage />} />
-        <Route path="community" element={<CommunityPage />} />
-        <Route path="settings" element={<SettingsPage />} />
+        <Route index element={<Navigate to={reviewerMode ? "settings" : "mission-control"} replace />} />
+        {!reviewerMode && <Route path="mission-control" element={<MissionControlPage />} />}
+        {!reviewerMode && <Route path="strategy" element={<StrategyPage />} />}
+        {!reviewerMode && <Route path="studio" element={<StudioPage />} />}
+        {!reviewerMode && <Route path="intelligence" element={<IntelligencePage />} />}
+        {!reviewerMode && <Route path="community" element={<CommunityPage />} />}
+        <Route path="settings" element={<SettingsPage reviewerMode={reviewerMode} />} />
         <Route
           path="overview"
           element={
-            <Navigate to="/innovation-lab/funnel/mission-control" replace />
+            <Navigate to={reviewerMode ? "/innovation-lab/funnel/settings" : "/innovation-lab/funnel/mission-control"} replace />
           }
         />
         <Route
           path="*"
           element={
-            <Navigate to="/innovation-lab/funnel/mission-control" replace />
+            <Navigate to={reviewerMode ? "/innovation-lab/funnel/settings" : "/innovation-lab/funnel/mission-control"} replace />
           }
         />
       </Routes>

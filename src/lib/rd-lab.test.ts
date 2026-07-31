@@ -76,6 +76,19 @@ test("Funnel OS social connections use the authenticated backend and expose no s
   assert.doesNotMatch(service,/localStorage.*social|sessionStorage.*social/i);
 });
 
+test("Meta reviewer UI is limited to isolated Facebook connection settings", () => {
+  const app = source("src/pages/growth/GrowthApp.tsx");
+  const pages = source("src/pages/growth/GrowthPages.tsx");
+  const layout = source("src/components/growth/GrowthLayout.tsx");
+  const connections = source("src/components/growth/SocialConnections.tsx");
+  assert.match(app,/role === "meta_reviewer"/);
+  assert.match(app,/reviewerMode \? "settings" : "mission-control"/);
+  assert.match(pages,/allowedProviders=\{\["facebook"\]\}/);
+  assert.match(layout,/Meta App Review Workspace/);
+  assert.match(layout,/isolated workspace is provided for Meta&apos;s review/);
+  assert.match(connections,/allowedProviders\.includes\(provider\.provider\)/);
+});
+
 test("LinkedIn OAuth return refreshes identity connection and removes result parameters", () => {
   const oauth = source("src/lib/growth-social-oauth-return.ts");
   const connections = source("src/components/growth/SocialConnections.tsx");
