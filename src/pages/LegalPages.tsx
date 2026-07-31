@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import Footer from "@/components/Footer";
 
-const BUILD_DATE = "30 July 2026";
+const BUILD_DATE = "31 July 2026";
 
 type SeoMetadataProps = {
   title: string;
@@ -81,6 +81,13 @@ function LegalPage({
               Privacy
             </Link>
             <Link
+              to="/data-deletion"
+              aria-current={canonicalPath === "/data-deletion" ? "page" : undefined}
+              className="rounded-sm text-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              Data deletion
+            </Link>
+            <Link
               to="/terms"
               aria-current={canonicalPath === "/terms" ? "page" : undefined}
               className="rounded-sm text-foreground underline-offset-4 hover:text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -101,7 +108,7 @@ function LegalPage({
               {title}
             </h1>
             <p className="mt-5 text-base font-medium text-muted-foreground sm:text-lg">
-              Last updated: <time dateTime="2026-07-30">{BUILD_DATE}</time>
+              Last updated: <time dateTime="2026-07-31">{BUILD_DATE}</time>
             </p>
           </header>
 
@@ -276,6 +283,115 @@ export function PrivacyPolicy() {
         <p>
           To ask a privacy question or exercise your rights, email <ContactLink />. We
           may need to verify your identity before acting on a request.
+        </p>
+        <p>
+          For step-by-step instructions, see our{" "}
+          <Link
+            to="/data-deletion"
+            className="font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary"
+          >
+            User Data Deletion page
+          </Link>
+          .
+        </p>
+      </Section>
+    </LegalPage>
+  );
+}
+
+export function DataDeletionInstructions() {
+  return (
+    <LegalPage
+      eyebrow="Your data, your choice"
+      title="User Data Deletion"
+      description="Instructions for requesting deletion of personal data held by KLPS, including data associated with Facebook and Instagram connections."
+      canonicalPath="/data-deletion"
+    >
+      <Section title="How to request deletion">
+        <p>
+          You can ask KLPS to delete personal data associated with your KLPS account,
+          including data received through a Facebook or Instagram connection.
+        </p>
+        <ol className="ml-6 list-decimal space-y-3 marker:font-bold marker:text-primary">
+          <li>
+            Email{" "}
+            <a
+              href="mailto:emmamendez@klps.co.uk?subject=User%20Data%20Deletion%20Request"
+              className="font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary"
+            >
+              emmamendez@klps.co.uk
+            </a>{" "}
+            with the subject <strong>User Data Deletion Request</strong>.
+          </li>
+          <li>
+            Send the request from the email address associated with your KLPS account,
+            where possible. Tell us which KLPS service you used and whether you connected
+            Facebook or Instagram. Do not send passwords, access tokens or copies of
+            identity documents with your initial request.
+          </li>
+          <li>
+            We will acknowledge your request and may ask for limited additional
+            information if reasonably necessary to verify your identity and locate the
+            relevant records.
+          </li>
+          <li>
+            We will confirm when the deletion has been completed or explain if any
+            information must be retained.
+          </li>
+        </ol>
+      </Section>
+
+      <Section title="Disconnect Facebook or Instagram">
+        <p>
+          If you can access KLPS Growth OS, open <strong>Settings</strong>, find{" "}
+          <strong>Social Connections</strong>, and select <strong>Disconnect</strong>{" "}
+          beside Facebook or Instagram. This ends the KLPS connection and removes the
+          stored access tokens used by that connection.
+        </p>
+        <p>
+          Disconnecting stops future access. To request deletion of all personal data
+          already associated with the connection, also follow the email instructions
+          above.
+        </p>
+      </Section>
+
+      <Section title="What we delete">
+        <p>Where held and applicable to your request, deletion may include:</p>
+        <Bullets>
+          <li>Facebook or Instagram user, Page and professional-account identifiers;</li>
+          <li>access tokens and other social connection credentials;</li>
+          <li>social connection records and imported profile information;</li>
+          <li>KLPS account and profile information;</li>
+          <li>research responses, submissions and communications linked to you; and</li>
+          <li>other personal information that is no longer required.</li>
+        </Bullets>
+      </Section>
+
+      <Section title="Timing and information we may retain">
+        <p>
+          We will respond without undue delay and ordinarily within one month after
+          receiving your request or completing any necessary identity verification.
+        </p>
+        <p>
+          In limited circumstances, we may retain information where required by law or
+          reasonably necessary for security, fraud prevention, legal claims or
+          regulatory record-keeping. We will restrict its use and tell you if this
+          applies. Data in protected backups may remain until the backup is securely
+          overwritten, and will not be restored for ordinary use.
+        </p>
+      </Section>
+
+      <Section title="Questions">
+        <p>
+          For questions about deletion or how KLPS handles personal information, email{" "}
+          <ContactLink /> or read our{" "}
+          <Link
+            to="/privacy"
+            className="font-semibold text-primary underline decoration-primary/40 underline-offset-4 hover:decoration-primary"
+          >
+            Privacy Policy
+          </Link>
+          .
         </p>
       </Section>
     </LegalPage>

@@ -37,7 +37,11 @@ import GrowthLogin from "@/pages/growth/GrowthLogin";
 import RdLabOverview from "@/pages/rd-lab/RdLabOverview";
 import RdLabLogin from "@/pages/rd-lab/RdLabLogin";
 import RdLabWorkspace from "@/pages/rd-lab/RdLabWorkspace";
-import { PrivacyPolicy, TermsOfService } from "@/pages/LegalPages";
+import {
+  DataDeletionInstructions,
+  PrivacyPolicy,
+  TermsOfService,
+} from "@/pages/LegalPages";
 
 const queryClient = new QueryClient();
 
@@ -52,6 +56,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/data-deletion" element={<DataDeletionInstructions />} />
           <Route path="/terms" element={<TermsOfService />} />
           <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
