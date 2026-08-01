@@ -87,6 +87,12 @@ test("Meta reviewer UI is limited to isolated Facebook connection settings", () 
   assert.match(layout,/Meta App Review Workspace/);
   assert.match(layout,/isolated workspace is provided for Meta&apos;s review/);
   assert.match(connections,/allowedProviders\.includes\(provider\.provider\)/);
+  assert.match(connections,/Facebook Page discovered/);
+  assert.match(connections,/Instagram Professional account discovered/);
+  assert.match(connections,/no managed Facebook Page was discovered/);
+  assert.match(connections,/No linked Instagram Professional account was found/);
+  assert.match(connections,/Publishing is not enabled/);
+  assert.doesNotMatch(connections,/posts|messages|comments|followers|insights/i);
 });
 
 test("LinkedIn OAuth return refreshes identity connection and removes result parameters", () => {

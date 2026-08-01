@@ -181,6 +181,19 @@ export type SocialConnection = {
   last_error_at: string | null;
   connected_at: string | null;
   token_expires_at: string | null;
+  assets: SocialConnectionAsset[];
+};
+
+export type SocialConnectionAsset = {
+  social_connection_id: string;
+  provider: "facebook" | "instagram";
+  provider_asset_type: "page" | "instagram_professional";
+  provider_asset_id: string;
+  provider_asset_name: string;
+  provider_asset_username: string | null;
+  status: "active";
+  discovered_at: string;
+  updated_at: string;
 };
 
 export type SocialSetupItem = {
