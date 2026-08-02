@@ -41,6 +41,11 @@ type SocialOAuthErrorCode = LinkedInOAuthErrorCode | MetaOAuthErrorCode;
 
 type SocialOAuthProvider = "linkedin" | "facebook";
 
+type CanonicalSocialProvider = {
+  provider: string;
+  connection: { status: string } | null;
+};
+
 export type LinkedInOAuthReturn =
   | {
       provider: SocialOAuthProvider;
@@ -113,7 +118,7 @@ export const removeSocialOAuthResultParameters = (href: string) => {
 
 export const processLinkedInOAuthReturn = async (
   href: string,
-  refreshConnections: () => Promise<void>,
+  refreshConnections: () => Promise<readonly CanonicalSocialProvider[]>,
   replaceHistory: (url: string) => void,
 ) => {
   const url = new URL(href);
@@ -126,6 +131,13 @@ export const processLinkedInOAuthReturn = async (
     replaceHistory(removeSocialOAuthResultParameters(href));
   }
 
-  await refreshConnections();
+  const providers=await refreshConnections();
+  if (
+    result?.provider === "facebook" &&
+    result.status === "connected" &&
+    !providers.some(provider =>
+      provider.provider === "facebook" && provider.connection?.status === "connected"
+    )
+  ) return null;
   return result;
 };

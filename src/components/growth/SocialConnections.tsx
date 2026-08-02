@@ -23,8 +23,15 @@ export function SocialConnections({ allowedProviders }: { allowedProviders?: str
 
   const load = async () => {
     setLoading(true); setError("");
-    try { setProviders(await growthService.socialProviders()); }
-    catch (reason) { setError(reason instanceof Error ? reason.message : "Connections could not be loaded."); }
+    try {
+      const refreshedProviders=await growthService.socialProviders();
+      setProviders(refreshedProviders);
+      return refreshedProviders;
+    }
+    catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Connections could not be loaded.");
+      return [];
+    }
     finally { setLoading(false); }
   };
   useEffect(() => {

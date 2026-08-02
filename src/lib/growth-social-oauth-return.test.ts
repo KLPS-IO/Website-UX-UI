@@ -13,7 +13,7 @@ test("successful LinkedIn return refreshes connections with identity-only copy",
   let replacement="";
   const result=await processLinkedInOAuthReturn(
     "https://klps.co.uk/innovation-lab/funnel/settings?keep=yes&social_provider=linkedin&social_status=connected",
-    async () => { refreshes += 1; },
+    async () => { refreshes += 1; return []; },
     (url) => { replacement=url; },
   );
   assert.equal(refreshes,1);
@@ -27,15 +27,38 @@ test("successful LinkedIn return refreshes connections with identity-only copy",
   );
 });
 
-test("successful Meta return is allowlisted and states discovery-only access", async () => {
+test("successful Meta return requires canonical connected status", async () => {
   const result = await processLinkedInOAuthReturn(
     "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=facebook&social_status=connected",
-    async () => undefined,
+    async () => [{provider:"facebook",connection:{status:"connected"}}],
     () => undefined,
   );
   assert.equal(result?.provider,"facebook");
   assert.match(result?.message ?? "",/Page and linked Instagram professional discovery/);
   assert.match(result?.message ?? "",/Publishing is not enabled/);
+});
+
+test("stale Meta success parameters do not show success for non-connected canonical states", async () => {
+  for (const connection of [
+    {status:"connecting"},
+    {status:"disconnected"},
+    {status:"unhealthy"},
+    null,
+  ]) {
+    let replacement="";
+    const result=await processLinkedInOAuthReturn(
+      "https://klps.co.uk/innovation-lab/funnel/settings?keep=yes&social_provider=facebook&social_status=connected",
+      async () => [{provider:"facebook",connection}],
+      url => { replacement=url; },
+    );
+    assert.equal(result,null);
+    assert.equal(replacement,"/innovation-lab/funnel/settings?keep=yes");
+  }
+  assert.equal(await processLinkedInOAuthReturn(
+    "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=facebook&social_status=connected",
+    async () => [{provider:"linkedin",connection:{status:"connected"}}],
+    () => undefined,
+  ),null);
 });
 
 test("every controlled LinkedIn failure maps to fixed safe copy", () => {
@@ -75,7 +98,10 @@ test("failed re-authorisation refreshes rather than removing an existing connect
   let visibleConnection=existingConnection;
   const result=await processLinkedInOAuthReturn(
     "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=linkedin&social_status=failed&social_error=access_denied",
-    async () => { visibleConnection=existingConnection; },
+    async () => {
+      visibleConnection=existingConnection;
+      return [{provider:"linkedin",connection:{status:"connected"}}];
+    },
     () => undefined,
   );
   assert.equal(result?.status,"failed");
