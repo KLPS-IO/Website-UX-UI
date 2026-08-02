@@ -77,3 +77,16 @@ export function safeApiDateValue(value: unknown): string {
   const candidate = timestamp ? input.slice(0, 10) : input;
   return ISO_DATE.test(candidate) && parseSafeDate(candidate) ? candidate : "";
 }
+
+/** Human-readable UK date that preserves the calendar portion supplied by the API. */
+export function formatDateOnlyUk(value: unknown, fallback = "Not confirmed"): string {
+  const candidate = safeApiDateValue(value);
+  if (!candidate) return fallback;
+  const [year, month, day] = candidate.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
