@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { formatDateOnlyUk } from "./safe-date.ts";
-import { calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, warningCopy } from "./vat-ledger-ui.ts";
+import { authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, warningCopy } from "./vat-ledger-ui.ts";
 import type { VatLedgerRow } from "../types/vat-ledger.ts";
 
 const row=(overrides:Partial<VatLedgerRow>):VatLedgerRow=>({id:"1",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2025-05-08",currency:"GBP",net_amount:null,vat_amount:null,gross_amount:"10.00",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:[],notes:null,created_at:"",updated_at:"",...overrides});
@@ -26,10 +26,26 @@ test("supplier, review and evidence filters combine and supplier matching is par
 });
 test("foreign currency validation accepts a rate path or complete manual GBP path",()=>{
   assert.equal(foreignCurrencyWarning({currency:"GBP"}),null);
-  assert.equal(foreignCurrencyWarning({currency:"EUR",gross_amount:"10",exchange_rate:"0.85"}),null);
+  assert.match(foreignCurrencyWarning({currency:"EUR",gross_amount:"10",exchange_rate:"0.85"})??"",/exchange rate/);
+  assert.equal(foreignCurrencyWarning({currency:"EUR",gross_amount:"10",exchange_rate:"0.85",gbp_net_amount:"7",gbp_vat_amount:"1.50",gbp_gross_amount:"8.50"}),null);
   assert.equal(calculatedGbpGross("10","0.85"),"8.50");
   assert.equal(foreignCurrencyWarning({currency:"EUR",gbp_net_amount:"7",gbp_vat_amount:"1.50",gbp_gross_amount:"8.50",notes:"Manual conversion reviewed"}),null);
+  assert.match(foreignCurrencyWarning({currency:"EUR",gbp_net_amount:"7",gbp_vat_amount:"1.50",gbp_gross_amount:"8.50"})??"",/review note/);
+  assert.match(foreignCurrencyWarning({currency:"EUR",gbp_net_amount:"7",gbp_gross_amount:"8.50",notes:"Incomplete"})??"",/all GBP values/);
+  assert.match(foreignCurrencyWarning({currency:"EUR",gbp_net_amount:"7",gbp_vat_amount:"2",gbp_gross_amount:"8.50",notes:"Mismatched"})??"",/review note/);
   assert.match(foreignCurrencyWarning({currency:"EUR",gross_amount:"10"})??"",/exchange rate/);
+});
+test("successful mutation waits for authoritative ledger rows before replacing stale warnings",async()=>{
+  const stale=row({id:"edited",warnings:["foreign_currency_without_conversion"],currency:"EUR"});
+  const refreshed=row({id:"edited",warnings:["pending_vat_treatment"],currency:"EUR",gbp_net_amount:"8.00",gbp_vat_amount:"2.00",gbp_gross_amount:"10.00",notes:"Manual conversion reviewed"});
+  const order:string[]=[];
+  const rows=await authoritativeRowsAfterMutation(async()=>{order.push("patch");},async()=>{order.push("refetch");return{transactions:[refreshed]};});
+  assert.deepEqual(order,["patch","refetch"]);
+  assert.deepEqual(rows,[refreshed]);
+  assert.ok(!rows[0].warnings.includes("foreign_currency_without_conversion"));
+  assert.deepEqual(filterVatLedgerRows(rows,{supplier:"supplier",reviewStatus:"",evidenceStatus:""}),[refreshed]);
+  assert.equal(rows.reduce((total,item)=>total+Number(item.gbp_gross_amount??0),0),10);
+  assert.ok(stale.warnings.includes("foreign_currency_without_conversion"));
 });
 test("pending VAT warning has clear controlled copy",()=>assert.equal(warningCopy("pending_vat_treatment"),"VAT treatment has not been reviewed."));
 test("derived-period rows are labelled without implying founder confirmation",()=>assert.deepEqual(vatPeriodDisplay({vat_period_start:"2025-05-08",vat_period_end:"2026-04-30",vat_period_source:"derived"}),{label:"8 May 2025 to 30 April 2026",detail:"Date-derived · not explicitly confirmed"}));

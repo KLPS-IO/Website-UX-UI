@@ -25,9 +25,16 @@ export function vatPeriodDisplay(row: Pick<VatLedgerRow,"vat_period_start"|"vat_
 export function foreignCurrencyWarning(input: {currency?:string|null;gross_amount?:unknown;exchange_rate?:unknown;gbp_net_amount?:unknown;gbp_vat_amount?:unknown;gbp_gross_amount?:unknown;notes?:string|null}): string | null {
   if ((input.currency ?? "GBP").trim().toUpperCase() === "GBP") return null;
   const finite = (value: unknown) => value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value));
-  const hasRateConversion = Number(input.exchange_rate) > 0 && finite(input.gross_amount);
-  const hasManualConversion = [input.gbp_net_amount,input.gbp_vat_amount,input.gbp_gross_amount].every(finite) && Boolean(input.notes?.trim());
+  const completeGbp = [input.gbp_net_amount,input.gbp_vat_amount,input.gbp_gross_amount].every(finite);
+  const balancedGbp = completeGbp && Math.abs(Number(input.gbp_net_amount) + Number(input.gbp_vat_amount) - Number(input.gbp_gross_amount)) <= 0.01;
+  const hasRateConversion = Number(input.exchange_rate) > 0 && finite(input.gross_amount) && completeGbp;
+  const hasManualConversion = balancedGbp && Boolean(input.notes?.trim());
   return hasRateConversion || hasManualConversion ? null : "Add an exchange rate and source gross amount, or all GBP values with a review note.";
+}
+
+export async function authoritativeRowsAfterMutation<T>(mutation:()=>Promise<unknown>,refetch:()=>Promise<{transactions:T[]}>):Promise<T[]> {
+  await mutation();
+  return (await refetch()).transactions;
 }
 
 export function calculatedGbpGross(grossAmount: unknown, exchangeRate: unknown): string {

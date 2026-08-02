@@ -23,3 +23,11 @@ test("CSV and XLSX builders export the same filtered ledger rows",async()=>{
   assert.equal(workbook.getWorksheet("Working ledger")?.rowCount,3);
   assert.equal(workbook.getWorksheet("Review summary")?.getRow(2).getCell(2).value,"8 May 2025 to 30 April 2026");
 });
+test("exports use refreshed warning and conversion values after editing",async()=>{
+  const refreshed={id:"edited",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2099-03-15",currency:"EUR",net_amount:null,vat_amount:null,gross_amount:"10",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:["pending_vat_treatment"],notes:"Manual conversion reviewed",created_at:"",updated_at:"",gbp_net_amount:"8.00",gbp_vat_amount:"2.00",gbp_gross_amount:"10.00"} satisfies VatLedgerRow;
+  const csv=buildVatCsv([refreshed]);
+  assert.match(csv,/"8.00","2.00","10.00"/);
+  assert.doesNotMatch(csv,/foreign_currency_without_conversion/);
+  const workbook=await buildVatWorkbook([refreshed]);
+  assert.equal(workbook.getWorksheet("Working ledger")?.getRow(3).getCell(vatExportColumns.indexOf("GBP gross")+1).value,"10.00");
+});
