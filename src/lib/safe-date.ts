@@ -64,3 +64,16 @@ export function safeDateInputValue(value: unknown): string {
   const day = String(parsed.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+/**
+ * Canonical date value for API fields that require YYYY-MM-DD.
+ * Timestamp strings preserve their leading calendar date without timezone conversion.
+ */
+export function safeApiDateValue(value: unknown): string {
+  if (typeof value !== "string") return "";
+  const input = value.trim();
+  const timestamp = input.includes("T");
+  if (timestamp && !ISO_TIMESTAMP.test(input)) return "";
+  const candidate = timestamp ? input.slice(0, 10) : input;
+  return ISO_DATE.test(candidate) && parseSafeDate(candidate) ? candidate : "";
+}
