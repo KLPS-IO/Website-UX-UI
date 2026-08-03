@@ -51,12 +51,29 @@ const TIKTOK_OAUTH_ERROR_MESSAGES = {
     "The TikTok identity connection could not be completed. Any existing healthy connection is unchanged.",
 } as const;
 
+const X_OAUTH_ERROR_MESSAGES = {
+  access_denied:
+    "X connection was cancelled. Any existing healthy connection is unchanged.",
+  invalid_state:
+    "This X connection request is invalid or has already been used. Start a new connection from Funnel OS.",
+  expired_state:
+    "This X connection request expired. Start a new connection from Funnel OS.",
+  missing_code:
+    "X did not return the information needed to complete the connection. Please try again.",
+  provider_exchange_failed:
+    "X could not complete the secure connection. Please try again.",
+  identity_lookup_failed:
+    "X connected, but the account identity could not be confirmed. Your existing connection is unchanged.",
+  connection_failed:
+    "The X identity connection could not be completed. Any existing healthy connection is unchanged.",
+} as const;
+
 export type LinkedInOAuthErrorCode =
   keyof typeof LINKEDIN_OAUTH_ERROR_MESSAGES;
 type MetaOAuthErrorCode = keyof typeof META_OAUTH_ERROR_MESSAGES;
 type SocialOAuthErrorCode = LinkedInOAuthErrorCode | MetaOAuthErrorCode;
 
-type SocialOAuthProvider = "linkedin" | "facebook" | "tiktok";
+type SocialOAuthProvider = "linkedin" | "facebook" | "tiktok" | "x";
 
 type CanonicalSocialProvider = {
   provider: string;
@@ -90,7 +107,8 @@ const isOAuthErrorCode = (
   Boolean(value && (
     value in LINKEDIN_OAUTH_ERROR_MESSAGES ||
     value in META_OAUTH_ERROR_MESSAGES ||
-    value in TIKTOK_OAUTH_ERROR_MESSAGES
+    value in TIKTOK_OAUTH_ERROR_MESSAGES ||
+    value in X_OAUTH_ERROR_MESSAGES
   ));
 
 export const readLinkedInOAuthReturn = (
@@ -98,29 +116,30 @@ export const readLinkedInOAuthReturn = (
 ): LinkedInOAuthReturn | null => {
   const parameters = new URLSearchParams(search);
   const provider = parameters.get("social_provider");
-  if (provider !== "linkedin" && provider !== "facebook" && provider !== "tiktok") return null;
+  if (!["linkedin","facebook","tiktok","x"].includes(provider ?? "")) return null;
 
   const status = parameters.get("social_status");
   if (status === "connected") {
     return {
-      provider,
+      provider:provider as SocialOAuthProvider,
       status,
       tone: "success",
       message: provider === "linkedin"
         ? "LinkedIn member identity connected. Publishing is not enabled."
         : provider === "facebook"
           ? "Meta identity connected. Facebook Page and linked Instagram professional discovery are available. Publishing is not enabled."
-          : "TikTok identity connected",
+          : provider === "tiktok" ? "TikTok identity connected" : "X identity connected",
     };
   }
 
   const errorCode = parameters.get("social_error");
   const messages = provider === "linkedin"
     ? LINKEDIN_OAUTH_ERROR_MESSAGES
-    : provider === "facebook" ? META_OAUTH_ERROR_MESSAGES : TIKTOK_OAUTH_ERROR_MESSAGES;
+    : provider === "facebook" ? META_OAUTH_ERROR_MESSAGES
+      : provider === "tiktok" ? TIKTOK_OAUTH_ERROR_MESSAGES : X_OAUTH_ERROR_MESSAGES;
   if (status !== "failed" || !isOAuthErrorCode(errorCode) || !(errorCode in messages)) return null;
   return {
-    provider,
+    provider:provider as SocialOAuthProvider,
     status,
     tone: "error",
     errorCode,
@@ -153,7 +172,7 @@ export const processLinkedInOAuthReturn = async (
 
   const providers=await refreshConnections();
   if (
-    (result?.provider === "facebook" || result?.provider === "tiktok") &&
+    (result?.provider === "facebook" || result?.provider === "tiktok" || result?.provider === "x") &&
     result.status === "connected" &&
     !providers.some(provider =>
       provider.provider === result.provider && provider.connection?.status === "connected"
