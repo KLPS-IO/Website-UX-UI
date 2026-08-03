@@ -70,6 +70,8 @@ test("Funnel OS social connections use the authenticated backend and expose no s
   assert.match(service,/\/api\/growth\/social\/oauth\/.*\/start/);
   assert.match(connections,/Official APIs only/);
   assert.match(connections,/Developer setup checklist/);
+  assert.match(connections,/Future provider approval/);
+  assert.match(connections,/Unavailable until separately approved and activated/);
   assert.match(connections,/Setup required/);
   assert.match(pages,/<SocialConnections \/>/);
   assert.doesNotMatch(connections,/client_secret|access_token|refresh_token/i);

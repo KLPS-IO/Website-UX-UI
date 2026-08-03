@@ -212,6 +212,7 @@ export type SocialProviderOverview = {
     reason: string;
   };
   required_permissions: string[];
+  future_permissions?: string[];
   capabilities: string[];
   approval_required: true;
   setup_checklist: SocialSetupItem[];
