@@ -98,6 +98,19 @@ test("Meta reviewer UI is limited to isolated Facebook connection settings", () 
   assert.doesNotMatch(connections,/posts|messages|comments|followers|insights/i);
 });
 
+test("Instagram Professional is represented once as a Meta-discovered asset", () => {
+  const connections = source("src/components/growth/SocialConnections.tsx");
+  assert.match(connections,/provider\.provider !== "instagram"/);
+  assert.match(connections,/asset\.provider === "instagram"/);
+  assert.match(connections,/Instagram Professional account discovered/);
+  assert.equal(
+    (connections.match(/Instagram Professional account discovered/g) ?? []).length,
+    1
+  );
+  assert.doesNotMatch(connections,/provider\.provider === "instagram"/);
+  assert.match(connections,/connectableProviders\.filter/);
+});
+
 test("LinkedIn OAuth return refreshes identity connection and removes result parameters", () => {
   const oauth = source("src/lib/growth-social-oauth-return.ts");
   const connections = source("src/components/growth/SocialConnections.tsx");

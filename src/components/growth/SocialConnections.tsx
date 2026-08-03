@@ -69,9 +69,10 @@ export function SocialConnections({ allowedProviders }: { allowedProviders?: str
     finally { setWorking(null); }
   };
 
+  const connectableProviders = providers.filter((provider) => provider.provider !== "instagram");
   const visibleProviders = allowedProviders
-    ? providers.filter((provider) => allowedProviders.includes(provider.provider))
-    : providers;
+    ? connectableProviders.filter((provider) => allowedProviders.includes(provider.provider))
+    : connectableProviders;
 
   return <section className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-5">
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><div className="text-xs font-bold uppercase tracking-[.1em] text-[#35d3c8]">Official APIs only</div><h2 className="mt-2 text-lg font-bold text-white">Connections</h2><p className="mt-1 max-w-2xl text-sm leading-6 text-white/60">Connect identities progressively using secure OAuth. Tokens stay encrypted on the backend. Publishing, messaging, advertising and content management are not enabled.</p></div><ShieldCheck className="h-6 w-6 shrink-0 text-[#35d3c8]" /></div>
