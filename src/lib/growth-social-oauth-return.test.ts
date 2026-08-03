@@ -38,6 +38,21 @@ test("successful Meta return requires canonical connected status", async () => {
   assert.match(result?.message ?? "",/Publishing is not enabled/);
 });
 
+test("successful TikTok return requires canonical identity and uses identity-only copy", async () => {
+  const result=await processLinkedInOAuthReturn(
+    "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=tiktok&social_status=connected",
+    async () => [{provider:"tiktok",connection:{status:"connected"}}],
+    () => undefined
+  );
+  assert.equal(result?.provider,"tiktok");
+  assert.equal(result?.message,"TikTok identity connected");
+  assert.equal(await processLinkedInOAuthReturn(
+    "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=tiktok&social_status=connected",
+    async () => [{provider:"tiktok",connection:{status:"disconnected"}}],
+    () => undefined
+  ),null);
+});
+
 test("stale Meta success parameters do not show success for non-connected canonical states", async () => {
   for (const connection of [
     {status:"connecting"},
