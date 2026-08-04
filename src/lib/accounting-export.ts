@@ -1,0 +1,14 @@
+import type { AccountingExportConfig,AccountingExportValidation,PaymentMappingKey } from "../types/accounting-export.ts";
+import type { VatPeriod } from "../types/vat-ledger.ts";
+
+export const paymentLabels:Record<PaymentMappingKey,string>={founder_director_funded:"Founder/director funded",paypal:"PayPal",personal_credit_card:"Personal credit card",company_credit_card:"Company credit card",business_bank:"Business bank",other:"Other"};
+export const blockingReasonCopy=(reason:string)=>{
+  const [code,detail]=reason.split(":");
+  const labels:Record<string,string>={review_not_export_ready:"Review is not complete",vat_treatment_pending:"VAT treatment is pending",reviewed_gbp_vat_missing:"VAT amount is missing",vat_rate_unresolved:"VAT rate is missing",supplier_missing:"Supplier is missing",effective_tax_point_missing:"Effective tax date is missing",gbp_values_do_not_reconcile:"Net, VAT and gross do not reconcile",evidence_requirement_unsatisfied:"Evidence review is incomplete",purchase_nominal_code_missing:"Purchase nominal code is not mapped",paid_account_nominal_code_missing:"Payment account is not mapped",foreign_currency_conversion_unresolved:"Foreign-currency conversion is incomplete",approved_gbp_gross_missing:"Approved GBP gross amount is missing",description_missing:"Description is missing",critical_warning:"Critical VAT warning",adjustment_requires_manual_handling:"Adjustment requires manual handling"};
+  return `${labels[code]??code.replaceAll("_"," ")}${detail?`: ${detail.replaceAll("_"," ")}`:""}`;
+};
+export const configStateCopy=(config:AccountingExportConfig|null)=>!config?"Configuration not loaded":config.source==="database"?(config.confirmed?"Confirmed founder configuration":"Draft founder configuration — export generation is disabled until confirmed"):config.source==="environment"?"Legacy environment configuration":"No accounting mappings configured";
+export const canGenerateAccountingExport=(config:AccountingExportConfig|null,validation:AccountingExportValidation|null,stale:boolean)=>Boolean(config&&validation&&!stale&&validation.blocked_row_count===0&&validation.source_ledger_fingerprint&&validation.mapping_config_source===config.source&&validation.mapping_config_version===config.version&&validation.mapping_config_confirmed===config.confirmed&&(config.source==="environment"||(config.source==="database"&&config.confirmed)));
+export const safeAccountingExportFilename=(period:VatPeriod|undefined)=>`KLPS-MTD-accounting-export-${period?.start_date?.slice(0,10)||"period-start"}-to-${period?.end_date?.slice(0,10)||"period-end"}-quickfile.csv`;
+export const shortReference=(value:string)=>value.length>12?`${value.slice(0,8)}…${value.slice(-4)}`:value;
+export const cleanMappings=(rows:Array<{key:string;value:string}>)=>Object.fromEntries(rows.map(({key,value})=>[key.trim(),value.trim()]).filter(([key,value])=>key&&value));

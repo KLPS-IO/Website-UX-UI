@@ -49,3 +49,10 @@ export async function authenticatedBlob(path: string): Promise<Blob> {
   }
   return response.blob();
 }
+
+export async function authenticatedBlobRequest(path:string,options:RequestInit={}):Promise<Blob>{
+  const token=TOKEN_KEYS.map(key=>sessionStorage.getItem(key)).find(Boolean);
+  const response=await fetch(`${API_BASE}${path}`,{...options,credentials:"include",headers:{"Content-Type":"application/json",...(token?{Authorization:`Bearer ${token}`}:{ }),...options.headers}});
+  if(!response.ok){let body:Record<string,unknown>={};try{body=await response.json() as Record<string,unknown>;}catch{/* CSV endpoint may return a non-JSON proxy error. */}throw new ApiError(String(body.message??body.error??`Request failed with ${response.status}`),response.status,typeof body.code==="string"?body.code:undefined,body);}
+  return response.blob();
+}
