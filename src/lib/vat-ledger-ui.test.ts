@@ -57,12 +57,22 @@ test("entry dirtiness ignores controlled defaults and detects any unsaved field 
   assert.equal(hasUnsavedVatEntry({...empty,vat_period_id:"period-id"}),true);
   assert.equal(hasUnsavedVatEntry({...empty,currency:"EUR"}),true);
 });
-test("inline entry card opens on demand and closes without persistence",()=>{
+test("inline editor closes saved records while new entries clear without persistence",()=>{
   const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
-  assert.match(page,/if\(hasUnsavedVatEntry\(form\)&&!window\.confirm\("Close this unsaved entry\? Nothing will be saved\."\)\)return;resetForm\(\);setEntryOpen\(false\)/);
-  assert.match(page,/>Close<\/button><button className="rounded-lg bg-brand-orange/);
-  assert.match(page,/>New entry<\/button>/);
-  assert.match(page,/setEditingId\(row\.id\);setFormError\(""\);setEntryOpen\(true\)/);
-  assert.match(page,/setForm\(emptyForm\);setEditingId\(null\);setSuggestion\(null\);setFormError\(""\)/);
+  assert.match(page,/dirty[\s\S]*Close this unsaved entry\? Nothing will be saved\./);
+  assert.match(page,/dirty[\s\S]*Clear this unsaved entry\? Nothing will be saved\./);
+  assert.match(page,/editingId \? closeForm : clearForm/);
+  assert.match(page,/editingId \? "Close" : "Clear form"/);
+  assert.match(page,/setFormBaseline\(saved\)/);
+  assert.match(page,/setSuggestion\(null\)/);
   assert.doesNotMatch(page,/Close[\s\S]{0,120}(archive|update)\(/);
+});
+
+test("VAT ledger exposes founder-only fixed expense and adjustment evidence targets",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  const dialog=readFileSync("src/components/finance/VatEvidenceUploadDialog.tsx","utf8");
+  assert.match(page,/Upload evidence/);assert.match(page,/Upload refund evidence/);assert.match(page,/View evidence/);assert.match(page,/View refund evidence/);
+  assert.match(page,/viewer\.isFounderAdmin/);assert.match(page,/entityType: "expense_adjustment"/);
+  assert.match(dialog,/Choose an evidence purpose and file/);assert.match(dialog,/linked_entity_id: target\.id/);assert.doesNotMatch(dialog,/setTarget|Entity ID/);
+  assert.match(dialog,/Existing canonical document reused and linked/);assert.match(dialog,/document_category: "Finance"/);
 });

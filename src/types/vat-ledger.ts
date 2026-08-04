@@ -8,7 +8,9 @@ export type VatLedgerRow={
   supplier_country?:string|null;supplier_vat_number?:string|null;invoice_number?:string|null;order_reference?:string|null;payment_method?:string|null;payment_source?:string|null;
   reimbursement_status:string|null;evidence_status:string;vat_review_status?:string|null;vat_period_id?:string|null;stored_vat_period_id?:string|null;effective_vat_period_id?:string|null;vat_period_source?:"explicit"|"derived"|"none"|"conflict";effective_tax_point_date?:string|null;vat_period_start?:string|null;vat_period_end?:string|null;
   exchange_rate?:MoneyDto;
-  evidence_files:Array<{id:string;filename:string|null;type:string|null}>;evidence_coverage?:string;warnings:string[];notes:string|null;created_at:string;updated_at:string;
+  evidence_files:Array<VatEvidenceFile>;adjustments?:VatExpenseAdjustment[];evidence_coverage?:string;warnings:string[];notes:string|null;created_at:string;updated_at:string;
 };
+export type VatEvidenceFile={id:string;filename:string|null;type:string|null};
+export type VatExpenseAdjustment={id:string;adjustment_type:string;adjustment_date:string;gross_amount:MoneyDto;gbp_gross_amount:MoneyDto;currency:string;supplier_reference:string|null;reason:string;review_status:string;parent_order_reference:string|null;parent_invoice_number:string|null;evidence_files:VatEvidenceFile[]};
 export type HistoricalExpenseInput=Partial<VatLedgerRow>&{payment_date:string;supplier_name:string;gross_amount:string;change_reason?:string};
 export type VatPeriodSuggestion=(VatPeriod&{vat_period_source:"derived";effective_tax_point_date:string})|{id:null;vat_period_source:"conflict";effective_tax_point_date:string;matching_period_ids:string[]};

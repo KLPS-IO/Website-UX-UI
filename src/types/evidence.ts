@@ -7,7 +7,7 @@ export const evidenceDocumentCategories = [
 export type EvidenceDocumentCategory = (typeof evidenceDocumentCategories)[number];
 export type EvidenceVerificationStatus = "Unknown" | "Unverified" | "Under Review" | "Verified" | "Rejected" | "Expired";
 export type EvidenceDocumentStatus = "Draft" | "Active" | "Superseded" | "Archived" | "Expired";
-export type EvidenceEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "kpi" | "report" | "scenario" | "hire" | "document" | "expense" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
+export type EvidenceEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "kpi" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
 
 export interface EvidenceLinkDto {
   id: string;
@@ -39,7 +39,8 @@ export interface EvidenceDto {
   next_review_date: string | null;
   expiry_date: string | null;
   document_date: string | null;
-  r2_object_key: string | null;
+  r2_object_key?: string | null;
+  has_r2_object?: boolean;
   original_filename: string | null;
   mime_type: string | null;
   file_size: number | null;
@@ -112,7 +113,7 @@ export type EvidenceFilters = Partial<{
 
 export type EvidenceMetadataInput = Partial<Omit<EvidenceDto, "id" | "evidence_code" | "created_at" | "updated_at" | "created_by" | "updated_by" | "version" | "links">> & Pick<EvidenceDto, "title" | "evidence_type">;
 
-export type DocumentLinkEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "report" | "scenario" | "hire" | "document" | "expense" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
+export type DocumentLinkEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
 
 export type DocumentUploadInput = {
   file: File;
@@ -124,6 +125,10 @@ export type DocumentUploadInput = {
   linked_entity_type?: DocumentLinkEntityType;
   linked_entity_id?: string;
   relationship?: string;
+  vat_evidence_type?: string;
+  supplier_reference?: string;
 };
+
+export type DocumentUploadResult = { evidence: EvidenceDto; link: EvidenceLinkDto | null; evidence_reused: boolean; link_created: boolean; duplicate_link: boolean };
 
 export type DocumentAccessResponse = { status: "success"; action: "view" | "download"; signed_url: string; expires_at: string };

@@ -39,8 +39,8 @@ test("download filename is deterministic and safe",()=>assert.equal(safeAccounti
 
 test("VAT ledger retains both working exports and adds a distinct founder-only modal action",()=>{
   const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
-  assert.match(page,/exportVatCsv\(filteredRows\)/);assert.match(page,/exportVatXlsx\(filteredRows,selected\)/);
-  assert.match(page,/>CSV<\/button>/);assert.match(page,/>XLSX<\/button>/);assert.match(page,/>MTD Accounting Export<\/button>/);
+  assert.match(page,/exportVatCsv\(filteredRows\)/);assert.match(page,/exportVatXlsx\(\s*filteredRows,\s*selected/);
+  assert.match(page,/CSV\s*<\/button>/);assert.match(page,/XLSX\s*<\/button>/);assert.match(page,/MTD Accounting Export\s*<\/button>/);
   assert.match(page,/viewer\?\.isFounderAdmin/);assert.match(page,/setMtdExportOpen\(true\)/);
 });
 
@@ -48,8 +48,19 @@ test("modal uses all approved endpoints, expected version, fingerprint, conflict
   const component=readFileSync("src/components/finance/MtdAccountingExportDialog.tsx","utf8");
   const repository=readFileSync("src/repositories/accountingExportRepository.ts","utf8");
   assert.match(repository,/accounting-exports/);assert.match(repository,/\/config/);assert.match(repository,/\/validate/);assert.match(repository,/\/generate/);
-  assert.match(component,/expected_version:config\.version/);assert.match(component,/accounting_export_config_version_conflict/);assert.match(component,/fetchConfig\(true\)/);
-  assert.match(component,/validation\.source_ledger_fingerprint/);assert.match(component,/Revalidate export before downloading/);
+  assert.match(component,/expected_version:\s*config\.version/);assert.match(component,/accounting_export_config_version_conflict/);assert.match(component,/fetchConfig\(true\)/);
+  assert.match(component,/validation\.source_ledger_fingerprint/);assert.match(component,/Revalidate transactions before generating the accounting CSV/);
   assert.match(component,/Manual adjustments required/);assert.match(component,/This has not been submitted to HMRC/);
   assert.doesNotMatch(component,/localStorage|sessionStorage/);assert.doesNotMatch(repository,/localStorage|sessionStorage/);
+});
+
+test("MTD dialog selects a period and permits draft validation while generation stays gated",()=>{
+  const component=readFileSync("src/components/finance/MtdAccountingExportDialog.tsx","utf8");
+  assert.match(component,/aria-label="MTD VAT period"/);assert.match(component,/setSelectedPeriodId\(period\?\.id \?\? ""\)/);
+  assert.match(component,/Validate transactions/);assert.match(component,/Select a VAT period first\./);
+  const validationGate=component.slice(component.indexOf("const validationDisabledReason"),component.indexOf("const generationReasons"));
+  assert.doesNotMatch(validationGate,/confirmed/);
+  assert.match(component,/canGenerateAccountingExport\(config, validation, stale\)/);
+  assert.match(component,/Mapping configuration is still a draft\./);
+  assert.match(component,/Save mapping draft/);assert.match(component,/Discard unsaved changes/);assert.match(component,/Confirm mappings/);
 });

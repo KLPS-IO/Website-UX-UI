@@ -34,7 +34,7 @@ export function mapEvidenceDto(dto: EvidenceDto, linkedContext?: { entityType: E
     nextReviewDate: dto.next_review_date,
     expiryDate: dto.expiry_date,
     documentDate: dto.document_date,
-    hasR2Object: Boolean(dto.r2_object_key),
+    hasR2Object: dto.has_r2_object ?? Boolean(dto.r2_object_key),
     originalFilename: dto.original_filename,
     mimeType: dto.mime_type,
     fileSize: dto.file_size,

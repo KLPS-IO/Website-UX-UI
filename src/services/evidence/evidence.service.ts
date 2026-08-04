@@ -56,7 +56,7 @@ export const evidenceService = {
   },
   async uploadDocument(input: DocumentUploadInput) {
     const response = await evidenceRepository.uploadDocument(buildDocumentUploadFormData(input));
-    return { evidence: mapEvidenceDto(response.evidence), link: response.link };
+    return { evidence: mapEvidenceDto(response.evidence), link: response.link, evidence_reused: response.evidence_reused, link_created: response.link_created, duplicate_link: response.duplicate_link };
   },
   accessDocument: evidenceRepository.accessDocument,
   previewDocument: evidenceRepository.previewDocument,
