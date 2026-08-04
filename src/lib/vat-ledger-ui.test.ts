@@ -57,10 +57,12 @@ test("entry dirtiness ignores controlled defaults and detects any unsaved field 
   assert.equal(hasUnsavedVatEntry({...empty,vat_period_id:"period-id"}),true);
   assert.equal(hasUnsavedVatEntry({...empty,currency:"EUR"}),true);
 });
-test("inline entry actions clear before save and confirm only dirty drafts",()=>{
+test("inline entry card opens on demand and closes without persistence",()=>{
   const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
-  assert.match(page,/if\(hasUnsavedVatEntry\(form\)&&!window\.confirm\("Clear this unsaved entry\? Nothing will be saved\."\)\)return;resetForm\(\)/);
-  assert.match(page,/>Clear form<\/button><button className="rounded-lg bg-brand-orange/);
+  assert.match(page,/if\(hasUnsavedVatEntry\(form\)&&!window\.confirm\("Close this unsaved entry\? Nothing will be saved\."\)\)return;resetForm\(\);setEntryOpen\(false\)/);
+  assert.match(page,/>Close<\/button><button className="rounded-lg bg-brand-orange/);
+  assert.match(page,/>New entry<\/button>/);
+  assert.match(page,/setEditingId\(row\.id\);setFormError\(""\);setEntryOpen\(true\)/);
   assert.match(page,/setForm\(emptyForm\);setEditingId\(null\);setSuggestion\(null\);setFormError\(""\)/);
-  assert.doesNotMatch(page,/Clear form[\s\S]{0,120}(archive|update)\(/);
+  assert.doesNotMatch(page,/Close[\s\S]{0,120}(archive|update)\(/);
 });
