@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { formatDateOnlyUk } from "./safe-date.ts";
-import { authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, warningCopy } from "./vat-ledger-ui.ts";
+import { authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, vatPeriodDisplay, warningCopy } from "./vat-ledger-ui.ts";
 import type { VatLedgerRow } from "../types/vat-ledger.ts";
 
 const row=(overrides:Partial<VatLedgerRow>):VatLedgerRow=>({id:"1",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2025-05-08",currency:"GBP",net_amount:null,vat_amount:null,gross_amount:"10.00",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:[],notes:null,created_at:"",updated_at:"",...overrides});
@@ -49,3 +50,17 @@ test("successful mutation waits for authoritative ledger rows before replacing s
 });
 test("pending VAT warning has clear controlled copy",()=>assert.equal(warningCopy("pending_vat_treatment"),"VAT treatment has not been reviewed."));
 test("derived-period rows are labelled without implying founder confirmation",()=>assert.deepEqual(vatPeriodDisplay({vat_period_start:"2025-05-08",vat_period_end:"2026-04-30",vat_period_source:"derived"}),{label:"8 May 2025 to 30 April 2026",detail:"Date-derived · not explicitly confirmed"}));
+test("entry dirtiness ignores controlled defaults and detects any unsaved field or selected period",()=>{
+  const empty={payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
+  assert.equal(hasUnsavedVatEntry(empty),false);
+  assert.equal(hasUnsavedVatEntry({...empty,supplier_name:"IONOS"}),true);
+  assert.equal(hasUnsavedVatEntry({...empty,vat_period_id:"period-id"}),true);
+  assert.equal(hasUnsavedVatEntry({...empty,currency:"EUR"}),true);
+});
+test("inline entry actions clear before save and confirm only dirty drafts",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  assert.match(page,/if\(hasUnsavedVatEntry\(form\)&&!window\.confirm\("Clear this unsaved entry\? Nothing will be saved\."\)\)return;resetForm\(\)/);
+  assert.match(page,/>Clear form<\/button><button className="rounded-lg bg-brand-orange/);
+  assert.match(page,/setForm\(emptyForm\);setEditingId\(null\);setSuggestion\(null\);setFormError\(""\)/);
+  assert.doesNotMatch(page,/Clear form[\s\S]{0,120}(archive|update)\(/);
+});
