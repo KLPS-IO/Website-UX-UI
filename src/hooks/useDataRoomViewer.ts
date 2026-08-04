@@ -1,10 +1,12 @@
 import { API_BASE } from "@/config/api";
 import { useEffect, useState } from "react";
+import { normaliseViewerPermissions } from "@/lib/viewer-permissions";
 
 type Viewer = {
   name: string;
   initials: string;
   role: string | null;
+  isFounderAdmin: boolean;
   canWriteFinance: boolean;
 };
 
@@ -45,10 +47,8 @@ const parseViewer = (payload: unknown): Viewer | null => {
     (text(user.email) ? readableEmailName(text(user.email)!) : undefined);
 
   const role = text(user.role) ?? null;
-  const isFounder = user.isFounder === true || user.is_founder === true;
-  const isAdmin = user.isAdmin === true || user.is_admin === true;
-  const canWriteFinance = isFounder || isAdmin || role === "founder" || role === "admin" || role === "founder_admin";
-  return fullName ? { name: fullName, initials: initialsFor(fullName), role, canWriteFinance } : null;
+  const permissions=normaliseViewerPermissions(user,role);
+  return fullName ? { name: fullName, initials: initialsFor(fullName), role, ...permissions } : null;
 };
 
 export function useDataRoomViewer() {

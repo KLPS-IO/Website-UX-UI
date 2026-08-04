@@ -41,7 +41,7 @@ test("VAT ledger retains both working exports and adds a distinct founder-only m
   const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
   assert.match(page,/exportVatCsv\(filteredRows\)/);assert.match(page,/exportVatXlsx\(filteredRows,selected\)/);
   assert.match(page,/>CSV<\/button>/);assert.match(page,/>XLSX<\/button>/);assert.match(page,/>MTD Accounting Export<\/button>/);
-  assert.match(page,/viewer\?\.role==="founder_admin"/);assert.match(page,/setMtdExportOpen\(true\)/);
+  assert.match(page,/viewer\?\.isFounderAdmin/);assert.match(page,/setMtdExportOpen\(true\)/);
 });
 
 test("modal uses all approved endpoints, expected version, fingerprint, conflict refetch and no browser mapping storage",()=>{
