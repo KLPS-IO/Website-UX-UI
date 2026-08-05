@@ -73,7 +73,9 @@ test("Funnel OS social connections use the authenticated backend and expose no s
   assert.match(connections,/Future provider approval/);
   assert.match(connections,/Unavailable until separately approved and activated/);
   assert.match(connections,/TikTok identity only\. Publishing is not enabled/);
-  assert.match(connections,/X identity only\. Publishing is not enabled/);
+  assert.match(connections,/X account identity connected\. Publishing is not enabled/);
+  assert.match(connections,/tweet\.read/);
+  assert.match(connections,/does not retrieve or store posts, timelines or analytics/);
   assert.match(connections,/Setup required/);
   assert.match(pages,/<SocialConnections \/>/);
   assert.doesNotMatch(connections,/client_secret|access_token|refresh_token/i);
@@ -96,7 +98,7 @@ test("Meta reviewer UI is limited to isolated Facebook connection settings", () 
   assert.match(connections,/no managed Facebook Page was discovered/);
   assert.match(connections,/No linked Instagram Professional account was found/);
   assert.match(connections,/Publishing is not enabled/);
-  assert.doesNotMatch(connections,/posts|messages|comments|followers|insights/i);
+  assert.doesNotMatch(connections,/messages|comments|followers|insights/i);
 });
 
 test("Instagram Professional is represented once as a Meta-discovered asset", () => {
