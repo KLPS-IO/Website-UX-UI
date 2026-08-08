@@ -1,4 +1,4 @@
-import type { AccountingExportConfig,AccountingExportValidation,PaymentMappingKey } from "../types/accounting-export.ts";
+import type { AccountingExportConfig,AccountingExportValidation,ManualAdjustment,PaymentMappingKey } from "../types/accounting-export.ts";
 import type { VatPeriod } from "../types/vat-ledger.ts";
 
 export const paymentLabels:Record<PaymentMappingKey,string>={founder_director_funded:"Founder/director funded",paypal:"PayPal",personal_credit_card:"Personal credit card",company_credit_card:"Company credit card",business_bank:"Business bank",other:"Other"};
@@ -10,5 +10,6 @@ export const blockingReasonCopy=(reason:string)=>{
 export const configStateCopy=(config:AccountingExportConfig|null)=>!config?"Configuration not loaded":config.source==="database"?(config.confirmed?"Confirmed founder configuration":"Draft founder configuration — export generation is disabled until confirmed"):config.source==="environment"?"Legacy environment configuration":"No accounting mappings configured";
 export const canGenerateAccountingExport=(config:AccountingExportConfig|null,validation:AccountingExportValidation|null,stale:boolean)=>Boolean(config&&validation&&!stale&&validation.blocked_row_count===0&&validation.source_ledger_fingerprint&&validation.mapping_config_source===config.source&&validation.mapping_config_version===config.version&&validation.mapping_config_confirmed===config.confirmed&&(config.source==="environment"||(config.source==="database"&&config.confirmed)));
 export const safeAccountingExportFilename=(period:VatPeriod|undefined)=>`KLPS-MTD-accounting-export-${period?.start_date?.slice(0,10)||"period-start"}-to-${period?.end_date?.slice(0,10)||"period-end"}-quickfile.csv`;
-export const shortReference=(value:string)=>value.length>12?`${value.slice(0,8)}…${value.slice(-4)}`:value;
+export const shortReference=(value:string|null|undefined)=>value?(value.length>12?`${value.slice(0,8)}…${value.slice(-4)}`:value):"Not recorded";
+export const manualAdjustmentParentReference=(item:ManualAdjustment)=>item.parent_expense_id||item.expense_id||null;
 export const cleanMappings=(rows:Array<{key:string;value:string}>)=>Object.fromEntries(rows.map(({key,value})=>[key.trim(),value.trim()]).filter(([key,value])=>key&&value));

@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { blockingReasonCopy,canGenerateAccountingExport,cleanMappings,configStateCopy,safeAccountingExportFilename } from "./accounting-export.ts";
+import { blockingReasonCopy,canGenerateAccountingExport,cleanMappings,configStateCopy,manualAdjustmentParentReference,safeAccountingExportFilename,shortReference } from "./accounting-export.ts";
 import type { AccountingExportConfig,AccountingExportValidation } from "../types/accounting-export.ts";
 
 const config=(source:AccountingExportConfig["source"],confirmed:boolean,version=2):AccountingExportConfig=>({export_type:"mtd_accounting",profile:"quickfile_purchase_csv_v1",category_nominal_codes:{Software:"7001"},payment_account_nominal_codes:{paypal:"1201"},source,confirmed,confirmed_at:confirmed?"2026-08-04T12:00:00Z":null,updated_at:"2026-08-04T12:00:00Z",version});
@@ -42,6 +42,12 @@ test("VAT ledger retains both working exports and adds a distinct founder-only m
   assert.match(page,/exportVatCsv\(filteredRows\)/);assert.match(page,/exportVatXlsx\(\s*filteredRows,\s*selected/);
   assert.match(page,/CSV\s*<\/button>/);assert.match(page,/XLSX\s*<\/button>/);assert.match(page,/MTD Accounting Export\s*<\/button>/);
   assert.match(page,/viewer\?\.isFounderAdmin/);assert.match(page,/setMtdExportOpen\(true\)/);
+});
+test("production-shaped manual adjustments use parent_expense_id without crashing",()=>{
+  const item={adjustment_id:"047be47c-8f35-402a-b004-c90c3fb9b1e3",parent_expense_id:"84e3f40c-1d38-40d8-a496-643b6f4d7afe",reason:"Reviewed partial refund"};
+  assert.equal(manualAdjustmentParentReference(item),item.parent_expense_id);
+  assert.equal(shortReference(manualAdjustmentParentReference(item)),"84e3f40c…7afe");
+  assert.equal(shortReference(undefined),"Not recorded");
 });
 
 test("modal uses all approved endpoints, expected version, fingerprint, conflict refetch and no browser mapping storage",()=>{

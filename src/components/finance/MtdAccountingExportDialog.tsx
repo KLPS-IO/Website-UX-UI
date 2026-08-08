@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Download, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ApiError } from "@/lib/authenticated-api";
-import { blockingReasonCopy, canGenerateAccountingExport, cleanMappings, configStateCopy, paymentLabels, safeAccountingExportFilename, shortReference } from "@/lib/accounting-export";
+import { blockingReasonCopy, canGenerateAccountingExport, cleanMappings, configStateCopy, manualAdjustmentParentReference, paymentLabels, safeAccountingExportFilename, shortReference } from "@/lib/accounting-export";
 import { accountingExportRepository } from "@/repositories/accountingExportRepository";
 import { PAYMENT_MAPPING_KEYS, QUICKFILE_PURCHASE_PROFILE, type AccountingExportConfig, type AccountingExportValidation } from "@/types/accounting-export";
 import type { VatLedgerRow, VatPeriod } from "@/types/vat-ledger";
@@ -31,7 +31,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
   const periodCategories = useMemo(() => [...new Set(rows.map((row) => row.category).filter(Boolean))], [rows]);
   const periodCategoriesRef = useRef(periodCategories);
   periodCategoriesRef.current = periodCategories;
-  const ledgerVersion = useMemo(() => rows.map((row) => `${row.id}:${row.updated_at}:${row.vat_review_status}:${row.evidence_status}:${row.evidence_files.map((item) => item.id).join(",")}:${(row.adjustments ?? []).map((item) => `${item.id}:${item.review_status}:${item.evidence_files.map((file) => file.id).join(",")}`).join(";")}`).join("|"), [rows]);
+  const ledgerVersion = useMemo(() => rows.map((row) => `${row.id}:${row.updated_at}:${row.vat_review_status}:${row.evidence_status}:${(row.evidence_files ?? []).map((item) => item.id).join(",")}:${(row.adjustments ?? []).map((item) => `${item.id}:${item.review_status}:${(item.evidence_files ?? []).map((file) => file.id).join(",")}`).join(";")}`).join("|"), [rows]);
   const previousLedgerVersion = useRef(ledgerVersion);
   const hydrate = useCallback((next: AccountingExportConfig) => {
     setConfig(next);
@@ -406,7 +406,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
                 <strong>{item.reference || item.supplier_reference || shortReference(item.adjustment_id)}</strong>
                 {(item.amount ?? item.gbp_gross_amount) != null && <span> · £{String(item.amount ?? item.gbp_gross_amount)}</span>}
                 {item.adjustment_date && <span> · {safeApiDateValue(item.adjustment_date)}</span>}
-                <p>Parent transaction {shortReference(item.expense_id)}. This must be entered or reviewed separately as a purchase credit/refund in QuickFile.</p>
+                <p>Parent transaction {shortReference(manualAdjustmentParentReference(item))}. This must be entered or reviewed separately as a purchase credit/refund in QuickFile.</p>
                 <p className="text-muted-foreground">{item.reason}</p>
               </div>
             ))}

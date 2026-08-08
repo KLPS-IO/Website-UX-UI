@@ -7,7 +7,7 @@ export type AccountingExportConfig={
   source:"database"|"environment"|"none";confirmed:boolean;confirmed_at:string|null;updated_at:string|null;version:number;
 };
 export type AccountingExportConfigInput={profile:typeof QUICKFILE_PURCHASE_PROFILE;category_nominal_codes:Record<string,string>;payment_account_nominal_codes:Partial<Record<PaymentMappingKey,string>>;confirm:boolean;expected_version:number;change_reason:string};
-export type ManualAdjustment={adjustment_id:string;expense_id:string;reason:string;amount?:string|number|null;gbp_gross_amount?:string|number|null;adjustment_date?:string|null;reference?:string|null;supplier_reference?:string|null};
+export type ManualAdjustment={adjustment_id:string;parent_expense_id:string;expense_id?:string|null;reason:string;amount?:string|number|null;gbp_gross_amount?:string|number|null;adjustment_date?:string|null;reference?:string|null;supplier_reference?:string|null};
 export type AccountingExportValidation={
   export_type:"mtd_accounting";profile:typeof QUICKFILE_PURCHASE_PROFILE;validation_mode:"dry_run";generated_at:string;
   vat_period:Record<string,unknown>;eligible_row_count:number;blocked_row_count:number;blocked_expense_ids:string[];
