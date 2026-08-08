@@ -130,4 +130,12 @@ test("VAT ledger exposes founder-only fixed expense and adjustment evidence targ
   assert.doesNotMatch(dialog,/deleteEverywhere/);
   assert.match(dialog,/result\.evidence_reused[\s\S]*evidenceService\.update/);assert.match(dialog,/Completed metadata during VAT evidence reuse/);
   assert.match(dialog,/linkedDetails\[item\.id\]\.description/);assert.match(dialog,/Its evidence details were saved/);
+  assert.match(dialog,/showEvidenceEditor/);assert.match(dialog,/Add another document/);assert.match(dialog,/Review the canonical documents linked to this transaction/);
+});
+
+test("VAT editing exposes period conflicts and percentage-entry mistakes",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  assert.match(page,/form\.vat_period_id !== suggestedPeriod\.id/);assert.match(page,/Replace selected period with suggestion/);
+  assert.match(page,/explicitly selected VAT period does not match the effective tax point/);
+  assert.match(page,/Entered rate is \{form\.vat_rate\}%/);assert.match(page,/Enter 20 for a 20% VAT rate/);
 });

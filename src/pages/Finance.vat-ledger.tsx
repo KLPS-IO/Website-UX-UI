@@ -109,6 +109,9 @@ export default function VatLedgerPage() {
   const selected = useMemo(() => periods.find((item) => item.id === period), [period, periods]);
   const filteredRows = useMemo(() => filterVatLedgerRows(rows, filters), [rows, filters]);
   const conversionWarning = foreignCurrencyWarning(form);
+  const enteredVatRate=Number(form.vat_rate),gbpNet=Number(form.gbp_net_amount),gbpVat=Number(form.gbp_vat_amount);
+  const impliedVatRate=gbpNet>0&&gbpVat>=0&&Number.isFinite(gbpNet)&&Number.isFinite(gbpVat)?gbpVat/gbpNet*100:null;
+  const vatRateMismatch=impliedVatRate!==null&&Number.isFinite(enteredVatRate)&&Math.abs(enteredVatRate-impliedVatRate)>0.05;
   const resetForm = () => {
     setForm(emptyForm);
     setFormBaseline(emptyForm);
@@ -305,7 +308,7 @@ export default function VatLedgerPage() {
             <label className="text-sm font-medium">GBP net<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="GBP net" value={form.gbp_net_amount} onChange={(event) => update("gbp_net_amount", event.target.value)} /></label>
             <label className="text-sm font-medium">GBP VAT<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="GBP VAT" value={form.gbp_vat_amount} onChange={(event) => update("gbp_vat_amount", event.target.value)} /></label>
             <label className="text-sm font-medium">GBP gross<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder={calculatedGbpGross(form.gross_amount, form.exchange_rate) ? `Calculated ${calculatedGbpGross(form.gross_amount, form.exchange_rate)}` : "GBP gross"} value={form.gbp_gross_amount} onChange={(event) => update("gbp_gross_amount", event.target.value)} /></label>
-            <label className="text-sm font-medium">VAT rate<input inputMode="decimal" min="0" max="100" className={`${input} mt-1 w-full`} placeholder="VAT rate % (for example 20)" value={form.vat_rate} onChange={(event) => update("vat_rate", event.target.value)} /></label>
+            <label className="text-sm font-medium">VAT rate (%)<input inputMode="decimal" min="0" max="100" className={`${input} mt-1 w-full`} placeholder="For example 20" value={form.vat_rate} onChange={(event) => update("vat_rate", event.target.value)} />{vatRateMismatch&&<span className="mt-1 block text-xs font-normal leading-4 text-brand-coral">Entered rate is {form.vat_rate}%, but GBP VAT and net amounts imply approximately {impliedVatRate?.toFixed(2)}%. Enter 20 for a 20% VAT rate.</span>}</label>
             <label className="text-sm font-medium">VAT treatment<select className={`${input} mt-1 w-full`} value={form.vat_treatment} onChange={(event) => update("vat_treatment", event.target.value)}>
               {treatments.map((value) => (
                 <option value={value} key={value}>
@@ -345,11 +348,12 @@ export default function VatLedgerPage() {
             ) : suggestedPeriod ? (
               <p>
                 Suggested VAT period: <strong>{formatVatPeriodLabel(suggestedPeriod)}</strong>. This is date-derived and not yet reviewed.{" "}
-                {!form.vat_period_id && (
+                {form.vat_period_id !== suggestedPeriod.id && (
                   <button type="button" className="ml-2 underline" onClick={() => update("vat_period_id", suggestedPeriod.id)}>
-                    Use suggestion
+                    Replace selected period with suggestion
                   </button>
                 )}
+                {form.vat_period_id && form.vat_period_id !== suggestedPeriod.id && <span className="mt-1 block text-brand-coral">The explicitly selected VAT period does not match the effective tax point.</span>}
               </p>
             ) : effectiveTaxPointDate ? (
               <p>No VAT period matches this tax-point date.</p>

@@ -71,6 +71,7 @@ export function VatEvidenceUploadDialog({
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
   const [editingEvidenceId,setEditingEvidenceId]=useState<string|null>(null);
+  const [addingDocument,setAddingDocument]=useState(false);
   const [linkedFiles,setLinkedFiles]=useState<VatEvidenceFile[]>([]);
   const [linkedDetails,setLinkedDetails]=useState<Record<string,EvidenceItem>>({});
   useEffect(() => {
@@ -88,6 +89,7 @@ export function VatEvidenceUploadDialog({
     setError("");
     setMessage("");
     setLinkedFiles(target.evidence);
+    setAddingDocument(target.evidence.length===0);
     let current=true;
     void Promise.all(target.evidence.map(item=>evidenceService.get(item.id))).then(items=>{
       if(current)setLinkedDetails(Object.fromEntries(items.map(item=>[item.id,item])));
@@ -138,6 +140,7 @@ export function VatEvidenceUploadDialog({
         : result.evidence;
       setLinkedDetails(current=>({...current,[savedEvidence.id]:savedEvidence}));
       setLinkedFiles(current=>current.some(item=>item.id===savedEvidence.id)?current:[...current,{id:savedEvidence.id,filename:savedEvidence.originalFilename,type:savedEvidence.vatEvidenceType}]);
+      setAddingDocument(false);setFile(null);setPurpose("");setTitle("");setNotes("");
       setMessage(
         result.duplicate_link
           ? "This document was already linked. Its evidence details were saved."
@@ -168,6 +171,7 @@ export function VatEvidenceUploadDialog({
     setBusy(true);setError("");setMessage("");
     try{
       const item=await evidenceService.get(id);
+      setAddingDocument(false);
       setLinkedDetails(current=>({...current,[id]:item}));
       const storedPurpose=item.vatEvidenceType??"";
       setEditingEvidenceId(id);
@@ -215,7 +219,7 @@ export function VatEvidenceUploadDialog({
       const linkId=item?.links?.find(link=>link.entity_type===target.entityType&&link.entity_id===target.id)?.id;
       if(!linkId)throw new Error("The evidence link could not be found. Refresh the ledger and try again.");
       const result=await evidenceService.unlink(id,linkId);
-      setLinkedFiles(current=>current.filter(item=>item.id!==id));
+      setLinkedFiles(current=>{const next=current.filter(item=>item.id!==id);if(!next.length)setAddingDocument(true);return next;});
       setLinkedDetails(current=>{const next={...current};delete next[id];return next;});
       if(editingEvidenceId===id)cancelEdit();
       setMessage(result.evidence_deleted?"Evidence removed and the unlinked document was deleted.":"Evidence unlinked from this transaction.");
@@ -223,6 +227,7 @@ export function VatEvidenceUploadDialog({
     }catch(reason){setError(documentApiErrorMessage(reason));}
     finally{setBusy(false);}
   };
+  const showEvidenceEditor=Boolean(editingEvidenceId)||addingDocument||linkedFiles.length===0;
   return (
     <Dialog
       open={Boolean(target)}
@@ -238,7 +243,7 @@ export function VatEvidenceUploadDialog({
               : "Upload evidence for this expense"}
           </DialogTitle>
           <DialogDescription>
-            {editingEvidenceId?"Update the canonical details for this linked document.":"The document will be stored privately in Financial OS and linked to this transaction."}
+            {editingEvidenceId?"Update the canonical details for this linked document.":showEvidenceEditor?"The document will be stored privately in Financial OS and linked to this transaction.":"Review the canonical documents linked to this transaction."}
           </DialogDescription>
         </DialogHeader>
         {target && (
@@ -289,7 +294,8 @@ export function VatEvidenceUploadDialog({
                 {message}
               </div>
             )}
-            <div className="grid gap-3 sm:grid-cols-2">
+            {showEvidenceEditor&&<div className="grid gap-3 rounded-lg border border-border bg-muted/20 p-4 sm:grid-cols-2">
+              <h3 className="text-sm font-semibold sm:col-span-2">{editingEvidenceId?"Edit linked evidence details":"Add another document"}</h3>
               <label className="text-sm">
                 Evidence purpose *
                 <select
@@ -349,10 +355,10 @@ export function VatEvidenceUploadDialog({
                   onChange={(event) => setNotes(event.target.value)}
                 />
               </label>
-            </div>
+            </div>}
             {linkedFiles.length > 0 && (
               <section>
-                <h3 className="text-sm font-semibold">Linked evidence</h3>
+                <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-sm font-semibold">Linked evidence</h3>{!showEvidenceEditor&&<button type="button" className={control} onClick={()=>setAddingDocument(true)}><Upload className="mr-2 inline h-4 w-4" />Add another document</button>}</div>
                 <div className="mt-2 space-y-2">
                   {linkedFiles.map((item) => (
                     <div
@@ -374,7 +380,7 @@ export function VatEvidenceUploadDialog({
               <button type="button" className={`${control} w-full sm:w-auto`} onClick={editingEvidenceId?cancelEdit:onClose}>
                 {editingEvidenceId?"Cancel edit":"Close"}
               </button>
-              <button
+              {showEvidenceEditor&&<button
                 type="button"
                 disabled={busy || !purpose || !title.trim() || (!editingEvidenceId&&!file)}
                 className={`${uploadAction} w-full sm:w-auto`}
@@ -382,7 +388,7 @@ export function VatEvidenceUploadDialog({
               >
                 <Upload className="mr-2 inline h-4 w-4" />
                 {busy ? (editingEvidenceId?"Saving…":"Uploading…") : editingEvidenceId?"Save details":"Upload and link"}
-              </button>
+              </button>}
             </div>
           </>
         )}
