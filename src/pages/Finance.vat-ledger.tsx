@@ -9,13 +9,14 @@ import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-expo
 import type { VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
-import { allowedVatReviewStatuses, authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
+import { allowedVatReviewStatuses, authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
 
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
 const treatments = ["pending_review", "standard_rated", "reduced_rated", "zero_rated", "exempt", "outside_scope", "no_vat_shown", "reverse_charge_review_required", "import_vat_review_required", "blocked_vat", "partially_recoverable", "personal_non_business"];
 const human = (value: string | null | undefined) => (value ?? "Not recorded").replaceAll("_", " ").replace(/^./, (character) => character.toUpperCase());
 type FormState = {
+  transaction_date: string;
   payment_date: string;
   invoice_date: string;
   supplier_name: string;
@@ -33,6 +34,7 @@ type FormState = {
   vat_period_id: string;
 };
 const emptyForm: FormState = {
+  transaction_date: "",
   payment_date: "",
   invoice_date: "",
   supplier_name: "",
@@ -82,17 +84,18 @@ export default function VatLedgerPage() {
   useEffect(() => {
     void load();
   }, [load]);
-  const taxPoint = form.invoice_date || form.payment_date;
+  const effectiveTaxPointDate = resolveEffectiveTaxPointDate(form);
   useEffect(() => {
     let current = true;
-    if (!taxPoint) {
+    if (!effectiveTaxPointDate) {
       setSuggestion(null);
       return () => {
         current = false;
       };
     }
+    setSuggestion(null);
     void vatLedgerRepository
-      .suggestPeriod(taxPoint)
+      .suggestPeriod(effectiveTaxPointDate)
       .then((result) => {
         if (current) setSuggestion(result.vat_period);
       })
@@ -102,7 +105,7 @@ export default function VatLedgerPage() {
     return () => {
       current = false;
     };
-  }, [taxPoint]);
+  }, [effectiveTaxPointDate]);
   const selected = useMemo(() => periods.find((item) => item.id === period), [period, periods]);
   const filteredRows = useMemo(() => filterVatLedgerRows(rows, filters), [rows, filters]);
   const conversionWarning = foreignCurrencyWarning(form);
@@ -136,7 +139,6 @@ export default function VatLedgerPage() {
       const payload = {
         ...form,
         vat_rate: vatRatePercentToRatio(form.vat_rate),
-        transaction_date: form.payment_date,
         gbp_gross_amount: gbpGross || null,
         vat_period_id: form.vat_period_id || null,
         change_reason: editingId ? "Founder edited VAT ledger record" : "Created through VAT fast entry",
@@ -155,7 +157,8 @@ export default function VatLedgerPage() {
   };
   const edit = (row: VatLedgerRow) => {
     const saved = {
-      payment_date: safeApiDateValue(row.payment_date ?? row.transaction_date),
+      transaction_date: safeApiDateValue(row.transaction_date),
+      payment_date: safeApiDateValue(row.payment_date),
       invoice_date: safeApiDateValue(row.invoice_date),
       supplier_name: row.supplier_name ?? "",
       gross_amount: String(row.gross_amount ?? ""),
@@ -216,6 +219,7 @@ export default function VatLedgerPage() {
     evidence: adjustment.evidence_files,
   });
   const suggestedPeriod = suggestion?.id ? periods.find((item) => item.id === suggestion.id) : null;
+  const displayedEffectiveTaxPointDate = suggestion?.effective_tax_point_date ?? effectiveTaxPointDate;
 
   return (
     <div>
@@ -289,8 +293,10 @@ export default function VatLedgerPage() {
             </div>
           )}
           <form onSubmit={save} className="grid items-start gap-3 md:grid-cols-3 xl:grid-cols-5">
-            <label className="text-sm font-medium">Tax point / transaction date<input required type="date" className={`${input} mt-1 w-full`} value={form.payment_date} onChange={(event) => update("payment_date", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Date the expense occurred and used for VAT-period allocation.</span></label>
+            <label className="text-sm font-medium">Transaction date<input required type="date" className={`${input} mt-1 w-full`} value={form.transaction_date} onChange={(event) => update("transaction_date", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Date the expense occurred.</span></label>
             <label className="text-sm font-medium">Invoice date<input type="date" className={`${input} mt-1 w-full`} value={form.invoice_date} onChange={(event) => update("invoice_date", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Date shown on the supplier invoice.</span></label>
+            <label className="text-sm font-medium">Payment date<input type="date" className={`${input} mt-1 w-full`} value={form.payment_date} onChange={(event) => update("payment_date", event.target.value)} /></label>
+            <div className="text-sm font-medium">Effective tax point<output className={`${input} mt-1 block min-h-10 w-full bg-muted text-muted-foreground`}>{displayedEffectiveTaxPointDate || "Not available"}</output><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Calculated from invoice date, otherwise transaction date, otherwise payment date.</span></div>
             <label className="text-sm font-medium">Supplier<input required className={`${input} mt-1 w-full`} placeholder="Supplier" value={form.supplier_name} onChange={(event) => update("supplier_name", event.target.value)} /></label>
             <label className="text-sm font-medium">Gross amount<input required inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="Foreign or gross amount" value={form.gross_amount} onChange={(event) => update("gross_amount", event.target.value)} /></label>
             <label className="text-sm font-medium">Transaction description<input className={`${input} mt-1 w-full`} placeholder="Short description" value={form.description} onChange={(event) => update("description", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Short description shown in the VAT ledger and accounting export.</span></label>
@@ -345,7 +351,7 @@ export default function VatLedgerPage() {
                   </button>
                 )}
               </p>
-            ) : taxPoint ? (
+            ) : effectiveTaxPointDate ? (
               <p>No VAT period matches this tax-point date.</p>
             ) : null}
             {conversionWarning && <p className="mt-1 text-brand-coral">{conversionWarning} Pending saves remain available, but review cannot be completed.</p>}

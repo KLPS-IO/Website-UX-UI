@@ -13,5 +13,5 @@ export type VatLedgerRow={
 export type VatWarningDetail={code:string;severity:"critical"|"review_required"|"advisory";message:string};
 export type VatEvidenceFile={id:string;filename:string|null;type:string|null;verification_status?:string|null;document_status?:string|null};
 export type VatExpenseAdjustment={id:string;adjustment_type:string|null;adjustment_date:string|null;gross_amount:MoneyDto;gbp_gross_amount:MoneyDto;currency:string|null;supplier_reference:string|null;reason:string|null;review_status:string|null;parent_order_reference:string|null;parent_invoice_number:string|null;evidence_files:VatEvidenceFile[]};
-export type HistoricalExpenseInput=Partial<VatLedgerRow>&{payment_date:string;supplier_name:string;gross_amount:string;change_reason?:string};
+export type HistoricalExpenseInput=Partial<VatLedgerRow>&{transaction_date:string;supplier_name:string;gross_amount:string;change_reason?:string};
 export type VatPeriodSuggestion=(VatPeriod&{vat_period_source:"derived";effective_tax_point_date:string})|{id:null;vat_period_source:"conflict";effective_tax_point_date:string;matching_period_ids:string[]};

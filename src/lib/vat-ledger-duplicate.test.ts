@@ -31,14 +31,15 @@ test("duplicate payload normalises an API timestamp without timezone conversion"
 
   const payload = buildDuplicateExpensePayload(source);
 
-  assert.equal(payload.payment_date, "2099-02-15");
+  assert.equal(payload.transaction_date, "2099-02-15");
+  assert.equal(payload.payment_date, undefined);
   assert.deepEqual(source, before);
 });
 
 test("duplicate payload preserves the timestamp's leading date across an offset", () => {
   const source = sourceExpense("2099-02-15T23:30:00-05:00");
 
-  assert.equal(buildDuplicateExpensePayload(source).payment_date, "2099-02-15");
+  assert.equal(buildDuplicateExpensePayload(source).transaction_date, "2099-02-15");
 });
 
 test("duplicate payload preserves an already-normalised date and expected fields only", () => {
@@ -47,7 +48,7 @@ test("duplicate payload preserves an already-normalised date and expected fields
   const payload = buildDuplicateExpensePayload(source);
 
   assert.deepEqual(payload, {
-    payment_date: "2099-02-15",
+    transaction_date: "2099-02-15",
     supplier_name: "Example supplier",
     gross_amount: "12.00",
     description: "Prototype materials (copy)",
@@ -62,5 +63,13 @@ test("duplicate payload handles a missing source date according to the required 
   const source = sourceExpense("2099-02-15");
   source.transaction_date = null;
 
-  assert.equal(buildDuplicateExpensePayload(source).payment_date, "");
+  assert.equal(buildDuplicateExpensePayload(source).transaction_date, "");
+});
+
+test("duplicate payload preserves a distinct payment date without copying either date",()=>{
+  const source=sourceExpense("2099-02-15");
+  source.payment_date="2099-02-20";
+  const payload=buildDuplicateExpensePayload(source);
+  assert.equal(payload.transaction_date,"2099-02-15");
+  assert.equal(payload.payment_date,"2099-02-20");
 });

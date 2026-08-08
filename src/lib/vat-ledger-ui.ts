@@ -2,11 +2,13 @@ import { formatDateOnlyUk } from "./safe-date.ts";
 import type { VatLedgerRow, VatPeriod, VatWarningDetail } from "../types/vat-ledger.ts";
 
 export type VatLedgerFilters = { supplier: string; reviewStatus: string; evidenceStatus: string };
-export type VatEntryDraft={payment_date:string;invoice_date:string;supplier_name:string;gross_amount:string;description:string;currency:string;exchange_rate:string;gbp_net_amount:string;gbp_vat_amount:string;gbp_gross_amount:string;vat_rate:string;notes:string;vat_treatment:string;vat_review_status:string;vat_period_id:string};
+export type VatEntryDraft={transaction_date:string;payment_date:string;invoice_date:string;supplier_name:string;gross_amount:string;description:string;currency:string;exchange_rate:string;gbp_net_amount:string;gbp_vat_amount:string;gbp_gross_amount:string;vat_rate:string;notes:string;vat_treatment:string;vat_review_status:string;vat_period_id:string};
 
-const EMPTY_VAT_ENTRY:VatEntryDraft={payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
+const EMPTY_VAT_ENTRY:VatEntryDraft={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
 
 export const hasUnsavedVatEntry=(entry:VatEntryDraft)=>Object.keys(EMPTY_VAT_ENTRY).some(key=>entry[key as keyof VatEntryDraft]!==EMPTY_VAT_ENTRY[key as keyof VatEntryDraft]);
+
+export const resolveEffectiveTaxPointDate=(input:Pick<VatEntryDraft,"invoice_date"|"transaction_date"|"payment_date">)=>input.invoice_date||input.transaction_date||input.payment_date;
 
 export const EVIDENCE_FILTERS = ["no_evidence","payment_evidence_only","supplier_document_only","supplier_document_plus_payment_evidence","vat_invoice_present","refund_or_credit_adjustment_present","requires_review"] as const;
 
