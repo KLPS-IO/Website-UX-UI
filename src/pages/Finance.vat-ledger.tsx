@@ -14,7 +14,7 @@ import { authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, f
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
 const treatments = ["pending_review", "standard_rated", "reduced_rated", "zero_rated", "exempt", "outside_scope", "no_vat_shown", "reverse_charge_review_required", "import_vat_review_required", "blocked_vat", "partially_recoverable", "personal_non_business"];
-const human = (value: string) => value.replaceAll("_", " ").replace(/^./, (character) => character.toUpperCase());
+const human = (value: string | null | undefined) => (value ?? "Not recorded").replaceAll("_", " ").replace(/^./, (character) => character.toUpperCase());
 type FormState = {
   payment_date: string;
   invoice_date: string;
@@ -182,7 +182,7 @@ export default function VatLedgerPage() {
     }
   };
   const archive = async (row: VatLedgerRow) => {
-    if (!window.confirm(`Archive ${row.name}?`)) return;
+    if (!window.confirm(`Archive ${row.name ?? "this VAT record"}?`)) return;
     try {
       await vatLedgerRepository.archive(row.id, "Archived from VAT ledger");
       await load();
@@ -365,7 +365,7 @@ export default function VatLedgerPage() {
                   <tr key={row.id} className="border-t border-border">
                     <td className="p-2">{safeApiDateValue(row.effective_tax_point_date ?? row.transaction_date) || "—"}</td>
                     <td className="p-2">{row.supplier_name ?? "—"}</td>
-                    <td className="p-2">{row.description ?? row.name}</td>
+                    <td className="p-2">{row.description ?? row.name ?? "Not recorded"}</td>
                     <td className="p-2">{String(row.gbp_net_amount ?? row.net_amount ?? "—")}</td>
                     <td className="p-2">{String(row.gbp_vat_amount ?? row.vat_amount ?? "—")}</td>
                     <td className="p-2">{String(row.gbp_gross_amount ?? row.gross_amount ?? "—")}</td>
@@ -376,7 +376,7 @@ export default function VatLedgerPage() {
                     </td>
                     <td className="p-2">{human(row.evidence_coverage ?? "requires_review")}</td>
                     <td className="p-2">{human(row.vat_review_status ?? "pending_review")}</td>
-                    <td className="p-2 text-brand-coral">{row.warnings.length ? row.warnings.map((warning) => <div key={warning}>{warningCopy(warning)}</div>) : "—"}</td>
+                    <td className="p-2 text-brand-coral">{row.warnings?.length ? row.warnings.map((warning) => <div key={warning}>{warningCopy(warning)}</div>) : "—"}</td>
                     <td className="p-2">
                       {viewer?.canWriteFinance && (
                         <div className="flex flex-wrap gap-1">
@@ -394,7 +394,7 @@ export default function VatLedgerPage() {
                               Upload evidence
                             </button>
                           )}
-                          {viewer.isFounderAdmin && row.evidence_files.length > 0 && (
+                          {viewer.isFounderAdmin && row.evidence_files?.length > 0 && (
                             <button type="button" className={input} onClick={() => setEvidenceTarget(expenseEvidenceTarget(row))}>
                               View evidence
                             </button>
@@ -410,7 +410,7 @@ export default function VatLedgerPage() {
                                   <button type="button" className={input} onClick={() => setEvidenceTarget(adjustmentEvidenceTarget(row, adjustment))}>
                                     Upload refund evidence
                                   </button>
-                                  {adjustment.evidence_files.length > 0 && (
+                                  {adjustment.evidence_files?.length > 0 && (
                                     <button type="button" className={input} onClick={() => setEvidenceTarget(adjustmentEvidenceTarget(row, adjustment))}>
                                       View refund evidence
                                     </button>
