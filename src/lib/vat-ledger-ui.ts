@@ -1,10 +1,10 @@
 import { formatDateOnlyUk } from "./safe-date.ts";
-import type { VatLedgerRow, VatPeriod } from "../types/vat-ledger.ts";
+import type { VatLedgerRow, VatPeriod, VatWarningDetail } from "../types/vat-ledger.ts";
 
 export type VatLedgerFilters = { supplier: string; reviewStatus: string; evidenceStatus: string };
-export type VatEntryDraft={payment_date:string;invoice_date:string;supplier_name:string;gross_amount:string;description:string;currency:string;exchange_rate:string;gbp_net_amount:string;gbp_vat_amount:string;gbp_gross_amount:string;notes:string;vat_treatment:string;vat_review_status:string;vat_period_id:string};
+export type VatEntryDraft={payment_date:string;invoice_date:string;supplier_name:string;gross_amount:string;description:string;currency:string;exchange_rate:string;gbp_net_amount:string;gbp_vat_amount:string;gbp_gross_amount:string;vat_rate:string;notes:string;vat_treatment:string;vat_review_status:string;vat_period_id:string};
 
-const EMPTY_VAT_ENTRY:VatEntryDraft={payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
+const EMPTY_VAT_ENTRY:VatEntryDraft={payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
 
 export const hasUnsavedVatEntry=(entry:VatEntryDraft)=>Object.keys(EMPTY_VAT_ENTRY).some(key=>entry[key as keyof VatEntryDraft]!==EMPTY_VAT_ENTRY[key as keyof VatEntryDraft]);
 
@@ -48,3 +48,22 @@ export function calculatedGbpGross(grossAmount: unknown, exchangeRate: unknown):
 }
 
 export const warningCopy = (warning:string) => ({pending_vat_treatment:"VAT treatment has not been reviewed.",foreign_currency_without_conversion:"Foreign-currency conversion data is incomplete.",gross_net_vat_mismatch:"Net plus VAT does not match gross.",no_supplier_invoice:"Supplier invoice is missing.",payment_evidence_missing:"Payment evidence is missing.",vat_period_conflict:"The tax-point date matches more than one VAT period."}[warning] ?? warning.replaceAll("_"," "));
+export type VatReviewStatus="pending_review"|"in_review"|"ready_for_review"|"review_complete";
+export const allowedVatReviewStatuses=(current:string|null|undefined):VatReviewStatus[]=>current==="ready_for_review"||current==="review_complete"?["in_review","ready_for_review","review_complete"]:["pending_review","in_review","ready_for_review"];
+export const warningSeverityCopy=(severity:VatWarningDetail["severity"])=>severity==="critical"?"Critical":severity==="review_required"?"Review required":"Advisory";
+export const vatReviewNextAction=(row:Pick<VatLedgerRow,"vat_review_status"|"warning_details">)=>{
+  const issue=row.warning_details?.find(item=>item.severity==="critical")??row.warning_details?.find(item=>item.severity==="review_required");
+  if(issue)return issue.message;
+  if(row.vat_review_status==="ready_for_review")return"Accounting checks passed. Mark review complete after final review.";
+  if(row.vat_review_status==="review_complete")return"Review complete. Resolve advisories when practical.";
+  return"Complete the accounting fields and VAT invoice evidence, then move to Ready for review.";
+};
+export const vatSaveErrorMessage=(error:unknown)=>{
+  if(!error||typeof error!=="object"||!("code" in error)||(error as {code?:unknown}).code!=="vat_review_blocked")return error instanceof Error?error.message:"Expense could not be saved";
+  const payload=(error as {payload?:Record<string,unknown>}).payload;
+  const details=payload?.details;
+  const issues=details&&typeof details==="object"&&Array.isArray((details as {issues?:unknown}).issues)?(details as {issues:Array<{message?:unknown}>}).issues:[];
+  const messages=issues.map(issue=>typeof issue?.message==="string"?issue.message:"").filter(Boolean);
+  const heading=error instanceof Error?error.message:"VAT review status could not be changed";
+  return messages.length?`${heading}:\n${messages.map(message=>`- ${message}`).join("\n")}`:heading;
+};

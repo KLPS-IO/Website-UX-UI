@@ -10,6 +10,8 @@ const evidenceFile = (value: JsonRecord): VatEvidenceFile => ({
   id: typeof value.id === "string" ? value.id : "",
   filename: optionalString(value.filename),
   type: optionalString(value.type),
+  verification_status: optionalString(value.verification_status),
+  document_status: optionalString(value.document_status),
 });
 
 const adjustment = (value: JsonRecord): VatExpenseAdjustment => ({
@@ -49,6 +51,7 @@ export function normalizeVatLedgerRow(value: unknown): VatLedgerRow {
     evidence_files: records(source.evidence_files).map(evidenceFile),
     adjustments: records(source.adjustments).map(adjustment),
     warnings: strings(source.warnings),
+    warning_details: Array.isArray(source.warning_details) ? source.warning_details : [],
   } as VatLedgerRow;
 }
 

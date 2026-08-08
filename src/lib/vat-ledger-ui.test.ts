@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { formatDateOnlyUk } from "./safe-date.ts";
-import { authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, vatPeriodDisplay, warningCopy } from "./vat-ledger-ui.ts";
+import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, vatPeriodDisplay, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
 import type { VatLedgerRow } from "../types/vat-ledger.ts";
 
 const row=(overrides:Partial<VatLedgerRow>):VatLedgerRow=>({id:"1",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2025-05-08",currency:"GBP",net_amount:null,vat_amount:null,gross_amount:"10.00",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:[],notes:null,created_at:"",updated_at:"",...overrides});
@@ -49,9 +49,24 @@ test("successful mutation waits for authoritative ledger rows before replacing s
   assert.ok(stale.warnings.includes("foreign_currency_without_conversion"));
 });
 test("pending VAT warning has clear controlled copy",()=>assert.equal(warningCopy("pending_vat_treatment"),"VAT treatment has not been reviewed."));
+test("review-blocked API details are shown as actionable form messages",()=>{
+  const error=Object.assign(new Error("Cannot mark VAT review complete"),{code:"vat_review_blocked",payload:{details:{issues:[{code:"vat_rate_missing",severity:"critical",message:"VAT rate is required for this VAT treatment."},{code:"vat_period_unconfirmed",severity:"critical",message:"VAT period must be explicitly confirmed."}]}}});
+  assert.equal(vatSaveErrorMessage(error),"Cannot mark VAT review complete:\n- VAT rate is required for this VAT treatment.\n- VAT period must be explicitly confirmed.");
+});
+test("VAT review states expose only coherent next transitions",()=>{
+  assert.deepEqual(allowedVatReviewStatuses("pending_review"),["pending_review","in_review","ready_for_review"]);
+  assert.deepEqual(allowedVatReviewStatuses("in_review"),["pending_review","in_review","ready_for_review"]);
+  assert.deepEqual(allowedVatReviewStatuses("ready_for_review"),["in_review","ready_for_review","review_complete"]);
+  assert.deepEqual(allowedVatReviewStatuses("review_complete"),["in_review","ready_for_review","review_complete"]);
+});
+test("VAT table explains severity and the exact next action",()=>{
+  assert.equal(warningSeverityCopy("critical"),"Critical");assert.equal(warningSeverityCopy("review_required"),"Review required");assert.equal(warningSeverityCopy("advisory"),"Advisory");
+  assert.equal(vatReviewNextAction({vat_review_status:"ready_for_review",warning_details:[{code:"vat_rate_missing",severity:"critical",message:"VAT rate is required for this VAT treatment."}]}),"VAT rate is required for this VAT treatment.");
+  assert.match(vatReviewNextAction({vat_review_status:"ready_for_review",warning_details:[]}),/Mark review complete/);
+});
 test("derived-period rows are labelled without implying founder confirmation",()=>assert.deepEqual(vatPeriodDisplay({vat_period_start:"2025-05-08",vat_period_end:"2026-04-30",vat_period_source:"derived"}),{label:"8 May 2025 to 30 April 2026",detail:"Date-derived · not explicitly confirmed"}));
 test("entry dirtiness ignores controlled defaults and detects any unsaved field or selected period",()=>{
-  const empty={payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
+  const empty={payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
   assert.equal(hasUnsavedVatEntry(empty),false);
   assert.equal(hasUnsavedVatEntry({...empty,supplier_name:"IONOS"}),true);
   assert.equal(hasUnsavedVatEntry({...empty,vat_period_id:"period-id"}),true);

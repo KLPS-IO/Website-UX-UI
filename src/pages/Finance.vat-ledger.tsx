@@ -9,7 +9,7 @@ import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-expo
 import type { VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
-import { authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, warningCopy } from "@/lib/vat-ledger-ui";
+import { allowedVatReviewStatuses, authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
 
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
@@ -26,6 +26,7 @@ type FormState = {
   gbp_net_amount: string;
   gbp_vat_amount: string;
   gbp_gross_amount: string;
+  vat_rate: string;
   notes: string;
   vat_treatment: string;
   vat_review_status: string;
@@ -42,6 +43,7 @@ const emptyForm: FormState = {
   gbp_net_amount: "",
   gbp_vat_amount: "",
   gbp_gross_amount: "",
+  vat_rate: "",
   notes: "",
   vat_treatment: "pending_review",
   vat_review_status: "pending_review",
@@ -112,6 +114,7 @@ export default function VatLedgerPage() {
     setFormError("");
   };
   const dirty = JSON.stringify(form) !== JSON.stringify(formBaseline);
+  const formReviewStatuses = allowedVatReviewStatuses(formBaseline.vat_review_status);
   const closeForm = () => {
     if (dirty && !window.confirm("Close this unsaved entry? Nothing will be saved.")) return;
     resetForm();
@@ -146,7 +149,7 @@ export default function VatLedgerPage() {
       resetForm();
       setEntryOpen(false);
     } catch (e) {
-      setFormError(e instanceof Error ? e.message : "Expense could not be saved");
+      setFormError(vatSaveErrorMessage(e));
     }
   };
   const edit = (row: VatLedgerRow) => {
@@ -161,6 +164,7 @@ export default function VatLedgerPage() {
       gbp_net_amount: String(row.gbp_net_amount ?? ""),
       gbp_vat_amount: String(row.gbp_vat_amount ?? ""),
       gbp_gross_amount: String(row.gbp_gross_amount ?? ""),
+      vat_rate: String(row.vat_rate ?? ""),
       notes: row.notes ?? "",
       vat_treatment: row.vat_treatment ?? "pending_review",
       vat_review_status: row.vat_review_status ?? "pending_review",
@@ -279,7 +283,7 @@ export default function VatLedgerPage() {
       {viewer?.canWriteFinance && entryOpen && (
         <Surface className="mb-5">
           {formError && (
-            <div role="alert" className="mb-3 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+            <div role="alert" className="mb-3 whitespace-pre-line rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-900">
               {formError}
             </div>
           )}
@@ -294,6 +298,7 @@ export default function VatLedgerPage() {
             <input aria-label="GBP net" inputMode="decimal" className={input} placeholder="GBP net" value={form.gbp_net_amount} onChange={(event) => update("gbp_net_amount", event.target.value)} />
             <input aria-label="GBP VAT" inputMode="decimal" className={input} placeholder="GBP VAT" value={form.gbp_vat_amount} onChange={(event) => update("gbp_vat_amount", event.target.value)} />
             <input aria-label="GBP gross" inputMode="decimal" className={input} placeholder={calculatedGbpGross(form.gross_amount, form.exchange_rate) ? `Calculated ${calculatedGbpGross(form.gross_amount, form.exchange_rate)}` : "GBP gross"} value={form.gbp_gross_amount} onChange={(event) => update("gbp_gross_amount", event.target.value)} />
+            <input aria-label="VAT rate" inputMode="decimal" className={input} placeholder="VAT rate (for example 20)" value={form.vat_rate} onChange={(event) => update("vat_rate", event.target.value)} />
             <select aria-label="VAT treatment" className={input} value={form.vat_treatment} onChange={(event) => update("vat_treatment", event.target.value)}>
               {treatments.map((value) => (
                 <option value={value} key={value}>
@@ -302,7 +307,7 @@ export default function VatLedgerPage() {
               ))}
             </select>
             <select aria-label="Review status" className={input} value={form.vat_review_status} onChange={(event) => update("vat_review_status", event.target.value)}>
-              {reviewStatuses.map((value) => (
+              {formReviewStatuses.map((value) => (
                 <option value={value} key={value}>
                   {human(value)}
                 </option>
@@ -375,8 +380,8 @@ export default function VatLedgerPage() {
                       <span className="block text-xs text-muted-foreground">{periodDisplay.detail}</span>
                     </td>
                     <td className="p-2">{human(row.evidence_coverage ?? "requires_review")}</td>
-                    <td className="p-2">{human(row.vat_review_status ?? "pending_review")}</td>
-                    <td className="p-2 text-brand-coral">{row.warnings?.length ? row.warnings.map((warning) => <div key={warning}>{warningCopy(warning)}</div>) : "—"}</td>
+                    <td className="p-2"><span>{human(row.vat_review_status ?? "pending_review")}</span><span className="mt-1 block max-w-56 text-xs text-muted-foreground">Next: {vatReviewNextAction(row)}</span></td>
+                    <td className="p-2">{row.warning_details?.length ? row.warning_details.map((warning) => <div className={warning.severity==="critical"?"text-brand-coral":"text-muted-foreground"} key={warning.code}><strong>{warningSeverityCopy(warning.severity)}:</strong> {warning.message}</div>) : row.warnings?.length ? row.warnings.map((warning) => <div key={warning}>{warningCopy(warning)}</div>) : "—"}</td>
                     <td className="p-2">
                       {viewer?.canWriteFinance && (
                         <div className="flex flex-wrap gap-1">
