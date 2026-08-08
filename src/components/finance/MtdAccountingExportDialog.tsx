@@ -2,15 +2,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Download, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ApiError } from "@/lib/authenticated-api";
-import { blockingReasonCopy, canGenerateAccountingExport, cleanMappings, configStateCopy, paymentLabels, safeAccountingExportFilename, shortReference } from "@/lib/accounting-export";
+import { blockingReasonCopy, canGenerateAccountingExport, cleanMappings, configStateCopy, manualAdjustmentParentReference, paymentLabels, safeAccountingExportFilename, shortReference } from "@/lib/accounting-export";
 import { accountingExportRepository } from "@/repositories/accountingExportRepository";
 import { PAYMENT_MAPPING_KEYS, QUICKFILE_PURCHASE_PROFILE, type AccountingExportConfig, type AccountingExportValidation } from "@/types/accounting-export";
 import type { VatLedgerRow, VatPeriod } from "@/types/vat-ledger";
 import { formatVatPeriodLabel } from "@/lib/vat-ledger-ui";
 import { safeApiDateValue } from "@/lib/safe-date";
 
-const control = "rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50";
-const primary = "rounded-lg bg-brand-orange px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50";
+const control = "rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground shadow-sm transition hover:border-brand-orange/50 disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100";
+const primary = "rounded-lg border border-brand-orange bg-brand-orange px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-orange/90 disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100";
 type MappingRow = { key: string; value: string };
 const rowsFor = (map: Record<string, string>, categories: string[] = []) => [...new Set([...Object.keys(map), ...categories.filter(Boolean)])].sort().map((key) => ({ key, value: map[key] ?? "" }));
 const errorCopy = (error: unknown) => (error instanceof ApiError ? (error.status === 401 || error.status === 403 ? "Only a founder-admin can use MTD Accounting Export." : error.code === "accounting_export_source_changed" ? "Financial records changed after validation. Validate the export again." : error.code === "accounting_export_config_unconfirmed" ? "Confirm the founder-reviewed mappings before downloading." : error.code === "accounting_export_config_missing" ? "Accounting mappings must be configured before downloading." : error.message) : error instanceof Error ? error.message : "The accounting export request failed.");
@@ -31,7 +31,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
   const periodCategories = useMemo(() => [...new Set(rows.map((row) => row.category).filter(Boolean))], [rows]);
   const periodCategoriesRef = useRef(periodCategories);
   periodCategoriesRef.current = periodCategories;
-  const ledgerVersion = useMemo(() => rows.map((row) => `${row.id}:${row.updated_at}:${row.vat_review_status}:${row.evidence_status}:${row.evidence_files.map((item) => item.id).join(",")}:${(row.adjustments ?? []).map((item) => `${item.id}:${item.review_status}:${item.evidence_files.map((file) => file.id).join(",")}`).join(";")}`).join("|"), [rows]);
+  const ledgerVersion = useMemo(() => rows.map((row) => `${row.id}:${row.updated_at}:${row.vat_review_status}:${row.evidence_status}:${(row.evidence_files ?? []).map((item) => item.id).join(",")}:${(row.adjustments ?? []).map((item) => `${item.id}:${item.review_status}:${(item.evidence_files ?? []).map((file) => file.id).join(",")}`).join(";")}`).join("|"), [rows]);
   const previousLedgerVersion = useRef(ledgerVersion);
   const hydrate = useCallback((next: AccountingExportConfig) => {
     setConfig(next);
@@ -339,13 +339,13 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
                 Change reason
                 <input className={`${control} mt-1 w-full`} value={changeReason} placeholder="Configured for first VAT return" onChange={(event) => setChangeReason(event.target.value)} />
               </label>
-              <div className="flex flex-wrap gap-2">
-                <button type="button" className={control} disabled={loading || categoryInvalid} onClick={() => void saveConfig(false)}>
+              <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:flex-wrap sm:items-center">
+                <button type="button" className={`${control} w-full sm:w-auto`} disabled={loading || categoryInvalid} onClick={() => void saveConfig(false)}>
                   Save mapping draft
                 </button>
                 <button
                   type="button"
-                  className={control}
+                  className={`${control} w-full sm:w-auto`}
                   disabled={loading}
                   onClick={() => {
                     if (config) hydrate(config);
@@ -357,7 +357,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
                 >
                   Discard unsaved changes
                 </button>
-                <button type="button" className={primary} disabled={loading || categoryInvalid} onClick={() => void saveConfig(true)}>
+                <button type="button" className={`${primary} w-full sm:ml-auto sm:w-auto`} disabled={loading || categoryInvalid} onClick={() => void saveConfig(true)}>
                   Confirm mappings
                 </button>
               </div>
@@ -406,33 +406,39 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
                 <strong>{item.reference || item.supplier_reference || shortReference(item.adjustment_id)}</strong>
                 {(item.amount ?? item.gbp_gross_amount) != null && <span> · £{String(item.amount ?? item.gbp_gross_amount)}</span>}
                 {item.adjustment_date && <span> · {safeApiDateValue(item.adjustment_date)}</span>}
-                <p>Parent transaction {shortReference(item.expense_id)}. This must be entered or reviewed separately as a purchase credit/refund in QuickFile.</p>
+                <p>Parent transaction {shortReference(manualAdjustmentParentReference(item))}. This must be entered or reviewed separately as a purchase credit/refund in QuickFile.</p>
                 <p className="text-muted-foreground">{item.reason}</p>
               </div>
             ))}
           </section>
         )}
         {stale && <p className="text-sm font-medium text-brand-coral">Revalidate transactions before generating the accounting CSV.</p>}
-        <p className="text-sm text-muted-foreground">For this return, import the file in QuickFile using Account Settings → Data Import Wizard → Sales and purchase invoices → Purchase invoices. Review the import preview before saving.</p>
-        <div className="space-y-2">
-          <div className="flex flex-wrap justify-end gap-2">
-            <button type="button" className={control} disabled={Boolean(validationDisabledReason)} onClick={() => void validate()}>
+        <section className="space-y-4 rounded-xl border border-border bg-muted/30 p-4 sm:p-5">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Validate and generate</h3>
+            <p className="mt-1 max-w-4xl text-sm leading-6 text-muted-foreground">For this return, import the file in QuickFile using Account Settings → Data Import Wizard → Sales and purchase invoices → Purchase invoices. Review the import preview before saving.</p>
+          </div>
+          {(validationDisabledReason || generationReasons.length > 0) && (
+            <div className="rounded-lg border border-border bg-background p-3 text-sm text-muted-foreground">
+              <p className="font-medium text-foreground">Before you can continue:</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                {validationDisabledReason && <li>{validationDisabledReason}</li>}
+                {generationReasons.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button type="button" className={`${control} w-full sm:w-auto`} disabled={Boolean(validationDisabledReason)} onClick={() => void validate()}>
               Validate transactions
             </button>
-            <button type="button" className={primary} disabled={loading || !canGenerateAccountingExport(config, validation, stale)} onClick={() => void download()}>
+            <button type="button" className={`${primary} w-full sm:w-auto`} disabled={loading || !canGenerateAccountingExport(config, validation, stale)} onClick={() => void download()}>
               <Download className="mr-2 inline h-4 w-4" />
               Generate accounting CSV
             </button>
           </div>
-          {validationDisabledReason && <p className="text-right text-sm text-muted-foreground">{validationDisabledReason}</p>}
-          {generationReasons.length > 0 && (
-            <ul className="text-right text-sm text-muted-foreground">
-              {generationReasons.map((reason) => (
-                <li key={reason}>{reason}</li>
-              ))}
-            </ul>
-          )}
-        </div>
+        </section>
       </DialogContent>
     </Dialog>
   );
