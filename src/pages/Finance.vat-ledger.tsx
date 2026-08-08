@@ -9,7 +9,7 @@ import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-expo
 import type { VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
-import { allowedVatReviewStatuses, authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
+import { authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
 
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
@@ -117,7 +117,7 @@ export default function VatLedgerPage() {
     setFormError("");
   };
   const dirty = JSON.stringify(form) !== JSON.stringify(formBaseline);
-  const formReviewStatuses = allowedVatReviewStatuses(formBaseline.vat_review_status);
+  const reviewCompleteAvailable = formBaseline.vat_review_status === "ready_for_review" || formBaseline.vat_review_status === "review_complete";
   const closeForm = () => {
     if (dirty && !window.confirm("Close this unsaved entry? Nothing will be saved.")) return;
     resetForm();
@@ -314,12 +314,12 @@ export default function VatLedgerPage() {
               ))}
             </select></label>
             <label className="text-sm font-medium">Review status<select className={`${input} mt-1 w-full`} value={form.vat_review_status} onChange={(event) => update("vat_review_status", event.target.value)}>
-              {formReviewStatuses.map((value) => (
-                <option value={value} key={value}>
+              {reviewStatuses.map((value) => (
+                <option value={value} key={value} disabled={value === "review_complete" && !reviewCompleteAvailable}>
                   {human(value)}
                 </option>
               ))}
-            </select></label>
+            </select>{!reviewCompleteAvailable && <span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Review complete becomes available after this record is saved as Ready for review.</span>}</label>
             <label className="text-sm font-medium">VAT period<select className={`${input} mt-1 w-full`} value={form.vat_period_id} onChange={(event) => update("vat_period_id", event.target.value)}>
               <option value="">No explicit period confirmed</option>
               {periods.map((item) => (

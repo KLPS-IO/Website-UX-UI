@@ -65,6 +65,14 @@ test("VAT review states expose only coherent next transitions",()=>{
   assert.deepEqual(allowedVatReviewStatuses("ready_for_review"),["in_review","ready_for_review","review_complete"]);
   assert.deepEqual(allowedVatReviewStatuses("review_complete"),["in_review","ready_for_review","review_complete"]);
 });
+
+test("Review complete remains visible but locked until the saved record is ready",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  assert.match(page,/reviewStatuses\.map/);assert.match(page,/value === "review_complete" && !reviewCompleteAvailable/);
+  assert.match(page,/formBaseline\.vat_review_status === "ready_for_review"/);assert.match(page,/formBaseline\.vat_review_status === "review_complete"/);
+  assert.match(page,/Review complete becomes available after this record is saved as Ready for review\./);
+  assert.match(page,/vatSaveErrorMessage\(e\)/);
+});
 test("VAT table explains severity and the exact next action",()=>{
   assert.equal(warningSeverityCopy("critical"),"Critical");assert.equal(warningSeverityCopy("review_required"),"Review required");assert.equal(warningSeverityCopy("advisory"),"Advisory");
   assert.equal(vatReviewNextAction({vat_review_status:"ready_for_review",warning_details:[{code:"vat_rate_missing",severity:"critical",message:"VAT rate is required for this VAT treatment."}]}),"VAT rate is required for this VAT treatment.");
@@ -114,10 +122,12 @@ test("VAT ledger exposes founder-only fixed expense and adjustment evidence targ
   assert.match(page,/Upload evidence/);assert.match(page,/Upload refund evidence/);assert.match(page,/View evidence/);assert.match(page,/View refund evidence/);
   assert.match(page,/viewer\.isFounderAdmin/);assert.match(page,/entityType: "expense_adjustment"/);
   assert.match(dialog,/Choose an evidence purpose and file/);assert.match(dialog,/linked_entity_id: target\.id/);assert.doesNotMatch(dialog,/setTarget|Entity ID/);
-  assert.match(dialog,/Existing canonical document reused and linked/);assert.match(dialog,/document_category: "Finance"/);
+  assert.match(dialog,/Existing canonical document details updated and linked/);assert.match(dialog,/document_category: "Finance"/);
   assert.match(dialog,/Upload and link/);assert.match(dialog,/!bg-\[#ef9f32\]/);assert.match(dialog,/disabled:!bg-slate-200/);
   assert.match(dialog,/Edit details/);assert.match(dialog,/Save details/);assert.match(dialog,/Evidence details saved\./);
   assert.match(dialog,/evidenceService\.update\(editingEvidenceId/);assert.match(dialog,/supplier_reference:supplierReference/);
   assert.match(dialog,/evidenceService\.unlink\(id,linkId\)/);assert.match(dialog,/If it is not linked anywhere else, the stored document will also be permanently deleted/);
   assert.doesNotMatch(dialog,/deleteEverywhere/);
+  assert.match(dialog,/result\.evidence_reused[\s\S]*evidenceService\.update/);assert.match(dialog,/Completed metadata during VAT evidence reuse/);
+  assert.match(dialog,/linkedDetails\[item\.id\]\.description/);assert.match(dialog,/Its evidence details were saved/);
 });

@@ -10,6 +10,7 @@ import {
 import { documentApiErrorMessage } from "@/services/evidence/document-upload";
 import { evidenceService } from "@/services/evidence/evidence.service";
 import type { DocumentLinkEntityType } from "@/types/evidence";
+import type { EvidenceItem } from "@/types/evidence";
 import type { VatEvidenceFile } from "@/types/vat-ledger";
 import { formatSafeDate } from "@/lib/safe-date";
 
@@ -70,6 +71,8 @@ export function VatEvidenceUploadDialog({
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
   const [editingEvidenceId,setEditingEvidenceId]=useState<string|null>(null);
+  const [linkedFiles,setLinkedFiles]=useState<VatEvidenceFile[]>([]);
+  const [linkedDetails,setLinkedDetails]=useState<Record<string,EvidenceItem>>({});
   useEffect(() => {
     if (!target) return;
     setFile(null);
@@ -84,6 +87,12 @@ export function VatEvidenceUploadDialog({
     setEditingEvidenceId(null);
     setError("");
     setMessage("");
+    setLinkedFiles(target.evidence);
+    let current=true;
+    void Promise.all(target.evidence.map(item=>evidenceService.get(item.id))).then(items=>{
+      if(current)setLinkedDetails(Object.fromEntries(items.map(item=>[item.id,item])));
+    }).catch(()=>{if(current)setLinkedDetails({});});
+    return()=>{current=false;};
   }, [target]);
   const purposeLabel = useMemo(
     () =>
@@ -106,9 +115,14 @@ export function VatEvidenceUploadDialog({
     setError("");
     setMessage("");
     try {
+      const metadata={
+        title:title.trim(),description:notes.trim()||null,document_date:documentDate||null,
+        source_organisation:source.trim()||null,vat_evidence_type:canonicalPurpose(purpose),
+        supplier_reference:supplierReference.trim()||null
+      };
       const result = await evidenceService.uploadDocument({
         file,
-        title,
+        title:metadata.title,
         document_category: "Finance",
         document_date: documentDate || undefined,
         description: notes || undefined,
@@ -119,11 +133,16 @@ export function VatEvidenceUploadDialog({
         vat_evidence_type: canonicalPurpose(purpose),
         supplier_reference: supplierReference || undefined,
       });
+      const savedEvidence=result.evidence_reused
+        ? await evidenceService.update(result.evidence.id,{...metadata,change_reason:"Completed metadata during VAT evidence reuse"})
+        : result.evidence;
+      setLinkedDetails(current=>({...current,[savedEvidence.id]:savedEvidence}));
+      setLinkedFiles(current=>current.some(item=>item.id===savedEvidence.id)?current:[...current,{id:savedEvidence.id,filename:savedEvidence.originalFilename,type:savedEvidence.vatEvidenceType}]);
       setMessage(
         result.duplicate_link
-          ? "This document was already linked to this transaction."
+          ? "This document was already linked. Its evidence details were saved."
           : result.evidence_reused
-            ? "Existing canonical document reused and linked."
+            ? "Existing canonical document details updated and linked."
             : "Evidence uploaded and linked.",
       );
       await onLinked(result);
@@ -149,6 +168,7 @@ export function VatEvidenceUploadDialog({
     setBusy(true);setError("");setMessage("");
     try{
       const item=await evidenceService.get(id);
+      setLinkedDetails(current=>({...current,[id]:item}));
       const storedPurpose=item.vatEvidenceType??"";
       setEditingEvidenceId(id);
       setPurpose(storedPurpose==="order_confirmation"?"supplier_order_confirmation":storedPurpose==="proof_of_payment"?"payment_evidence":storedPurpose);
@@ -170,11 +190,12 @@ export function VatEvidenceUploadDialog({
     if(!editingEvidenceId||!purpose||!title.trim()){setError("Complete the evidence purpose and document title before saving.");return;}
     setBusy(true);setError("");setMessage("");
     try{
-      await evidenceService.update(editingEvidenceId,{
+      const saved=await evidenceService.update(editingEvidenceId,{
         title:title.trim(),description:notes.trim()||null,document_date:documentDate||null,
         source_organisation:source.trim()||null,vat_evidence_type:canonicalPurpose(purpose),
         supplier_reference:supplierReference.trim()||null,change_reason:"Updated from VAT Ledger evidence review"
       });
+      setLinkedDetails(current=>({...current,[saved.id]:saved}));
       setMessage("Evidence details saved.");
       await onLinked({evidence_reused:true,link_created:false,duplicate_link:false});
       if(target){
@@ -194,6 +215,8 @@ export function VatEvidenceUploadDialog({
       const linkId=item?.links?.find(link=>link.entity_type===target.entityType&&link.entity_id===target.id)?.id;
       if(!linkId)throw new Error("The evidence link could not be found. Refresh the ledger and try again.");
       const result=await evidenceService.unlink(id,linkId);
+      setLinkedFiles(current=>current.filter(item=>item.id!==id));
+      setLinkedDetails(current=>{const next={...current};delete next[id];return next;});
       if(editingEvidenceId===id)cancelEdit();
       setMessage(result.evidence_deleted?"Evidence removed and the unlinked document was deleted.":"Evidence unlinked from this transaction.");
       await onLinked({evidence_reused:false,link_created:false,duplicate_link:false});
@@ -327,18 +350,16 @@ export function VatEvidenceUploadDialog({
                 />
               </label>
             </div>
-            {target.evidence.length > 0 && (
+            {linkedFiles.length > 0 && (
               <section>
                 <h3 className="text-sm font-semibold">Linked evidence</h3>
                 <div className="mt-2 space-y-2">
-                  {target.evidence.map((item) => (
+                  {linkedFiles.map((item) => (
                     <div
                       key={item.id}
                       className="flex flex-col gap-2 rounded-lg border border-border p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
                     >
-                      <span>
-                        {item.filename ?? item.type ?? "Evidence document"}
-                      </span>
+                      <div className="min-w-0"><div className="font-medium">{linkedDetails[item.id]?.title??item.filename??item.type??"Evidence document"}</div>{linkedDetails[item.id]&&<div className="mt-1 space-y-0.5 text-xs text-muted-foreground"><div>{[linkedDetails[item.id].vatEvidenceType?.replaceAll("_"," "),linkedDetails[item.id].documentDate,linkedDetails[item.id].sourceOrganisation,linkedDetails[item.id].supplierReference].filter(Boolean).join(" · ")}</div>{linkedDetails[item.id].description&&<p className="whitespace-pre-wrap">{linkedDetails[item.id].description}</p>}</div>}</div>
                       <div className="flex flex-wrap gap-2">
                         <button type="button" className={control} onClick={() => void view(item.id)}><Eye className="mr-2 inline h-4 w-4" />View</button>
                         <button type="button" className={control} disabled={busy} onClick={() => void editDetails(item.id)}><Pencil className="mr-2 inline h-4 w-4" />Edit details</button>
