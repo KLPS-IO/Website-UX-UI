@@ -75,4 +75,5 @@ test("VAT ledger exposes founder-only fixed expense and adjustment evidence targ
   assert.match(page,/viewer\.isFounderAdmin/);assert.match(page,/entityType: "expense_adjustment"/);
   assert.match(dialog,/Choose an evidence purpose and file/);assert.match(dialog,/linked_entity_id: target\.id/);assert.doesNotMatch(dialog,/setTarget|Entity ID/);
   assert.match(dialog,/Existing canonical document reused and linked/);assert.match(dialog,/document_category: "Finance"/);
+  assert.match(dialog,/Upload and link/);assert.match(dialog,/!bg-\[#ef9f32\]/);assert.match(dialog,/disabled:!bg-slate-200/);
 });

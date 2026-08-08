@@ -15,6 +15,8 @@ import { formatSafeDate } from "@/lib/safe-date";
 
 const control =
   "rounded-lg border border-border bg-background px-3 py-2 text-sm";
+const uploadAction =
+  "rounded-lg border border-[#d97f13] !bg-[#ef9f32] px-4 py-2 text-sm font-semibold !text-white shadow-sm transition hover:!bg-[#d97f13] disabled:cursor-not-allowed disabled:!border-slate-300 disabled:!bg-slate-200 disabled:!text-slate-600 disabled:opacity-100";
 const purposes = [
   ["full_vat_invoice", "Full VAT invoice"],
   ["simplified_vat_invoice", "Simplified VAT invoice"],
@@ -302,14 +304,14 @@ export function VatEvidenceUploadDialog({
                 </div>
               </section>
             )}
-            <div className="flex justify-end gap-2">
-              <button type="button" className={control} onClick={onClose}>
+            <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+              <button type="button" className={`${control} w-full sm:w-auto`} onClick={onClose}>
                 Close
               </button>
               <button
                 type="button"
                 disabled={busy || !file || !purpose || !title.trim()}
-                className="rounded-lg bg-brand-orange px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className={`${uploadAction} w-full sm:w-auto`}
                 onClick={() => void upload()}
               >
                 <Upload className="mr-2 inline h-4 w-4" />
