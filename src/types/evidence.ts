@@ -39,6 +39,8 @@ export interface EvidenceDto {
   next_review_date: string | null;
   expiry_date: string | null;
   document_date: string | null;
+  vat_evidence_type?: string | null;
+  supplier_reference?: string | null;
   r2_object_key?: string | null;
   has_r2_object?: boolean;
   original_filename: string | null;
@@ -81,6 +83,8 @@ export interface EvidenceItem {
   nextReviewDate: string | null;
   expiryDate: string | null;
   documentDate: string | null;
+  vatEvidenceType: string | null;
+  supplierReference: string | null;
   hasR2Object: boolean;
   originalFilename: string | null;
   mimeType: string | null;

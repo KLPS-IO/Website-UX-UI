@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Upload } from "lucide-react";
+import { Eye, Pencil, Trash2, Upload } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -69,9 +69,11 @@ export function VatEvidenceUploadDialog({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
+  const [editingEvidenceId,setEditingEvidenceId]=useState<string|null>(null);
   useEffect(() => {
     if (!target) return;
     setFile(null);
+    setTitle("");
     setPurpose(
       target.entityType === "expense_adjustment" ? "refund_confirmation" : "",
     );
@@ -79,6 +81,7 @@ export function VatEvidenceUploadDialog({
     setSource(target.supplier);
     setSupplierReference(target.reference ?? "");
     setNotes("");
+    setEditingEvidenceId(null);
     setError("");
     setMessage("");
   }, [target]);
@@ -89,11 +92,11 @@ export function VatEvidenceUploadDialog({
     [purpose],
   );
   useEffect(() => {
-    if (target && purpose)
+    if (target && purpose && !editingEvidenceId)
       setTitle(
         `${target.supplier} — ${purposeLabel} — ${documentDate || target.date || "undated"}`,
       );
-  }, [target, purpose, purposeLabel, documentDate]);
+  }, [target, purpose, purposeLabel, documentDate, editingEvidenceId]);
   const upload = async () => {
     if (!target || !file || !purpose) {
       setError("Choose an evidence purpose and file before uploading.");
@@ -142,6 +145,61 @@ export function VatEvidenceUploadDialog({
       setError(documentApiErrorMessage(reason));
     }
   };
+  const editDetails=async(id:string)=>{
+    setBusy(true);setError("");setMessage("");
+    try{
+      const item=await evidenceService.get(id);
+      const storedPurpose=item.vatEvidenceType??"";
+      setEditingEvidenceId(id);
+      setPurpose(storedPurpose==="order_confirmation"?"supplier_order_confirmation":storedPurpose==="proof_of_payment"?"payment_evidence":storedPurpose);
+      setTitle(item.title);
+      setDocumentDate(item.documentDate??"");
+      setSource(item.sourceOrganisation??"");
+      setSupplierReference(item.supplierReference??"");
+      setNotes(item.description??"");
+    }catch(reason){setError(documentApiErrorMessage(reason));}
+    finally{setBusy(false);}
+  };
+  const cancelEdit=()=>{
+    if(!target)return;
+    setEditingEvidenceId(null);setFile(null);setPurpose("");setTitle("");
+    setDocumentDate(target.date??"");setSource(target.supplier);
+    setSupplierReference(target.reference??"");setNotes("");setError("");setMessage("");
+  };
+  const saveDetails=async()=>{
+    if(!editingEvidenceId||!purpose||!title.trim()){setError("Complete the evidence purpose and document title before saving.");return;}
+    setBusy(true);setError("");setMessage("");
+    try{
+      await evidenceService.update(editingEvidenceId,{
+        title:title.trim(),description:notes.trim()||null,document_date:documentDate||null,
+        source_organisation:source.trim()||null,vat_evidence_type:canonicalPurpose(purpose),
+        supplier_reference:supplierReference.trim()||null,change_reason:"Updated from VAT Ledger evidence review"
+      });
+      setMessage("Evidence details saved.");
+      await onLinked({evidence_reused:true,link_created:false,duplicate_link:false});
+      if(target){
+        setEditingEvidenceId(null);setFile(null);setPurpose("");setTitle("");
+        setDocumentDate(target.date??"");setSource(target.supplier);
+        setSupplierReference(target.reference??"");setNotes("");
+      }
+    }catch(reason){setError(documentApiErrorMessage(reason));}
+    finally{setBusy(false);}
+  };
+  const removeLink=async(id:string)=>{
+    if(!target||!window.confirm("Remove this evidence from the transaction? If it is not linked anywhere else, the stored document will also be permanently deleted."))return;
+    setBusy(true);setError("");setMessage("");
+    try{
+      const linked=await evidenceService.linked(target.entityType,target.id);
+      const item=linked.find(candidate=>candidate.id===id);
+      const linkId=item?.links?.find(link=>link.entity_type===target.entityType&&link.entity_id===target.id)?.id;
+      if(!linkId)throw new Error("The evidence link could not be found. Refresh the ledger and try again.");
+      const result=await evidenceService.unlink(id,linkId);
+      if(editingEvidenceId===id)cancelEdit();
+      setMessage(result.evidence_deleted?"Evidence removed and the unlinked document was deleted.":"Evidence unlinked from this transaction.");
+      await onLinked({evidence_reused:false,link_created:false,duplicate_link:false});
+    }catch(reason){setError(documentApiErrorMessage(reason));}
+    finally{setBusy(false);}
+  };
   return (
     <Dialog
       open={Boolean(target)}
@@ -157,8 +215,7 @@ export function VatEvidenceUploadDialog({
               : "Upload evidence for this expense"}
           </DialogTitle>
           <DialogDescription>
-            The document will be stored privately in Financial OS and linked to
-            this transaction.
+            {editingEvidenceId?"Update the canonical details for this linked document.":"The document will be stored privately in Financial OS and linked to this transaction."}
           </DialogDescription>
         </DialogHeader>
         {target && (
@@ -226,16 +283,7 @@ export function VatEvidenceUploadDialog({
                   ))}
                 </select>
               </label>
-              <label className="text-sm">
-                File *
-                <input
-                  required
-                  type="file"
-                  className={`${control} mt-1 w-full`}
-                  accept=".pdf,.png,.jpg,.jpeg,.txt,.csv,.docx,.xlsx,.pptx"
-                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                />
-              </label>
+              {!editingEvidenceId&&<label className="text-sm">File *<input required type="file" className={`${control} mt-1 w-full`} accept=".pdf,.png,.jpg,.jpeg,.txt,.csv,.docx,.xlsx,.pptx" onChange={(event) => setFile(event.target.files?.[0] ?? null)} /></label>}
               <label className="text-sm sm:col-span-2">
                 Document title *
                 <input
@@ -286,36 +334,33 @@ export function VatEvidenceUploadDialog({
                   {target.evidence.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between rounded-lg border border-border p-3 text-sm"
+                      className="flex flex-col gap-2 rounded-lg border border-border p-3 text-sm sm:flex-row sm:items-center sm:justify-between"
                     >
                       <span>
                         {item.filename ?? item.type ?? "Evidence document"}
                       </span>
-                      <button
-                        type="button"
-                        className={control}
-                        onClick={() => void view(item.id)}
-                      >
-                        <Eye className="mr-2 inline h-4 w-4" />
-                        View
-                      </button>
+                      <div className="flex flex-wrap gap-2">
+                        <button type="button" className={control} onClick={() => void view(item.id)}><Eye className="mr-2 inline h-4 w-4" />View</button>
+                        <button type="button" className={control} disabled={busy} onClick={() => void editDetails(item.id)}><Pencil className="mr-2 inline h-4 w-4" />Edit details</button>
+                        <button type="button" className="rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-700" disabled={busy} onClick={() => void removeLink(item.id)}><Trash2 className="mr-2 inline h-4 w-4" />Remove</button>
+                      </div>
                     </div>
                   ))}
                 </div>
               </section>
             )}
             <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
-              <button type="button" className={`${control} w-full sm:w-auto`} onClick={onClose}>
-                Close
+              <button type="button" className={`${control} w-full sm:w-auto`} onClick={editingEvidenceId?cancelEdit:onClose}>
+                {editingEvidenceId?"Cancel edit":"Close"}
               </button>
               <button
                 type="button"
-                disabled={busy || !file || !purpose || !title.trim()}
+                disabled={busy || !purpose || !title.trim() || (!editingEvidenceId&&!file)}
                 className={`${uploadAction} w-full sm:w-auto`}
-                onClick={() => void upload()}
+                onClick={() => void (editingEvidenceId?saveDetails():upload())}
               >
                 <Upload className="mr-2 inline h-4 w-4" />
-                {busy ? "Uploading…" : "Upload and link"}
+                {busy ? (editingEvidenceId?"Saving…":"Uploading…") : editingEvidenceId?"Save details":"Upload and link"}
               </button>
             </div>
           </>
