@@ -47,6 +47,19 @@ export function calculatedGbpGross(grossAmount: unknown, exchangeRate: unknown):
   return gross>=0&&rate>0&&Number.isFinite(gross)&&Number.isFinite(rate)?(gross*rate).toFixed(2):"";
 }
 
+export function vatRateRatioToPercent(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "";
+  const ratio=Number(value);
+  return Number.isFinite(ratio)&&ratio>=0&&ratio<=1?String(ratio*100):"";
+}
+
+export function vatRatePercentToRatio(value: unknown): string | null {
+  if (value === null || value === undefined || value === "") return null;
+  const percent=Number(value);
+  if(!Number.isFinite(percent)||percent<0||percent>100)throw new Error("VAT rate must be between 0 and 100%.");
+  return String(percent/100);
+}
+
 export const warningCopy = (warning:string) => ({pending_vat_treatment:"VAT treatment has not been reviewed.",foreign_currency_without_conversion:"Foreign-currency conversion data is incomplete.",gross_net_vat_mismatch:"Net plus VAT does not match gross.",no_supplier_invoice:"Supplier invoice is missing.",payment_evidence_missing:"Payment evidence is missing.",vat_period_conflict:"The tax-point date matches more than one VAT period."}[warning] ?? warning.replaceAll("_"," "));
 export type VatReviewStatus="pending_review"|"in_review"|"ready_for_review"|"review_complete";
 export const allowedVatReviewStatuses=(current:string|null|undefined):VatReviewStatus[]=>current==="ready_for_review"||current==="review_complete"?["in_review","ready_for_review","review_complete"]:["pending_review","in_review","ready_for_review"];

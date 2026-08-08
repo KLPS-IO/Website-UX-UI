@@ -9,7 +9,7 @@ import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-expo
 import type { VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
-import { allowedVatReviewStatuses, authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
+import { allowedVatReviewStatuses, authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
 
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
@@ -135,6 +135,7 @@ export default function VatLedgerPage() {
       const gbpGross = form.gbp_gross_amount || calculatedGbpGross(form.gross_amount, form.exchange_rate);
       const payload = {
         ...form,
+        vat_rate: vatRatePercentToRatio(form.vat_rate),
         transaction_date: form.payment_date,
         gbp_gross_amount: gbpGross || null,
         vat_period_id: form.vat_period_id || null,
@@ -164,7 +165,7 @@ export default function VatLedgerPage() {
       gbp_net_amount: String(row.gbp_net_amount ?? ""),
       gbp_vat_amount: String(row.gbp_vat_amount ?? ""),
       gbp_gross_amount: String(row.gbp_gross_amount ?? ""),
-      vat_rate: String(row.vat_rate ?? ""),
+      vat_rate: vatRateRatioToPercent(row.vat_rate),
       notes: row.notes ?? "",
       vat_treatment: row.vat_treatment ?? "pending_review",
       vat_review_status: row.vat_review_status ?? "pending_review",
@@ -287,42 +288,42 @@ export default function VatLedgerPage() {
               {formError}
             </div>
           )}
-          <form onSubmit={save} className="grid gap-3 md:grid-cols-3 xl:grid-cols-5">
-            <input required aria-label="Payment date" type="date" className={input} value={form.payment_date} onChange={(event) => update("payment_date", event.target.value)} />
-            <input aria-label="Invoice date" type="date" className={input} value={form.invoice_date} onChange={(event) => update("invoice_date", event.target.value)} />
-            <input required aria-label="Supplier" className={input} placeholder="Supplier" value={form.supplier_name} onChange={(event) => update("supplier_name", event.target.value)} />
-            <input required aria-label="Foreign or gross amount" inputMode="decimal" className={input} placeholder="Foreign or gross amount" value={form.gross_amount} onChange={(event) => update("gross_amount", event.target.value)} />
-            <input aria-label="Description" className={input} placeholder="Short description" value={form.description} onChange={(event) => update("description", event.target.value)} />
-            <input aria-label="Currency" className={input} maxLength={3} placeholder="Currency" value={form.currency} onChange={(event) => update("currency", event.target.value.toUpperCase())} />
-            <input aria-label="Exchange rate" inputMode="decimal" className={input} placeholder="Exchange rate" value={form.exchange_rate} onChange={(event) => update("exchange_rate", event.target.value)} />
-            <input aria-label="GBP net" inputMode="decimal" className={input} placeholder="GBP net" value={form.gbp_net_amount} onChange={(event) => update("gbp_net_amount", event.target.value)} />
-            <input aria-label="GBP VAT" inputMode="decimal" className={input} placeholder="GBP VAT" value={form.gbp_vat_amount} onChange={(event) => update("gbp_vat_amount", event.target.value)} />
-            <input aria-label="GBP gross" inputMode="decimal" className={input} placeholder={calculatedGbpGross(form.gross_amount, form.exchange_rate) ? `Calculated ${calculatedGbpGross(form.gross_amount, form.exchange_rate)}` : "GBP gross"} value={form.gbp_gross_amount} onChange={(event) => update("gbp_gross_amount", event.target.value)} />
-            <input aria-label="VAT rate" inputMode="decimal" className={input} placeholder="VAT rate (for example 20)" value={form.vat_rate} onChange={(event) => update("vat_rate", event.target.value)} />
-            <select aria-label="VAT treatment" className={input} value={form.vat_treatment} onChange={(event) => update("vat_treatment", event.target.value)}>
+          <form onSubmit={save} className="grid items-start gap-3 md:grid-cols-3 xl:grid-cols-5">
+            <label className="text-sm font-medium">Tax point / transaction date<input required type="date" className={`${input} mt-1 w-full`} value={form.payment_date} onChange={(event) => update("payment_date", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Date the expense occurred and used for VAT-period allocation.</span></label>
+            <label className="text-sm font-medium">Invoice date<input type="date" className={`${input} mt-1 w-full`} value={form.invoice_date} onChange={(event) => update("invoice_date", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Date shown on the supplier invoice.</span></label>
+            <label className="text-sm font-medium">Supplier<input required className={`${input} mt-1 w-full`} placeholder="Supplier" value={form.supplier_name} onChange={(event) => update("supplier_name", event.target.value)} /></label>
+            <label className="text-sm font-medium">Gross amount<input required inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="Foreign or gross amount" value={form.gross_amount} onChange={(event) => update("gross_amount", event.target.value)} /></label>
+            <label className="text-sm font-medium">Transaction description<input className={`${input} mt-1 w-full`} placeholder="Short description" value={form.description} onChange={(event) => update("description", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Short description shown in the VAT ledger and accounting export.</span></label>
+            <label className="text-sm font-medium">Currency<input className={`${input} mt-1 w-full`} maxLength={3} placeholder="Currency" value={form.currency} onChange={(event) => update("currency", event.target.value.toUpperCase())} /></label>
+            <label className="text-sm font-medium">Exchange rate<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="Exchange rate" value={form.exchange_rate} onChange={(event) => update("exchange_rate", event.target.value)} /></label>
+            <label className="text-sm font-medium">GBP net<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="GBP net" value={form.gbp_net_amount} onChange={(event) => update("gbp_net_amount", event.target.value)} /></label>
+            <label className="text-sm font-medium">GBP VAT<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="GBP VAT" value={form.gbp_vat_amount} onChange={(event) => update("gbp_vat_amount", event.target.value)} /></label>
+            <label className="text-sm font-medium">GBP gross<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder={calculatedGbpGross(form.gross_amount, form.exchange_rate) ? `Calculated ${calculatedGbpGross(form.gross_amount, form.exchange_rate)}` : "GBP gross"} value={form.gbp_gross_amount} onChange={(event) => update("gbp_gross_amount", event.target.value)} /></label>
+            <label className="text-sm font-medium">VAT rate<input inputMode="decimal" min="0" max="100" className={`${input} mt-1 w-full`} placeholder="VAT rate % (for example 20)" value={form.vat_rate} onChange={(event) => update("vat_rate", event.target.value)} /></label>
+            <label className="text-sm font-medium">VAT treatment<select className={`${input} mt-1 w-full`} value={form.vat_treatment} onChange={(event) => update("vat_treatment", event.target.value)}>
               {treatments.map((value) => (
                 <option value={value} key={value}>
                   {human(value)}
                 </option>
               ))}
-            </select>
-            <select aria-label="Review status" className={input} value={form.vat_review_status} onChange={(event) => update("vat_review_status", event.target.value)}>
+            </select></label>
+            <label className="text-sm font-medium">Review status<select className={`${input} mt-1 w-full`} value={form.vat_review_status} onChange={(event) => update("vat_review_status", event.target.value)}>
               {formReviewStatuses.map((value) => (
                 <option value={value} key={value}>
                   {human(value)}
                 </option>
               ))}
-            </select>
-            <select aria-label="Confirmed VAT period" className={input} value={form.vat_period_id} onChange={(event) => update("vat_period_id", event.target.value)}>
+            </select></label>
+            <label className="text-sm font-medium">VAT period<select className={`${input} mt-1 w-full`} value={form.vat_period_id} onChange={(event) => update("vat_period_id", event.target.value)}>
               <option value="">No explicit period confirmed</option>
               {periods.map((item) => (
                 <option value={item.id} key={item.id}>
                   {formatVatPeriodLabel(item)}
                 </option>
               ))}
-            </select>
-            <input aria-label="Review note" className={input} placeholder="Review note for manual conversion" value={form.notes} onChange={(event) => update("notes", event.target.value)} />
-            <div className="flex gap-2">
+            </select></label>
+            <label className="text-sm font-medium">Internal review notes<input className={`${input} mt-1 w-full`} placeholder="Optional accounting or review note" value={form.notes} onChange={(event) => update("notes", event.target.value)} /><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Optional private note for accounting, evidence or manual review context.</span></label>
+            <div className="flex items-end gap-2 self-start pt-6">
               <button type="button" className={input} onClick={editingId ? closeForm : clearForm}>
                 {editingId ? "Close" : "Clear form"}
               </button>

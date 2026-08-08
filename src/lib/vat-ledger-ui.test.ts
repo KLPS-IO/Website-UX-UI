@@ -2,13 +2,19 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { formatDateOnlyUk } from "./safe-date.ts";
-import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, vatPeriodDisplay, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
+import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
 import type { VatLedgerRow } from "../types/vat-ledger.ts";
 
 const row=(overrides:Partial<VatLedgerRow>):VatLedgerRow=>({id:"1",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2025-05-08",currency:"GBP",net_amount:null,vat_amount:null,gross_amount:"10.00",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:[],notes:null,created_at:"",updated_at:"",...overrides});
 
 test("UK VAT period labels preserve date-only calendar values",()=>{
   assert.equal(formatVatPeriodLabel({start_date:"2025-05-08",end_date:"2026-04-30"}),"8 May 2025 to 30 April 2026");
+});
+test("VAT rate UI uses percentages while the canonical API contract uses decimal fractions",()=>{
+  assert.equal(vatRateRatioToPercent("0.20"),"20");
+  assert.equal(vatRatePercentToRatio("20"),"0.2");
+  assert.equal(vatRatePercentToRatio(""),null);
+  assert.throws(()=>vatRatePercentToRatio("101"),/between 0 and 100%/);
 });
 test("UK VAT period labels preserve midnight UTC and offset timestamp dates",()=>{
   assert.equal(formatDateOnlyUk("2026-05-01T00:00:00.000Z"),"1 May 2026");
@@ -81,6 +87,14 @@ test("inline editor closes saved records while new entries clear without persist
   assert.match(page,/setFormBaseline\(saved\)/);
   assert.match(page,/setSuggestion\(null\)/);
   assert.doesNotMatch(page,/Close[\s\S]{0,120}(archive|update)\(/);
+});
+
+test("VAT entry fields expose explicit accounting labels and focused helper text",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  for(const label of ["Tax point / transaction date","Invoice date","Supplier","Gross amount","Transaction description","Currency","Exchange rate","GBP net","GBP VAT","GBP gross","VAT rate","VAT treatment","Review status","VAT period","Internal review notes"])assert.match(page,new RegExp(`>${label.replaceAll("/","\\/")}`));
+  assert.match(page,/Date the expense occurred and used for VAT-period allocation\./);assert.match(page,/Date shown on the supplier invoice\./);
+  assert.match(page,/Short description shown in the VAT ledger and accounting export\./);assert.match(page,/Optional private note for accounting, evidence or manual review context\./);
+  assert.match(page,/placeholder="Optional accounting or review note"/);assert.doesNotMatch(page,/Review note for manual conversion/);
 });
 
 test("VAT ledger exposes founder-only fixed expense and adjustment evidence targets",()=>{
