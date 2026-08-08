@@ -69,4 +69,6 @@ test("MTD dialog selects a period and permits draft validation while generation 
   assert.match(component,/canGenerateAccountingExport\(config, validation, stale\)/);
   assert.match(component,/Mapping configuration is still a draft\./);
   assert.match(component,/Save mapping draft/);assert.match(component,/Discard unsaved changes/);assert.match(component,/Confirm mappings/);
+  assert.match(component,/Create the accounting CSV/);assert.match(component,/Complete these steps in order/);assert.match(component,/Still required/);
+  assert.match(component,/!bg-\[#ef9f32\]/);assert.match(component,/disabled:!bg-slate-200/);
 });

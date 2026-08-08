@@ -9,8 +9,8 @@ import type { VatLedgerRow, VatPeriod } from "@/types/vat-ledger";
 import { formatVatPeriodLabel } from "@/lib/vat-ledger-ui";
 import { safeApiDateValue } from "@/lib/safe-date";
 
-const control = "rounded-lg border border-border bg-background px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50";
-const primary = "rounded-lg bg-brand-orange px-3 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50";
+const control = "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition hover:border-[#ef9f32] disabled:cursor-not-allowed disabled:!bg-slate-100 disabled:!text-slate-500 disabled:opacity-100";
+const primary = "rounded-lg border border-[#d97f13] !bg-[#ef9f32] px-4 py-2 text-sm font-semibold !text-white shadow-sm transition hover:!bg-[#d97f13] disabled:cursor-not-allowed disabled:!border-slate-300 disabled:!bg-slate-200 disabled:!text-slate-600 disabled:opacity-100";
 type MappingRow = { key: string; value: string };
 const rowsFor = (map: Record<string, string>, categories: string[] = []) => [...new Set([...Object.keys(map), ...categories.filter(Boolean)])].sort().map((key) => ({ key, value: map[key] ?? "" }));
 const errorCopy = (error: unknown) => (error instanceof ApiError ? (error.status === 401 || error.status === 403 ? "Only a founder-admin can use MTD Accounting Export." : error.code === "accounting_export_source_changed" ? "Financial records changed after validation. Validate the export again." : error.code === "accounting_export_config_unconfirmed" ? "Confirm the founder-reviewed mappings before downloading." : error.code === "accounting_export_config_missing" ? "Accounting mappings must be configured before downloading." : error.message) : error instanceof Error ? error.message : "The accounting export request failed.");
@@ -339,13 +339,13 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
                 Change reason
                 <input className={`${control} mt-1 w-full`} value={changeReason} placeholder="Configured for first VAT return" onChange={(event) => setChangeReason(event.target.value)} />
               </label>
-              <div className="flex flex-wrap gap-2">
-                <button type="button" className={control} disabled={loading || categoryInvalid} onClick={() => void saveConfig(false)}>
+              <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:flex-wrap sm:items-center">
+                <button type="button" className={`${control} w-full sm:w-auto`} disabled={loading || categoryInvalid} onClick={() => void saveConfig(false)}>
                   Save mapping draft
                 </button>
                 <button
                   type="button"
-                  className={control}
+                  className={`${control} w-full sm:w-auto`}
                   disabled={loading}
                   onClick={() => {
                     if (config) hydrate(config);
@@ -357,7 +357,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
                 >
                   Discard unsaved changes
                 </button>
-                <button type="button" className={primary} disabled={loading || categoryInvalid} onClick={() => void saveConfig(true)}>
+                <button type="button" className={`${primary} w-full sm:ml-auto sm:w-auto`} disabled={loading || categoryInvalid} onClick={() => void saveConfig(true)}>
                   Confirm mappings
                 </button>
               </div>
@@ -413,26 +413,33 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
           </section>
         )}
         {stale && <p className="text-sm font-medium text-brand-coral">Revalidate transactions before generating the accounting CSV.</p>}
-        <p className="text-sm text-muted-foreground">For this return, import the file in QuickFile using Account Settings → Data Import Wizard → Sales and purchase invoices → Purchase invoices. Review the import preview before saving.</p>
-        <div className="space-y-2">
-          <div className="flex flex-wrap justify-end gap-2">
-            <button type="button" className={control} disabled={Boolean(validationDisabledReason)} onClick={() => void validate()}>
+        <section className="space-y-4 rounded-xl border border-slate-300 bg-slate-50 p-4 sm:p-5">
+          <div>
+            <h3 className="font-semibold text-slate-950">Create the accounting CSV</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">Complete these steps in order: confirm the mappings, validate the selected VAT period, then generate the CSV.</p>
+          </div>
+          {(validationDisabledReason || generationReasons.length > 0) && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950">
+              <p className="font-semibold">Still required</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5">
+                {validationDisabledReason && <li>{validationDisabledReason}</li>}
+                {generationReasons.map((reason) => (
+                  <li key={reason}>{reason}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button type="button" className={`${control} w-full sm:w-auto`} disabled={Boolean(validationDisabledReason)} onClick={() => void validate()}>
               Validate transactions
             </button>
-            <button type="button" className={primary} disabled={loading || !canGenerateAccountingExport(config, validation, stale)} onClick={() => void download()}>
+            <button type="button" className={`${primary} w-full sm:w-auto`} disabled={loading || !canGenerateAccountingExport(config, validation, stale)} onClick={() => void download()}>
               <Download className="mr-2 inline h-4 w-4" />
               Generate accounting CSV
             </button>
           </div>
-          {validationDisabledReason && <p className="text-right text-sm text-muted-foreground">{validationDisabledReason}</p>}
-          {generationReasons.length > 0 && (
-            <ul className="text-right text-sm text-muted-foreground">
-              {generationReasons.map((reason) => (
-                <li key={reason}>{reason}</li>
-              ))}
-            </ul>
-          )}
-        </div>
+          <p className="text-sm leading-6 text-slate-600">After downloading, import the file in QuickFile using Account Settings → Data Import Wizard → Sales and purchase invoices → Purchase invoices. Review the import preview before saving.</p>
+        </section>
       </DialogContent>
     </Dialog>
   );
