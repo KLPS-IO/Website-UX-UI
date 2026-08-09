@@ -9,7 +9,7 @@ import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-expo
 import type { SupplierDocumentReviewStatus, VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
-import { authoritativeRowsAfterMutation, buildVatExpensePayload, calculatedGbpGross, canonicalExpenseCategory, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
+import { authoritativeRowsAfterMutation, buildVatExpensePayload, calculatedGbpGross, canonicalExpenseCategory, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDateConflictDisplay, vatPeriodDisplay, vatRateAmountMismatch, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
 
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
@@ -413,6 +413,7 @@ export default function VatLedgerPage() {
             <tbody>
               {filteredRows.map((row) => {
                 const periodDisplay = vatPeriodDisplay(row);
+                const periodConflict = vatPeriodDateConflictDisplay(row,periods);
                 return (
                   <tr key={row.id} className="border-t border-border">
                     <td className="p-2">{safeApiDateValue(row.effective_tax_point_date ?? row.transaction_date) || "—"}</td>
@@ -428,7 +429,7 @@ export default function VatLedgerPage() {
                     </td>
                     <td className="p-2">{human(row.evidence_coverage ?? "requires_review")}</td>
                     <td className="p-2"><span>{human(row.vat_review_status ?? "pending_review")}</span><span className="mt-1 block max-w-56 text-xs text-muted-foreground">Next: {vatReviewNextAction(row)}</span></td>
-                    <td className="p-2">{row.warning_details?.length ? row.warning_details.map((warning) => <div className={warning.severity==="critical"?"text-brand-coral":"text-muted-foreground"} key={warning.code}><strong>{warningSeverityCopy(warning.severity)}:</strong> {warning.message}</div>) : row.warnings?.length ? row.warnings.map((warning) => <div key={warning}>{warningCopy(warning)}</div>) : "—"}</td>
+                    <td className="p-2">{periodConflict?<div className="min-w-64 rounded-lg border border-brand-coral bg-red-50 p-3 text-red-900"><strong>VAT period conflict</strong><dl className="mt-2 space-y-1 text-xs"><div><dt className="font-semibold">Stored VAT period</dt><dd>{periodConflict.storedPeriod}</dd></div><div><dt className="font-semibold">Effective tax point</dt><dd>{periodConflict.effectiveTaxPoint}</dd></div><div><dt className="font-semibold">Date-derived VAT period</dt><dd>{periodConflict.dateDerivedPeriod}</dd></div></dl><p className="mt-2 text-xs font-medium">Founder review required before accounting export.</p></div>:row.warning_details?.length ? row.warning_details.map((warning) => <div className={warning.severity==="critical"?"text-brand-coral":"text-muted-foreground"} key={warning.code}><strong>{warningSeverityCopy(warning.severity)}:</strong> {warning.message}</div>) : row.warnings?.length ? row.warnings.map((warning) => <div key={warning}>{warningCopy(warning)}</div>) : "—"}</td>
                     <td className="p-2">
                       {viewer?.canWriteFinance && (
                         <div className="flex flex-wrap gap-1">

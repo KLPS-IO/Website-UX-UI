@@ -6,7 +6,7 @@ import { blockingReasonCopy, canGenerateAccountingExport, cleanMappings, configS
 import { accountingExportRepository } from "@/repositories/accountingExportRepository";
 import { PAYMENT_MAPPING_KEYS, QUICKFILE_PURCHASE_PROFILE, type AccountingExportConfig, type AccountingExportValidation } from "@/types/accounting-export";
 import type { VatLedgerRow, VatPeriod } from "@/types/vat-ledger";
-import { formatVatPeriodLabel } from "@/lib/vat-ledger-ui";
+import { formatVatPeriodLabel, vatPeriodDateConflictDisplay } from "@/lib/vat-ledger-ui";
 import { safeApiDateValue } from "@/lib/safe-date";
 
 const control = "rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm transition hover:border-[#ef9f32] disabled:cursor-not-allowed disabled:!bg-slate-100 disabled:!text-slate-500 disabled:opacity-100";
@@ -399,6 +399,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
                     <li key={reason}>{blockingReasonCopy(reason)}</li>
                   ))}
                 </ul>
+                {item.reasons.includes("vat_period_date_conflict")&&item.row&&(()=>{const conflict=vatPeriodDateConflictDisplay(item.row,periods);return conflict?<div className="mt-3 rounded-lg border border-red-300 bg-red-50 p-3 text-red-900"><strong>VAT period conflict</strong><dl className="mt-2 grid gap-2 sm:grid-cols-3"><div><dt className="font-semibold">Stored VAT period</dt><dd>{conflict.storedPeriod}</dd></div><div><dt className="font-semibold">Effective tax point</dt><dd>{conflict.effectiveTaxPoint}</dd></div><div><dt className="font-semibold">Date-derived VAT period</dt><dd>{conflict.dateDerivedPeriod}</dd></div></dl><p className="mt-2 font-medium">Founder review required before accounting export.</p></div>:null;})()}
               </div>
             ))}
           </section>

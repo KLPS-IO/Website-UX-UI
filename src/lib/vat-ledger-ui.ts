@@ -32,6 +32,12 @@ export function vatPeriodDisplay(row: Pick<VatLedgerRow,"vat_period_start"|"vat_
   return{label,detail};
 }
 
+export function vatPeriodDateConflictDisplay(row:Pick<VatLedgerRow,"vat_period_date_conflict">,periods:VatPeriod[]){
+  const conflict=row.vat_period_date_conflict;if(!conflict)return null;
+  const stored=periods.find(period=>period.id===conflict.stored_vat_period_id),derived=periods.find(period=>period.id===conflict.date_derived_vat_period_id);
+  return{storedPeriod:stored?formatVatPeriodLabel(stored):"Stored period unavailable",effectiveTaxPoint:formatDateOnlyUk(conflict.effective_tax_point_date,"Date unavailable"),dateDerivedPeriod:derived?formatVatPeriodLabel(derived):conflict.date_derived_vat_period_source==="conflict"?"Matches multiple VAT periods":"No matching VAT period"};
+}
+
 export function foreignCurrencyWarning(input: {currency?:string|null;gross_amount?:unknown;exchange_rate?:unknown;gbp_net_amount?:unknown;gbp_vat_amount?:unknown;gbp_gross_amount?:unknown;notes?:string|null}): string | null {
   if ((input.currency ?? "GBP").trim().toUpperCase() === "GBP") return null;
   const finite = (value: unknown) => value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value));

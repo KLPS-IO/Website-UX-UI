@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { formatDateOnlyUk } from "./safe-date.ts";
-import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,buildVatExpensePayload,calculatedGbpGross, canonicalExpenseCategory, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
+import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,buildVatExpensePayload,calculatedGbpGross, canonicalExpenseCategory, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, resolveEffectiveTaxPointDate, vatPeriodDateConflictDisplay, vatPeriodDisplay, vatRateAmountMismatch, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
 import type { VatLedgerRow } from "../types/vat-ledger.ts";
 
 const row=(overrides:Partial<VatLedgerRow>):VatLedgerRow=>({id:"1",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2025-05-08",currency:"GBP",net_amount:null,vat_amount:null,gross_amount:"10.00",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:[],notes:null,created_at:"",updated_at:"",...overrides});
@@ -89,6 +89,13 @@ test("VAT table explains severity and the exact next action",()=>{
   assert.match(vatReviewNextAction({vat_review_status:"ready_for_review",warning_details:[]}),/Mark review complete/);
 });
 test("derived-period rows are labelled without implying founder confirmation",()=>assert.deepEqual(vatPeriodDisplay({vat_period_start:"2025-05-08",vat_period_end:"2026-04-30",vat_period_source:"derived"}),{label:"8 May 2025 to 30 April 2026",detail:"Date-derived · not explicitly confirmed"}));
+test("explicit period conflicts show stored, tax-point and date-derived period details",()=>{
+  const periods=[{id:"overdue",start_date:"2025-05-08",end_date:"2026-04-30",filing_deadline:null,status:"open",overdue:true,review_status:"open",locked_at:null},{id:"next",start_date:"2026-05-01",end_date:"2026-07-31",filing_deadline:null,status:"open",overdue:false,review_status:"open",locked_at:null}];
+  const openAi={vat_period_date_conflict:{stored_vat_period_id:"overdue",effective_tax_point_date:"2026-07-20",date_derived_vat_period_id:"next",date_derived_vat_period_source:"derived" as const,date_derived_matching_period_ids:["next"]}};
+  assert.deepEqual(vatPeriodDateConflictDisplay(openAi,periods),{storedPeriod:"8 May 2025 to 30 April 2026",effectiveTaxPoint:"20 July 2026",dateDerivedPeriod:"1 May 2026 to 31 July 2026"});
+  const ebay={vat_period_date_conflict:{...openAi.vat_period_date_conflict,effective_tax_point_date:"2026-10-05",date_derived_vat_period_id:null,date_derived_vat_period_source:"none" as const,date_derived_matching_period_ids:[]}};
+  assert.equal(vatPeriodDateConflictDisplay(ebay,periods)?.dateDerivedPeriod,"No matching VAT period");
+});
 test("entry dirtiness ignores controlled defaults and detects any unsaved field or selected period",()=>{
   const empty={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",category:"To Classify",payment_source:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",supplier_document_review_status:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
   assert.equal(hasUnsavedVatEntry(empty),false);

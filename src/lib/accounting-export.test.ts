@@ -34,12 +34,14 @@ test("blocked reasons are founder-readable and retain payment source detail",()=
   assert.equal(blockingReasonCopy("paid_account_nominal_code_missing:founder_director_funded"),"Payment account is not mapped: founder director funded");
   assert.equal(blockingReasonCopy("critical_warning:vat_conflict"),"Critical VAT warning: vat conflict");
   assert.match(blockingReasonCopy("supplier_document_insufficient_evidence"),/Intentionally excluded/);
+  assert.match(blockingReasonCopy("vat_period_date_conflict"),/Stored VAT period conflicts/);
 });
 
 test("MTD review distinguishes eligible, blocked and intentionally excluded transactions",()=>{
   const component=readFileSync("src/components/finance/MtdAccountingExportDialog.tsx","utf8");
   assert.match(component,/Intentionally excluded/);assert.match(component,/excluded_row_count/);assert.match(component,/excluded_expense_ids/);assert.match(component,/exclusion_reasons/);
   assert.match(component,/supplier_document_review_status/);
+  assert.match(component,/VAT period conflict/);assert.match(component,/Founder review required before accounting export/);assert.match(component,/vat_period_date_conflict/);
 });
 
 test("download filename is deterministic and safe",()=>assert.equal(safeAccountingExportFilename({id:"p",start_date:"2025-05-08",end_date:"2026-04-30",filing_deadline:null,status:"open",overdue:false,review_status:"open",locked_at:null}),"KLPS-MTD-accounting-export-2025-05-08-to-2026-04-30-quickfile.csv"));

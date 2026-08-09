@@ -8,10 +8,12 @@ test("normalizes no VAT records", () => {
 });
 
 test("preserves a complete VAT record", () => {
-  const row = normalizeVatLedgerRow({ id: "complete", name: "Purchase", supplier_name: "Supplier", category: "Other", currency: "GBP", warnings: ["review"], evidence_files: [{ id: "invoice", filename: "invoice.pdf", type: "full_vat_invoice" }], adjustments: [] });
+  const conflict={stored_vat_period_id:"stored",effective_tax_point_date:"2026-07-20",date_derived_vat_period_id:"next",date_derived_vat_period_source:"derived",date_derived_matching_period_ids:["next"]};
+  const row = normalizeVatLedgerRow({ id: "complete", name: "Purchase", supplier_name: "Supplier", category: "Other", currency: "GBP", warnings: ["review"], evidence_files: [{ id: "invoice", filename: "invoice.pdf", type: "full_vat_invoice" }], adjustments: [],vat_period_date_conflict:conflict });
   assert.equal(row.supplier_name, "Supplier");
   assert.deepEqual(row.warnings, ["review"]);
   assert.equal(row.evidence_files[0].filename, "invoice.pdf");
+  assert.deepEqual(row.vat_period_date_conflict,conflict);
 });
 
 test("normalizes historical partial records, missing links, and optional arrays", () => {
