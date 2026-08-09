@@ -80,7 +80,7 @@ test("VAT table explains severity and the exact next action",()=>{
 });
 test("derived-period rows are labelled without implying founder confirmation",()=>assert.deepEqual(vatPeriodDisplay({vat_period_start:"2025-05-08",vat_period_end:"2026-04-30",vat_period_source:"derived"}),{label:"8 May 2025 to 30 April 2026",detail:"Date-derived · not explicitly confirmed"}));
 test("entry dirtiness ignores controlled defaults and detects any unsaved field or selected period",()=>{
-  const empty={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
+  const empty={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",supplier_document_review_status:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
   assert.equal(hasUnsavedVatEntry(empty),false);
   assert.equal(hasUnsavedVatEntry({...empty,supplier_name:"IONOS"}),true);
   assert.equal(hasUnsavedVatEntry({...empty,vat_period_id:"period-id"}),true);
@@ -114,6 +114,19 @@ test("VAT entry fields expose canonical date bindings and focused helper text",(
   assert.match(page,/Calculated from invoice date, otherwise transaction date, otherwise payment date\./);assert.match(page,/Date shown on the supplier invoice\./);
   assert.match(page,/Short description shown in the VAT ledger and accounting export\./);assert.match(page,/Optional private note for accounting, evidence or manual review context\./);
   assert.match(page,/placeholder="Optional accounting or review note"/);assert.doesNotMatch(page,/Review note for manual conversion/);
+});
+
+test("supplier-document review is separate from VAT treatment and retains evidence access",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  assert.match(page,/>Supplier document review/);
+  assert.match(page,/value=\{form\.supplier_document_review_status\}[\s\S]{0,140}update\("supplier_document_review_status"/);
+  assert.match(page,/Supporting document accepted for bookkeeping — no VAT claimed/);
+  assert.match(page,/not relying on the document to reclaim VAT/);
+  assert.match(page,/does not approve a VAT reclaim/);assert.match(page,/specialist review and HMRC discretion/);
+  assert.match(page,/remains in Financial OS but will not be included in the accounting export/);
+  assert.match(page,/value=\{form\.vat_treatment\}[\s\S]{0,120}update\("vat_treatment"/);
+  assert.doesNotMatch(page,/update\("supplier_document_review_status"[\s\S]{0,80}vat_treatment/);
+  assert.match(page,/View evidence/);
 });
 
 test("VAT ledger exposes founder-only fixed expense and adjustment evidence targets",()=>{

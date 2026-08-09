@@ -10,8 +10,8 @@ export type AccountingExportConfigInput={profile:typeof QUICKFILE_PURCHASE_PROFI
 export type ManualAdjustment={adjustment_id:string;parent_expense_id:string;expense_id?:string|null;reason:string;amount?:string|number|null;gbp_gross_amount?:string|number|null;adjustment_date?:string|null;reference?:string|null;supplier_reference?:string|null};
 export type AccountingExportValidation={
   export_type:"mtd_accounting";profile:typeof QUICKFILE_PURCHASE_PROFILE;validation_mode:"dry_run";generated_at:string;
-  vat_period:Record<string,unknown>;eligible_row_count:number;blocked_row_count:number;blocked_expense_ids:string[];
-  blocking_reasons:Record<string,string[]>;mapping_config_source:"database"|"environment"|"none";mapping_config_confirmed:boolean;
+  vat_period:Record<string,unknown>;eligible_row_count:number;blocked_row_count:number;excluded_row_count:number;blocked_expense_ids:string[];excluded_expense_ids:string[];
+  blocking_reasons:Record<string,string[]>;exclusion_reasons:Record<string,string[]>;mapping_config_source:"database"|"environment"|"none";mapping_config_confirmed:boolean;
   mapping_config_version:number;mapped_nominal_codes:Record<string,string>;missing_nominal_mappings:string[];
   payment_account_mappings:Record<string,string>;unmapped_payment_sources:string[];
   adjustment_handling:{strategy:string;manual_adjustment_count:number;items:ManualAdjustment[]};

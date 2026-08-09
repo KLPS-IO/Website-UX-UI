@@ -6,7 +6,7 @@ import { blockingReasonCopy,canGenerateAccountingExport,cleanMappings,configStat
 import type { AccountingExportConfig,AccountingExportValidation } from "../types/accounting-export.ts";
 
 const config=(source:AccountingExportConfig["source"],confirmed:boolean,version=2):AccountingExportConfig=>({export_type:"mtd_accounting",profile:"quickfile_purchase_csv_v1",category_nominal_codes:{Software:"7001"},payment_account_nominal_codes:{paypal:"1201"},source,confirmed,confirmed_at:confirmed?"2026-08-04T12:00:00Z":null,updated_at:"2026-08-04T12:00:00Z",version});
-const validation=(blocked=0):AccountingExportValidation=>({export_type:"mtd_accounting",profile:"quickfile_purchase_csv_v1",validation_mode:"dry_run",generated_at:"2026-08-04T12:00:00Z",vat_period:{},eligible_row_count:1,blocked_row_count:blocked,blocked_expense_ids:blocked?["expense-id"]:[],blocking_reasons:blocked?{"expense-id":["purchase_nominal_code_missing"]}:{},mapping_config_source:"database",mapping_config_confirmed:true,mapping_config_version:2,mapped_nominal_codes:{Software:"7001"},missing_nominal_mappings:[],payment_account_mappings:{paypal:"1201"},unmapped_payment_sources:[],adjustment_handling:{strategy:"manual",manual_adjustment_count:0,items:[]},expected_csv_headings:[],source_ledger_fingerprint:"a".repeat(64)});
+const validation=(blocked=0):AccountingExportValidation=>({export_type:"mtd_accounting",profile:"quickfile_purchase_csv_v1",validation_mode:"dry_run",generated_at:"2026-08-04T12:00:00Z",vat_period:{},eligible_row_count:1,blocked_row_count:blocked,excluded_row_count:0,blocked_expense_ids:blocked?["expense-id"]:[],excluded_expense_ids:[],blocking_reasons:blocked?{"expense-id":["purchase_nominal_code_missing"]}:{},exclusion_reasons:{},mapping_config_source:"database",mapping_config_confirmed:true,mapping_config_version:2,mapped_nominal_codes:{Software:"7001"},missing_nominal_mappings:[],payment_account_mappings:{paypal:"1201"},unmapped_payment_sources:[],adjustment_handling:{strategy:"manual",manual_adjustment_count:0,items:[]},expected_csv_headings:[],source_ledger_fingerprint:"a".repeat(64)});
 
 test("configuration provenance copy covers confirmed, draft, environment and none",()=>{
   assert.equal(configStateCopy(config("database",true)),"Confirmed founder configuration");
@@ -33,6 +33,13 @@ test("blocked reasons are founder-readable and retain payment source detail",()=
   assert.equal(blockingReasonCopy("reviewed_gbp_vat_missing"),"VAT amount is missing");
   assert.equal(blockingReasonCopy("paid_account_nominal_code_missing:founder_director_funded"),"Payment account is not mapped: founder director funded");
   assert.equal(blockingReasonCopy("critical_warning:vat_conflict"),"Critical VAT warning: vat conflict");
+  assert.match(blockingReasonCopy("supplier_document_insufficient_evidence"),/Intentionally excluded/);
+});
+
+test("MTD review distinguishes eligible, blocked and intentionally excluded transactions",()=>{
+  const component=readFileSync("src/components/finance/MtdAccountingExportDialog.tsx","utf8");
+  assert.match(component,/Intentionally excluded/);assert.match(component,/excluded_row_count/);assert.match(component,/excluded_expense_ids/);assert.match(component,/exclusion_reasons/);
+  assert.match(component,/supplier_document_review_status/);
 });
 
 test("download filename is deterministic and safe",()=>assert.equal(safeAccountingExportFilename({id:"p",start_date:"2025-05-08",end_date:"2026-04-30",filing_deadline:null,status:"open",overdue:false,review_status:"open",locked_at:null}),"KLPS-MTD-accounting-export-2025-05-08-to-2026-04-30-quickfile.csv"));

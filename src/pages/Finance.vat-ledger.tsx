@@ -6,7 +6,7 @@ import { VatEvidenceUploadDialog, type VatEvidenceTarget } from "@/components/fi
 import { useDataRoomViewer } from "@/hooks/useDataRoomViewer";
 import { vatLedgerRepository } from "@/repositories/vatLedgerRepository";
 import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-export";
-import type { VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
+import type { SupplierDocumentReviewStatus, VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
 import { authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
@@ -14,6 +14,18 @@ import { authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, f
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
 const treatments = ["pending_review", "standard_rated", "reduced_rated", "zero_rated", "exempt", "outside_scope", "no_vat_shown", "reverse_charge_review_required", "import_vat_review_required", "blocked_vat", "partially_recoverable", "personal_non_business"];
+const supplierDocumentReviewOptions = [
+  ["pending_review", "Pending review"],
+  ["vat_invoice_confirmed", "VAT invoice confirmed"],
+  ["supporting_document_accepted_no_vat_claim", "Supporting document accepted for bookkeeping — no VAT claimed"],
+  ["alternative_vat_evidence_requires_specialist_review", "Alternative evidence for VAT claim — specialist review required"],
+  ["insufficient_evidence_exclude_from_export", "Insufficient evidence — exclude from accounting export"],
+] as const;
+const supplierDocumentHelp:Record<string,string>={
+  supporting_document_accepted_no_vat_claim:"Use this where the purchase is supported well enough for bookkeeping, but you are not relying on the document to reclaim VAT.",
+  alternative_vat_evidence_requires_specialist_review:"This does not approve a VAT reclaim. Alternative evidence without a valid VAT invoice may require specialist review and HMRC discretion.",
+  insufficient_evidence_exclude_from_export:"The purchase remains in Financial OS but will not be included in the accounting export.",
+};
 const human = (value: string | null | undefined) => (value ?? "Not recorded").replaceAll("_", " ").replace(/^./, (character) => character.toUpperCase());
 type FormState = {
   transaction_date: string;
@@ -30,6 +42,7 @@ type FormState = {
   vat_rate: string;
   notes: string;
   vat_treatment: string;
+  supplier_document_review_status: SupplierDocumentReviewStatus;
   vat_review_status: string;
   vat_period_id: string;
 };
@@ -48,6 +61,7 @@ const emptyForm: FormState = {
   vat_rate: "",
   notes: "",
   vat_treatment: "pending_review",
+  supplier_document_review_status: "pending_review",
   vat_review_status: "pending_review",
   vat_period_id: "",
 };
@@ -174,6 +188,7 @@ export default function VatLedgerPage() {
       vat_rate: vatRateRatioToPercent(row.vat_rate),
       notes: row.notes ?? "",
       vat_treatment: row.vat_treatment ?? "pending_review",
+      supplier_document_review_status: row.supplier_document_review_status ?? "pending_review",
       vat_review_status: row.vat_review_status ?? "pending_review",
       vat_period_id: row.stored_vat_period_id ?? row.vat_period_id ?? "",
     };
@@ -316,6 +331,9 @@ export default function VatLedgerPage() {
                 </option>
               ))}
             </select></label>
+            <label className="text-sm font-medium">Supplier document review<select className={`${input} mt-1 w-full`} value={form.supplier_document_review_status} onChange={(event) => update("supplier_document_review_status", event.target.value)}>
+              {supplierDocumentReviewOptions.map(([value,label]) => <option value={value} key={value}>{label}</option>)}
+            </select>{supplierDocumentHelp[form.supplier_document_review_status]&&<span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">{supplierDocumentHelp[form.supplier_document_review_status]}</span>}</label>
             <label className="text-sm font-medium">Review status<select className={`${input} mt-1 w-full`} value={form.vat_review_status} onChange={(event) => update("vat_review_status", event.target.value)}>
               {reviewStatuses.map((value) => (
                 <option value={value} key={value} disabled={value === "review_complete" && !reviewCompleteAvailable}>

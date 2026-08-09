@@ -31,7 +31,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
   const periodCategories = useMemo(() => [...new Set(rows.map((row) => row.category).filter(Boolean))], [rows]);
   const periodCategoriesRef = useRef(periodCategories);
   periodCategoriesRef.current = periodCategories;
-  const ledgerVersion = useMemo(() => rows.map((row) => `${row.id}:${row.updated_at}:${row.vat_review_status}:${row.evidence_status}:${(row.evidence_files ?? []).map((item) => item.id).join(",")}:${(row.adjustments ?? []).map((item) => `${item.id}:${item.review_status}:${(item.evidence_files ?? []).map((file) => file.id).join(",")}`).join(";")}`).join("|"), [rows]);
+  const ledgerVersion = useMemo(() => rows.map((row) => `${row.id}:${row.updated_at}:${row.vat_review_status}:${row.supplier_document_review_status}:${row.evidence_status}:${(row.evidence_files ?? []).map((item) => item.id).join(",")}:${(row.adjustments ?? []).map((item) => `${item.id}:${item.review_status}:${(item.evidence_files ?? []).map((file) => file.id).join(",")}`).join(";")}`).join("|"), [rows]);
   const previousLedgerVersion = useRef(ledgerVersion);
   const hydrate = useCallback((next: AccountingExportConfig) => {
     setConfig(next);
@@ -177,6 +177,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
       row: rows.find((item) => item.id === id),
       reasons: validation.blocking_reasons[id] ?? [],
     })) ?? [];
+  const excluded = validation?.excluded_expense_ids.map((id)=>({id,row:rows.find((item)=>item.id===id),reasons:validation.exclusion_reasons[id]??[]}))??[];
   const categoryInvalid = categories.some((row) => !row.key.trim() || !row.value.trim());
   const validationDisabledReason = !selectedPeriod ? "Select a VAT period first." : loading ? "Configuration is still loading." : !config ? "The selected export profile is unavailable." : null;
   const generationReasons = [config?.source === "database" && !config.confirmed ? "Mapping configuration is still a draft." : null, config?.source === "none" ? "Confirm accounting mappings before generation." : null, !validation ? "Validate transactions first." : validation && validation.blocked_row_count > 0 ? `${validation.blocked_row_count} transactions remain blocked.` : null, stale ? "Financial records changed after validation." : null].filter((value): value is string => Boolean(value));
@@ -237,6 +238,10 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
           <div>
             <dt className="text-muted-foreground">Blocked transactions</dt>
             <dd>{validation?.blocked_row_count ?? "Not validated"}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">Intentionally excluded</dt>
+            <dd>{validation?.excluded_row_count ?? "Not validated"}</dd>
           </div>
           <div>
             <dt className="text-muted-foreground">Manual adjustments</dt>
@@ -412,6 +417,7 @@ export function MtdAccountingExportDialog({ open, onOpenChange, period, periods,
             ))}
           </section>
         )}
+        {validation && excluded.length > 0 && <section className="space-y-2"><h3 className="font-semibold">Intentionally excluded transactions</h3>{excluded.map((item)=><div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm" key={item.id}><strong>{item.row?.supplier_name||"Supplier unavailable"}</strong><ul className="mt-2 list-disc pl-5">{item.reasons.map((reason)=><li key={reason}>{blockingReasonCopy(reason)}</li>)}</ul>{item.row&&<button type="button" className="mt-2 underline" onClick={()=>{onEdit(item.row!);onOpenChange(false);}}>Review transaction</button>}</div>)}</section>}
         {stale && <p className="text-sm font-medium text-brand-coral">Revalidate transactions before generating the accounting CSV.</p>}
         <section className="space-y-4 rounded-xl border border-slate-300 bg-slate-50 p-4 sm:p-5">
           <div>
