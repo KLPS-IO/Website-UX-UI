@@ -2,9 +2,9 @@ import { formatDateOnlyUk } from "./safe-date.ts";
 import type { VatLedgerRow, VatPeriod, VatWarningDetail } from "../types/vat-ledger.ts";
 
 export type VatLedgerFilters = { supplier: string; reviewStatus: string; evidenceStatus: string };
-export type VatEntryDraft={transaction_date:string;payment_date:string;invoice_date:string;supplier_name:string;gross_amount:string;description:string;currency:string;exchange_rate:string;gbp_net_amount:string;gbp_vat_amount:string;gbp_gross_amount:string;vat_rate:string;notes:string;vat_treatment:string;supplier_document_review_status:string;vat_review_status:string;vat_period_id:string};
+export type VatEntryDraft={transaction_date:string;payment_date:string;invoice_date:string;supplier_name:string;gross_amount:string;description:string;category:string;payment_source:string;currency:string;exchange_rate:string;gbp_net_amount:string;gbp_vat_amount:string;gbp_gross_amount:string;vat_rate:string;notes:string;vat_treatment:string;supplier_document_review_status:string;vat_review_status:string;vat_period_id:string};
 
-const EMPTY_VAT_ENTRY:VatEntryDraft={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",supplier_document_review_status:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
+const EMPTY_VAT_ENTRY:VatEntryDraft={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",category:"To Classify",payment_source:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",supplier_document_review_status:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
 
 export const hasUnsavedVatEntry=(entry:VatEntryDraft)=>Object.keys(EMPTY_VAT_ENTRY).some(key=>entry[key as keyof VatEntryDraft]!==EMPTY_VAT_ENTRY[key as keyof VatEntryDraft]);
 
@@ -60,6 +60,19 @@ export function vatRatePercentToRatio(value: unknown): string | null {
   const percent=Number(value);
   if(!Number.isFinite(percent)||percent<0||percent>100)throw new Error("VAT rate must be between 0 and 100%.");
   return String(percent/100);
+}
+
+export function vatRateAmountMismatch(input:{gbp_net_amount:unknown;gbp_vat_amount:unknown;vat_rate:unknown;vat_treatment:string}):boolean {
+  if(!["standard_rated","reduced_rated"].includes(input.vat_treatment))return false;
+  const present=(value:unknown)=>value!==""&&value!==null&&value!==undefined&&Number.isFinite(Number(value));
+  if(!present(input.gbp_net_amount)||!present(input.gbp_vat_amount)||!present(input.vat_rate))return false;
+  const expectedVat=Number(input.gbp_net_amount)*(Number(input.vat_rate)/100);
+  return Math.abs(expectedVat-Number(input.gbp_vat_amount))>0.02;
+}
+
+export function buildVatExpensePayload<T extends VatEntryDraft>(input:T,editing:boolean){
+  const gbpGross=input.gbp_gross_amount||calculatedGbpGross(input.gross_amount,input.exchange_rate);
+  return{...input,payment_source:input.payment_source||null,vat_rate:vatRatePercentToRatio(input.vat_rate),gbp_gross_amount:gbpGross||null,vat_period_id:input.vat_period_id||null,change_reason:editing?"Founder edited VAT ledger record":"Created through VAT fast entry"};
 }
 
 export const warningCopy = (warning:string) => ({pending_vat_treatment:"VAT treatment has not been reviewed.",foreign_currency_without_conversion:"Foreign-currency conversion data is incomplete.",gross_net_vat_mismatch:"Net plus VAT does not match gross.",no_supplier_invoice:"Supplier invoice is missing.",payment_evidence_missing:"Payment evidence is missing.",vat_period_conflict:"The tax-point date matches more than one VAT period."}[warning] ?? warning.replaceAll("_"," "));

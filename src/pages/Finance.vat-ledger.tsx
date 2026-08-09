@@ -9,7 +9,7 @@ import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-expo
 import type { SupplierDocumentReviewStatus, VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
-import { authoritativeRowsAfterMutation, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
+import { authoritativeRowsAfterMutation, buildVatExpensePayload, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
 
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
@@ -20,6 +20,15 @@ const supplierDocumentReviewOptions = [
   ["supporting_document_accepted_no_vat_claim", "Supporting document accepted for bookkeeping — no VAT claimed"],
   ["alternative_vat_evidence_requires_specialist_review", "Alternative evidence for VAT claim — specialist review required"],
   ["insufficient_evidence_exclude_from_export", "Insufficient evidence — exclude from accounting export"],
+] as const;
+const paymentSourceOptions = [
+  ["", "Unresolved / not selected"],
+  ["founder_director_funded", "Founder/director funded"],
+  ["paypal", "PayPal"],
+  ["personal_credit_card", "Personal credit card"],
+  ["company_credit_card", "Company credit card"],
+  ["business_bank", "Business bank"],
+  ["other", "Other"],
 ] as const;
 const supplierDocumentHelp:Record<string,string>={
   supporting_document_accepted_no_vat_claim:"Use this where the purchase is supported well enough for bookkeeping, but you are not relying on the document to reclaim VAT.",
@@ -34,6 +43,8 @@ type FormState = {
   supplier_name: string;
   gross_amount: string;
   description: string;
+  category: string;
+  payment_source: string;
   currency: string;
   exchange_rate: string;
   gbp_net_amount: string;
@@ -53,6 +64,8 @@ const emptyForm: FormState = {
   supplier_name: "",
   gross_amount: "",
   description: "",
+  category: "To Classify",
+  payment_source: "",
   currency: "GBP",
   exchange_rate: "",
   gbp_net_amount: "",
@@ -122,10 +135,11 @@ export default function VatLedgerPage() {
   }, [effectiveTaxPointDate]);
   const selected = useMemo(() => periods.find((item) => item.id === period), [period, periods]);
   const filteredRows = useMemo(() => filterVatLedgerRows(rows, filters), [rows, filters]);
+  const categoryOptions = useMemo(() => [...new Set(["To Classify",...rows.map((row) => row.category).filter((value):value is string=>Boolean(value?.trim())),form.category].filter(Boolean))].sort((a,b)=>a.localeCompare(b)), [rows,form.category]);
   const conversionWarning = foreignCurrencyWarning(form);
-  const enteredVatRate=Number(form.vat_rate),gbpNet=Number(form.gbp_net_amount),gbpVat=Number(form.gbp_vat_amount);
+  const gbpNet=Number(form.gbp_net_amount),gbpVat=Number(form.gbp_vat_amount);
   const impliedVatRate=gbpNet>0&&gbpVat>=0&&Number.isFinite(gbpNet)&&Number.isFinite(gbpVat)?gbpVat/gbpNet*100:null;
-  const vatRateMismatch=impliedVatRate!==null&&Number.isFinite(enteredVatRate)&&Math.abs(enteredVatRate-impliedVatRate)>0.05;
+  const vatRateMismatch=vatRateAmountMismatch(form);
   const resetForm = () => {
     setForm(emptyForm);
     setFormBaseline(emptyForm);
@@ -152,14 +166,7 @@ export default function VatLedgerPage() {
     event.preventDefault();
     setFormError("");
     try {
-      const gbpGross = form.gbp_gross_amount || calculatedGbpGross(form.gross_amount, form.exchange_rate);
-      const payload = {
-        ...form,
-        vat_rate: vatRatePercentToRatio(form.vat_rate),
-        gbp_gross_amount: gbpGross || null,
-        vat_period_id: form.vat_period_id || null,
-        change_reason: editingId ? "Founder edited VAT ledger record" : "Created through VAT fast entry",
-      };
+      const payload = buildVatExpensePayload(form,Boolean(editingId));
       const refreshed = await authoritativeRowsAfterMutation(
         () => (editingId ? vatLedgerRepository.update(editingId, payload) : vatLedgerRepository.create(payload)),
         () => vatLedgerRepository.ledger(period),
@@ -180,6 +187,8 @@ export default function VatLedgerPage() {
       supplier_name: row.supplier_name ?? "",
       gross_amount: String(row.gross_amount ?? ""),
       description: row.description ?? "",
+      category: row.category ?? "To Classify",
+      payment_source: row.payment_source ?? "",
       currency: row.currency ?? "GBP",
       exchange_rate: String(row.exchange_rate ?? ""),
       gbp_net_amount: String(row.gbp_net_amount ?? ""),
@@ -323,6 +332,15 @@ export default function VatLedgerPage() {
             <label className="text-sm font-medium">GBP net<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="GBP net" value={form.gbp_net_amount} onChange={(event) => update("gbp_net_amount", event.target.value)} /></label>
             <label className="text-sm font-medium">GBP VAT<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder="GBP VAT" value={form.gbp_vat_amount} onChange={(event) => update("gbp_vat_amount", event.target.value)} /></label>
             <label className="text-sm font-medium">GBP gross<input inputMode="decimal" className={`${input} mt-1 w-full`} placeholder={calculatedGbpGross(form.gross_amount, form.exchange_rate) ? `Calculated ${calculatedGbpGross(form.gross_amount, form.exchange_rate)}` : "GBP gross"} value={form.gbp_gross_amount} onChange={(event) => update("gbp_gross_amount", event.target.value)} /></label>
+            <fieldset className="grid gap-3 rounded-lg border border-border p-3 md:col-span-3 md:grid-cols-2 xl:col-span-5">
+              <legend className="px-1 text-sm font-semibold">Accounting classification</legend>
+              <label className="text-sm font-medium">Purchase category<select required disabled={!viewer?.canWriteFinance} className={`${input} mt-1 w-full`} value={form.category} onChange={(event) => update("category", event.target.value)}>
+                {categoryOptions.map((value)=><option value={value} key={value}>{value}</option>)}
+              </select><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Used to map this expense to the accounting nominal code during export.</span></label>
+              <label className="text-sm font-medium">Payment source<select disabled={!viewer?.canWriteFinance} className={`${input} mt-1 w-full`} value={form.payment_source} onChange={(event) => update("payment_source", event.target.value)}>
+                {paymentSourceOptions.map(([value,label])=><option value={value} key={value||"unresolved"}>{label}</option>)}
+              </select><span className="mt-1 block text-xs font-normal leading-4 text-muted-foreground">Identifies which account funded the purchase for accounting export.</span></label>
+            </fieldset>
             <label className="text-sm font-medium">VAT rate (%)<input inputMode="decimal" min="0" max="100" className={`${input} mt-1 w-full`} placeholder="For example 20" value={form.vat_rate} onChange={(event) => update("vat_rate", event.target.value)} />{vatRateMismatch&&<span className="mt-1 block text-xs font-normal leading-4 text-brand-coral">Entered rate is {form.vat_rate}%, but GBP VAT and net amounts imply approximately {impliedVatRate?.toFixed(2)}%. Enter 20 for a 20% VAT rate.</span>}</label>
             <label className="text-sm font-medium">VAT treatment<select className={`${input} mt-1 w-full`} value={form.vat_treatment} onChange={(event) => update("vat_treatment", event.target.value)}>
               {treatments.map((value) => (

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { formatDateOnlyUk } from "./safe-date.ts";
-import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
+import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,buildVatExpensePayload,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
 import type { VatLedgerRow } from "../types/vat-ledger.ts";
 
 const row=(overrides:Partial<VatLedgerRow>):VatLedgerRow=>({id:"1",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2025-05-08",currency:"GBP",net_amount:null,vat_amount:null,gross_amount:"10.00",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:[],notes:null,created_at:"",updated_at:"",...overrides});
@@ -15,6 +15,11 @@ test("VAT rate UI uses percentages while the canonical API contract uses decimal
   assert.equal(vatRatePercentToRatio("20"),"0.2");
   assert.equal(vatRatePercentToRatio(""),null);
   assert.throws(()=>vatRatePercentToRatio("101"),/between 0 and 100%/);
+});
+test("VAT rate mismatch uses the backend monetary tolerance",()=>{
+  assert.equal(vatRateAmountMismatch({gbp_net_amount:"4.63",gbp_vat_amount:"0.92",vat_rate:"20",vat_treatment:"standard_rated"}),false);
+  assert.equal(vatRateAmountMismatch({gbp_net_amount:"4.63",gbp_vat_amount:"0.89",vat_rate:"20",vat_treatment:"standard_rated"}),true);
+  assert.equal(vatRateAmountMismatch({gbp_net_amount:"4.63",gbp_vat_amount:"0.89",vat_rate:"20",vat_treatment:"zero_rated"}),false);
 });
 test("UK VAT period labels preserve midnight UTC and offset timestamp dates",()=>{
   assert.equal(formatDateOnlyUk("2026-05-01T00:00:00.000Z"),"1 May 2026");
@@ -80,11 +85,31 @@ test("VAT table explains severity and the exact next action",()=>{
 });
 test("derived-period rows are labelled without implying founder confirmation",()=>assert.deepEqual(vatPeriodDisplay({vat_period_start:"2025-05-08",vat_period_end:"2026-04-30",vat_period_source:"derived"}),{label:"8 May 2025 to 30 April 2026",detail:"Date-derived · not explicitly confirmed"}));
 test("entry dirtiness ignores controlled defaults and detects any unsaved field or selected period",()=>{
-  const empty={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",supplier_document_review_status:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
+  const empty={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",category:"To Classify",payment_source:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",supplier_document_review_status:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
   assert.equal(hasUnsavedVatEntry(empty),false);
   assert.equal(hasUnsavedVatEntry({...empty,supplier_name:"IONOS"}),true);
   assert.equal(hasUnsavedVatEntry({...empty,vat_period_id:"period-id"}),true);
   assert.equal(hasUnsavedVatEntry({...empty,currency:"EUR"}),true);
+});
+
+test("accounting classification uses canonical PATCH fields without changing VAT review state",()=>{
+  const draft={transaction_date:"2025-10-05",payment_date:"2025-10-05",invoice_date:"2025-10-05",supplier_name:"eBay (UK) Limited",gross_amount:"5.55",description:"Prototype box",category:"To Classify",payment_source:"",currency:"GBP",exchange_rate:"1",gbp_net_amount:"4.63",gbp_vat_amount:"0.92",gbp_gross_amount:"5.55",vat_rate:"20",notes:"",vat_treatment:"standard_rated",supplier_document_review_status:"vat_invoice_confirmed",vat_review_status:"review_complete",vat_period_id:"period-id"};
+  const unresolved=buildVatExpensePayload(draft,true);
+  assert.equal(unresolved.category,"To Classify");assert.equal(unresolved.payment_source,null);assert.equal(unresolved.vat_rate,"0.2");
+  assert.equal(unresolved.vat_treatment,"standard_rated");assert.equal(unresolved.supplier_document_review_status,"vat_invoice_confirmed");assert.equal(unresolved.change_reason,"Founder edited VAT ledger record");
+  assert.ok(!("nominal_code" in unresolved));
+  for(const source of ["founder_director_funded","paypal","personal_credit_card","company_credit_card","business_bank","other"]){
+    assert.equal(buildVatExpensePayload({...draft,category:"Prototype materials/electronics",payment_source:source},true).payment_source,source);
+  }
+});
+
+test("VAT Ledger exposes founder-editable canonical accounting classification fields",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  assert.match(page,/>Accounting classification/);assert.match(page,/>Purchase category/);assert.match(page,/>Payment source/);
+  assert.match(page,/row\.category \?\? "To Classify"/);assert.match(page,/row\.payment_source \?\? ""/);
+  assert.match(page,/value=\{form\.category\}[\s\S]{0,120}update\("category"/);assert.match(page,/value=\{form\.payment_source\}[\s\S]{0,120}update\("payment_source"/);
+  assert.match(page,/viewer\?\.canWriteFinance && entryOpen/);assert.match(page,/disabled=\{!viewer\?\.canWriteFinance\}/);assert.match(page,/buildVatExpensePayload\(form,Boolean\(editingId\)\)/);
+  assert.doesNotMatch(page,/nominal_code/);
 });
 test("inline editor closes saved records while new entries clear without persistence",()=>{
   const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
