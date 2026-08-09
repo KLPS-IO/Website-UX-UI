@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import { formatDateOnlyUk } from "./safe-date.ts";
-import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,buildVatExpensePayload,calculatedGbpGross, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
+import { allowedVatReviewStatuses,authoritativeRowsAfterMutation,buildVatExpensePayload,calculatedGbpGross, canonicalExpenseCategory, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, hasUnsavedVatEntry, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRatePercentToRatio, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "./vat-ledger-ui.ts";
 import type { VatLedgerRow } from "../types/vat-ledger.ts";
 
 const row=(overrides:Partial<VatLedgerRow>):VatLedgerRow=>({id:"1",name:"Expense",supplier_name:"Supplier",category:"Other",transaction_date:"2025-05-08",currency:"GBP",net_amount:null,vat_amount:null,gross_amount:"10.00",vat_rate:null,reimbursement_status:null,evidence_status:"To Evidence",evidence_files:[],warnings:[],notes:null,created_at:"",updated_at:"",...overrides});
@@ -20,6 +20,11 @@ test("VAT rate mismatch uses the backend monetary tolerance",()=>{
   assert.equal(vatRateAmountMismatch({gbp_net_amount:"4.63",gbp_vat_amount:"0.92",vat_rate:"20",vat_treatment:"standard_rated"}),false);
   assert.equal(vatRateAmountMismatch({gbp_net_amount:"4.63",gbp_vat_amount:"0.89",vat_rate:"20",vat_treatment:"standard_rated"}),true);
   assert.equal(vatRateAmountMismatch({gbp_net_amount:"4.63",gbp_vat_amount:"0.89",vat_rate:"20",vat_treatment:"zero_rated"}),false);
+});
+test("retired prototype-material category is displayed and saved canonically",()=>{
+  assert.equal(canonicalExpenseCategory("Prototype materials/electronics"),"Prototype materials and electronics");
+  assert.equal(canonicalExpenseCategory("Prototype equipment/tools"),"Prototype equipment/tools");
+  assert.equal(canonicalExpenseCategory(null),"To Classify");
 });
 test("UK VAT period labels preserve midnight UTC and offset timestamp dates",()=>{
   assert.equal(formatDateOnlyUk("2026-05-01T00:00:00.000Z"),"1 May 2026");
@@ -99,14 +104,15 @@ test("accounting classification uses canonical PATCH fields without changing VAT
   assert.equal(unresolved.vat_treatment,"standard_rated");assert.equal(unresolved.supplier_document_review_status,"vat_invoice_confirmed");assert.equal(unresolved.change_reason,"Founder edited VAT ledger record");
   assert.ok(!("nominal_code" in unresolved));
   for(const source of ["founder_director_funded","paypal","personal_credit_card","company_credit_card","business_bank","other"]){
-    assert.equal(buildVatExpensePayload({...draft,category:"Prototype materials/electronics",payment_source:source},true).payment_source,source);
+    const payload=buildVatExpensePayload({...draft,category:"Prototype materials/electronics",payment_source:source},true);
+    assert.equal(payload.payment_source,source);assert.equal(payload.category,"Prototype materials and electronics");
   }
 });
 
 test("VAT Ledger exposes founder-editable canonical accounting classification fields",()=>{
   const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
   assert.match(page,/>Accounting classification/);assert.match(page,/>Purchase category/);assert.match(page,/>Payment source/);
-  assert.match(page,/row\.category \?\? "To Classify"/);assert.match(page,/row\.payment_source \?\? ""/);
+  assert.match(page,/canonicalExpenseCategory\(row\.category\)/);assert.match(page,/row\.payment_source \?\? ""/);
   assert.match(page,/value=\{form\.category\}[\s\S]{0,120}update\("category"/);assert.match(page,/value=\{form\.payment_source\}[\s\S]{0,120}update\("payment_source"/);
   assert.match(page,/viewer\?\.canWriteFinance && entryOpen/);assert.match(page,/disabled=\{!viewer\?\.canWriteFinance\}/);assert.match(page,/buildVatExpensePayload\(form,Boolean\(editingId\)\)/);
   assert.doesNotMatch(page,/nominal_code/);

@@ -3,6 +3,9 @@ import type { VatLedgerRow, VatPeriod, VatWarningDetail } from "../types/vat-led
 
 export type VatLedgerFilters = { supplier: string; reviewStatus: string; evidenceStatus: string };
 export type VatEntryDraft={transaction_date:string;payment_date:string;invoice_date:string;supplier_name:string;gross_amount:string;description:string;category:string;payment_source:string;currency:string;exchange_rate:string;gbp_net_amount:string;gbp_vat_amount:string;gbp_gross_amount:string;vat_rate:string;notes:string;vat_treatment:string;supplier_document_review_status:string;vat_review_status:string;vat_period_id:string};
+export const CANONICAL_PROTOTYPE_MATERIALS_CATEGORY="Prototype materials and electronics";
+const RETIRED_PROTOTYPE_MATERIALS_CATEGORY="Prototype materials/electronics";
+export const canonicalExpenseCategory=(value:string|null|undefined)=>value===RETIRED_PROTOTYPE_MATERIALS_CATEGORY?CANONICAL_PROTOTYPE_MATERIALS_CATEGORY:value??"To Classify";
 
 const EMPTY_VAT_ENTRY:VatEntryDraft={transaction_date:"",payment_date:"",invoice_date:"",supplier_name:"",gross_amount:"",description:"",category:"To Classify",payment_source:"",currency:"GBP",exchange_rate:"",gbp_net_amount:"",gbp_vat_amount:"",gbp_gross_amount:"",vat_rate:"",notes:"",vat_treatment:"pending_review",supplier_document_review_status:"pending_review",vat_review_status:"pending_review",vat_period_id:""};
 
@@ -72,7 +75,7 @@ export function vatRateAmountMismatch(input:{gbp_net_amount:unknown;gbp_vat_amou
 
 export function buildVatExpensePayload<T extends VatEntryDraft>(input:T,editing:boolean){
   const gbpGross=input.gbp_gross_amount||calculatedGbpGross(input.gross_amount,input.exchange_rate);
-  return{...input,payment_source:input.payment_source||null,vat_rate:vatRatePercentToRatio(input.vat_rate),gbp_gross_amount:gbpGross||null,vat_period_id:input.vat_period_id||null,change_reason:editing?"Founder edited VAT ledger record":"Created through VAT fast entry"};
+  return{...input,category:canonicalExpenseCategory(input.category),payment_source:input.payment_source||null,vat_rate:vatRatePercentToRatio(input.vat_rate),gbp_gross_amount:gbpGross||null,vat_period_id:input.vat_period_id||null,change_reason:editing?"Founder edited VAT ledger record":"Created through VAT fast entry"};
 }
 
 export const warningCopy = (warning:string) => ({pending_vat_treatment:"VAT treatment has not been reviewed.",foreign_currency_without_conversion:"Foreign-currency conversion data is incomplete.",gross_net_vat_mismatch:"Net plus VAT does not match gross.",no_supplier_invoice:"Supplier invoice is missing.",payment_evidence_missing:"Payment evidence is missing.",vat_period_conflict:"The tax-point date matches more than one VAT period."}[warning] ?? warning.replaceAll("_"," "));

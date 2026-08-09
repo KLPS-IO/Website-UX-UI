@@ -9,7 +9,7 @@ import { exportVatCsv, exportVatXlsx } from "@/services/expenses/vat-ledger-expo
 import type { SupplierDocumentReviewStatus, VatLedgerRow, VatPeriod, VatPeriodSuggestion } from "@/types/vat-ledger";
 import { buildDuplicateExpensePayload } from "@/lib/vat-ledger-duplicate";
 import { safeApiDateValue } from "@/lib/safe-date";
-import { authoritativeRowsAfterMutation, buildVatExpensePayload, calculatedGbpGross, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
+import { authoritativeRowsAfterMutation, buildVatExpensePayload, calculatedGbpGross, canonicalExpenseCategory, EVIDENCE_FILTERS, filterVatLedgerRows, foreignCurrencyWarning, formatVatPeriodLabel, resolveEffectiveTaxPointDate, vatPeriodDisplay, vatRateAmountMismatch, vatRateRatioToPercent, vatReviewNextAction, vatSaveErrorMessage, warningCopy, warningSeverityCopy } from "@/lib/vat-ledger-ui";
 
 const input = "rounded-lg border border-border bg-background px-3 py-2 text-sm";
 const reviewStatuses = ["pending_review", "in_review", "ready_for_review", "review_complete"];
@@ -135,7 +135,7 @@ export default function VatLedgerPage() {
   }, [effectiveTaxPointDate]);
   const selected = useMemo(() => periods.find((item) => item.id === period), [period, periods]);
   const filteredRows = useMemo(() => filterVatLedgerRows(rows, filters), [rows, filters]);
-  const categoryOptions = useMemo(() => [...new Set(["To Classify",...rows.map((row) => row.category).filter((value):value is string=>Boolean(value?.trim())),form.category].filter(Boolean))].sort((a,b)=>a.localeCompare(b)), [rows,form.category]);
+  const categoryOptions = useMemo(() => [...new Set(["To Classify",...rows.map((row) => canonicalExpenseCategory(row.category)),canonicalExpenseCategory(form.category)])].sort((a,b)=>a.localeCompare(b)), [rows,form.category]);
   const conversionWarning = foreignCurrencyWarning(form);
   const gbpNet=Number(form.gbp_net_amount),gbpVat=Number(form.gbp_vat_amount);
   const impliedVatRate=gbpNet>0&&gbpVat>=0&&Number.isFinite(gbpNet)&&Number.isFinite(gbpVat)?gbpVat/gbpNet*100:null;
@@ -187,7 +187,7 @@ export default function VatLedgerPage() {
       supplier_name: row.supplier_name ?? "",
       gross_amount: String(row.gross_amount ?? ""),
       description: row.description ?? "",
-      category: row.category ?? "To Classify",
+      category: canonicalExpenseCategory(row.category),
       payment_source: row.payment_source ?? "",
       currency: row.currency ?? "GBP",
       exchange_rate: String(row.exchange_rate ?? ""),
