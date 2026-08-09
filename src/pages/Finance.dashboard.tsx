@@ -49,6 +49,7 @@ import {
 } from "@/lib/finance-exports";
 import { useState } from "react";
 import { useExpenses } from "@/hooks/useExpenses";
+import { FinanceCompliancePanel } from "@/components/finance/FinanceCompliancePanel";
 
 export default function DashboardPage() {
   const [excelStatus, setExcelStatus] = useState<"idle" | "preparing">("idle");
@@ -132,6 +133,8 @@ export default function DashboardPage() {
           <span className="text-muted-foreground">· {currentCosts.expenses.length} canonical records available in Expenses. Dashboard forecasts are unchanged.</span>
         </div>
       )}
+
+      <FinanceCompliancePanel />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Cash on Hand" value={k.cashKnown ? currencyShort(k.cash) : "Not available"} hint={k.cashKnown ? "Verified input" : "Not yet evidenced"} icon={Banknote} accent="orange" index={0} />

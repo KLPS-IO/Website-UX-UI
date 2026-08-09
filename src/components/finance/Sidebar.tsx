@@ -18,6 +18,7 @@ import {
   Sparkles,
   ClipboardCheck,
   AlertTriangle,
+  ListChecks,
   Building2,
   PieChart,
 } from "lucide-react";
@@ -33,6 +34,7 @@ const nav = [
   { to: "/finance/revenue", label: "Revenue", icon: TrendingUp },
   { to: "/finance/expenses", label: "Expenses", icon: Receipt },
   { to: "/finance/vat-ledger", label: "VAT Ledger", icon: ClipboardCheck },
+  { to: "/finance/actions", label: "Finance Actions", icon: ListChecks },
   { to: "/finance/hiring", label: "Hiring", icon: Users },
   { to: "/finance/funding", label: "Funding", icon: Landmark },
   { to: "/finance/cash-flow", label: "Cash Flow", icon: Waves },

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Download, Plus } from "lucide-react";
 import { PageHeader, Surface } from "@/components/finance/PageHeader";
 import { MtdAccountingExportDialog } from "@/components/finance/MtdAccountingExportDialog";
@@ -80,9 +81,11 @@ const emptyForm: FormState = {
 };
 
 export default function VatLedgerPage() {
+  const [searchParams] = useSearchParams();
+  const deepLinkedExpenseOpened = useRef(false);
   const viewer = useDataRoomViewer();
   const [periods, setPeriods] = useState<VatPeriod[]>([]),
-    [period, setPeriod] = useState(""),
+    [period, setPeriod] = useState(searchParams.get("period") ?? ""),
     [rows, setRows] = useState<VatLedgerRow[]>([]),
     [error, setError] = useState("");
   const [filters, setFilters] = useState({
@@ -208,6 +211,12 @@ export default function VatLedgerPage() {
     setFormBaseline(saved);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  useEffect(() => {
+    const expenseId=searchParams.get("expense");
+    if(!expenseId||deepLinkedExpenseOpened.current)return;
+    const row=rows.find(item=>item.id===expenseId);
+    if(row){deepLinkedExpenseOpened.current=true;edit(row);}
+  },[rows,searchParams]);
   const duplicate = async (row: VatLedgerRow) => {
     try {
       await vatLedgerRepository.create(buildDuplicateExpensePayload(row));
