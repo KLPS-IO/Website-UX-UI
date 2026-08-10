@@ -136,11 +136,12 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
     document.figures.map((figure) => [figure.figureNumber, figure]),
   );
   for (const section of document.sections) {
-    ensure(section.number === "12" ? 158 : 41);
+    ensure(section.number === "12" ? 151 : 36);
     pdf.setFontSize(8);
     pdf.setTextColor(116, 76, 145);
     pdf.text(section.number, margin, y);
-    y += 14;
+    // jsPDF uses millimetres: the extra 0.5 mm is approximately 2 CSS px.
+    y += 6.5;
     text(section.title, 22, [20, 20, 24], 9);
     text(`ENGINEERING QUESTION  ${section.question}`, 9, [100, 70, 120], 5);
     for (const paragraph of section.body) text(paragraph, 10, [40, 40, 45], 5);
