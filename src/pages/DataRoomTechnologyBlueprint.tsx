@@ -49,21 +49,21 @@ export default function DataRoomTechnologyBlueprint() {
   }, []);
   if (access === "checking")
     return (
-      <main className="blueprint-shell grid min-h-screen place-items-center text-sm text-white">
+      <main className="blueprint-shell grid min-h-screen place-items-center text-sm">
         Checking Data Room access…
       </main>
     );
   if (access === "denied")
     return (
-      <main className="blueprint-shell grid min-h-screen place-items-center p-6 text-center text-white">
+      <main className="blueprint-shell blueprint-access-state grid min-h-screen place-items-center p-6 text-center">
         <div>
           <h1 className="text-2xl">Authorised Data Room access required</h1>
-          <p className="mt-3 text-white/60">
+          <p className="mt-3">
             Sign in and accept the current NDA to view this confidential
             engineering record.
           </p>
           <Link
-            className="mt-6 inline-block rounded border border-white/20 px-4 py-2"
+            className="mt-6 inline-block rounded border px-4 py-2"
             to="/data-room"
           >
             Return to Data Room

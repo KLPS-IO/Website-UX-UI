@@ -13,6 +13,17 @@
   padding: 0 32px 100px;
   font-family: "DM Sans", Inter, ui-sans-serif, system-ui, sans-serif;
 }
+.blueprint-access-state h1 {
+  color: var(--ink);
+}
+.blueprint-access-state p {
+  color: var(--muted);
+}
+.blueprint-access-state a {
+  border-color: var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+}
 .blueprint-cover {
   min-height: 76vh;
   display: flex;
