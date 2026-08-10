@@ -1,0 +1,3 @@
+import { authenticatedApi } from "@/lib/authenticated-api";
+type EvidenceDto={id?:string;original_filename?:string};
+export async function secureEvidenceAsset(filename:string){const query=new URLSearchParams({evidence_type:"document",keyword:filename,limit:"50"});const result=await authenticatedApi<{evidence?:EvidenceDto[]}>(`/api/finance/evidence?${query}`);const item=(result.evidence??[]).find(value=>value.original_filename===filename);if(!item?.id)throw new Error(`Canonical evidence is unavailable: ${filename}`);const access=await authenticatedApi<{signed_url:string}>(`/api/finance/evidence/${item.id}/access`,{method:"POST",body:JSON.stringify({action:"view"})});if(!access.signed_url)throw new Error("Secure evidence URL unavailable");return access.signed_url;}

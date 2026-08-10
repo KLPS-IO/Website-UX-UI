@@ -1,10 +1,6 @@
-import materials from "@/assets/Tech Spech 2026/KLPS_WP1_MVP1_Initial-Materials-and-Garment_v1.jpg";
-import circuit from "@/assets/Tech Spech 2026/KLPS_WP1_MVP1_First-Stretch-Sensor-Test-Circuit_v1.jpg";
-import arduino from "@/assets/Tech Spech 2026/KLPS_WP1_MVP1_Arduino-Breadboard-Test_v1.jpg";
-import garment from "@/assets/Tech Spech 2026/KLPS_WP1_MVP1_Integrated-Garment-with-Electronics_v1.jpg";
-import body from "@/assets/Tech Spech 2026/KLPS_WP1_MVP1_On-Body-Abdominal-Sensing_v1.jpg";
-import bench from "@/assets/Tech Spech 2026/KLPS_WP1_MVP1_Stretch-Sensor-Bench-Test_v1.jpg";
 import type { TechnologyBlueprint } from "./types";
+
+const materials="KLPS_WP1_MVP1_Initial-Materials-and-Garment_v1.jpg",circuit="KLPS_WP1_MVP1_First-Stretch-Sensor-Test-Circuit_v1.jpg",arduino="KLPS_WP1_MVP1_Arduino-Breadboard-Test_v1.jpg",garment="KLPS_WP1_MVP1_Integrated-Garment-with-Electronics_v1.jpg",body="KLPS_WP1_MVP1_On-Body-Abdominal-Sensing_v1.jpg",bench="KLPS_WP1_MVP1_Stretch-Sensor-Bench-Test_v1.jpg";
 
 const section=(number:string,title:string,question:string,state:"PROVEN"|"OBSERVED"|"IN DEVELOPMENT"|"PLANNED",body:string[],extra:Partial<TechnologyBlueprint["sections"][number]>={}):TechnologyBlueprint["sections"][number]=>({number,title,question,state,body,...extra});
 
