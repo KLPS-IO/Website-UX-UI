@@ -18,7 +18,7 @@ export const EvidenceBadge = ({
   state: keyof typeof badgeColours;
 }) => (
   <span
-    className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-[.16em] ${badgeColours[state]}`}
+    className={`inline-flex whitespace-nowrap rounded-full border px-2.5 py-1 text-[10px] font-semibold tracking-[.16em] ${badgeColours[state]}`}
   >
     {state}
   </span>
