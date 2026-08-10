@@ -124,3 +124,26 @@ test("second-pass Blueprint uses a varied editorial model without repeating evid
   assert.match(renderer, /blueprint-layout-/);
   assert.match(renderer, /questionLabel/);
 });
+test("editorial export hides display section numbers and draws reliable arrows", () => {
+  const renderer = readFileSync(
+      path.resolve("src/features/technology-blueprint/TechnicalPublication.tsx"),
+      "utf8",
+    ),
+    exporter = readFileSync(
+      path.resolve("src/features/technology-blueprint/exportBlueprintPdf.ts"),
+      "utf8",
+    ),
+    content = readFileSync(
+      path.resolve("src/features/technology-blueprint/mvp1Blueprint.ts"),
+      "utf8",
+    );
+  assert.doesNotMatch(renderer, /blueprint-section-number/);
+  assert.doesNotMatch(exporter, /text\([^\n]*section\.number/);
+  assert.match(exporter, /const arrowSequence/);
+  assert.match(exporter, /pdf\.line\(x \+ 6, lineY/);
+  assert.doesNotMatch(content, /!’|�|->/);
+  assert.match(content, /Hand-built on purpose\./);
+  assert.match(content, /workable early prototype/);
+  assert.match(content, /inspect sensor placement and handling on the body/);
+  assert.match(content, /visible electrical response through the prototype circuit/);
+});

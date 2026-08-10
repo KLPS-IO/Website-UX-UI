@@ -240,13 +240,22 @@
   background: #e9e7e5;
 }
 .blueprint-figure figcaption {
-  padding: 16px 18px 18px;
+  padding: 14px 18px 17px;
+  color: var(--muted);
+}
+.blueprint-caption-head strong {
+  color: #bda4ce;
+  font-size: 0.64rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 .blueprint-figure figcaption p {
-  color: #c9c6ce;
-  font-size: 0.8rem;
-  line-height: 1.55;
-  margin: 9px 0;
+  max-width: 72ch;
+  color: #aaa7b2;
+  font-size: 0.76rem;
+  line-height: 1.58;
+  margin: 8px 0;
 }
 .blueprint-figure small {
   color: var(--muted);
@@ -395,25 +404,44 @@
 }
 .blueprint-architecture-track {
   display: grid;
-  justify-items: center;
-  text-align: center;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 32px;
+  align-items: stretch;
 }
-.blueprint-architecture-track span {
-  width: min(100%, 520px);
-  border-top: 1px solid rgba(185, 154, 219, 0.55);
-  border-bottom: 1px solid rgba(185, 154, 219, 0.2);
-  background: linear-gradient(90deg, transparent, rgba(139, 91, 180, 0.12), transparent);
-  padding: 15px;
+.blueprint-architecture-stage {
+  position: relative;
+  min-height: 128px;
+  border-top: 2px solid #8b5bb4;
+  padding: 17px 2px 0;
+}
+.blueprint-architecture-stage:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: calc(100% + 6px);
+  width: 20px;
+  border-top: 1px solid rgba(185, 154, 219, 0.58);
+}
+.blueprint-architecture-stage span {
+  display: block;
   font-weight: 560;
+  line-height: 1.3;
 }
-.blueprint-architecture-track i {
+.blueprint-architecture-stage i {
+  display: block;
   font-size: 0.7rem;
   color: var(--muted);
   font-style: normal;
-  padding: 7px;
+  line-height: 1.45;
+  margin-top: 8px;
 }
-.blueprint-architecture-track b {
+.blueprint-architecture-stage b {
+  position: absolute;
+  top: -11px;
+  right: -22px;
   color: #b99adb;
+  font-size: 0.85rem;
+  transform: rotate(-90deg);
 }
 .blueprint-architecture-boundary {
   margin: 24px 0;
@@ -633,6 +661,23 @@
   }
   .blueprint-architecture-software {
     grid-template-columns: 1fr 1fr;
+  }
+  .blueprint-architecture-track {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .blueprint-architecture-stage {
+    min-height: auto;
+    padding-bottom: 10px;
+  }
+  .blueprint-architecture-stage:not(:last-child)::after {
+    display: none;
+  }
+  .blueprint-architecture-stage b {
+    top: auto;
+    right: 50%;
+    bottom: -20px;
+    transform: none;
   }
   .blueprint-lightbox {
     padding: 12px;

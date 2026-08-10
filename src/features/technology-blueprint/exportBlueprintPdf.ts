@@ -76,8 +76,8 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
     y += 9;
   };
   const architecture = () => {
-    ensure(126);
-    const boxWidth = width - margin * 2;
+    ensure(112);
+    const diagramWidth = width - margin * 2;
     const stages = [
       ["Conductive textile", "Physical sensing region"],
       ["Removable electrical connection", "Press studs and prototype wiring"],
@@ -88,21 +88,31 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
       ],
       ["BLE / data-capture exploration", "Not a validated telemetry pipeline"],
     ];
-    for (const [title, note] of stages) {
-      pdf.setDrawColor(150, 125, 170);
-      pdf.setFillColor(249, 247, 250);
-      pdf.line(margin + boxWidth / 2, y + 10, margin + boxWidth / 2, y + 13);
-      pdf.line(margin + boxWidth / 2, y + 13, margin + boxWidth / 2 - 1.5, y + 11.2);
-      pdf.line(margin + boxWidth / 2, y + 13, margin + boxWidth / 2 + 1.5, y + 11.2);
-      pdf.roundedRect(margin, y, boxWidth, 11, 1.5, 1.5, "FD");
+    const nodeWidth = 27;
+    const gap = (diagramWidth - nodeWidth * stages.length) / (stages.length - 1);
+    stages.forEach(([title, note], index) => {
+      const x = margin + index * (nodeWidth + gap);
+      pdf.setDrawColor(116, 76, 145);
+      pdf.setLineWidth(0.55);
+      pdf.line(x, y, x + nodeWidth, y);
+      if (index < stages.length - 1) {
+        const start = x + nodeWidth + 2;
+        const end = x + nodeWidth + gap - 2;
+        pdf.setLineWidth(0.2);
+        pdf.line(start, y, end, y);
+        pdf.line(end, y, end - 1.6, y - 0.9);
+        pdf.line(end, y, end - 1.6, y + 0.9);
+      }
       pdf.setFontSize(8.5);
       pdf.setTextColor(35, 35, 40);
-      pdf.text(title, margin + 4, y + 4.2);
+      pdf.setFont("helvetica", "bold");
+      pdf.text(pdf.splitTextToSize(title, nodeWidth), x, y + 5);
       pdf.setFontSize(7);
+      pdf.setFont("helvetica", "normal");
       pdf.setTextColor(95, 95, 100);
-      pdf.text(note, margin + 4, y + 7.8);
-      y += 15;
-    }
+      pdf.text(pdf.splitTextToSize(note, nodeWidth), x, y + 15);
+    });
+    y += 37;
     pdf.setDrawColor(116, 76, 145);
     pdf.setLineDashPattern([2, 1.5], 0);
     pdf.line(margin, y, width - margin, y);
@@ -116,7 +126,7 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
     y += 5;
     pdf.setDrawColor(180);
     pdf.setFillColor(252, 252, 252);
-    pdf.roundedRect(margin, y, boxWidth, 23, 1.5, 1.5, "FD");
+    pdf.roundedRect(margin, y, diagramWidth, 23, 1.5, 1.5, "FD");
     pdf.setFontSize(8.5);
     pdf.setTextColor(35, 35, 40);
     pdf.text("SUPPORTING RESEARCH INFRASTRUCTURE", margin + 4, y + 5);
@@ -141,10 +151,12 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
   pdf.text("KLPS · TECHNOLOGY PUBLICATION", margin, y);
   y += 20;
   pdf.setFontSize(34);
+  pdf.setFont("helvetica", "bold");
   pdf.setTextColor(20);
   const title = pdf.splitTextToSize(document.metadata.document, 170);
   pdf.text(title, margin, y);
   y += title.length * 13 + 8;
+  pdf.setFont("helvetica", "normal");
   text(document.metadata.documentType, 16, [116, 76, 145], 8);
   arrowSequence(["Scientific Hypothesis", "MVP1", "Next Engineering Gates"], 11);
   y += 12;
@@ -189,18 +201,74 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
     );
     y += imageHeight + 4;
     text(
-      `Figure ${figure.figureNumber} | ${figure.classification} — ${figure.caption}`,
-      8,
-      [60, 60, 65],
+      `FIGURE ${figure.figureNumber} · ${figure.classification}`,
+      7,
+      [116, 76, 145],
       4,
     );
+    text(figure.caption, 7.5, [90, 90, 96], 4);
     if (figure.callouts?.length)
       text(figure.callouts.join("  ·  "), 7, [116, 76, 145], 4);
+  };
+  const addSoftwareComposition = async (ids: string[]) => {
+    ensure(116);
+    const labels = [
+      ["MEASUREMENT", "Body Scan"],
+      ["PROGRESS", "Statistics"],
+      ["DAILY UNDERSTANDING", "Daily engagement"],
+    ];
+    const gap = 8;
+    const columnWidth = (width - margin * 2 - gap * 2) / 3;
+    const top = y;
+    for (let index = 0; index < ids.length; index++) {
+      const figure = figures.get(ids[index]);
+      if (!figure) continue;
+      const data = await loadImage(figure.asset);
+      const properties = pdf.getImageProperties(data);
+      const x = margin + index * (columnWidth + gap);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(6.5);
+      pdf.setTextColor(116, 76, 145);
+      pdf.text(labels[index][0], x, top);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9);
+      pdf.setTextColor(35, 35, 40);
+      pdf.text(labels[index][1], x, top + 5);
+      const imageRatio = properties.width / properties.height;
+      let imageWidth = columnWidth;
+      let imageHeight = imageWidth / imageRatio;
+      if (imageHeight > 85) {
+        imageHeight = 85;
+        imageWidth = imageHeight * imageRatio;
+      }
+      pdf.addImage(
+        data,
+        "JPEG",
+        x + (columnWidth - imageWidth) / 2,
+        top + 10,
+        imageWidth,
+        imageHeight,
+        undefined,
+        "FAST",
+      );
+      pdf.setFontSize(6);
+      pdf.setTextColor(105, 105, 110);
+      pdf.text(`FIGURE ${figure.figureNumber} · ${figure.classification}`, x, top + 99);
+    }
+    y = top + 108;
+    text(
+      "Interface concepts only. These screens do not represent validated physiological outputs or a validated sensor-ingestion pipeline.",
+      7,
+      [95, 95, 100],
+      4,
+    );
   };
   for (const section of document.sections) {
     if (y > 30) next();
     ensure(section.layoutVariant === "architecture" ? 151 : 36);
+    pdf.setFont("helvetica", "bold");
     text(section.title, 25, [20, 20, 24], 10);
+    pdf.setFont("helvetica", "normal");
     text(
       `${(section.questionLabel ?? "QUESTION").toUpperCase()}  ${section.question}`,
       9,
@@ -224,15 +292,18 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
       else text(section.comparison.right, 10, [75, 45, 95], 5);
     }
     for (const step of section.evolutionSteps ?? []) {
-      ensure(46);
+      ensure(112);
       text(`${step.stage} · Figure ${step.figureId}`, 12, [75, 45, 95], 6);
       text(`CHANGED  ${step.changed}`, 8, [45, 45, 50], 4);
       text(`LEARNING  ${step.learned}`, 8, [45, 45, 50], 4);
       text(`OPEN  ${step.unresolved}`, 8, [80, 80, 85], 4);
       await addFigure(step.figureId, 65);
     }
-    for (const id of section.figureIds ?? [])
-      await addFigure(id, section.layoutVariant === "full-bleed" ? 115 : 90);
+    if (section.number === "12" && section.figureIds)
+      await addSoftwareComposition(section.figureIds);
+    else
+      for (const id of section.figureIds ?? [])
+        await addFigure(id, section.layoutVariant === "full-bleed" ? 115 : 90);
     if (section.pullQuote) {
       if (section.pullQuote.includes("→")) arrowSequence(section.pullQuote.split(" → "), 14);
       else text(section.pullQuote, 14, [75, 45, 95], 7);

@@ -60,26 +60,26 @@ export function EngineeringObservation({ value }: { value: ObservationType }) {
   );
 }
 function SystemArchitecture() {
+  const stages = [
+    ["Conductive textile", "Physical sensing region"],
+    ["Removable connection", "Press studs and prototype wiring"],
+    ["Arduino Nano 33 BLE Sense Rev2", "Development measurement hardware"],
+    ["Firmware measurement", "Baseline and stretch response"],
+    ["BLE / data-capture exploration", "Not a validated telemetry pipeline"],
+  ];
   return (
     <div
       className="blueprint-architecture"
       aria-label="Evidenced MVP1 system architecture"
     >
       <div className="blueprint-architecture-track">
-        <span>Conductive textile</span>
-        <i>Physical sensing region</i>
-        <b>↓</b>
-        <span>Removable connection</span>
-        <i>Press studs and prototype wiring</i>
-        <b>↓</b>
-        <span>Arduino Nano 33 BLE Sense Rev2</span>
-        <i>Development measurement hardware</i>
-        <b>↓</b>
-        <span>Firmware measurement / calibration</span>
-        <i>Experimental baseline and stretch response</i>
-        <b>↓</b>
-        <span>BLE / data-capture exploration</span>
-        <i>Not a validated telemetry pipeline</i>
+        {stages.map(([title, note], index) => (
+          <div className="blueprint-architecture-stage" key={title}>
+            <span>{title}</span>
+            <i>{note}</i>
+            {index < stages.length - 1 && <b aria-hidden="true">↓</b>}
+          </div>
+        ))}
       </div>
       <div className="blueprint-architecture-boundary">
         Evidenced prototype boundary
@@ -182,7 +182,9 @@ export function TechnicalPublication({
             .map(([key, value]) => (
               <div key={key}>
                 <dt>{key.replace(/([A-Z])/g, " $1")}</dt>
-                <dd>{value}</dd>
+                <dd>
+                  {key === "technologyReadiness" ? "TRL 3" : value}
+                </dd>
               </div>
             ))}
         </dl>
