@@ -85,7 +85,7 @@ function SystemArchitecture() {
         Evidenced prototype boundary
       </div>
       <div className="blueprint-architecture-software">
-        <strong>Separate deployed research infrastructure</strong>
+        <strong>Supporting research infrastructure</strong>
         <span>React / TypeScript</span>
         <span>Express / TypeScript</span>
         <span>PostgreSQL</span>
@@ -123,9 +123,8 @@ export function EvidenceFigure({ figure }: { figure: BlueprintFigure }) {
         <img src={figure.asset} alt={figure.caption} loading="eager" />
       </button>
       <figcaption>
-        <div className="flex items-center justify-between gap-3">
-          <strong>Figure {figure.figureNumber}</strong>
-          <EvidenceBadge state={figure.classification} />
+        <div className="blueprint-caption-head">
+          <strong>Figure {figure.figureNumber} · {figure.classification}</strong>
         </div>
         <p>{figure.caption}</p>
         {figure.callouts && (
@@ -171,17 +170,15 @@ export function TechnicalPublication({
       className="blueprint-publication"
     >
       <header className="blueprint-cover">
-        <div className="blueprint-kicker">
-          KLPS · Engineering record · {document.metadata.version}
-        </div>
+        <div className="blueprint-kicker">KLPS · Technology publication</div>
         <h1>{document.metadata.document}</h1>
-        <p>
-          Scientific hypothesis → experimental progression → MVP1 → next
-          engineering gates
-        </p>
+        <h2>{document.metadata.documentType}</h2>
+        <p>Scientific Hypothesis → MVP1 → Next Engineering Gates</p>
         <dl>
           {Object.entries(document.metadata)
-            .filter(([key]) => key !== "document")
+            .filter(([key]) =>
+              ["version", "date", "workPackage", "technologyReadiness", "confidentiality"].includes(key),
+            )
             .map(([key, value]) => (
               <div key={key}>
                 <dt>{key.replace(/([A-Z])/g, " $1")}</dt>
@@ -197,10 +194,7 @@ export function TechnicalPublication({
           className={`blueprint-section blueprint-layout-${section.layoutVariant ?? "standard"}`}
         >
           <div className="blueprint-section-head">
-            <div>
-              <span>{section.number}</span>
-              <h2>{section.title}</h2>
-            </div>
+            <h2>{section.title}</h2>
             <EvidenceBadge state={section.state} />
           </div>
           <div className="blueprint-question">
@@ -238,13 +232,11 @@ export function TechnicalPublication({
                     </a>
                   </div>
                   <dl>
-                    <dt>What changed</dt>
+                    <dt>Changed</dt>
                     <dd>{step.changed}</dd>
-                    <dt>Why</dt>
-                    <dd>{step.reason}</dd>
-                    <dt>What was learned</dt>
+                    <dt>Learning</dt>
                     <dd>{step.learned}</dd>
-                    <dt>What remained unresolved</dt>
+                    <dt>Open</dt>
                     <dd>{step.unresolved}</dd>
                   </dl>
                 </article>
@@ -252,14 +244,27 @@ export function TechnicalPublication({
             </div>
           )}
           {section.figureIds && (
-            <div className="blueprint-figures">
+            <div className={section.number === "12" ? "blueprint-figures blueprint-software-screens" : "blueprint-figures"}>
               {section.figureIds
                 .map((id) => figures.get(id))
                 .filter(Boolean)
-                .map((figure) => (
-                  <EvidenceFigure key={figure!.figureNumber} figure={figure!} />
+                .map((figure, index) => (
+                  <div key={figure!.figureNumber} className="blueprint-figure-wrap">
+                    {section.number === "12" && (
+                      <div className="blueprint-screen-label">
+                        <span>{["Measurement", "Progress", "Daily understanding"][index]}</span>
+                        <strong>{["Body Scan", "Statistics", "Daily engagement"][index]}</strong>
+                      </div>
+                    )}
+                    <EvidenceFigure figure={figure!} />
+                  </div>
                 ))}
             </div>
+          )}
+          {section.number === "12" && (
+            <p className="blueprint-group-evidence-note">
+              Interface concepts only. These screens do not represent validated physiological outputs or a validated sensor-ingestion pipeline.
+            </p>
           )}
           {section.comparison && (
             <div className="blueprint-comparison">

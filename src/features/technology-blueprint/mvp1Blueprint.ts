@@ -206,7 +206,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
       asset: bodyScan,
       classification: "OBSERVED",
       caption:
-        "Body Scan interface concept: an exploration of how measurements could be presented. It is not evidence of validated sensor ingestion.",
+        "Body Scan concept exploring how a measurement might be presented.",
       evidenceIds: ["EV-008"],
     },
     {
@@ -214,7 +214,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
       asset: statistics,
       classification: "OBSERVED",
       caption:
-        "Statistics interface concept for longitudinal progress. Displayed interface values do not constitute validated physiological results.",
+        "Statistics concept exploring the presentation of longitudinal progress.",
       evidenceIds: ["EV-008"],
     },
     {
@@ -222,7 +222,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
       asset: dailyInsight,
       classification: "OBSERVED",
       caption:
-        "Daily-engagement concept showing how repeated records might support understandable progress over time.",
+        "Daily-engagement concept exploring how repeated records might support understandable progress over time.",
       evidenceIds: ["EV-008"],
     },
   ],
@@ -335,7 +335,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
 
     section(
       "06",
-      "Hand built on purpose.",
+      "Hand-built on purpose.",
       "What did manual construction make possible?",
       "PROVEN",
       [
@@ -445,19 +445,19 @@ export const mvp1Blueprint: TechnologyBlueprint = {
         pullQuote: "Each version answered one question and exposed another.",
         evolutionSteps: [
           {
-            stage: "01 · Material exploration",
+            stage: "Material exploration",
             figureId: "11.1",
             changed:
               "Conductive textile, thread and a close-fitting garment were brought together.",
             reason:
               "Create the smallest practical garment-based deformation experiment.",
             learned:
-              "The constituent materials could be combined for early trials.",
+              "The materials could be combined into a workable early prototype.",
             unresolved:
               "Material specification, resistance, durability and washability.",
           },
           {
-            stage: "02 · Sensing region",
+            stage: "Sensing region",
             figureId: "11.2",
             changed: "Conductive textile was positioned at the waistband.",
             reason: "Inspect placement before committing to a stitched region.",
@@ -467,7 +467,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
               "Dimensional control, fit consistency and repeatable construction.",
           },
           {
-            stage: "03 · Connection",
+            stage: "Connection",
             figureId: "11.3",
             changed: "Press-stud components introduced a detachable contact.",
             reason: "Separate garment construction from reusable electronics.",
@@ -476,7 +476,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
               "Connection life, electrical stability and wash handling.",
           },
           {
-            stage: "04 · Electronics integration",
+            stage: "Electronics integration",
             figureId: "11.4",
             changed:
               "Development electronics were combined with the stitched garment.",
@@ -487,23 +487,23 @@ export const mvp1Blueprint: TechnologyBlueprint = {
               "Miniaturisation, enclosure, power and wearer handling.",
           },
           {
-            stage: "05 · On-body fitting",
+            stage: "On-body fitting",
             figureId: "11.5",
             changed:
               "The integrated prototype was inspected during a founder fitting.",
-            reason: "Observe placement and handling on body.",
+            reason: "Observe placement and handling on the body.",
             learned:
-              "The sensing location can be inspected in a development context.",
+              "The fitting allowed us to inspect sensor placement and handling on the body.",
             unresolved:
               "Long-duration comfort, sizes, multiple bodies and formal wear validation.",
           },
           {
-            stage: "06 · Signal capture",
+            stage: "Signal capture",
             figureId: "11.6",
             changed: "Serial output was observed during physical manipulation.",
             reason: "Check whether the experiment produced changing readings.",
             learned:
-              "Applied deformation can be explored through the electrical path.",
+              "Applied stretch produced a visible electrical response through the prototype circuit.",
             unresolved:
               "Repeatability, artefacts, calibration stability and physiological meaning.",
           },

@@ -11,7 +11,7 @@
   max-width: 1040px;
   margin: auto;
   padding: 0 32px 100px;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: "DM Sans", Inter, ui-sans-serif, system-ui, sans-serif;
 }
 .blueprint-cover {
   min-height: 76vh;
@@ -23,11 +23,18 @@
 }
 .blueprint-cover h1 {
   font-size: clamp(3rem, 8vw, 7rem);
-  font-weight: 300;
+  font-weight: 600;
   letter-spacing: -0.055em;
   line-height: 0.92;
   max-width: 850px;
   margin: 24px 0;
+}
+.blueprint-cover h2 {
+  margin: 0;
+  color: #cdb9df;
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  font-weight: 450;
+  letter-spacing: -0.025em;
 }
 .blueprint-cover > p {
   font-size: 1.2rem;
@@ -36,7 +43,7 @@
 }
 .blueprint-cover dl {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1px;
   background: var(--rule);
   margin-top: 64px;
@@ -76,20 +83,9 @@
   align-items: flex-start;
   gap: 24px;
 }
-.blueprint-section-head > div {
-  display: flex;
-  align-items: baseline;
-  gap: 22px;
-}
-.blueprint-section-head span {
-  font:
-    600 0.72rem ui-monospace,
-    monospace;
-  color: #b99adb;
-}
 .blueprint-section h2 {
   font-size: clamp(2rem, 5vw, 4.1rem);
-  font-weight: 350;
+  font-weight: 560;
   letter-spacing: -0.04em;
   line-height: 1;
 }
@@ -109,10 +105,10 @@
 }
 .blueprint-section > p,
 .blueprint-section > ul {
-  max-width: 760px;
+  max-width: 68ch;
   color: #d0cdd5;
-  font-size: 1.02rem;
-  line-height: 1.8;
+  font-size: 1.06rem;
+  line-height: 1.64;
   margin: 16px 0;
 }
 .blueprint-section > ul {
@@ -244,12 +240,13 @@
   background: #e9e7e5;
 }
 .blueprint-figure figcaption {
-  padding: 20px;
+  padding: 16px 18px 18px;
 }
 .blueprint-figure figcaption p {
   color: #c9c6ce;
-  line-height: 1.6;
-  margin: 12px 0;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  margin: 9px 0;
 }
 .blueprint-figure small {
   color: var(--muted);
@@ -298,6 +295,12 @@
   color: #b99adb;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+.blueprint-evidence-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+.blueprint-evidence-table thead {
+  display: table-header-group;
 }
 .blueprint-evidence-table small {
   color: var(--muted);
@@ -387,8 +390,7 @@
 }
 .blueprint-architecture {
   margin: 44px 0;
-  border: 1px solid var(--rule);
-  padding: 28px;
+  padding: 12px 0 0;
   break-inside: avoid;
 }
 .blueprint-architecture-track {
@@ -398,10 +400,11 @@
 }
 .blueprint-architecture-track span {
   width: min(100%, 520px);
-  border: 1px solid rgba(139, 91, 180, 0.5);
-  background: rgba(139, 91, 180, 0.08);
-  padding: 13px;
-  font-weight: 600;
+  border-top: 1px solid rgba(185, 154, 219, 0.55);
+  border-bottom: 1px solid rgba(185, 154, 219, 0.2);
+  background: linear-gradient(90deg, transparent, rgba(139, 91, 180, 0.12), transparent);
+  padding: 15px;
+  font-weight: 560;
 }
 .blueprint-architecture-track i {
   font-size: 0.7rem;
@@ -453,30 +456,38 @@
   display: grid;
   gap: 1rem;
   margin: 2rem 0;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
+  counter-reset: evolution;
 }
 .blueprint-evolution article {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.025);
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) 1.15fr;
+  gap: 28px;
+  border: 0;
+  border-top: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 30px 0 30px 32px;
+  background: transparent;
+  counter-increment: evolution;
   break-inside: avoid;
 }
 .blueprint-evolution .blueprint-figure {
-  margin: -1rem -1rem 1rem;
-  border-width: 0 0 1px;
-  border-radius: 0.75rem 0.75rem 0 0;
+  grid-row: span 2;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
   overflow: hidden;
 }
 .blueprint-evolution .blueprint-figure figcaption {
-  padding: 12px;
+  display: none;
 }
 .blueprint-evolution .blueprint-figure figcaption p {
   font-size: 0.72rem;
   margin: 8px 0;
 }
 .blueprint-evolution .blueprint-figure img {
-  height: 230px;
+  height: 260px;
   object-fit: cover;
 }
 .blueprint-evolution article > div {
@@ -484,6 +495,23 @@
   justify-content: space-between;
   gap: 1rem;
   color: #fff;
+}
+.blueprint-evolution article::before {
+  content: counter(evolution, decimal-leading-zero);
+  position: absolute;
+  top: 29px;
+  left: 0;
+  color: #b99adb;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+}
+.blueprint-evolution article:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 48px;
+  bottom: -31px;
+  border-left: 1px solid rgba(185, 154, 219, 0.35);
 }
 .blueprint-evolution a {
   color: #c9a9e0;
@@ -497,6 +525,46 @@
   margin-top: 0.9rem;
   font-size: 0.78rem;
 }
+.blueprint-software-screens {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: end;
+  gap: 26px !important;
+  margin-top: 46px;
+}
+.blueprint-software-screens .blueprint-figure {
+  margin: 14px 0 0;
+  border: 0;
+  background: transparent;
+}
+.blueprint-software-screens .blueprint-figure img {
+  max-height: 620px;
+  background: transparent;
+}
+.blueprint-software-screens figcaption {
+  display: none;
+}
+.blueprint-screen-label span,
+.blueprint-screen-label strong {
+  display: block;
+}
+.blueprint-screen-label span {
+  color: #b99adb;
+  font-size: 0.66rem;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.blueprint-screen-label strong {
+  margin-top: 5px;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+.blueprint-group-evidence-note {
+  color: var(--muted) !important;
+  font-size: 0.78rem !important;
+  line-height: 1.5 !important;
+}
 .blueprint-evolution dt {
   color: #bda4ce;
   font-weight: 600;
@@ -508,6 +576,12 @@
 @media (max-width: 700px) {
   .blueprint-evolution {
     grid-template-columns: 1fr;
+  }
+  .blueprint-evolution article {
+    grid-template-columns: 1fr;
+  }
+  .blueprint-software-screens {
+    grid-template-columns: 1fr !important;
   }
   .blueprint-evolution dl {
     grid-template-columns: 1fr;
@@ -590,7 +664,7 @@
   .blueprint-publication {
     max-width: none;
     padding: 0 12mm;
-    font-family: Arial, sans-serif;
+    font-family: "DM Sans", Inter, Arial, sans-serif;
   }
   .blueprint-cover {
     min-height: 250mm;
@@ -603,8 +677,11 @@
     background: white;
   }
   .blueprint-section {
-    padding: 16mm 0;
+    padding: 20mm 0 18mm;
     break-before: page;
+  }
+  .blueprint-layout-statement {
+    break-after: page;
   }
   .blueprint-section > p,
   .blueprint-section > ul,
@@ -621,7 +698,7 @@
     max-height: 150mm;
   }
   .blueprint-evidence-table {
-    font-size: 7pt;
+    font-size: 6.5pt;
   }
   .blueprint-evidence-table th,
   .blueprint-evidence-table td {
