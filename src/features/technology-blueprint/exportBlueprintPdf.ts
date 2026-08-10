@@ -136,11 +136,11 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
     document.figures.map((figure) => [figure.figureNumber, figure]),
   );
   for (const section of document.sections) {
-    ensure(section.number === "12" ? 150 : 36);
+    ensure(section.number === "12" ? 158 : 41);
     pdf.setFontSize(8);
     pdf.setTextColor(116, 76, 145);
     pdf.text(section.number, margin, y);
-    y += 6;
+    y += 14;
     text(section.title, 22, [20, 20, 24], 9);
     text(`ENGINEERING QUESTION  ${section.question}`, 9, [100, 70, 120], 5);
     for (const paragraph of section.body) text(paragraph, 10, [40, 40, 45], 5);
@@ -209,7 +209,7 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
           4,
         );
       }
-    y += 8;
+    y += 5;
   }
   footer();
   pdf.save("KLPS-Technology-Blueprint-MVP1-v1.0.pdf");
