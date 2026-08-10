@@ -1,9 +1,9 @@
 .blueprint-shell {
-  --paper: #111216;
-  --ink: #f3f2f5;
-  --muted: #aaa7b2;
-  --rule: rgba(255, 255, 255, 0.12);
-  background: #090a0d;
+  --paper: #ffffff;
+  --ink: #17151b;
+  --muted: #68636d;
+  --rule: rgba(34, 27, 39, 0.14);
+  background: #f7f5f2;
   color: var(--ink);
   min-height: 100vh;
 }
@@ -31,7 +31,7 @@
 }
 .blueprint-cover h2 {
   margin: 0;
-  color: #cdb9df;
+  color: #70458f;
   font-size: clamp(1.35rem, 2.5vw, 2rem);
   font-weight: 450;
   letter-spacing: -0.025em;
@@ -66,7 +66,7 @@
   font-size: 0.82rem;
 }
 .blueprint-kicker {
-  color: #b99adb;
+  color: #70458f;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.66rem;
@@ -106,7 +106,7 @@
 .blueprint-section > p,
 .blueprint-section > ul {
   max-width: 68ch;
-  color: #d0cdd5;
+  color: #454149;
   font-size: 1.06rem;
   line-height: 1.64;
   margin: 16px 0;
@@ -126,7 +126,7 @@
 .blueprint-pull-quote {
   max-width: 840px;
   margin: 48px 0 12px;
-  color: #f2eaf8;
+  color: #653d80;
   font-size: clamp(1.35rem, 3vw, 2.35rem);
   font-weight: 350;
   line-height: 1.25;
@@ -196,7 +196,7 @@
   border: 1px solid rgba(185, 154, 219, 0.3);
   border-radius: 999px;
   padding: 5px 8px;
-  color: #cdb9df;
+  color: #70458f;
   font-size: 0.76rem;
 }
 .blueprint-comparison {
@@ -228,7 +228,7 @@
 }
 .blueprint-figure {
   margin: 48px 0;
-  background: #050506;
+  background: #ffffff;
   border: 1px solid var(--rule);
   break-inside: avoid;
 }
@@ -244,7 +244,7 @@
   color: var(--muted);
 }
 .blueprint-caption-head strong {
-  color: #bda4ce;
+  color: #70458f;
   font-size: 0.64rem;
   font-weight: 650;
   letter-spacing: 0.14em;
@@ -252,7 +252,7 @@
 }
 .blueprint-figure figcaption p {
   max-width: 72ch;
-  color: #aaa7b2;
+  color: #5f5964;
   font-size: 0.9rem;
   line-height: 1.58;
   margin: 8px 0;
@@ -273,7 +273,7 @@
   margin: 10px 0;
 }
 .blueprint-callout p {
-  color: #cfccd4;
+  color: #454149;
   line-height: 1.65;
 }
 .blueprint-callout dl,
@@ -284,7 +284,7 @@
 }
 .blueprint-callout dd,
 .blueprint-outcomes dd {
-  color: #d5d2d9;
+  color: #3f3a43;
 }
 .blueprint-evidence-table {
   width: 100%;
@@ -306,7 +306,7 @@
   letter-spacing: 0.08em;
 }
 .blueprint-evidence-table tbody tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(112, 69, 143, 0.045);
 }
 .blueprint-evidence-table thead {
   display: table-header-group;
@@ -326,7 +326,7 @@
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(9, 10, 13, 0.92);
+  background: rgba(247, 245, 242, 0.92);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--rule);
 }
@@ -341,11 +341,11 @@
 .blueprint-nav select {
   min-width: 0;
   max-width: 360px;
-  background: #17181d;
+  background: #ffffff;
   border: 1px solid var(--rule);
   border-radius: 7px;
   padding: 9px;
-  color: white;
+  color: var(--ink);
 }
 .blueprint-nav button,
 .blueprint-nav a {
@@ -522,7 +522,7 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  color: #fff;
+  color: var(--ink);
 }
 .blueprint-evolution article::before {
   content: counter(evolution, decimal-leading-zero);
@@ -542,7 +542,7 @@
   border-left: 1px solid rgba(185, 154, 219, 0.35);
 }
 .blueprint-evolution a {
-  color: #c9a9e0;
+  color: #70458f;
   font-size: 0.75rem;
   white-space: nowrap;
 }
@@ -594,12 +594,12 @@
   line-height: 1.5 !important;
 }
 .blueprint-evolution dt {
-  color: #bda4ce;
+  color: #70458f;
   font-weight: 600;
 }
 .blueprint-evolution dd {
   margin: 0;
-  color: rgba(255, 255, 255, 0.7);
+  color: #5f5964;
 }
 @media (max-width: 700px) {
   .blueprint-evolution {

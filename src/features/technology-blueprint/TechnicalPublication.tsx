@@ -7,10 +7,10 @@ import type {
 import { useEffect, useState } from "react";
 
 const badgeColours = {
-  PROVEN: "border-emerald-500/30 text-emerald-300 bg-emerald-500/10",
-  OBSERVED: "border-sky-500/30 text-sky-300 bg-sky-500/10",
-  "IN DEVELOPMENT": "border-amber-500/30 text-amber-300 bg-amber-500/10",
-  PLANNED: "border-slate-500/30 text-slate-300 bg-slate-500/10",
+  PROVEN: "border-emerald-600/30 text-emerald-800 bg-emerald-50",
+  OBSERVED: "border-sky-600/30 text-sky-800 bg-sky-50",
+  "IN DEVELOPMENT": "border-amber-600/30 text-amber-800 bg-amber-50",
+  PLANNED: "border-slate-500/30 text-slate-700 bg-slate-50",
 };
 export const EvidenceBadge = ({
   state,
