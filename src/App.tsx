@@ -38,6 +38,7 @@ import BodyDiscoverySurvey from "@/pages/BodyDiscoverySurvey";
 import FinanceApp from "@/pages/FinanceApp";
 import { FinanceProvider } from "@/contexts/FinanceContext";
 import DataRoomGuidePage from "@/pages/DataRoomGuide";
+import DataRoomTechnologyBlueprint from "@/pages/DataRoomTechnologyBlueprint";
 import GrowthApp from "@/pages/growth/GrowthApp";
 import GrowthLogin from "@/pages/growth/GrowthLogin";
 import RdLabOverview from "@/pages/rd-lab/RdLabOverview";
@@ -121,6 +122,7 @@ const App = () => (
           />
           <Route path="/data-room" element={<DataRoom />} />
           <Route path="/data-room/guide" element={<DataRoomGuidePage />} />
+          <Route path="/data-room/technology/mvp1-blueprint" element={<DataRoomTechnologyBlueprint />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/beta-login" element={<BetaLogin />} />
           <Route path="/beta-dashboard" element={<DashboardLayout />}>

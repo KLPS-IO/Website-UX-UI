@@ -120,6 +120,7 @@ const categories = [
   "Pitch Deck",
   "Financials",
   "Finance OS",
+  "Technology",
   "IP Portfolio",
   "Market",
   "Legal",
@@ -190,6 +191,8 @@ const normaliseCategoryName = (value?: string): DataRoomCategory | null => {
     return "Pitch Deck";
   if (normalized.includes("financial") || normalized.includes("projection"))
     return "Financials";
+  if (normalized.includes("technology") || normalized.includes("engineering blueprint"))
+    return "Technology";
   if (
     normalized.includes("ip") ||
     normalized.includes("portfolio") ||
@@ -632,6 +635,8 @@ const DataRoom = () => {
             category === "All Documents"
               ? documents.length
               : category === "Finance OS"
+                ? 1
+              : category === "Technology"
                 ? 1
               : category === "FAQ"
                 ? faqItems.length
@@ -1269,6 +1274,12 @@ const DataRoom = () => {
                 <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   {DATA_ROOM_WATERMARK}
                 </div>
+              </div>
+            ) : activeCategory === "Technology" ? (
+              <div className="glass overflow-hidden rounded-lg">
+                <div className="flex items-center justify-between border-b border-border px-6 py-4"><h3 className="text-sm font-medium">Technology</h3><span className="font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">{DATA_ROOM_WATERMARK}</span></div>
+                <div className="px-6 py-10"><div className="font-mono text-[10px] uppercase tracking-[.2em] text-accent">Engineering Blueprint</div><h3 className="mt-3 text-2xl font-light">MVP1 — Technology Blueprint</h3><p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">A living technical publication tracing the scientific hypothesis, genuine prototype evidence, known limitations and next WP1 engineering gates.</p><div className="mt-4 flex flex-wrap gap-2 text-[10px] uppercase tracking-wider text-muted-foreground"><span className="rounded border border-border px-2 py-1">v1.0</span><span className="rounded border border-border px-2 py-1">Active engineering record</span><span className="rounded border border-border px-2 py-1">Confidential</span></div><Link to="/data-room/technology/mvp1-blueprint" className="mt-6 inline-flex rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-primary-foreground">View Blueprint</Link></div>
+                <div className="border-t border-border px-6 py-3 text-center text-[10px] uppercase tracking-[.22em] text-muted-foreground">{DATA_ROOM_WATERMARK}</div>
               </div>
             ) : (
               <div className="glass overflow-hidden rounded-lg">
