@@ -1,14 +1,23 @@
 import type { TechnologyBlueprint } from "./types";
-import materials from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Initial-Materials-and-Garment_v1.jpg";
-import circuit from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_First-Stretch-Sensor-Test-Circuit_v1.jpg";
+
+import finalGarment from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Final-Waistband-Prototype_v1.jpg";
+import onBody from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_On-Body-Abdominal-Sensing_v1.jpg";
+import firstSignal from "@/assets/Tech Spech 2026/publication/Screenshot 2026-03-31 at 12.59.26.jpg";
+import textileCircuit from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_First-Stretch-Sensor-Test-Circuit_v1.jpg";
+import stitchedRegion from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Conductive-Waistband-Prototype_v1.jpg";
+import removableAssembly from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Internal-Electronics-Assembly_v1.jpg";
 import arduino from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Arduino-Breadboard-Test_v1.jpg";
-import garment from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Integrated-Garment-with-Electronics_v1.jpg";
-import body from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_On-Body-Abdominal-Sensing_v1.jpg";
-import bench from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Stretch-Sensor-Bench-Test_v1.jpg";
+import workbench from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Engineering-Components-Layout_v1.jpg";
+import laterSignal from "@/assets/Tech Spech 2026/publication/Screenshot 2026-06-24 at 21.09.52.jpg";
+import materials from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Initial-Materials-and-Garment_v1.jpg";
 import firstWaistband from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_First-Waistband-Integration_v1.jpg";
-import conductiveWaistband from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Conductive-Waistband-Prototype_v1.jpg";
-import internalElectronics from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Internal-Electronics-Assembly_v1.jpg";
-import bodyInterface from "@/assets/Tech Spech 2026/publication/KLPS_MVP1_Body-Measurement-Interface_v1.jpg";
+import connectionDetail from "@/assets/Tech Spech 2026/publication/20260407_155524.jpg";
+import integratedFront from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_Integrated-Garment-Front_v1.jpg";
+import firstFitting from "@/assets/Tech Spech 2026/publication/KLPS_WP1_MVP1_First-On-Body-Wear-Trial_v1.jpg";
+import evolutionSignal from "@/assets/Tech Spech 2026/publication/Screenshot 2026-03-31 at 12.55.35.jpg";
+import bodyScan from "@/assets/Tech Spech 2026/publication/KLPS_MVP1_BodyScan-Dashboard_v1.jpg";
+import statistics from "@/assets/Tech Spech 2026/publication/KLPS_MVP1_Statistics-Dashboard_v1.jpg";
+import dailyInsight from "@/assets/Tech Spech 2026/publication/Screenshot 2026-04-04 at 22.01.24.jpg";
 
 const section = (
   number: string,
@@ -30,7 +39,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
   slug: "mvp1-technology-blueprint",
   metadata: {
     document: "KLPS Technology Blueprint",
-    documentType: "Engineering Record",
+    documentType: "Engineering Record 01",
     version: "1.0",
     date: "August 2026",
     currentStage: "MVP1",
@@ -41,572 +50,643 @@ export const mvp1Blueprint: TechnologyBlueprint = {
   },
   figures: [
     {
-      figureNumber: "6.1",
-      asset: materials,
+      figureNumber: "1.1",
+      asset: finalGarment,
       classification: "PROVEN",
       caption:
-        "Early material exploration showing a close-fitting garment, conductive textile samples and conductive thread before integration.",
-      evidenceIds: ["EV-001"],
-    },
-    {
-      figureNumber: "9.1",
-      asset: circuit,
-      classification: "PROVEN",
-      caption:
-        "Arduino Nano 33 BLE Sense Rev2 breadboard circuit with removable press-stud leads used to explore a textile-resistance measurement path.",
-      evidenceIds: ["EV-002"],
-    },
-    {
-      figureNumber: "9.2",
-      asset: arduino,
-      classification: "PROVEN",
-      caption:
-        "Close view of the actual Arduino-based prototype electronics. This is development hardware, not a custom production PCB.",
-      evidenceIds: ["EV-002"],
-    },
-    {
-      figureNumber: "14.1",
-      asset: garment,
-      classification: "PROVEN",
-      caption:
-        "MVP1 garment iteration with conductive waistband region, removable connections and externally mounted prototype electronics.",
+        "A later hand-built waistband prototype. The conductive region is integrated into a familiar garment form; repeatable manufacture and wear performance remain open questions.",
       evidenceIds: ["EV-003"],
     },
     {
-      figureNumber: "14.2",
-      asset: body,
+      figureNumber: "3.1",
+      asset: onBody,
       classification: "OBSERVED",
       caption:
-        "An on-body fitting experiment used to inspect placement and garment behaviour. It does not establish long-duration comfort, clinical performance or population-level fit.",
+        "Founder development fitting used to inspect the abdominal sensing position and waistband deformation zone. It is not a comfort, population-fit or clinical study.",
+      callouts: ["Abdominal sensing region", "Waistband deformation zone"],
       evidenceIds: ["EV-004"],
     },
     {
-      figureNumber: "11.1",
-      asset: bench,
-      classification: "PROVEN",
+      figureNumber: "4.1",
+      asset: firstSignal,
+      classification: "OBSERVED",
       caption:
-        "Bench configuration used to explore electrical response during applied stretch. No formal linearity, SNR or durability result is claimed.",
-      evidenceIds: ["EV-005"],
+        "Arduino Serial Monitor during an early stretch experiment. Changing readings were observed as the textile experiment was manipulated; no formal linearity or repeatability result is claimed.",
+      callouts: [
+        "Live stretch value",
+        "Changing range",
+        "Baseline / calibration",
+        "Event response",
+      ],
+      evidenceIds: ["EV-005", "EV-009"],
     },
     {
-      figureNumber: "8.1",
-      asset: firstWaistband,
+      figureNumber: "5.1",
+      asset: textileCircuit,
       classification: "PROVEN",
       caption:
-        "Early waistband integration experiment comparing the original garment construction with a manually positioned conductive textile layer. It establishes physical material placement only.",
+        "Conductive textile connected to a breadboard measurement circuit through removable prototype leads: the physical bridge from soft material to rigid hardware.",
+      callouts: [
+        "Conductive textile",
+        "Removable contact",
+        "Electrical path",
+        "Prototype lead",
+      ],
+      evidenceIds: ["EV-002"],
+    },
+    {
+      figureNumber: "6.1",
+      asset: stitchedRegion,
+      classification: "PROVEN",
+      caption:
+        "The hand-stitched sensing region during construction. Temporary stitching and unfinished edges are evidence of an iteration built for learning, not product finish.",
       evidenceIds: ["EV-006"],
     },
     {
-      figureNumber: "8.2",
-      asset: conductiveWaistband,
+      figureNumber: "7.1",
+      asset: removableAssembly,
       classification: "PROVEN",
       caption:
-        "Hand-stitched conductive sensing region during construction. Visible temporary stitching and unfinished edges show the experimental manufacturing state.",
-      evidenceIds: ["EV-006"],
-    },
-    {
-      figureNumber: "9.3",
-      asset: internalElectronics,
-      classification: "PROVEN",
-      caption:
-        "Internal MVP1 assembly showing conductive textile, press-stud connections, wiring and development electronics. The assembly is removable but not miniaturised or production-ready.",
+        "Internal assembly showing the sensing textile, press-stud connections, wiring and removable development electronics. Washability has not been validated.",
+      callouts: [
+        "Conductive region",
+        "Press-stud connection",
+        "Removable electronics",
+      ],
       evidenceIds: ["EV-007"],
     },
     {
-      figureNumber: "13.1",
-      asset: bodyInterface,
+      figureNumber: "8.1",
+      asset: arduino,
+      classification: "PROVEN",
+      caption:
+        "Arduino Nano 33 BLE Sense Rev2 on development wiring. This is measurement hardware, not a custom production PCB.",
+      callouts: [
+        "Arduino Nano 33 BLE Sense Rev2",
+        "Sensor connection",
+        "Development wiring",
+        "USB development power",
+      ],
+      evidenceIds: ["EV-002"],
+    },
+    {
+      figureNumber: "9.1",
+      asset: workbench,
+      classification: "PROVEN",
+      caption:
+        "MVP1 engineering components brought together on the workbench: textiles, joining tools, electrical connections, development hardware and measurement equipment.",
+      callouts: [
+        "Textiles",
+        "Garment construction",
+        "Electrical connection",
+        "Embedded hardware",
+        "Measurement tools",
+        "Firmware development",
+      ],
+      evidenceIds: ["EV-010"],
+    },
+    {
+      figureNumber: "10.1",
+      asset: laterSignal,
       classification: "OBSERVED",
       caption:
-        "Early KLPS body-measurement interface captured during software exploration. It establishes that an interface concept exists; it does not establish validated sensor ingestion or physiological interpretation.",
+        "A separate serial-output capture from later development work. It records exploratory measurement output, not a validated physiological signal or formal performance result.",
+      evidenceIds: ["EV-009"],
+    },
+    {
+      figureNumber: "11.1",
+      asset: materials,
+      classification: "PROVEN",
+      caption:
+        "Material exploration: garment, conductive textile, conductive thread and prototype components before integration.",
+      evidenceIds: ["EV-001"],
+    },
+    {
+      figureNumber: "11.2",
+      asset: firstWaistband,
+      classification: "PROVEN",
+      caption:
+        "Initial waistband placement compared with the original garment construction.",
+      evidenceIds: ["EV-006"],
+    },
+    {
+      figureNumber: "11.3",
+      asset: connectionDetail,
+      classification: "PROVEN",
+      caption:
+        "Press-stud components and installation tooling used to explore a detachable electrical interface.",
+      evidenceIds: ["EV-007"],
+    },
+    {
+      figureNumber: "11.4",
+      asset: integratedFront,
+      classification: "PROVEN",
+      caption:
+        "Garment iteration combining the stitched sensing region, wiring and externally mounted development electronics.",
+      evidenceIds: ["EV-003"],
+    },
+    {
+      figureNumber: "11.5",
+      asset: firstFitting,
+      classification: "OBSERVED",
+      caption:
+        "An early founder fitting used to inspect placement and handling of the external development hardware.",
+      evidenceIds: ["EV-004"],
+    },
+    {
+      figureNumber: "11.6",
+      asset: evolutionSignal,
+      classification: "OBSERVED",
+      caption:
+        "Early serial output used to observe whether the physical experiment produced changing readings.",
+      evidenceIds: ["EV-009"],
+    },
+    {
+      figureNumber: "12.1",
+      asset: bodyScan,
+      classification: "OBSERVED",
+      caption:
+        "Body Scan interface concept: an exploration of how measurements could be presented. It is not evidence of validated sensor ingestion.",
+      evidenceIds: ["EV-008"],
+    },
+    {
+      figureNumber: "12.2",
+      asset: statistics,
+      classification: "OBSERVED",
+      caption:
+        "Statistics interface concept for longitudinal progress. Displayed interface values do not constitute validated physiological results.",
+      evidenceIds: ["EV-008"],
+    },
+    {
+      figureNumber: "12.3",
+      asset: dailyInsight,
+      classification: "OBSERVED",
+      caption:
+        "Daily-engagement concept showing how repeated records might support understandable progress over time.",
       evidenceIds: ["EV-008"],
     },
   ],
   sections: [
-    section("00", "Document Control", "What record is this?", "PROVEN", [
-      "This controlled publication records the evidence available for KLPS MVP1 and separates demonstrated prototype facts from observations, work in development and future objectives.",
-    ]),
+    section(
+      "00",
+      "The hardest sensor to build is the one people forget to wear.",
+      "Could sensing disappear into everyday life?",
+      "IN DEVELOPMENT",
+      [
+        "Most wearables add another behaviour: put it on, charge it, remember it and keep wearing it. Every missed day creates another gap in the picture.",
+        "KLPS started with a different question: could the sensing live inside something people already put on?",
+      ],
+      {
+        layoutVariant: "statement",
+        heroStatement:
+          "Continuous data only works when the sensing stays with the person.",
+        pullQuote:
+          "The challenge isn’t only sensing. It’s making sensing disappear into everyday life.",
+        questionLabel: "Starting question",
+      },
+    ),
+
     section(
       "01",
-      "Engineering Summary",
-      "What does MVP1 establish?",
-      "PROVEN",
+      "What if the garment was the interface?",
+      "Why begin with something already worn?",
+      "IN DEVELOPMENT",
       [
-        "A physical sensor-integrated underwear prototype exists. Conductive textile, conductive thread, removable connections and Arduino-based electronics have been assembled to investigate textile deformation as an electrical signal.",
-        "MVP1 is an experimental platform. It is not a clinical device or commercial product.",
+        "Underwear already sits close to the body, follows its movement and belongs to an existing daily routine.",
+        "That makes the garment more than a place to attach a sensor. It becomes the mechanical interface between the body and the sensing system.",
+        "KLPS is exploring whether textile deformation can become a continuous source of body data without introducing another device to remember.",
       ],
       {
-        keyLearning:
-          "Garment integration and an electrical measurement path are feasible at prototype level.",
-        nextActivity:
-          "Convert prototype observations into repeatable WP1 test protocols.",
-        workPackage: "WP1",
+        layoutVariant: "split",
+        figureIds: ["1.1"],
+        pullQuote:
+          "Signal begins with movement. The textile is where we listen.",
+        questionLabel: "Design premise",
       },
     ),
+
     section(
       "02",
-      "Scientific Hypothesis",
-      "What is the underlying hypothesis?",
+      "Can fabric learn the movement of the body?",
+      "Can stretch become signal?",
       "IN DEVELOPMENT",
       [
-        "Changes in the deformation of a close-fitting textile sensing region may create measurable electrical responses over time.",
-        "A future research programme may investigate whether validated longitudinal signal features correlate with body-state patterns. MVP1 does not establish that inference.",
+        "Our hypothesis is that conductive textile integrated around the abdomen can produce measurable electrical changes as the garment deforms.",
+        "If those signals can be made repeatable over time, they may provide the foundation for studying longitudinal patterns associated with body movement and changing body states.",
       ],
-      { nextActivity: "Define falsifiable sensing and repeatability tests." },
+      {
+        layoutVariant: "statement",
+        pullQuote:
+          "MVP1 tests the first part of the hypothesis: can stretch become signal?",
+        questionLabel: "Hypothesis",
+      },
     ),
+
     section(
       "03",
-      "Why Textiles?",
-      "Why investigate a garment-based sensing interface?",
-      "IN DEVELOPMENT",
-      [
-        "Textiles can place a sensing region close to the body while using a familiar garment form. The engineering challenge is to preserve repeatable contact, stretch behaviour and usable signals without assuming comfort or durability.",
-      ],
-      {
-        keyLearning:
-          "The textile is both sensing medium and mechanical interface.",
-      },
-    ),
-    section(
-      "04",
-      "Target Sensing Region",
-      "Where is MVP1 investigating deformation?",
+      "Why start with the abdomen?",
+      "Can changing mechanical patterns be captured consistently?",
       "OBSERVED",
       [
-        "MVP1 places conductive material around the waistband and abdominal region. Photographs establish placement, not validated physiological interpretation.",
+        "The abdomen changes throughout the day. Movement, posture, breathing, food, cycle-related changes and normal body variation all alter how this region expands, contracts and carries tension.",
+        "MVP1 does not identify those causes. The opportunity is more fundamental: establish whether a textile sensing region can capture changing mechanical patterns consistently enough to build a longitudinal baseline.",
       ],
-      { figureIds: ["14.2"] },
+      {
+        layoutVariant: "split",
+        figureIds: ["3.1"],
+        pullQuote:
+          "The first job is not diagnosis. The first job is reliable signal.",
+        questionLabel: "Sensing region",
+      },
     ),
+
+    section(
+      "04",
+      "The first test was simple: does the number move?",
+      "Could applied stretch create a measurable electrical response?",
+      "OBSERVED",
+      [
+        "Before building intelligence, KLPS had to answer a smaller question. Development electronics and conductive material were assembled into a simple experiment.",
+        "Applied deformation produced changing electrical readings. This did not establish physiological meaning. It established something more basic: the textile could become a signal source.",
+      ],
+      {
+        layoutVariant: "evidence",
+        figureIds: ["4.1"],
+        pullQuote: "We stretched the textile. The signal changed.",
+        questionLabel: "First experiment",
+      },
+    ),
+
     section(
       "05",
-      "Engineering Question",
-      "What must be resolved before progression?",
-      "IN DEVELOPMENT",
+      "From fabric to circuit.",
+      "How does a soft sensing region reach rigid hardware?",
+      "PROVEN",
       [
-        "Can an integrated conductive textile produce repeatable electrical responses under controlled deformation, garment fit and repeated use conditions?",
+        "The sensing region needed a physical electrical path. Conductive textile, conductive thread and removable contacts connected the garment experiment to development electronics.",
+        "That bridge between soft material and rigid hardware is one of the core engineering problems in intelligent textiles.",
       ],
       {
-        items: [
-          "Signal repeatability",
-          "Fit and placement sensitivity",
-          "Material durability",
-          "Connection reliability",
-          "Calibration behaviour",
-        ],
+        layoutVariant: "split",
+        figureIds: ["5.1"],
+        questionLabel: "Connection",
       },
     ),
+
     section(
       "06",
-      "Experimental Progression",
-      "How did the prototype move from material to garment?",
+      "Hand built on purpose.",
+      "What did manual construction make possible?",
       "PROVEN",
       [
-        "Work progressed from material exploration to a simple circuit, waistband integration, removable electronics, on-body fitting and signal-capture experiments.",
+        "MVP1 was built to answer questions quickly, not to look like a finished product. Materials were positioned, stitched, removed and changed by hand so each iteration could expose the next problem.",
+        "The visible stitching, unfinished edges and manual construction are part of the evidence. They show the transition from idea to physical experiment.",
       ],
       {
-        figureIds: ["6.1", "9.1"],
-        keyLearning:
-          "Each iteration reduced uncertainty about physical integration while exposing new repeatability questions.",
+        layoutVariant: "full-bleed",
+        figureIds: ["6.1"],
+        pullQuote:
+          "Prototype quality is not product quality. At MVP1, learning speed mattered more.",
+        questionLabel: "Construction",
       },
     ),
+
     section(
       "07",
-      "Material Selection",
-      "What sensing materials are present?",
+      "The garment and the electronics needed to separate.",
+      "Could the development hardware be removable?",
       "PROVEN",
       [
-        "The repository photographs show conductive textile, including silver-coloured conductive material, and conductive thread used with a conventional stretch garment.",
+        "Textile and electronics have different handling requirements. Press-stud-style contacts created a simple removable interface between the conductive sensing region and external development hardware.",
+        "The interface supports experimentation. It is not presented as wash-safe, electrically validated over repeated connection cycles or ready for wear outside development work.",
       ],
       {
-        figureIds: ["6.1"],
-        nextActivity:
-          "Record composition, resistance, dimensions and supplier provenance for each test sample.",
+        layoutVariant: "split",
+        figureIds: ["7.1"],
+        questionLabel: "Removable interface",
       },
     ),
+
     section(
       "08",
-      "MVP1 Garment Construction",
-      "How is the sensing region integrated?",
+      "What did we actually build?",
+      "What electronics exist in MVP1?",
       "PROVEN",
       [
-        "Conductive textile is attached around the waistband/abdominal sensing region of a close-fitting prototype underwear platform. Construction remains an experimental hand-built iteration.",
-      ],
-      { figureIds: ["8.1", "8.2", "14.1"] },
-    ),
-    section(
-      "09",
-      "Electronics & Connections",
-      "What electronics are actually implemented?",
-      "PROVEN",
-      [
-        "MVP1 uses an Arduino Nano 33 BLE Sense Rev2 on breadboard/prototype wiring, with resistive components, conductive leads and press-stud-style removable connections.",
-        "No custom KLPS PCB, production enclosure, final battery system or validated runtime is claimed.",
+        "MVP1 uses development hardware rather than production electronics: an Arduino Nano 33 BLE Sense Rev2, prototype wiring and removable textile connections.",
+        "Its purpose is measurement, experimentation and iteration—not miniaturisation.",
       ],
       {
-        figureIds: ["9.1", "9.2", "9.3"],
+        layoutVariant: "evidence",
+        figureIds: ["8.1"],
+        pullQuote: "Development hardware first. Product electronics later.",
         decision: {
-          decision: "Use accessible modular development hardware for MVP1.",
+          decision: "Use modular development hardware for MVP1.",
           reason:
-            "It supports rapid circuit and firmware iteration without prematurely fixing a production architecture.",
+            "It allows rapid circuit and firmware iteration before a production architecture is justified.",
           alternatives: [],
           tradeOff:
-            "The assembly is bulky and unsuitable for product-level wearability.",
+            "The assembly remains bulky and unsuitable for product-level wearability.",
           evidenceIds: ["EV-002", "EV-007"],
         },
+        questionLabel: "Electronics",
       },
     ),
+
+    section(
+      "09",
+      "A garment became an engineering system.",
+      "What came together on the workbench?",
+      "PROVEN",
+      [
+        "By MVP1, the experiment was no longer one material or one circuit. It spanned textile construction, electronics, firmware and physical wear.",
+        "The value of MVP1 is not that every element is solved. It is that the interactions between them are now visible.",
+      ],
+      {
+        layoutVariant: "full-bleed",
+        figureIds: ["9.1"],
+        questionLabel: "System view",
+      },
+    ),
+
     section(
       "10",
-      "Firmware & Calibration",
-      "How is the electrical response made usable?",
-      "IN DEVELOPMENT",
+      "What is the signal today?",
+      "What does MVP1 measure now?",
+      "PROVEN",
       [
-        "MVP1 firmware work uses baseline/calibration concepts and stretch measurements. Repository evidence does not justify claims for production firmware, OTA updates, formal linearity or validated calibration stability.",
+        "MVP1 detects changes in electrical response as the textile is deformed. That is the current measurement.",
+        "The system does not yet determine why the body moved or what that movement means physiologically. The next challenge is repeatability across time, garments and wear conditions.",
       ],
       {
-        nextActivity:
-          "Version the firmware and publish controlled calibration/test procedures.",
+        layoutVariant: "evidence",
+        figureIds: ["10.1"],
+        comparison: {
+          leftLabel: "Today",
+          left: "Textile deformation → electrical response",
+          rightLabel: "Future research",
+          right: "Repeatable signal → longitudinal interpretation",
+        },
+        questionLabel: "Current measurement",
       },
     ),
+
     section(
       "11",
-      "Signal Capture",
-      "What is measured?",
+      "The prototype did not appear fully formed.",
+      "How did each version expose the next question?",
       "PROVEN",
       [
-        "The present measurement is an electrical response associated with applied textile deformation/stretch. It is not a validated measurement of digestion, hormones, bloating, respiration or a clinical condition.",
+        "Each physical iteration answered one question and made the next uncertainty visible. This is a progression in experimental configuration—not evidence of validated product performance.",
       ],
       {
-        figureIds: ["11.1"],
-        observation: {
-          observation:
-            "Applied textile deformation can be explored through the prototype electrical path.",
-          context:
-            "Bench and garment experiments using conductive textile and Arduino-based electronics.",
-          implication:
-            "Repeatability and artefact controls are the next evidence gate.",
-          evidenceIds: ["EV-005"],
-        },
-      },
-    ),
-    section(
-      "12",
-      "MVP1 System Architecture",
-      "What is the evidenced end-to-end system?",
-      "IN DEVELOPMENT",
-      [
-        "Conductive textile → removable electrical connection → Arduino Nano 33 BLE Sense Rev2 → firmware measurement/calibration → BLE/data capture exploration → KLPS application and research interfaces.",
-        "The current website platform uses a React/TypeScript client, an Express/TypeScript service, PostgreSQL and private Cloudflare R2 object storage, deployed through the repository’s Railway-backed service architecture. This web stack documents and supports research; it is not presented as validated embedded-device telemetry infrastructure.",
-      ],
-      {
-        items: [
-          "Textile sensor",
-          "Prototype circuit",
-          "Arduino firmware",
-          "BLE exploration",
-          "Application/research interface",
-          "Express API",
-          "PostgreSQL",
-          "Private R2 evidence storage",
-        ],
-      },
-    ),
-    section(
-      "13",
-      "Software / Research Infrastructure",
-      "What supporting software exists?",
-      "PROVEN",
-      [
-        "The repository contains authenticated Data Room, R&D work-package, evidence, research and dashboard interfaces. These systems organise records and research workflows; screenshots do not by themselves validate sensor performance.",
-      ],
-      {
-        figureIds: ["13.1"],
-        nextActivity: "Link future test outputs to canonical evidence records.",
-      },
-    ),
-    section(
-      "14",
-      "Prototype Evolution",
-      "What physical progression is visible?",
-      "PROVEN",
-      [
-        "The photographic record shows material exploration, sensing-region construction, circuit prototyping, removable connection, electronics integration and an on-body development fitting. This is progression in experimental configuration, not validated product performance.",
-      ],
-      {
-        figureIds: [
-          "6.1",
-          "8.1",
-          "8.2",
-          "9.1",
-          "9.3",
-          "14.1",
-          "14.2",
-          "11.1",
-          "13.1",
-        ],
+        layoutVariant: "timeline",
+        questionLabel: "Prototype evolution",
+        pullQuote: "Each version answered one question and exposed another.",
         evolutionSteps: [
           {
-            stage: "Material exploration",
-            figureId: "6.1",
+            stage: "01 · Material exploration",
+            figureId: "11.1",
             changed:
-              "Conductive textile, thread and a close-fitting garment were brought together as candidate prototype materials.",
+              "Conductive textile, thread and a close-fitting garment were brought together.",
             reason:
-              "To determine whether a garment-based deformation experiment could be assembled from accessible materials.",
+              "Create the smallest practical garment-based deformation experiment.",
             learned:
-              "The constituent materials could be physically combined for early trials.",
+              "The constituent materials could be combined for early trials.",
             unresolved:
-              "Electrical repeatability, attachment method, durability and washability.",
+              "Material specification, resistance, durability and washability.",
           },
           {
-            stage: "Initial garment integration",
-            figureId: "8.1",
-            changed:
-              "A conductive textile layer was manually positioned at the waistband.",
-            reason:
-              "To inspect placement before committing to a stitched sensing region.",
+            stage: "02 · Sensing region",
+            figureId: "11.2",
+            changed: "Conductive textile was positioned at the waistband.",
+            reason: "Inspect placement before committing to a stitched region.",
             learned:
-              "The waistband provides a practical experimental integration location.",
+              "The waistband provides a practical experimental location.",
             unresolved:
               "Dimensional control, fit consistency and repeatable construction.",
           },
           {
-            stage: "Conductive sensing region",
-            figureId: "8.2",
-            changed:
-              "The conductive layer was hand stitched into the garment construction.",
-            reason:
-              "To create a retained textile region for subsequent electrical experiments.",
-            learned:
-              "A hand-built conductive region can be integrated physically.",
+            stage: "03 · Connection",
+            figureId: "11.3",
+            changed: "Press-stud components introduced a detachable contact.",
+            reason: "Separate garment construction from reusable electronics.",
+            learned: "A removable physical interface could be assembled.",
             unresolved:
-              "Seam durability, wash behaviour and manufacturing repeatability.",
+              "Connection life, electrical stability and wash handling.",
           },
           {
-            stage: "Wired prototype",
-            figureId: "9.1",
+            stage: "04 · Electronics integration",
+            figureId: "11.4",
             changed:
-              "The textile experiment was connected to a breadboard measurement circuit.",
+              "Development electronics were combined with the stitched garment.",
             reason:
-              "To explore whether applied stretch is associated with an electrical response.",
-            learned:
-              "The physical measurement path can support exploratory readings.",
+              "Examine the garment and measurement hardware as one experiment.",
+            learned: "The elements coexist as an MVP1 platform.",
             unresolved:
-              "Linearity, noise, calibration stability and artefact control.",
+              "Miniaturisation, enclosure, power and wearer handling.",
           },
           {
-            stage: "Removable connection",
-            figureId: "9.3",
+            stage: "05 · On-body fitting",
+            figureId: "11.5",
             changed:
-              "Press studs and wiring linked the textile region to removable development electronics.",
-            reason:
-              "To separate garment construction from reusable measurement hardware.",
+              "The integrated prototype was inspected during a founder fitting.",
+            reason: "Observe placement and handling on body.",
             learned:
-              "A detachable physical connection can be assembled at prototype level.",
+              "The sensing location can be inspected in a development context.",
             unresolved:
-              "Connection-cycle life, electrical stability, bulk and wearer safety.",
+              "Long-duration comfort, sizes, multiple bodies and formal wear validation.",
           },
           {
-            stage: "Electronics integration",
-            figureId: "14.1",
-            changed:
-              "Development electronics were mounted with the integrated garment prototype.",
-            reason:
-              "To examine the combined garment-and-electronics configuration.",
-            learned: "The elements coexist as an MVP1 experimental platform.",
-            unresolved:
-              "Miniaturisation, enclosure, power, runtime and product wearability.",
-          },
-          {
-            stage: "On-body development fitting",
-            figureId: "14.2",
-            changed:
-              "The integrated garment was inspected during a founder development fitting.",
-            reason: "To observe placement and garment behaviour on body.",
+            stage: "06 · Signal capture",
+            figureId: "11.6",
+            changed: "Serial output was observed during physical manipulation.",
+            reason: "Check whether the experiment produced changing readings.",
             learned:
-              "Placement can be inspected in a development fitting context.",
+              "Applied deformation can be explored through the electrical path.",
             unresolved:
-              "Long-duration comfort, multiple bodies, size repeatability and formal wear validation.",
-          },
-          {
-            stage: "Electrical signal capture",
-            figureId: "11.1",
-            changed:
-              "A bench arrangement applied stretch while observing the electrical path.",
-            reason:
-              "To move from physical assembly towards controlled measurement questions.",
-            learned:
-              "Stretch-related electrical response can be explored with the prototype.",
-            unresolved:
-              "Repeatability, SNR, validation thresholds and physiological meaning.",
-          },
-          {
-            stage: "Research / software interface",
-            figureId: "13.1",
-            changed:
-              "An early interface concept presented body-measurement information.",
-            reason:
-              "To explore how future research measurements might be represented.",
-            learned:
-              "A KLPS interface concept exists independently of sensor validation.",
-            unresolved:
-              "Validated ingestion, measurement accuracy and physiological interpretation.",
+              "Repeatability, artefacts, calibration stability and physiological meaning.",
           },
         ],
-        keyLearning:
-          "Physical iteration moved uncertainty from basic integration towards repeatability, artefact and validation questions.",
-        nextActivity:
-          "Record each future iteration against a controlled change, test method and result.",
       },
     ),
+
     section(
-      "15",
-      "Engineering Observations",
-      "What has been observed without formal validation?",
+      "12",
+      "The signal was never meant to stop at the garment.",
+      "How might repeated measurements become understandable over time?",
       "OBSERVED",
       [
-        "Garment placement, wiring movement, connection bulk and hand-built textile construction may affect the measured response. These are development observations requiring controlled comparison.",
+        "While sensing hardware was being explored, KLPS also developed software concepts around measurement, longitudinal progress and daily engagement.",
+        "These interfaces are not validated sensor-driven health outputs. They show the intended destination: turn repeated measurements into something a person can understand over time.",
       ],
       {
-        keyLearning:
-          "Mechanical and electrical variables cannot yet be separated reliably.",
+        layoutVariant: "cards",
+        figureIds: ["12.1", "12.2", "12.3"],
+        pullQuote: "Signal → Memory → Insight",
+        questionLabel: "Software direction",
       },
     ),
+
     section(
-      "16",
-      "Known Limitations",
-      "What currently constrains confidence?",
-      "PROVEN",
-      [
-        "MVP1 lacks formal evidence for wash durability, repeatability across sizes and bodies, long-duration wear, stable calibration, artefact rejection, production electronics, manufacturing repeatability and physiological interpretation.",
-      ],
-      {
-        items: [
-          "Material durability — protocol not completed",
-          "Washability — unproven",
-          "Calibration stability — unproven",
-          "Garment fit repeatability — unproven",
-          "Long-duration performance — unproven",
-          "Physiological classification — unproven",
-        ],
-      },
-    ),
-    section(
-      "17",
-      "What MVP1 Establishes",
-      "What can be stated directly?",
-      "PROVEN",
-      [
-        "Physical garment integration is feasible at prototype level; actual Arduino-based electronics and removable textile connections exist; and stretch-related electrical response can be investigated using this platform.",
-      ],
-    ),
-    section(
-      "18",
-      "What MVP1 Does NOT Yet Establish",
-      "Which claims remain outside the evidence?",
-      "PROVEN",
-      [
-        "MVP1 does not establish clinical relevance, physiological classification, formal comfort, multi-size performance, wash durability, signal-quality thresholds, battery life, wireless reliability, manufacturing yield or commercial economics.",
-      ],
-    ),
-    section(
-      "19",
-      "WP1: Textile Sensing",
-      "What is the next engineering gate?",
+      "13",
+      "How the experiment connects.",
+      "Where does the current prototype boundary end?",
       "IN DEVELOPMENT",
       [
-        "WP1 should characterise materials, textile construction, resistance response, hysteresis, drift, repeatability, attachment methods and wash/durability behaviour under controlled protocols.",
+        "The current measurement path runs from conductive textile through a removable connection and Arduino-based development hardware into firmware measurement and data-capture exploration.",
+        "KLPS research software supports records, evidence and interface exploration. It is shown separately because it is not yet a validated embedded telemetry pipeline.",
       ],
-      { workPackage: "WP1" },
+      { layoutVariant: "architecture", questionLabel: "System architecture" },
     ),
+
     section(
-      "20",
-      "WP2: Electronics & Power",
-      "What follows textile feasibility?",
-      "PLANNED",
+      "14",
+      "What still needs proving?",
+      "Which uncertainties become the engineering roadmap?",
+      "IN DEVELOPMENT",
       [
-        "Future work should translate the development circuit into requirements for smaller electronics, safe power, connection robustness and product-level integration. No custom PCB or runtime result is claimed.",
-      ],
-      { workPackage: "WP2" },
-    ),
-    section(
-      "21",
-      "WP3: Body Intelligence",
-      "When can body-state inference be investigated?",
-      "PLANNED",
-      [
-        "Only after sensing repeatability and artefacts are characterised should longitudinal features and potential body-state correlations be studied with appropriate validation and governance.",
-      ],
-      { workPackage: "WP3" },
-    ),
-    section(
-      "22",
-      "Graphene Materials Pathway",
-      "Why is graphene being considered?",
-      "PLANNED",
-      [
-        "The current MVP uses commercially available conductive material. KLPS intends to investigate a nylon and graphene-nanoplatelet melt-spun fibre pathway as a materials hypothesis.",
-        "Planned gates are formulation, fibre production, material characterisation, textile construction, garment integration and comparative validation. No KLPS graphene sensor performance result is claimed.",
+        "MVP1 makes the unanswered questions concrete. Each one now points to a test, protocol or later validation programme.",
       ],
       {
-        nextActivity:
-          "Define material characterisation criteria before comparative claims.",
-      },
-    ),
-    section(
-      "23",
-      "Manufacturing Progression",
-      "What must change before repeatable manufacture?",
-      "PLANNED",
-      [
-        "Hand-built integration must progress to controlled patterns, material specifications, connection methods, assembly tolerances, inspection criteria and traceable test records.",
-      ],
-      {
+        layoutVariant: "cards",
+        questionLabel: "Opportunity map",
         items: [
-          "Repeatable sensing-zone dimensions",
-          "Documented joining method",
-          "Component traceability",
-          "In-process inspection",
-          "End-of-line functional test",
+          "Wash durability | Not yet validated → WP1 wash protocol",
+          "Repeatability | Not yet established → controlled strain testing",
+          "Garment fit | Founder fitting only → multi-size validation",
+          "Calibration stability | Not yet validated → repeatability protocol",
+          "Long-duration wear | Not established → wear study",
+          "Physiological interpretation | Not established → later WP3 validation",
         ],
+        pullQuote: "The unanswered questions are the roadmap.",
       },
     ),
+
     section(
-      "24",
-      "Technology Readiness",
+      "15",
+      "What MVP1 proves today.",
+      "What has moved beyond concept?",
+      "PROVEN",
+      [
+        "A physical sensor-integrated underwear prototype exists. Conductive textile is integrated into the garment. Development electronics connect to the sensing region. Stretch-related electrical responses can be observed.",
+        "The system can now be subjected to controlled engineering tests.",
+      ],
+      {
+        layoutVariant: "statement",
+        pullQuote:
+          "MVP1 does not finish the technology. It makes the next experiments possible.",
+        questionLabel: "Evidence today",
+      },
+    ),
+
+    section(
+      "16",
+      "What MVP1 leaves unanswered.",
+      "What can the present evidence not tell us?",
+      "PROVEN",
+      [
+        "How the textile behaves after repeated washing. How repeatable the signal is across garments. How body size and fit affect measurement. How stable calibration remains over long wear.",
+        "Whether signal patterns correlate with specific physiological states. What production electronics should look like. What the manufacturing economics will be.",
+      ],
+      { layoutVariant: "statement", questionLabel: "Open questions" },
+    ),
+
+    section(
+      "17",
+      "Why graphene comes next—not first.",
+      "When should the material itself be re-engineered?",
+      "PLANNED",
+      [
+        "MVP1 uses commercially available conductive materials because the first job was to test the sensing concept.",
+        "KLPS intends to investigate whether nylon blended with graphene nanoplatelets can produce a conductive fibre better suited to integrated textile sensing. That is a materials hypothesis, not yet a result.",
+      ],
+      {
+        layoutVariant: "standard",
+        items: [
+          "Formulation",
+          "Fibre production",
+          "Material characterisation",
+          "Textile construction",
+          "Garment integration",
+          "Comparative validation",
+        ],
+        pullQuote:
+          "First prove the sensing system. Then improve the material at its source.",
+        questionLabel: "Materials pathway",
+      },
+    ),
+
+    section(
+      "18",
+      "The next chapter is repeatability.",
+      "Can the experiment work consistently?",
+      "PLANNED",
+      [
+        "WP1 moves the programme from ‘Can this work?’ towards ‘Can this work consistently?’",
+      ],
+      {
+        layoutVariant: "cards",
+        items: [
+          "Resistance under controlled strain",
+          "Hysteresis",
+          "Drift over repeated cycles",
+          "Attachment-method effects",
+          "Wash-performance change",
+          "Sensing-region repeatability across garments",
+        ],
+        pullQuote: "WP1 is where prototype behaviour becomes engineering data.",
+        questionLabel: "WP1",
+      },
+    ),
+
+    section(
+      "19",
+      "Where are we really?",
       "What is the defensible readiness position?",
       "OBSERVED",
       [
-        "Current evidence is consistent with TRL 3: an experimental proof of concept supported by physical prototypes and exploratory testing.",
-        "The next validation gate is repeatable WP1 performance under controlled deformation and environmental/durability protocols. A higher target TRL is not treated as achieved.",
+        "KLPS is currently at TRL 3: an experimental proof of concept supported by physical prototypes and exploratory testing.",
+        "The next step is not simply ‘TRL 4’. The next step is evidence: repeatable performance under controlled conditions.",
       ],
       {
-        keyLearning: "TRL is an evidence conclusion, not a roadmap decoration.",
+        layoutVariant: "comparison",
+        comparison: {
+          leftLabel: "You are here",
+          left: "TRL 3 · Experimental proof of concept",
+          rightLabel: "Next evidence gate",
+          right: "Controlled repeatability → TRL 4 target",
+        },
+        questionLabel: "Technology readiness",
       },
     ),
+
     section(
-      "25",
-      "Engineering Status",
-      "Where does the programme stand now?",
+      "20",
+      "This is the beginning of the engineering record.",
+      "What becomes possible after MVP1?",
       "IN DEVELOPMENT",
       [
-        "MVP1 physically exists and combines conductive textile, garment integration, prototype electronics and firmware-led measurement exploration.",
-        "Wash durability, manufacturing and fit repeatability, long-duration performance, physiological classification, clinical relevance, commercial electronics and production economics remain unproven.",
+        "MVP1 answered the first question: can textile deformation become a measurable electrical signal inside a garment? Yes—at experimental prototype level.",
+        "The next questions are harder. Can it become repeatable? Can it survive real use? Can the materials be engineered for scale? Can longitudinal signal eventually become meaningful body intelligence?",
       ],
       {
-        nextActivity:
-          "WP1 textile sensing development and controlled evidence capture.",
+        layoutVariant: "statement",
+        heroStatement: "The garment is built. Now the evidence gets deeper.",
+        pullQuote: "Signal → Memory → Insight",
+        questionLabel: "Next chapter",
       },
     ),
-    section("26", "Technical Glossary", "How are key terms used?", "PROVEN", [
-      "Textile deformation: change in textile geometry under applied movement or stretch. Calibration: establishing a reference for subsequent measurements. BLE: Bluetooth Low Energy. MVP1: the current experimental minimum viable prototype. Evidence state: PROVEN, OBSERVED, IN DEVELOPMENT or PLANNED.",
-    ]),
+
     section(
-      "27",
+      "21",
       "Evidence Register",
-      "Which records support the conclusions?",
+      "Which records support this engineering story?",
       "PROVEN",
       [
-        "The register below states both what each item establishes and what it does not establish. Future blueprint versions should extend this same structure.",
+        "Each record states what the evidence establishes and where its limits begin.",
       ],
+      { layoutVariant: "standard", questionLabel: "Controlled evidence" },
     ),
   ],
   evidence: [
@@ -620,7 +700,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
       establishes:
         "Candidate textile, conductive thread and garment materials were assembled for development.",
       doesNotEstablish:
-        "Material durability, composition, washability or production suitability.",
+        "Material composition, durability, washability or production suitability.",
       workPackage: "WP1",
     },
     {
@@ -640,7 +720,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
       question:
         "Can conductive textile be physically integrated into underwear?",
       type: "Prototype photography",
-      asset: "Integrated garment with electronics",
+      asset: "Integrated garment iterations",
       status: "PROVEN",
       establishes:
         "Physical integration is feasible at hand-built prototype level.",
@@ -650,12 +730,12 @@ export const mvp1Blueprint: TechnologyBlueprint = {
     },
     {
       id: "EV-004",
-      question: "Has the placement been inspected on body?",
-      type: "Development photograph",
-      asset: "On-body abdominal sensing experiment",
+      question: "Has placement been inspected on body?",
+      type: "Development photography",
+      asset: "Founder on-body fitting images",
       status: "OBSERVED",
       establishes:
-        "A founder development fitting was undertaken to inspect placement.",
+        "Founder development fittings were undertaken to inspect placement and handling.",
       doesNotEstablish:
         "Formal wear validation, multiple participants, clinical relevance or long-duration comfort.",
       workPackage: "WP1",
@@ -664,52 +744,74 @@ export const mvp1Blueprint: TechnologyBlueprint = {
       id: "EV-005",
       question:
         "Can the prototype explore an electrical response during stretch?",
-      type: "Bench configuration photograph",
-      asset: "Stretch-sensor bench test",
-      status: "PROVEN",
+      type: "Bench configuration and serial output",
+      asset: "Stretch experiment",
+      status: "OBSERVED",
       establishes:
-        "A physical test arrangement exists for observing stretch-related electrical response.",
+        "A physical test arrangement exists and changing readings were observed during manipulation.",
       doesNotEstablish:
-        "Linearity, SNR, repeatability, physiological meaning or validated performance thresholds.",
+        "Linearity, SNR, repeatability, physiological meaning or validated thresholds.",
       workPackage: "WP1",
     },
     {
       id: "EV-006",
-      question:
-        "How was the conductive sensing region introduced into the garment?",
+      question: "How was the conductive sensing region introduced?",
       type: "Construction photography",
-      asset: "First and conductive waistband integrations",
+      asset: "Waistband integration images",
       status: "PROVEN",
       establishes:
-        "Manual placement and stitching of a conductive waistband region occurred across physical iterations.",
+        "Manual placement and stitching of a conductive waistband region occurred across iterations.",
       doesNotEstablish:
         "Repeatable manufacture, seam durability, washability or dimensional tolerance.",
       workPackage: "WP1",
     },
     {
       id: "EV-007",
-      question:
-        "Are the sensing region and development electronics physically connected?",
-      type: "Internal assembly photography",
-      asset: "Internal electronics assembly",
+      question: "Are the sensing region and electronics physically connected?",
+      type: "Assembly photography",
+      asset: "Internal assembly and press-stud details",
       status: "PROVEN",
       establishes:
-        "Press-stud connections and wiring link the textile region to development electronics in MVP1.",
+        "Press-stud contacts and wiring link the textile region to development electronics.",
       doesNotEstablish:
         "Connection-cycle life, electrical stability, wearer safety or commercial packaging.",
       workPackage: "WP1/WP2",
     },
     {
       id: "EV-008",
-      question: "Does a KLPS software-interface concept exist?",
-      type: "Application screenshot",
-      asset: "Body-measurement interface",
+      question: "Do KLPS software-interface concepts exist?",
+      type: "Application screenshots",
+      asset: "Body Scan, statistics and daily-engagement concepts",
       status: "OBSERVED",
       establishes:
-        "An early interface concept and measurement presentation were explored.",
+        "Interface concepts for measurement, progress and engagement were explored.",
       doesNotEstablish:
         "Validated sensor ingestion, accurate measurements or physiological interpretation.",
       workPackage: "Software research",
+    },
+    {
+      id: "EV-009",
+      question: "Was exploratory serial output captured?",
+      type: "Arduino IDE screenshots",
+      asset: "Serial Monitor development captures",
+      status: "OBSERVED",
+      establishes:
+        "Changing development readings were captured during prototype experiments.",
+      doesNotEstablish:
+        "A controlled test result, calibration stability, repeatability or physiological meaning.",
+      workPackage: "WP1",
+    },
+    {
+      id: "EV-010",
+      question: "Did MVP1 span multiple engineering disciplines?",
+      type: "Workbench photography",
+      asset: "Engineering components layout",
+      status: "PROVEN",
+      establishes:
+        "Textile, construction, connection, electronics and measurement components were assembled for MVP1 work.",
+      doesNotEstablish:
+        "A finished system, production process or validated end-to-end telemetry.",
+      workPackage: "WP1/WP2",
     },
   ],
 };

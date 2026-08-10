@@ -12,12 +12,29 @@ export default function DataRoomTechnologyBlueprint() {
       "checking",
     ),
     [exporting, setExporting] = useState(false),
-    [progress, setProgress] = useState(0);
+    [progress, setProgress] = useState(0),
+    [activeSection, setActiveSection] = useState("");
   useEffect(() => {
     authenticatedApi("/api/data-room/documents")
       .then(() => setAccess("allowed"))
       .catch(() => setAccess("denied"));
   }, []);
+  useEffect(() => {
+    if (access !== "allowed") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible)
+          setActiveSection(visible.target.id.replace("section-", ""));
+      },
+      { rootMargin: "-15% 0px -65%", threshold: [0, 0.15, 0.4] },
+    );
+    const sections = document.querySelectorAll(".blueprint-section");
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
+  }, [access]);
   useEffect(() => {
     const update = () => {
       const maximum =
@@ -72,7 +89,7 @@ export default function DataRoomTechnologyBlueprint() {
           </Link>
           <select
             aria-label="Jump to section"
-            defaultValue=""
+            value={activeSection}
             onChange={(event) => {
               if (event.target.value)
                 document

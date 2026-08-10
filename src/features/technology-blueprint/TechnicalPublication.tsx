@@ -90,6 +90,7 @@ function SystemArchitecture() {
         <span>Express / TypeScript</span>
         <span>PostgreSQL</span>
         <span>Private Cloudflare R2</span>
+        <span>Railway</span>
         <small>
           Supports research records and evidence. It is not presented as
           embedded-device infrastructure.
@@ -127,6 +128,13 @@ export function EvidenceFigure({ figure }: { figure: BlueprintFigure }) {
           <EvidenceBadge state={figure.classification} />
         </div>
         <p>{figure.caption}</p>
+        {figure.callouts && (
+          <ul className="blueprint-figure-callouts">
+            {figure.callouts.map((callout) => (
+              <li key={callout}>{callout}</li>
+            ))}
+          </ul>
+        )}
         <small>Evidence: {figure.evidenceIds.join(", ")}</small>
       </figcaption>
       {enlarged && (
@@ -186,7 +194,7 @@ export function TechnicalPublication({
         <section
           id={`section-${section.number}`}
           key={section.number}
-          className="blueprint-section"
+          className={`blueprint-section blueprint-layout-${section.layoutVariant ?? "standard"}`}
         >
           <div className="blueprint-section-head">
             <div>
@@ -196,9 +204,12 @@ export function TechnicalPublication({
             <EvidenceBadge state={section.state} />
           </div>
           <div className="blueprint-question">
-            <span>Engineering question</span>
+            <span>{section.questionLabel ?? "Question"}</span>
             {section.question}
           </div>
+          {section.heroStatement && (
+            <p className="blueprint-hero-statement">{section.heroStatement}</p>
+          )}
           {section.body.map((paragraph, index) => (
             <p key={index}>{paragraph}</p>
           ))}
@@ -209,7 +220,7 @@ export function TechnicalPublication({
               ))}
             </ul>
           )}
-          {section.number === "12" && <SystemArchitecture />}
+          {section.layoutVariant === "architecture" && <SystemArchitecture />}
           {section.evolutionSteps && (
             <div
               className="blueprint-evolution"
@@ -217,6 +228,9 @@ export function TechnicalPublication({
             >
               {section.evolutionSteps.map((step) => (
                 <article key={step.figureId}>
+                  {figures.get(step.figureId) && (
+                    <EvidenceFigure figure={figures.get(step.figureId)!} />
+                  )}
                   <div>
                     <strong>{step.stage}</strong>
                     <a href={`#figure-${step.figureId.replace(".", "-")}`}>
@@ -237,12 +251,34 @@ export function TechnicalPublication({
               ))}
             </div>
           )}
-          {section.figureIds
-            ?.map((id) => figures.get(id))
-            .filter(Boolean)
-            .map((figure) => (
-              <EvidenceFigure key={figure!.figureNumber} figure={figure!} />
-            ))}
+          {section.figureIds && (
+            <div className="blueprint-figures">
+              {section.figureIds
+                .map((id) => figures.get(id))
+                .filter(Boolean)
+                .map((figure) => (
+                  <EvidenceFigure key={figure!.figureNumber} figure={figure!} />
+                ))}
+            </div>
+          )}
+          {section.comparison && (
+            <div className="blueprint-comparison">
+              <div>
+                <span>{section.comparison.leftLabel}</span>
+                <strong>{section.comparison.left}</strong>
+              </div>
+              <b aria-hidden="true">→</b>
+              <div>
+                <span>{section.comparison.rightLabel}</span>
+                <strong>{section.comparison.right}</strong>
+              </div>
+            </div>
+          )}
+          {section.pullQuote && (
+            <blockquote className="blueprint-pull-quote">
+              {section.pullQuote}
+            </blockquote>
+          )}
           {section.decision && <EngineeringDecision value={section.decision} />}{" "}
           {section.observation && (
             <EngineeringObservation value={section.observation} />
@@ -278,7 +314,7 @@ export function TechnicalPublication({
               )}
             </dl>
           )}
-          {section.number === "27" && (
+          {section.title === "Evidence Register" && (
             <div className="overflow-x-auto">
               <table className="blueprint-evidence-table">
                 <thead>

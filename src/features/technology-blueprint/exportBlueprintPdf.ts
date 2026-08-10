@@ -95,7 +95,7 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
     pdf.text("Separate deployed research infrastructure", margin + 4, y + 5);
     pdf.setFontSize(7.5);
     pdf.text(
-      "React / TypeScript  ·  Express / TypeScript  ·  PostgreSQL  ·  Private Cloudflare R2",
+      "React / TypeScript · Express / TypeScript · PostgreSQL · Private Cloudflare R2 · Railway",
       margin + 4,
       y + 11,
     );
@@ -135,65 +135,93 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
   const figures = new Map(
     document.figures.map((figure) => [figure.figureNumber, figure]),
   );
+  const addFigure = async (id: string, maximumHeight = 90) => {
+    const figure = figures.get(id);
+    if (!figure) return;
+    const data = await loadImage(figure.asset);
+    const properties = pdf.getImageProperties(data);
+    const availableWidth = width - margin * 2;
+    const imageRatio = properties.width / properties.height;
+    let imageWidth = availableWidth;
+    let imageHeight = imageWidth / imageRatio;
+    if (imageHeight > maximumHeight) {
+      imageHeight = maximumHeight;
+      imageWidth = imageHeight * imageRatio;
+    }
+    ensure(imageHeight + 28);
+    const imageX = margin + (availableWidth - imageWidth) / 2;
+    pdf.addImage(
+      data,
+      "JPEG",
+      imageX,
+      y,
+      imageWidth,
+      imageHeight,
+      undefined,
+      "FAST",
+    );
+    y += imageHeight + 4;
+    text(
+      `Figure ${figure.figureNumber} | ${figure.classification} — ${figure.caption}`,
+      8,
+      [60, 60, 65],
+      4,
+    );
+    if (figure.callouts?.length)
+      text(figure.callouts.join("  ·  "), 7, [116, 76, 145], 4);
+  };
   for (const section of document.sections) {
-    ensure(section.number === "12" ? 151 : 36);
+    if (section.layoutVariant === "statement" && y > 30) next();
+    ensure(section.layoutVariant === "architecture" ? 151 : 36);
     pdf.setFontSize(8);
     pdf.setTextColor(116, 76, 145);
     pdf.text(section.number, margin, y);
     // jsPDF uses millimetres: the extra 0.5 mm is approximately 2 CSS px.
     y += 6.5;
     text(section.title, 22, [20, 20, 24], 9);
-    text(`ENGINEERING QUESTION  ${section.question}`, 9, [100, 70, 120], 5);
+    text(
+      `${(section.questionLabel ?? "QUESTION").toUpperCase()}  ${section.question}`,
+      9,
+      [100, 70, 120],
+      5,
+    );
+    if (section.heroStatement) text(section.heroStatement, 18, [35, 35, 40], 8);
     for (const paragraph of section.body) text(paragraph, 10, [40, 40, 45], 5);
-    if (section.number === "12") architecture();
+    if (section.layoutVariant === "architecture") architecture();
     for (const item of section.items ?? [])
       text(`• ${item}`, 9, [45, 45, 50], 4.6);
+    if (section.comparison) {
+      ensure(30);
+      text(
+        `${section.comparison.leftLabel.toUpperCase()}  ${section.comparison.left}`,
+        10,
+        [75, 45, 95],
+        5,
+      );
+      text(
+        `${section.comparison.rightLabel.toUpperCase()}  ${section.comparison.right}`,
+        10,
+        [75, 45, 95],
+        5,
+      );
+    }
     for (const step of section.evolutionSteps ?? []) {
-      ensure(38);
+      ensure(46);
       text(`${step.stage} · Figure ${step.figureId}`, 11, [75, 45, 95], 5);
       text(`WHAT CHANGED  ${step.changed}`, 8, [45, 45, 50], 4);
       text(`WHY  ${step.reason}`, 8, [45, 45, 50], 4);
       text(`WHAT WAS LEARNED  ${step.learned}`, 8, [45, 45, 50], 4);
       text(`UNRESOLVED  ${step.unresolved}`, 8, [80, 80, 85], 4);
+      await addFigure(step.figureId, 65);
     }
-    for (const id of section.figureIds ?? []) {
-      const figure = figures.get(id);
-      if (!figure) continue;
-      const data = await loadImage(figure.asset);
-      const properties = pdf.getImageProperties(data);
-      const availableWidth = width - margin * 2;
-      const imageRatio = properties.width / properties.height;
-      let imageWidth = availableWidth;
-      let imageHeight = imageWidth / imageRatio;
-      if (imageHeight > 90) {
-        imageHeight = 90;
-        imageWidth = imageHeight * imageRatio;
-      }
-      ensure(imageHeight + 24);
-      const imageX = margin + (availableWidth - imageWidth) / 2;
-      pdf.addImage(
-        data,
-        "JPEG",
-        imageX,
-        y,
-        imageWidth,
-        imageHeight,
-        undefined,
-        "FAST",
-      );
-      y += imageHeight + 4;
-      text(
-        `Figure ${figure.figureNumber} | ${figure.classification} — ${figure.caption}`,
-        8,
-        [60, 60, 65],
-        4,
-      );
-    }
+    for (const id of section.figureIds ?? [])
+      await addFigure(id, section.layoutVariant === "full-bleed" ? 115 : 90);
+    if (section.pullQuote) text(section.pullQuote, 14, [75, 45, 95], 7);
     if (section.keyLearning)
       text(`KEY LEARNING  ${section.keyLearning}`, 9, [75, 45, 95], 5);
     if (section.nextActivity)
       text(`NEXT ACTIVITY  ${section.nextActivity}`, 9, [75, 45, 95], 5);
-    if (section.number === "27")
+    if (section.title === "Evidence Register")
       for (const record of document.evidence) {
         ensure(28);
         text(

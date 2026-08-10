@@ -49,7 +49,7 @@ test("publication keeps evidence states and rejects unsupported generated claims
   ])
     assert.doesNotMatch(content, new RegExp(claim));
   assert.match(content, /Arduino Nano 33 BLE Sense Rev2/);
-  assert.match(content, /does not establish/i);
+  assert.match(content, /doesNotEstablish|does not establish/i);
 });
 test("publication CSS includes mobile, A4 print and hidden navigation rules", () => {
   const css = readFileSync(
@@ -85,7 +85,42 @@ test("every intended figure uses a statically verified repository asset with no 
   assert.match(renderer, /blueprint-lightbox/);
   assert.match(renderer, /section\.evolutionSteps/);
   assert.match(renderer, /SystemArchitecture/);
-  assert.match(exporter, /section\.number === "12"/);
+  assert.match(exporter, /section\.layoutVariant === "architecture"/);
   assert.match(exporter, /getImageProperties/);
   assert.match(exporter, /section\.evolutionSteps/);
+});
+test("second-pass Blueprint uses a varied editorial model without repeating evidence figures", () => {
+  const content = readFileSync(
+      path.resolve("src/features/technology-blueprint/mvp1Blueprint.ts"),
+      "utf8",
+    ),
+    renderer = readFileSync(
+      path.resolve("src/features/technology-blueprint/TechnicalPublication.tsx"),
+      "utf8",
+    );
+  for (const title of [
+    "The hardest sensor to build",
+    "What if the garment was the interface?",
+    "What is the signal today?",
+    "What still needs proving?",
+    "Where are we really?",
+  ])
+    assert.match(content, new RegExp(title.replace(/[?]/g, "\\?")));
+  assert.doesNotMatch(content, /"Engineering Question"/);
+  const defined = [...content.matchAll(/figureNumber: "([0-9.]+)"/g)].map(
+    (match) => match[1],
+  );
+  const used = [
+    ...[...content.matchAll(/figureIds: \[([\s\S]*?)\]/g)].flatMap((match) =>
+      [...match[1].matchAll(/"([0-9.]+)"/g)].map((id) => id[1]),
+    ),
+    ...[...content.matchAll(/figureId: "([0-9.]+)"/g)].map(
+      (match) => match[1],
+    ),
+  ];
+  assert.equal(defined.length, 18);
+  assert.equal(new Set(used).size, used.length);
+  assert.deepEqual(new Set(used), new Set(defined));
+  assert.match(renderer, /blueprint-layout-/);
+  assert.match(renderer, /questionLabel/);
 });

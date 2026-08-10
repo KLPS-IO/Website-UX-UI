@@ -32,12 +32,33 @@ export type PrototypeEvolutionStep = {
   learned: string;
   unresolved: string;
 };
+export type BlueprintLayout =
+  | "statement"
+  | "split"
+  | "evidence"
+  | "full-bleed"
+  | "timeline"
+  | "architecture"
+  | "cards"
+  | "comparison"
+  | "standard";
+export type BlueprintComparison = {
+  leftLabel: string;
+  left: string;
+  rightLabel: string;
+  right: string;
+};
 export type BlueprintSection = {
   number: string;
   title: string;
   question: string;
   state: EvidenceState;
   body: string[];
+  layoutVariant?: BlueprintLayout;
+  heroStatement?: string;
+  pullQuote?: string;
+  questionLabel?: string;
+  comparison?: BlueprintComparison;
   keyLearning?: string;
   outcome?: string;
   nextActivity?: string;
