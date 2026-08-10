@@ -146,4 +146,6 @@ test("editorial export hides display section numbers and draws reliable arrows",
   assert.match(content, /workable early prototype/);
   assert.match(content, /inspect sensor placement and handling on the body/);
   assert.match(content, /visible electrical response through the prototype circuit/);
+  assert.match(exporter, /text\(figure\.caption, 12,/);
+  assert.match(exporter, /figure\.callouts\.join\(" {2}· {2}"\), 12,/);
 });

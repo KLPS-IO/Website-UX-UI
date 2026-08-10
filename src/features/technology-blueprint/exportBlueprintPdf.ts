@@ -187,7 +187,7 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
       imageHeight = maximumHeight;
       imageWidth = imageHeight * imageRatio;
     }
-    ensure(imageHeight + 28);
+    ensure(imageHeight + 58);
     const imageX = margin + (availableWidth - imageWidth) / 2;
     pdf.addImage(
       data,
@@ -206,9 +206,9 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
       [116, 76, 145],
       4,
     );
-    text(figure.caption, 7.5, [90, 90, 96], 4);
+    text(figure.caption, 12, [75, 75, 82], 5.5);
     if (figure.callouts?.length)
-      text(figure.callouts.join("  ·  "), 7, [116, 76, 145], 4);
+      text(figure.callouts.join("  ·  "), 12, [116, 76, 145], 5.5);
   };
   const addSoftwareComposition = async (ids: string[]) => {
     ensure(116);
@@ -258,9 +258,9 @@ export async function exportBlueprintPdf(document: TechnologyBlueprint) {
     y = top + 108;
     text(
       "Interface concepts only. These screens do not represent validated physiological outputs or a validated sensor-ingestion pipeline.",
-      7,
+      12,
       [95, 95, 100],
-      4,
+      5.5,
     );
   };
   for (const section of document.sections) {
