@@ -1,3 +1,495 @@
-.blueprint-shell{--paper:#111216;--ink:#f3f2f5;--muted:#aaa7b2;--rule:rgba(255,255,255,.12);background:#090a0d;color:var(--ink);min-height:100vh}.blueprint-publication{max-width:1040px;margin:auto;padding:0 32px 100px;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.blueprint-cover{min-height:76vh;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--rule);padding:96px 0 64px}.blueprint-cover h1{font-size:clamp(3rem,8vw,7rem);font-weight:300;letter-spacing:-.055em;line-height:.92;max-width:850px;margin:24px 0}.blueprint-cover>p{font-size:1.2rem;color:var(--muted);max-width:620px}.blueprint-cover dl{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);margin-top:64px;border:1px solid var(--rule)}.blueprint-cover dl div{background:var(--paper);padding:18px}.blueprint-cover dt,.blueprint-outcomes dt,.blueprint-callout dt{font-size:.62rem;text-transform:uppercase;letter-spacing:.17em;color:var(--muted)}.blueprint-cover dd{margin-top:7px;font-size:.82rem}.blueprint-kicker{color:#b99adb;text-transform:uppercase;letter-spacing:.2em;font-size:.66rem;font-weight:700}.blueprint-section{padding:84px 0;border-bottom:1px solid var(--rule);scroll-margin-top:90px}.blueprint-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}.blueprint-section-head>div{display:flex;align-items:baseline;gap:22px}.blueprint-section-head span{font:600 .72rem ui-monospace,monospace;color:#b99adb}.blueprint-section h2{font-size:clamp(2rem,5vw,4.1rem);font-weight:350;letter-spacing:-.04em;line-height:1}.blueprint-question{margin:36px 0 24px;padding-left:20px;border-left:2px solid #8b5bb4;font-size:1.2rem}.blueprint-question span{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.17em;color:var(--muted);margin-bottom:8px}.blueprint-section>p,.blueprint-section>ul{max-width:760px;color:#d0cdd5;font-size:1.02rem;line-height:1.8;margin:16px 0}.blueprint-section>ul{padding-left:20px}.blueprint-figure{margin:48px 0;background:#050506;border:1px solid var(--rule);break-inside:avoid}.blueprint-figure img{display:block;width:100%;max-height:680px;object-fit:contain;background:#e9e7e5}.blueprint-figure figcaption{padding:20px}.blueprint-figure figcaption p{color:#c9c6ce;line-height:1.6;margin:12px 0}.blueprint-figure small{color:var(--muted)}.blueprint-callout,.blueprint-outcomes{margin:36px 0;padding:24px;border:1px solid rgba(139,91,180,.38);background:rgba(139,91,180,.07);break-inside:avoid}.blueprint-callout h4{font-size:1.25rem;margin:10px 0}.blueprint-callout p{color:#cfccd4;line-height:1.65}.blueprint-callout dl,.blueprint-outcomes{display:grid;grid-template-columns:160px 1fr;gap:12px 20px}.blueprint-callout dd,.blueprint-outcomes dd{color:#d5d2d9}.blueprint-evidence-table{width:100%;border-collapse:collapse;font-size:.72rem;margin-top:36px}.blueprint-evidence-table th,.blueprint-evidence-table td{border:1px solid var(--rule);padding:12px;vertical-align:top;text-align:left;min-width:105px}.blueprint-evidence-table th{color:#b99adb;text-transform:uppercase;letter-spacing:.08em}.blueprint-evidence-table small{color:var(--muted)}.blueprint-document-footer{text-align:center;color:var(--muted);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;padding-top:48px}.blueprint-nav{position:sticky;top:0;z-index:30;background:rgba(9,10,13,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--rule)}.blueprint-nav-inner{max-width:1200px;margin:auto;display:flex;align-items:center;gap:12px;padding:12px 24px}.blueprint-nav select{min-width:0;max-width:360px;background:#17181d;border:1px solid var(--rule);border-radius:7px;padding:9px;color:white}.blueprint-nav button,.blueprint-nav a{border:1px solid var(--rule);border-radius:7px;padding:9px 12px;font-size:.75rem}.blueprint-nav .spacer{flex:1}
-@media(max-width:700px){.blueprint-publication{padding:0 18px 70px}.blueprint-cover{padding:72px 0 48px}.blueprint-cover dl{grid-template-columns:1fr}.blueprint-section{padding:58px 0}.blueprint-section-head{display:block}.blueprint-section-head>div{margin-bottom:18px}.blueprint-callout dl,.blueprint-outcomes{grid-template-columns:1fr}.blueprint-nav-inner{padding:10px 12px}.blueprint-nav .label{display:none}}
-@media print{body{background:white!important}.blueprint-shell{background:white;color:#111;--ink:#111;--muted:#555;--rule:#bbb}.blueprint-nav{display:none}.blueprint-publication{max-width:none;padding:0 12mm;font-family:Arial,sans-serif}.blueprint-cover{min-height:250mm;page-break-after:always}.blueprint-cover dl{background:#bbb}.blueprint-cover dl div{background:white}.blueprint-section{padding:16mm 0;break-before:page}.blueprint-section>p,.blueprint-section>ul,.blueprint-callout p,.blueprint-callout dd,.blueprint-outcomes dd{color:#222}.blueprint-figure{background:white;border-color:#aaa}.blueprint-figure img{max-height:150mm}.blueprint-evidence-table{font-size:7pt}.blueprint-evidence-table th,.blueprint-evidence-table td{padding:5px}.blueprint-document-footer{position:fixed;bottom:4mm;left:0;right:0}.blueprint-callout,.blueprint-outcomes{background:#f7f3fa}}
+.blueprint-shell {
+  --paper: #111216;
+  --ink: #f3f2f5;
+  --muted: #aaa7b2;
+  --rule: rgba(255, 255, 255, 0.12);
+  background: #090a0d;
+  color: var(--ink);
+  min-height: 100vh;
+}
+.blueprint-publication {
+  max-width: 1040px;
+  margin: auto;
+  padding: 0 32px 100px;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+.blueprint-cover {
+  min-height: 76vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid var(--rule);
+  padding: 96px 0 64px;
+}
+.blueprint-cover h1 {
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 300;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+  max-width: 850px;
+  margin: 24px 0;
+}
+.blueprint-cover > p {
+  font-size: 1.2rem;
+  color: var(--muted);
+  max-width: 620px;
+}
+.blueprint-cover dl {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  margin-top: 64px;
+  border: 1px solid var(--rule);
+}
+.blueprint-cover dl div {
+  background: var(--paper);
+  padding: 18px;
+}
+.blueprint-cover dt,
+.blueprint-outcomes dt,
+.blueprint-callout dt {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+  color: var(--muted);
+}
+.blueprint-cover dd {
+  margin-top: 7px;
+  font-size: 0.82rem;
+}
+.blueprint-kicker {
+  color: #b99adb;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+.blueprint-section {
+  padding: 84px 0;
+  border-bottom: 1px solid var(--rule);
+  scroll-margin-top: 90px;
+}
+.blueprint-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+.blueprint-section-head > div {
+  display: flex;
+  align-items: baseline;
+  gap: 22px;
+}
+.blueprint-section-head span {
+  font:
+    600 0.72rem ui-monospace,
+    monospace;
+  color: #b99adb;
+}
+.blueprint-section h2 {
+  font-size: clamp(2rem, 5vw, 4.1rem);
+  font-weight: 350;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.blueprint-question {
+  margin: 36px 0 24px;
+  padding-left: 20px;
+  border-left: 2px solid #8b5bb4;
+  font-size: 1.2rem;
+}
+.blueprint-question span {
+  display: block;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.blueprint-section > p,
+.blueprint-section > ul {
+  max-width: 760px;
+  color: #d0cdd5;
+  font-size: 1.02rem;
+  line-height: 1.8;
+  margin: 16px 0;
+}
+.blueprint-section > ul {
+  padding-left: 20px;
+}
+.blueprint-figure {
+  margin: 48px 0;
+  background: #050506;
+  border: 1px solid var(--rule);
+  break-inside: avoid;
+}
+.blueprint-figure img {
+  display: block;
+  width: 100%;
+  max-height: 680px;
+  object-fit: contain;
+  background: #e9e7e5;
+}
+.blueprint-figure figcaption {
+  padding: 20px;
+}
+.blueprint-figure figcaption p {
+  color: #c9c6ce;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.blueprint-figure small {
+  color: var(--muted);
+}
+.blueprint-callout,
+.blueprint-outcomes {
+  margin: 36px 0;
+  padding: 24px;
+  border: 1px solid rgba(139, 91, 180, 0.38);
+  background: rgba(139, 91, 180, 0.07);
+  break-inside: avoid;
+}
+.blueprint-callout h4 {
+  font-size: 1.25rem;
+  margin: 10px 0;
+}
+.blueprint-callout p {
+  color: #cfccd4;
+  line-height: 1.65;
+}
+.blueprint-callout dl,
+.blueprint-outcomes {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px 20px;
+}
+.blueprint-callout dd,
+.blueprint-outcomes dd {
+  color: #d5d2d9;
+}
+.blueprint-evidence-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  margin-top: 36px;
+}
+.blueprint-evidence-table th,
+.blueprint-evidence-table td {
+  border: 1px solid var(--rule);
+  padding: 12px;
+  vertical-align: top;
+  text-align: left;
+  min-width: 105px;
+}
+.blueprint-evidence-table th {
+  color: #b99adb;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.blueprint-evidence-table small {
+  color: var(--muted);
+}
+.blueprint-document-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding-top: 48px;
+}
+.blueprint-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(9, 10, 13, 0.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--rule);
+}
+.blueprint-nav-inner {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+}
+.blueprint-nav select {
+  min-width: 0;
+  max-width: 360px;
+  background: #17181d;
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  padding: 9px;
+  color: white;
+}
+.blueprint-nav button,
+.blueprint-nav a {
+  border: 1px solid var(--rule);
+  border-radius: 7px;
+  padding: 9px 12px;
+  font-size: 0.75rem;
+}
+.blueprint-nav .spacer {
+  flex: 1;
+}
+.blueprint-figure-image {
+  display: block;
+  width: 100%;
+  cursor: zoom-in;
+}
+.blueprint-figure-image img {
+  display: block;
+  width: 100%;
+  max-height: 680px;
+  object-fit: contain;
+  background: #e9e7e5;
+}
+.blueprint-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.94);
+  padding: 24px;
+}
+.blueprint-lightbox button {
+  justify-self: end;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.blueprint-lightbox img {
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.blueprint-lightbox p {
+  max-width: 900px;
+  margin: auto;
+  color: #ddd;
+  font-size: 0.8rem;
+}
+.blueprint-architecture {
+  margin: 44px 0;
+  border: 1px solid var(--rule);
+  padding: 28px;
+  break-inside: avoid;
+}
+.blueprint-architecture-track {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+.blueprint-architecture-track span {
+  width: min(100%, 520px);
+  border: 1px solid rgba(139, 91, 180, 0.5);
+  background: rgba(139, 91, 180, 0.08);
+  padding: 13px;
+  font-weight: 600;
+}
+.blueprint-architecture-track i {
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-style: normal;
+  padding: 7px;
+}
+.blueprint-architecture-track b {
+  color: #b99adb;
+}
+.blueprint-architecture-boundary {
+  margin: 24px 0;
+  border-top: 1px dashed #8b5bb4;
+  padding-top: 8px;
+  text-align: center;
+  color: #b99adb;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+.blueprint-architecture-software {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.blueprint-architecture-software strong,
+.blueprint-architecture-software small {
+  grid-column: 1/-1;
+}
+.blueprint-architecture-software span {
+  border: 1px solid var(--rule);
+  padding: 10px;
+  text-align: center;
+  font-size: 0.76rem;
+}
+.blueprint-architecture-software small {
+  color: var(--muted);
+  line-height: 1.5;
+}
+.blueprint-progress {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #b99adb;
+  transition: width 0.15s linear;
+}
+.blueprint-evolution {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.blueprint-evolution article {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.025);
+  break-inside: avoid;
+}
+.blueprint-evolution article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #fff;
+}
+.blueprint-evolution a {
+  color: #c9a9e0;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.blueprint-evolution dl {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 0.4rem 0.75rem;
+  margin-top: 0.9rem;
+  font-size: 0.78rem;
+}
+.blueprint-evolution dt {
+  color: #bda4ce;
+  font-weight: 600;
+}
+.blueprint-evolution dd {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+@media (max-width: 700px) {
+  .blueprint-evolution {
+    grid-template-columns: 1fr;
+  }
+  .blueprint-evolution dl {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+  .blueprint-publication {
+    padding: 0 18px 70px;
+  }
+  .blueprint-cover {
+    padding: 72px 0 48px;
+  }
+  .blueprint-cover dl {
+    grid-template-columns: 1fr;
+  }
+  .blueprint-section {
+    padding: 58px 0;
+  }
+  .blueprint-section-head {
+    display: block;
+  }
+  .blueprint-section-head > div {
+    margin-bottom: 18px;
+  }
+  .blueprint-callout dl,
+  .blueprint-outcomes {
+    grid-template-columns: 1fr;
+  }
+  .blueprint-nav-inner {
+    padding: 10px 12px;
+  }
+  .blueprint-nav .label {
+    display: none;
+  }
+  .blueprint-architecture-software {
+    grid-template-columns: 1fr 1fr;
+  }
+  .blueprint-lightbox {
+    padding: 12px;
+  }
+}
+@media print {
+  body {
+    background: white !important;
+  }
+  .blueprint-shell {
+    background: white;
+    color: #111;
+    --ink: #111;
+    --muted: #555;
+    --rule: #bbb;
+  }
+  .blueprint-nav {
+    display: none;
+  }
+  .blueprint-lightbox {
+    display: none;
+  }
+  .blueprint-figure-image {
+    cursor: default;
+  }
+  .blueprint-architecture {
+    padding: 8mm;
+  }
+  .blueprint-publication {
+    max-width: none;
+    padding: 0 12mm;
+    font-family: Arial, sans-serif;
+  }
+  .blueprint-cover {
+    min-height: 250mm;
+    page-break-after: always;
+  }
+  .blueprint-cover dl {
+    background: #bbb;
+  }
+  .blueprint-cover dl div {
+    background: white;
+  }
+  .blueprint-section {
+    padding: 16mm 0;
+    break-before: page;
+  }
+  .blueprint-section > p,
+  .blueprint-section > ul,
+  .blueprint-callout p,
+  .blueprint-callout dd,
+  .blueprint-outcomes dd {
+    color: #222;
+  }
+  .blueprint-figure {
+    background: white;
+    border-color: #aaa;
+  }
+  .blueprint-figure img {
+    max-height: 150mm;
+  }
+  .blueprint-evidence-table {
+    font-size: 7pt;
+  }
+  .blueprint-evidence-table th,
+  .blueprint-evidence-table td {
+    padding: 5px;
+  }
+  .blueprint-document-footer {
+    position: fixed;
+    bottom: 4mm;
+    left: 0;
+    right: 0;
+  }
+  .blueprint-callout,
+  .blueprint-outcomes {
+    background: #f7f3fa;
+  }
+}
