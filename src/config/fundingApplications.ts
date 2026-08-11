@@ -1,3 +1,5 @@
+import { womenTechEuSections, type FundingApplicationSection } from "./womenTechEuApplication.ts";
+
 export type FundingApplicationStatus = "Submitted / Historical" | "Empty application workspace" | "In development" | "Submitted";
 export type FundingApplicationVisibility = "investor_nda" | "founder_admin";
 
@@ -17,7 +19,7 @@ export type FundingApplication = {
   submissionDate: string | null;
   fundingAmount: number | null;
   version: string;
-  sections: readonly [];
+  sections: readonly FundingApplicationSection[];
   supportingDocuments: readonly FundingDocumentReference[];
   workingDrafts: readonly FundingDocumentReference[];
   finalSubmittedVersion: FundingDocumentReference | null;
@@ -49,12 +51,12 @@ export const fundingApplications: readonly FundingApplication[] = [
     id: "eu-women-tech-eu",
     programme: "Women TechEU",
     applicationName: "EU Women",
-    status: "Empty application workspace",
+    status: "In development",
     visibility: "founder_admin",
     submissionDate: null,
     fundingAmount: null,
-    version: "Not started",
-    sections: [],
+    version: "Evidence-led draft 0.1",
+    sections: womenTechEuSections,
     supportingDocuments: [],
     workingDrafts: [],
     finalSubmittedVersion: null,
