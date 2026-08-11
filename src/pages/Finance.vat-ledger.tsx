@@ -41,8 +41,8 @@ const CompactDetail = ({ title, children, critical = false }: { title: string; c
   <details className="group max-w-56">
     <summary className={`cursor-pointer list-none [&::-webkit-details-marker]:hidden ${critical ? "text-brand-coral" : "text-foreground"}`}>
       <strong>{title}</strong>{" "}
-      <span className="text-xs font-medium text-muted-foreground underline underline-offset-2 group-open:hidden">See more</span>
-      <span className="hidden text-xs font-medium text-muted-foreground underline underline-offset-2 group-open:inline">See less</span>
+      <span className="text-xs font-medium text-blue-600 underline underline-offset-2 group-open:hidden dark:text-blue-400">See more</span>
+      <span className="hidden text-xs font-medium text-blue-600 underline underline-offset-2 group-open:inline dark:text-blue-400">See less</span>
     </summary>
     <div className={`mt-1 text-xs ${critical ? "text-brand-coral" : "text-muted-foreground"}`}>{children}</div>
   </details>
