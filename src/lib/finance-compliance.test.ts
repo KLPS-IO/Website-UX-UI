@@ -28,3 +28,19 @@ test("VAT filing evidence uses a fixed canonical filing target and controlled co
   assert.match(page,/filed VAT return summary/i);assert.match(page,/window\.confirm/);assert.match(page,/immutable filing will not be changed/);
   assert.match(documents,/Finance → VAT Filings →/);assert.match(documents,/filingEvidenceIds/);
 });
+
+test("VAT filing completeness requires only the three core purposes and presents absent support as optional",()=>{
+  const page=readFileSync("src/pages/Finance.vat-filings.tsx","utf8");
+  const types=readFileSync("src/types/evidence.ts","utf8");
+  assert.match(page,/corePurposes[^\n]+hmrc_submitted_vat_return[^\n]+vat_return_submission_confirmation[^\n]+vat_return_calculation_export/);
+  assert.doesNotMatch(page,/corePurposes[^\n]+vat_return_filed_summary/);
+  assert.doesNotMatch(page,/corePurposes[^\n]+accounting_export_snapshot/);
+  assert.doesNotMatch(page,/corePurposes[^\n]+hmrc_obligation_confirmation/);
+  assert.doesNotMatch(page,/corePurposes[^\n]+other_vat_filing_support/);
+  assert.match(page,/optional title="Supporting evidence"/);
+  assert.match(page,/optional\?"Not supplied \(optional\)":"Missing"/);
+  assert.match(page,/vat_return_calculation_export:"QuickFile VAT calculation backing export"/);
+  assert.match(page,/accounting_export_snapshot:"Financial OS accounting export snapshot"/);
+  assert.match(types,/"vat_return_calculation_export","accounting_export_snapshot"/);
+  assert.doesNotMatch(page,/accounting_export_snapshot[^\n]+corePurposes/);
+});
