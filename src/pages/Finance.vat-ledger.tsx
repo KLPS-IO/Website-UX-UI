@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Download, Plus } from "lucide-react";
 import { PageHeader, Surface } from "@/components/finance/PageHeader";
@@ -37,6 +37,16 @@ const supplierDocumentHelp:Record<string,string>={
   insufficient_evidence_exclude_from_export:"The purchase remains in Financial OS but will not be included in the accounting export.",
 };
 const human = (value: string | null | undefined) => (value ?? "Not recorded").replaceAll("_", " ").replace(/^./, (character) => character.toUpperCase());
+const CompactDetail = ({ title, children, critical = false }: { title: string; children: ReactNode; critical?: boolean }) => (
+  <details className="group max-w-56">
+    <summary className={`cursor-pointer list-none [&::-webkit-details-marker]:hidden ${critical ? "text-brand-coral" : "text-foreground"}`}>
+      <strong>{title}</strong>{" "}
+      <span className="text-xs font-medium text-muted-foreground underline underline-offset-2 group-open:hidden">See more</span>
+      <span className="hidden text-xs font-medium text-muted-foreground underline underline-offset-2 group-open:inline">See less</span>
+    </summary>
+    <div className={`mt-1 text-xs ${critical ? "text-brand-coral" : "text-muted-foreground"}`}>{children}</div>
+  </details>
+);
 type FormState = {
   transaction_date: string;
   payment_date: string;
@@ -437,8 +447,8 @@ export default function VatLedgerPage() {
                       <span className="block text-xs text-muted-foreground">{periodDisplay.detail}</span>
                     </td>
                     <td className="p-2">{human(row.evidence_coverage ?? "requires_review")}</td>
-                    <td className="p-2"><span>{human(row.vat_review_status ?? "pending_review")}</span><span className="mt-1 block max-w-56 text-xs text-muted-foreground">Next: {vatReviewNextAction(row)}</span></td>
-                    <td className="p-2">{periodConflict?<div className="min-w-64 rounded-lg border border-brand-coral bg-red-50 p-3 text-red-900"><strong>VAT period conflict</strong><dl className="mt-2 space-y-1 text-xs"><div><dt className="font-semibold">Stored VAT period</dt><dd>{periodConflict.storedPeriod}</dd></div><div><dt className="font-semibold">Effective tax point</dt><dd>{periodConflict.effectiveTaxPoint}</dd></div><div><dt className="font-semibold">Date-derived VAT period</dt><dd>{periodConflict.dateDerivedPeriod}</dd></div></dl><p className="mt-2 text-xs font-medium">Founder review required before accounting export.</p></div>:row.warning_details?.length ? row.warning_details.map((warning) => <div className={warning.severity==="critical"?"text-brand-coral":"text-muted-foreground"} key={warning.code}><strong>{warningSeverityCopy(warning.severity)}:</strong> {warning.message}</div>) : row.warnings?.length ? row.warnings.map((warning) => <div key={warning}>{warningCopy(warning)}</div>) : "—"}</td>
+                    <td className="p-2"><CompactDetail title={human(row.vat_review_status ?? "pending_review")}>Next: {vatReviewNextAction(row)}</CompactDetail></td>
+                    <td className="p-2">{periodConflict?<CompactDetail title="VAT period conflict" critical><dl className="space-y-1"><div><dt className="font-semibold">Stored VAT period</dt><dd>{periodConflict.storedPeriod}</dd></div><div><dt className="font-semibold">Effective tax point</dt><dd>{periodConflict.effectiveTaxPoint}</dd></div><div><dt className="font-semibold">Date-derived VAT period</dt><dd>{periodConflict.dateDerivedPeriod}</dd></div></dl><p className="mt-2 font-medium">Founder review required before accounting export.</p></CompactDetail>:row.warning_details?.length ? <div className="space-y-1">{row.warning_details.map((warning) => <CompactDetail critical={warning.severity==="critical"} key={warning.code} title={`${warningSeverityCopy(warning.severity)}:`}>{warning.message}</CompactDetail>)}</div> : row.warnings?.length ? <div className="space-y-1">{row.warnings.map((warning) => <CompactDetail key={warning} title="Warning:">{warningCopy(warning)}</CompactDetail>)}</div> : "—"}</td>
                     <td className="p-2">
                       {viewer?.canWriteFinance && (
                         <div className="flex flex-wrap gap-1">

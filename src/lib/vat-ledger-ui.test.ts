@@ -154,6 +154,17 @@ test("VAT entry fields expose canonical date bindings and focused helper text",(
   assert.match(page,/placeholder="Optional accounting or review note"/);assert.doesNotMatch(page,/Review note for manual conversion/);
 });
 
+test("VAT ledger keeps review and warning details compact behind see-more controls",()=>{
+  const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
+  assert.match(page,/const CompactDetail/);
+  assert.match(page,/>See more</);
+  assert.match(page,/group-open:hidden/);
+  assert.match(page,/group-open:inline[^>]*>See less</);
+  assert.match(page,/title=\{`\$\{warningSeverityCopy\(warning\.severity\)\}:`\}/);
+  assert.match(page,/title=\{human\(row\.vat_review_status/);
+  assert.match(page,/title="VAT period conflict" critical/);
+});
+
 test("supplier-document review is separate from VAT treatment and retains evidence access",()=>{
   const page=readFileSync("src/pages/Finance.vat-ledger.tsx","utf8");
   assert.match(page,/>Supplier document review/);
