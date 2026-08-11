@@ -5,6 +5,8 @@ import { normalizeAccessEmail } from "@/config/dataRoomAccess";
 import { X } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { FundingWorkspace } from "@/components/data-room/FundingWorkspace";
+import { visibleFundingApplications } from "@/config/fundingApplications";
 
 const LEGACY_KEYS = [
   "klps.dataRoom.session",
@@ -120,6 +122,7 @@ const categories = [
   "Pitch Deck",
   "Financials",
   "Finance OS",
+  "Funding",
   "Technology",
   "IP Portfolio",
   "Market",
@@ -191,6 +194,8 @@ const normaliseCategoryName = (value?: string): DataRoomCategory | null => {
     return "Pitch Deck";
   if (normalized.includes("financial") || normalized.includes("projection"))
     return "Financials";
+  if (normalized.includes("funding") || normalized.includes("innovate uk"))
+    return "Funding";
   if (normalized.includes("technology") || normalized.includes("engineering blueprint"))
     return "Technology";
   if (
@@ -636,6 +641,8 @@ const DataRoom = () => {
               ? documents.length
               : category === "Finance OS"
                 ? 1
+              : category === "Funding"
+                ? visibleFundingApplications(isAdmin).length
               : category === "Technology"
                 ? 1
               : category === "FAQ"
@@ -654,7 +661,7 @@ const DataRoom = () => {
         },
         {} as Record<DataRoomCategory, number>,
       ),
-    [documents],
+    [documents, isAdmin],
   );
   const hasFinanceWorkspace = activeCategory === "Financials";
   const visibleDocuments = useMemo(
@@ -1275,6 +1282,8 @@ const DataRoom = () => {
                   {DATA_ROOM_WATERMARK}
                 </div>
               </div>
+            ) : activeCategory === "Funding" ? (
+              <FundingWorkspace isFounderAdmin={isAdmin} documents={documents} onViewDocument={viewDocument}/>
             ) : activeCategory === "Technology" ? (
               <div className="glass overflow-hidden rounded-lg">
                 <div className="flex items-center justify-between border-b border-border px-6 py-4"><h3 className="text-sm font-medium">Technology</h3><span className="font-mono text-[10px] uppercase tracking-[.2em] text-muted-foreground">{DATA_ROOM_WATERMARK}</span></div>
