@@ -9,6 +9,8 @@ import { documentApiErrorMessage, documentFolderDisplay, validateDocumentUpload 
 import { evidenceService } from "@/services/evidence/evidence.service";
 import { evidenceDocumentCategories, type DocumentLinkEntityType, type DocumentUploadInput, type EvidenceDocumentCategory, type EvidenceItem, type EvidenceVerificationStatus } from "@/types/evidence";
 import { useLocation, useNavigate } from "react-router-dom";
+import { financeComplianceRepository } from "@/repositories/financeComplianceRepository";
+import type { VatFiling } from "@/types/finance-compliance";
 
 export type QueueStatus = "Ready" | "Validating" | "Uploading" | "Complete" | "Failed";
 export type QueueItem = {
@@ -39,6 +41,7 @@ export default function DocumentsPage() {
   const navigate = useNavigate();
   const { company, refreshCompany } = useFinance();
   const [documents, setDocuments] = useState<EvidenceItem[]>([]);
+  const [vatFilings, setVatFilings] = useState<VatFiling[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
   const [category, setCategory] = useState<EvidenceDocumentCategory | "">("");
@@ -56,7 +59,8 @@ export default function DocumentsPage() {
   const loadDocuments = useCallback(async () => {
     setLoading(true); setError(null);
     try {
-      setDocuments(await evidenceService.listWithLinks({ evidence_type: "document", category: category || undefined, keyword: keyword.trim() || undefined, verification_status: verification || undefined, source_organisation: sourceOrganisation.trim() || undefined, limit: 250 }));
+      const [items,filings]=await Promise.all([evidenceService.listWithLinks({ evidence_type: "document", category: category || undefined, keyword: keyword.trim() || undefined, verification_status: verification || undefined, source_organisation: sourceOrganisation.trim() || undefined, limit: 250 }),financeComplianceRepository.filings()]);
+      setDocuments(items);setVatFilings(filings);
     } catch (reason) { setDocuments([]); setError(reason); }
     finally { setLoading(false); }
   }, [category, keyword, verification, sourceOrganisation]);
@@ -69,7 +73,8 @@ export default function DocumentsPage() {
     navigate(location.pathname, { replace: true, state: null });
   }, [location.pathname, location.state, navigate]);
 
-  const grouped = useMemo(() => evidenceDocumentCategories.map((name) => ({ name, documents: documents.filter((document) => document.category === name) })), [documents]);
+  const filingEvidenceIds=useMemo(()=>new Set(vatFilings.flatMap(filing=>filing.evidence.map(item=>item.id))),[vatFilings]);
+  const grouped = useMemo(() => evidenceDocumentCategories.map((name) => ({ name, documents: documents.filter((document) => document.category === name&&!filingEvidenceIds.has(document.id)) })), [documents,filingEvidenceIds]);
   const sources = useMemo(() => Array.from(new Set(documents.map((document) => document.sourceOrganisation).filter((value): value is string => Boolean(value)))).sort(), [documents]);
   const unauthorised = error instanceof ApiError && (error.status === 401 || error.status === 403);
 
@@ -114,7 +119,7 @@ export default function DocumentsPage() {
       {loading && <DocumentState title="Loading documents" message="Retrieving canonical document evidence…" />}
       {!loading && error && <DocumentState title={unauthorised ? "Unauthorised" : "Documents unavailable"} message={unauthorised ? "You are not authorised to view Finance documents." : documentApiErrorMessage(error)} action={loadDocuments} />}
       {!loading && !error && documents.length === 0 && <DocumentState title={category ? `No documents in ${category}` : "No documents yet"} message="The canonical Evidence API returned no matching document records." />}
-      {!loading && !error && documents.length > 0 && <div className="space-y-6">{grouped.filter((group) => group.documents.length > 0).map((group) => (
+      {!loading && !error && documents.length > 0 && <div className="space-y-6">{vatFilings.filter(filing=>filing.evidence.length).map(filing=><Surface key={filing.id} padded={false}><div className="border-b border-white/5 px-5 py-4"><SectionTitle title={`Finance → VAT Filings → ${filing.obligation_reference} — ${formatDate(filing.start_date)} to ${formatDate(filing.end_date)}`} hint={`${filing.evidence.length}`}/></div><div className="divide-y divide-border">{filing.evidence.map(reference=>{const item=documents.find(document=>document.id===reference.id);return item?<div key={item.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm"><div><div className="font-semibold text-brand-orange">{item.code}</div><div className="font-medium">{item.title}</div><div className="text-xs text-muted-foreground">{item.sourceOrganisation??"Not confirmed"} · {reference.filing_evidence_purpose.replaceAll("_"," ")}</div></div><div className="flex gap-2"><button disabled={!item.hasR2Object} onClick={()=>void accessFile(item,"view")} className={buttonClass}><Eye className="h-4 w-4"/>View</button><button disabled={!item.hasR2Object} onClick={()=>void accessFile(item,"download")} className={buttonClass}><Download className="h-4 w-4"/>Download</button></div></div>:null;})}</div></Surface>)}{grouped.filter((group) => group.documents.length > 0).map((group) => (
         <Surface key={group.name} padded={false}>
           <div className="border-b border-white/5 px-5 py-4"><SectionTitle title={group.name} hint={`${group.documents.length} · ${documentFolderDisplay[group.name]}`} /></div>
           <div className="overflow-x-auto"><table className="w-full min-w-[1050px] text-sm"><thead><tr className="text-left text-[10px] uppercase tracking-wider text-muted-foreground"><th className="px-5 py-3">Document</th><th className="px-3 py-3">Source</th><th className="px-3 py-3">File</th><th className="px-3 py-3">Status</th><th className="px-3 py-3">Updated</th><th className="px-3 py-3">Links</th><th className="px-5 py-3 text-right">Actions</th></tr></thead><tbody>{group.documents.map((item) => (

@@ -7,7 +7,10 @@ export const evidenceDocumentCategories = [
 export type EvidenceDocumentCategory = (typeof evidenceDocumentCategories)[number];
 export type EvidenceVerificationStatus = "Unknown" | "Unverified" | "Under Review" | "Verified" | "Rejected" | "Expired";
 export type EvidenceDocumentStatus = "Draft" | "Active" | "Superseded" | "Archived" | "Expired";
-export type EvidenceEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "kpi" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
+export type EvidenceEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "kpi" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "vat_filing" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
+
+export const filingEvidencePurposes = ["hmrc_submitted_vat_return","vat_return_submission_confirmation","vat_return_filed_summary","vat_return_calculation_export","accounting_export_snapshot","hmrc_obligation_confirmation","other_vat_filing_support"] as const;
+export type FilingEvidencePurpose = (typeof filingEvidencePurposes)[number];
 
 export interface EvidenceLinkDto {
   id: string;
@@ -40,6 +43,7 @@ export interface EvidenceDto {
   expiry_date: string | null;
   document_date: string | null;
   vat_evidence_type?: string | null;
+  filing_evidence_purpose?: FilingEvidencePurpose | null;
   supplier_reference?: string | null;
   r2_object_key?: string | null;
   has_r2_object?: boolean;
@@ -84,6 +88,7 @@ export interface EvidenceItem {
   expiryDate: string | null;
   documentDate: string | null;
   vatEvidenceType: string | null;
+  filingEvidencePurpose: FilingEvidencePurpose | null;
   supplierReference: string | null;
   hasR2Object: boolean;
   originalFilename: string | null;
@@ -117,7 +122,7 @@ export type EvidenceFilters = Partial<{
 
 export type EvidenceMetadataInput = Partial<Omit<EvidenceDto, "id" | "evidence_code" | "created_at" | "updated_at" | "created_by" | "updated_by" | "version" | "links">> & Pick<EvidenceDto, "title" | "evidence_type">;
 
-export type DocumentLinkEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
+export type DocumentLinkEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "vat_filing" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
 
 export type DocumentUploadInput = {
   file: File;
@@ -130,6 +135,7 @@ export type DocumentUploadInput = {
   linked_entity_id?: string;
   relationship?: string;
   vat_evidence_type?: string;
+  filing_evidence_purpose?: FilingEvidencePurpose;
   supplier_reference?: string;
 };
 

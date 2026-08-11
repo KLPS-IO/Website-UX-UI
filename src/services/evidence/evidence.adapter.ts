@@ -35,6 +35,7 @@ export function mapEvidenceDto(dto: EvidenceDto, linkedContext?: { entityType: E
     expiryDate: dto.expiry_date,
     documentDate: dto.document_date,
     vatEvidenceType: dto.vat_evidence_type ?? null,
+    filingEvidencePurpose: dto.filing_evidence_purpose ?? null,
     supplierReference: dto.supplier_reference ?? null,
     hasR2Object: dto.has_r2_object ?? Boolean(dto.r2_object_key),
     originalFilename: dto.original_filename,

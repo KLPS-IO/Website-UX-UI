@@ -21,6 +21,7 @@ import CompanyPage from "@/pages/Finance.company";
 import CapTablePage from "@/pages/Finance.cap-table";
 import VatLedgerPage from "@/pages/Finance.vat-ledger";
 import FinanceActionsPage from "@/pages/Finance.actions";
+import VatFilingsPage from "@/pages/Finance.vat-filings";
 
 export default function FinanceApp() {
   return (
@@ -36,6 +37,7 @@ export default function FinanceApp() {
         <Route path="expenses" element={<ExpensesPage />} />
         <Route path="vat-ledger" element={<VatLedgerPage />} />
         <Route path="actions" element={<FinanceActionsPage />} />
+        <Route path="vat-filings" element={<VatFilingsPage />} />
         <Route path="hiring" element={<HiringPage />} />
         <Route path="funding" element={<FundingPage />} />
         <Route path="cash-flow" element={<CashFlowPage />} />

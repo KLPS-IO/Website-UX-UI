@@ -52,6 +52,7 @@ export function buildDocumentUploadFormData(input: DocumentUploadInput) {
     form.append("relationship", input.relationship.trim());
   }
   if (input.vat_evidence_type) form.append("vat_evidence_type", input.vat_evidence_type);
+  if (input.filing_evidence_purpose) form.append("filing_evidence_purpose", input.filing_evidence_purpose);
   if (input.supplier_reference?.trim()) form.append("supplier_reference", input.supplier_reference.trim());
   return form;
 }
