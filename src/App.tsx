@@ -28,6 +28,8 @@ import Rewards from "@/pages/Rewards";
 import Avatar from "@/pages/Avatar";
 import Profile from "@/pages/Profile";
 import FounderDashboard from "@/pages/FounderDashboard";
+import FounderControlCentre from "@/pages/FounderControlCentre";
+import TextileIntelligenceLab from "@/pages/TextileIntelligenceLab";
 import InvestorDashboard from "@/pages/InvestorDashboard";
 import FounderRoute from "@/components/FounderRoute";
 import DataRoom from "@/pages/DataRoom";
@@ -143,10 +145,12 @@ const App = () => (
               path="founder"
               element={
                 <FounderRoute>
-                  <FounderDashboard />
+                  <FounderControlCentre />
                 </FounderRoute>
               }
             />
+            <Route path="founder/traction" element={<FounderRoute><FounderDashboard /></FounderRoute>} />
+            <Route path="founder/textile-lab" element={<FounderRoute><TextileIntelligenceLab /></FounderRoute>} />
             <Route
               path="investor"
               element={
