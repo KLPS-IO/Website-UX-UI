@@ -159,7 +159,7 @@ const measurements = [
               <div className="aspect-square bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl flex items-center justify-center">
                 <div className="text-center space-y-2">
                   <div className="w-32 h-48 mx-auto bg-gradient-to-b from-purple-200 to-purple-300 rounded-full opacity-50"></div>
-                  <p className="text-sm text-gray-600">3D Body Scan Visualization</p>
+                  <p className="text-sm text-gray-600">3D Body Scan Visualisation</p>
                   <p className="text-xs text-gray-500">Connect wearable to scan</p>
                 </div>
               </div>
