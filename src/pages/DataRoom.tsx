@@ -4,7 +4,7 @@ import { API_BASE } from "@/config/api";
 import { normalizeAccessEmail } from "@/config/dataRoomAccess";
 import { X } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FundingWorkspace } from "@/components/data-room/FundingWorkspace";
 import { visibleFundingApplications } from "@/config/fundingApplications";
 
@@ -15,6 +15,9 @@ const LEGACY_KEYS = [
 ];
 
 const TOKEN_KEY = "klps.dataRoom.sessionToken";
+
+const safeInternalReturnPath = (value: string | null) =>
+  value?.startsWith("/beta-dashboard/founder/") ? value : null;
 
 type DataRoomUser = {
   id?: string;
@@ -618,6 +621,8 @@ function LoginGate({
 }
 
 const DataRoom = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<DataRoomUser | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
@@ -828,6 +833,8 @@ const DataRoom = () => {
     setLoading(true);
     try {
       await loadSecureData(verifiedUser);
+      const returnTo = safeInternalReturnPath(searchParams.get("returnTo"));
+      if (returnTo) navigate(returnTo, { replace: true });
     } catch (err) {
       setError(
         err instanceof Error

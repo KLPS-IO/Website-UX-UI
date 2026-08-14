@@ -32,6 +32,7 @@ import FounderControlCentre from "@/pages/FounderControlCentre";
 import TextileIntelligenceLab from "@/pages/TextileIntelligenceLab";
 import InvestorDashboard from "@/pages/InvestorDashboard";
 import FounderRoute from "@/components/FounderRoute";
+import TextileLabAuthGate from "@/components/TextileLabAuthGate";
 import DataRoom from "@/pages/DataRoom";
 import InnovationLab from "@/pages/InnovationLab";
 import { SlideDeck } from "./components/SlideDeck";
@@ -150,7 +151,7 @@ const App = () => (
               }
             />
             <Route path="founder/traction" element={<FounderRoute><FounderDashboard /></FounderRoute>} />
-            <Route path="founder/textile-lab" element={<FounderRoute><TextileIntelligenceLab /></FounderRoute>} />
+            <Route path="founder/textile-lab" element={<FounderRoute><TextileLabAuthGate><TextileIntelligenceLab /></TextileLabAuthGate></FounderRoute>} />
             <Route
               path="investor"
               element={
