@@ -623,6 +623,7 @@ function LoginGate({
 const DataRoom = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const returnTo = safeInternalReturnPath(searchParams.get("returnTo"));
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<DataRoomUser | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
@@ -726,6 +727,10 @@ const DataRoom = () => {
       .then((session) => {
         if (!session.authenticated || !session.user) {
           setUser(null);
+          return;
+        }
+        if (returnTo && isAdminUser(session.user)) {
+          navigate(returnTo, { replace: true });
           return;
         }
         return loadSecureData(session.user);
@@ -832,9 +837,11 @@ const DataRoom = () => {
   const handleVerifiedUser = async (verifiedUser: DataRoomUser) => {
     setLoading(true);
     try {
+      if (returnTo && isAdminUser(verifiedUser)) {
+        navigate(returnTo, { replace: true });
+        return;
+      }
       await loadSecureData(verifiedUser);
-      const returnTo = safeInternalReturnPath(searchParams.get("returnTo"));
-      if (returnTo) navigate(returnTo, { replace: true });
     } catch (err) {
       setError(
         err instanceof Error
