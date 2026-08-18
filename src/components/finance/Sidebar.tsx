@@ -21,6 +21,7 @@ import {
   ListChecks,
   Building2,
   PieChart,
+  Upload,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,7 @@ const nav = [
   { to: "/finance/products", label: "Products", icon: Package },
   { to: "/finance/revenue", label: "Revenue", icon: TrendingUp },
   { to: "/finance/expenses", label: "Expenses", icon: Receipt },
+  { to: "/finance/bank-imports", label: "Bank Imports", icon: Upload },
   { to: "/finance/vat-ledger", label: "VAT Ledger", icon: ClipboardCheck },
   { to: "/finance/vat-filings", label: "VAT Filings", icon: ShieldCheck },
   { to: "/finance/actions", label: "Finance Actions", icon: ListChecks },
