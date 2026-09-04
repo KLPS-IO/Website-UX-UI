@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
 import {
   BrowserRouter,
   Navigate,
@@ -10,45 +11,42 @@ import {
   useLocation,
 } from "react-router-dom";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import BetaLogin from "./pages/BetaLogin";
-import Waitlist from "./pages/Waitlist";
-import BetaDashboard from "./pages/BetaDashboard";
-import { DashboardLayout } from "./components/DasboardLayout";
-import { BodyScanPage } from "./components/BodyScanPage";
-import ChatLema from "./pages/ChatLema";
-import { StatsPage } from "./components/StatsPage";
-import { ProfilePage } from "./components/ProfilePage";
-import Summary from "@/pages/Summary";
-import CheckIn from "@/pages/CheckIn";
-import Goals from "@/pages/Goals";
-import Progress from "@/pages/Progress";
-import Streaks from "@/pages/Streaks";
-import Rewards from "@/pages/Rewards";
-import Avatar from "@/pages/Avatar";
-import Profile from "@/pages/Profile";
-import FounderDashboard from "@/pages/FounderDashboard";
-import InvestorDashboard from "@/pages/InvestorDashboard";
 import FounderRoute from "@/components/FounderRoute";
-import DataRoom from "@/pages/DataRoom";
-import InnovationLab from "@/pages/InnovationLab";
-import { SlideDeck } from "./components/SlideDeck";
-import { SlideDeckPdfExport } from "./components/SlideDeckPdfExport";
-import BodyDiscoverySurvey from "@/pages/BodyDiscoverySurvey";
-import FinanceApp from "@/pages/FinanceApp";
-import { FinanceProvider } from "@/contexts/FinanceContext";
-import DataRoomGuidePage from "@/pages/DataRoomGuide";
-import DataRoomTechnologyBlueprint from "@/pages/DataRoomTechnologyBlueprint";
-import GrowthApp from "@/pages/growth/GrowthApp";
-import GrowthLogin from "@/pages/growth/GrowthLogin";
-import RdLabOverview from "@/pages/rd-lab/RdLabOverview";
-import RdLabLogin from "@/pages/rd-lab/RdLabLogin";
-import RdLabWorkspace from "@/pages/rd-lab/RdLabWorkspace";
-import {
-  DataDeletionInstructions,
-  PrivacyPolicy,
-  TermsOfService,
-} from "@/pages/LegalPages";
+
+const NotFound = lazy(() => import("./pages/NotFound"));
+const BetaLogin = lazy(() => import("./pages/BetaLogin"));
+const Waitlist = lazy(() => import("./pages/Waitlist"));
+const BetaDashboard = lazy(() => import("./pages/BetaDashboard"));
+const DashboardLayout = lazy(() => import("./components/DasboardLayout").then((module) => ({ default: module.DashboardLayout })));
+const BodyScanPage = lazy(() => import("./components/BodyScanPage").then((module) => ({ default: module.BodyScanPage })));
+const ChatLema = lazy(() => import("./pages/ChatLema"));
+const StatsPage = lazy(() => import("./components/StatsPage").then((module) => ({ default: module.StatsPage })));
+const Summary = lazy(() => import("@/pages/Summary"));
+const CheckIn = lazy(() => import("@/pages/CheckIn"));
+const Goals = lazy(() => import("@/pages/Goals"));
+const Progress = lazy(() => import("@/pages/Progress"));
+const Streaks = lazy(() => import("@/pages/Streaks"));
+const Rewards = lazy(() => import("@/pages/Rewards"));
+const Avatar = lazy(() => import("@/pages/Avatar"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const FounderDashboard = lazy(() => import("@/pages/FounderDashboard"));
+const InvestorDashboard = lazy(() => import("@/pages/InvestorDashboard"));
+const DataRoom = lazy(() => import("@/pages/DataRoom"));
+const InnovationLab = lazy(() => import("@/pages/InnovationLab"));
+const SlideDeck = lazy(() => import("./components/SlideDeck").then((module) => ({ default: module.SlideDeck })));
+const SlideDeckPdfExport = lazy(() => import("./components/SlideDeckPdfExport").then((module) => ({ default: module.SlideDeckPdfExport })));
+const BodyDiscoverySurvey = lazy(() => import("@/pages/BodyDiscoverySurvey"));
+const FinanceRoute = lazy(() => import("@/routes/FinanceRoute"));
+const DataRoomGuidePage = lazy(() => import("@/pages/DataRoomGuide"));
+const DataRoomTechnologyBlueprint = lazy(() => import("@/pages/DataRoomTechnologyBlueprint"));
+const GrowthApp = lazy(() => import("@/pages/growth/GrowthApp"));
+const GrowthLogin = lazy(() => import("@/pages/growth/GrowthLogin"));
+const RdLabOverview = lazy(() => import("@/pages/rd-lab/RdLabOverview"));
+const RdLabLogin = lazy(() => import("@/pages/rd-lab/RdLabLogin"));
+const RdLabWorkspace = lazy(() => import("@/pages/rd-lab/RdLabWorkspace"));
+const PrivacyPolicy = lazy(() => import("@/pages/LegalPages").then((module) => ({ default: module.PrivacyPolicy })));
+const DataDeletionInstructions = lazy(() => import("@/pages/LegalPages").then((module) => ({ default: module.DataDeletionInstructions })));
+const TermsOfService = lazy(() => import("@/pages/LegalPages").then((module) => ({ default: module.TermsOfService })));
 
 const queryClient = new QueryClient();
 
@@ -70,6 +68,7 @@ const App = () => (
       <BrowserRouter
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
+        <Suspense fallback={<div className="min-h-screen bg-background" aria-label="Loading page" />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -99,17 +98,13 @@ const App = () => (
           <Route
             path="/finance/*"
             element={
-              <FinanceProvider>
-                <FinanceApp />
-              </FinanceProvider>
+              <FinanceRoute />
             }
           />
           <Route
             path="/data-room/finance/*"
             element={
-              <FinanceProvider>
-                <FinanceApp />
-              </FinanceProvider>
+              <FinanceRoute />
             }
           />{" "}
           <Route
@@ -130,7 +125,6 @@ const App = () => (
             <Route path="bodyscan" element={<BodyScanPage />} />
             <Route path="chat" element={<ChatLema />} />
             <Route path="stats" element={<StatsPage />} />
-            <Route path="profile" element={<ProfilePage />} />
             <Route path="summary" element={<Summary />} />
             <Route path="check-in" element={<CheckIn />} />
             <Route path="goals" element={<Goals />} />
@@ -159,6 +153,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

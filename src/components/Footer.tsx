@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
-              FemTech Innovation
+              KLPS
             </h3>
             <p className="text-sm text-muted-foreground italic font-bold">
               Female? You Matter!

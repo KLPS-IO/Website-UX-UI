@@ -14,7 +14,7 @@ const features = [
   {
     icon: Heart,
     title: "Personalised Care",
-    description: "`Recovery appears slower than normal this week.`",
+    description: "‘Recovery appears slower than normal this week.’",
   },
   {
     icon: Zap,
@@ -28,7 +28,7 @@ const features = [
   },
   {
     icon: Heart,
-    title: "Insights developed Around You",
+    title: "Insights Developed Around You",
     description: "Most health tools compare users against everyone else. KLPS compares You versus You.",
   },
 ];

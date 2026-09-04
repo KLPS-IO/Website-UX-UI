@@ -11,7 +11,7 @@ const textVariants = {
     x: -5,
     transition: {
       duration: 2,
-      delay: 5,
+      delay: 0.2,
     },
   },
 };
@@ -26,7 +26,7 @@ const pathVariants = {
     pathLength: 1,
     transition: {
       duration: 2,
-      delay: 3,
+      delay: 0.2,
     },
   },
 };
@@ -38,7 +38,7 @@ const Logo = () => {
         <motion.div
           initial={{ y: -10, opacity: 0   }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 2, delay: 3 }}
+          transition={{ duration: 2, delay: 0.2 }}
           className="fixed top-4 left-4 w-full text-foreground z-[5]"
         />
         <motion.img

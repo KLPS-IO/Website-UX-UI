@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import walkingVideo from "../assets/walking-girl.mp4";
+import posterImage from "../assets/hero-bg.jpg";
 
 const container = {
   hidden: {
@@ -8,7 +9,7 @@ const container = {
   show: {
     opacity: 1,
     transition: {
-      delayChildren: 5,
+      delayChildren: 0.2,
       staggerChildren: 0.5,
     },
   },
@@ -24,16 +25,26 @@ const item = {
 };
 
 const CoverVideo = () => {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="relative w-full h-screen overflow-hidden">
-      <video
-        className="w-full h-screen object-cover object-center md:object-center"
-        autoPlay
-        muted
-        loop
-      >
-        <source src={walkingVideo} type="video/mp4" />
-      </video>
+      {reduceMotion ? (
+        <img src={posterImage} alt="" className="w-full h-screen object-cover object-center md:object-center" />
+      ) : (
+        <video
+          className="w-full h-screen object-cover object-center md:object-center"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          poster={posterImage}
+          aria-hidden="true"
+        >
+          <source src={walkingVideo} type="video/mp4" />
+        </video>
+      )}
       
       <div className="absolute inset-0 bg-background/60 z-[1]" />
       
