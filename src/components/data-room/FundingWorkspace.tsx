@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle2, FileText, FolderOpen } from "lucide-react";
+import { FounderCatalystWorkspace } from './FounderCatalystWorkspace';
 import { visibleFundingApplications } from "@/config/fundingApplications";
 import { countFundingAnswer, type FundingQuestion } from "@/config/womenTechEuApplication";
 
@@ -25,7 +26,7 @@ export function FundingWorkspace({ isFounderAdmin, documents, onViewDocument }: 
   const applications = visibleFundingApplications(isFounderAdmin);
   return <div className="glass overflow-hidden rounded-lg">
     <div className="border-b border-border px-6 py-5"><div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent">Funding</div><h3 className="mt-3 text-2xl font-light tracking-tight text-foreground">Funding applications</h3><p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">Submitted applications and permissioned workspaces for current and future funding programmes.</p></div>
-    <div className="space-y-4 p-6">{applications.map(application=>{
+    <div className="space-y-4 p-6">{isFounderAdmin && <FounderCatalystWorkspace/>}{applications.map(application=>{
       const reference=application.finalSubmittedVersion;
       const secureDocument=reference?documents.find(document=>document.filename===reference.filename&&document.category?.toLowerCase()==="funding"):undefined;
       const questionCount=application.sections.reduce((sum, section)=>sum+section.questions.length,0);

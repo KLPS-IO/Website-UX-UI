@@ -34,6 +34,13 @@ export const evidenceRepository = {
     }),
   linked: (entityType: EvidenceEntityType, entityId: string) => authenticatedApi<EvidenceListResponse>(`/api/finance/evidence/linked/${entityType}/${entityId}`),
   uploadDocument: (formData: FormData) => authenticatedApi<{ status: "success" } & DocumentUploadResult>("/api/finance/evidence/upload", { method: "POST", body: formData }),
-  accessDocument: (evidenceId: string, action: "view" | "download") => authenticatedApi<DocumentAccessResponse>(`/api/finance/evidence/${evidenceId}/access`, { method: "POST", body: JSON.stringify({ action }) }),
+  accessDocument: async (evidenceId: string, action: "view" | "download"): Promise<DocumentAccessResponse> => {
+    const result = await authenticatedApi<DocumentAccessResponse & {authenticated_content_path?:string}>(`/api/finance/evidence/${evidenceId}/access`, { method: "POST", body: JSON.stringify({ action }) });
+    if (!result.authenticated_content_path) return result;
+    const blob = await authenticatedBlob(result.authenticated_content_path);
+    const url = URL.createObjectURL(blob);
+    window.setTimeout(() => URL.revokeObjectURL(url), 300000);
+    return {...result, signed_url:url};
+  },
   previewDocument: (evidenceId: string) => authenticatedBlob(`/api/finance/evidence/${evidenceId}/content`),
 };

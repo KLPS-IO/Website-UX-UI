@@ -1,0 +1,16 @@
+import { authenticatedApi } from '@/lib/authenticated-api';
+export type Requirement = {id:string;code:string;title:string;source:string;canonical_location:string;required_document:string;owner:string;dependency:string;classification:string;next_action:string;notes:string;evidence_id:string|null;evidence_title?:string;evidence_status?:string;evidence_document_status?:string;evidence_version?:number;reviewed_evidence_version?:number;version:number};
+export type Holding = {shareholder:string;shareholder_type:string;share_class:string;shares:number;nominal_value:number;amount_paid:number;amount_unpaid:number;acquisition_date:string;voting_rights:string;notes?:string;ownership:number};
+export type OwnershipSnapshot = {id:string;scope:'ACTUAL'|'HISTORICAL';effective_date:string;verification_status:string;usable:boolean;review_required?:string;evidence_id:string;evidence_version:number;review_notes:string;holdings:Holding[];calculated?:{shares:number;nominal_capital:number;total_ownership:number;holdings:Holding[]}};
+export type Calculation = {available:boolean;missing?:string;post_money?:number;investor_ownership?:number;price_per_share?:number|null;theoretical_new_shares?:number|null;theoretical_post_round_shares?:number|null;requires_share_rounding_review?:boolean;basis?:string;holdings?:{shareholder:string;before:number;after:number}[]|null};
+export type SubdivisionReview = {status:string;scope:"PROPOSED_NOT_CURRENT";shares:number;nominal_value:number;nominal_capital:number;amount_paid:number;amount_unpaid:number;ownership:number;shareholder:string;share_class:string;review_evidence_id:string|null};
+export type Readiness = {subdivision_review?:SubdivisionReview|null;company:{id:string;legal_name:string;company_number:string};engagement:null|{id:string;purpose:string;status:string;version:number;budget_ex_vat:string;price_basis:string;service_purchased:string|null;start_date:string|null};requirements:Requirement[];activity:{id:string;kind:string;description:string;source:string;occurred_on:string|null;recorded_at:string;evidence_id:string|null}[];ownership:OwnershipSnapshot[];scenarios:{id:string;name:string;notes:string;proposed_investment:string|null;pre_money_valuation:string|null;baseline_review_required:boolean;calculation:Calculation}[];classifications:string[]};
+export const readinessApi = {
+  evidence:() => authenticatedApi<{evidence:{id:string;title:string;evidence_code?:string}[]}>('/api/finance/evidence?limit=500'),
+  update:(id:string,input:Record<string,unknown>) => authenticatedApi(`/api/finance/readiness/${id}`,{method:'PATCH',body:JSON.stringify(input)}),
+  get:() => authenticatedApi<Readiness>('/api/finance/readiness'),
+  initialise:() => authenticatedApi('/api/finance/readiness',{method:'POST',body:'{}'}),
+  review:(id:string,input:Record<string,unknown>) => authenticatedApi(`/api/finance/readiness/requirements/${id}`,{method:'PATCH',body:JSON.stringify(input)}),
+  activity:(id:string,input:Record<string,unknown>) => authenticatedApi(`/api/finance/readiness/${id}/activity`,{method:'POST',body:JSON.stringify(input)}),
+  scenario:(id:string,input:Record<string,unknown>) => authenticatedApi(`/api/finance/readiness/${id}/scenarios`,{method:'POST',body:JSON.stringify(input)}),
+};
