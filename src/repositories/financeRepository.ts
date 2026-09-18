@@ -10,7 +10,7 @@ export class PlaceholderFinanceRepository implements FinanceRepository {
     return createInitialFinanceState();
   }
 
-  async saveFinanceState(state: FinanceState) {
-    return state;
+  async saveFinanceState(_state: FinanceState):Promise<FinanceState> {
+    throw new Error("Use canonical assumption/scenario endpoints to save; client model replacement is not supported");
   }
 }
