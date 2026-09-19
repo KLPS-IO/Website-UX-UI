@@ -1,3 +1,4 @@
+import BankImportsPage from "@/pages/Finance.bank-imports";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { FinanceLayout } from "@/components/finance/Layout";
 import DashboardPage from "@/pages/Finance.dashboard";
@@ -28,6 +29,7 @@ export default function FinanceApp() {
     <FinanceLayout>
       <Routes>
         <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="bank-imports" element={<BankImportsPage />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="company" element={<CompanyPage />} />
         <Route path="cap-table" element={<CapTablePage />} />

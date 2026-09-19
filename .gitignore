@@ -88,3 +88,14 @@ coverage/
 
 
 src/assets/Tech Spech 2026/Graphene suite shoot no vfx.mov
+
+# Isolated founder review Vite cache
+.finance-vite-cache/
+
+# Local founder-review proxy and runtime artefacts
+vite.finance-review.config.ts
+*.dump
+*.sql.gz
+/evidence-objects/
+/test-evidence-objects/
+/outputs/

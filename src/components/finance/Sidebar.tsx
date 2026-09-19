@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const nav = [
+  { to: "/finance/bank-imports", label: "Bank Imports", icon: Landmark },
   { to: "/data-room/guide", label: "Read First", icon: BookOpen, canonical: true },
   { to: "/finance/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/finance/company", label: "Company", icon: Building2 },
@@ -112,13 +113,13 @@ export function FinanceSidebar({ className, onNavigate }: { className?: string; 
 
       <div className="border-t border-sidebar-border p-4">
         <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3">
-          <div className="text-xs font-medium text-foreground">Live model</div>
+          <div className="text-xs font-medium text-foreground">Canonical Finance records</div>
           <div className="mt-1 text-[11px] text-muted-foreground">
-            All calculations flow from the Assumptions ledger.
+            Cash and credit use evidenced account records. Forecasts expose their assumptions.
           </div>
           <div className="mt-2 flex items-center gap-1.5 text-[11px] text-brand-sage">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-sage" />
-            Sync healthy
+
+            Source dates and missing evidence appear on the dashboard.
           </div>
         </div>
       </div>

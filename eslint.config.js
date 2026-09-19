@@ -8,6 +8,7 @@ export default tseslint.config(
   {
     ignores: [
       "dist",
+      ".finance-vite-cache",
       "**/*.timestamp-*.mjs",
     ]
   },

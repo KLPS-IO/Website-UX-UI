@@ -7,7 +7,7 @@ export const evidenceDocumentCategories = [
 export type EvidenceDocumentCategory = (typeof evidenceDocumentCategories)[number];
 export type EvidenceVerificationStatus = "Unknown" | "Unverified" | "Under Review" | "Verified" | "Rejected" | "Expired";
 export type EvidenceDocumentStatus = "Draft" | "Active" | "Superseded" | "Archived" | "Expired";
-export type EvidenceEntityType = "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "kpi" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "vat_filing" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
+export type EvidenceEntityType = "credit_facility" | "credit_term_version" | "credit_statement" | "bank_balance_observation" | "bank_sync_run" | "bank_transaction" | "assumption" | "product" | "decision" | "risk" | "company" | "funding" | "kpi" | "report" | "scenario" | "hire" | "document" | "expense" | "expense_adjustment" | "vat_filing" | "rd_work_package" | "rd_supplier" | "rd_rfq" | "rd_quotation";
 
 export const filingEvidencePurposes = ["hmrc_submitted_vat_return","vat_return_submission_confirmation","vat_return_filed_summary","vat_return_calculation_export","accounting_export_snapshot","hmrc_obligation_confirmation","other_vat_filing_support"] as const;
 export type FilingEvidencePurpose = (typeof filingEvidencePurposes)[number];
