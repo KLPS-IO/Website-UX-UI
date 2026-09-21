@@ -53,14 +53,14 @@ test("successful TikTok return requires canonical identity and uses identity-onl
   ),null);
 });
 
-test("successful X return requires canonical identity and uses identity-only copy", async () => {
+test("successful X return requires canonical connection and defers capability to the grant", async () => {
   const result=await processLinkedInOAuthReturn(
     "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=x&social_status=connected",
     async () => [{provider:"x",connection:{status:"connected"}}],
     () => undefined
   );
   assert.equal(result?.provider,"x");
-  assert.equal(result?.message,"X account identity connected. Publishing is not enabled.");
+  assert.equal(result?.message,"X connected. Check the connection card for granted publishing capability.");
   assert.equal(await processLinkedInOAuthReturn(
     "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=x&social_status=connected",
     async () => [{provider:"x",connection:{status:"disconnected"}}],

@@ -214,6 +214,18 @@ export type SocialProviderOverview = {
   required_permissions: string[];
   future_permissions?: string[];
   capabilities: string[];
-  approval_required: true;
+  approval_required: boolean;
+  publishing_enabled?: boolean;
+  publishing_destination?: string | null;
+  reauthorization_required?: boolean;
   setup_checklist: SocialSetupItem[];
+};
+
+export type SocialPublishJob = {
+  id: string; provider: string; content_variant_id: string;
+  status: string; copy: string; account_name: string; destination_reference: string;
+  current_fingerprint: string; approval_fingerprint: string | null;
+  execution_state: string; needs_review: boolean; attempt_count: number;
+  last_error_code: string | null; retry_after: string | null;
+  provider_post_id: string | null; provider_post_url: string | null;
 };
