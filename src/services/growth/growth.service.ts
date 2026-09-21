@@ -10,6 +10,7 @@ import type {
   GrowthStrategy,
   MissionControl,
   SocialProviderOverview,
+  SocialPublishJob,
 } from "@/types/growth";
 
 export const growthService = {
@@ -168,6 +169,22 @@ export const growthService = {
     (await authenticatedApi<{ status: "success"; summary: GrowthRecord }>(
       "/api/growth/traction/summary",
     )).summary,
+  socialPublishJobs: async () =>
+    (await authenticatedApi<{publish_jobs: SocialPublishJob[]}>("/api/growth/social/publish-jobs")).publish_jobs,
+  socialPublishJob: async (id: string) =>
+    (await authenticatedApi<{publish_job: SocialPublishJob}>(`/api/growth/social/publish-jobs/${id}`)).publish_job,
+  saveSocialVariant: async (contentId: string, provider: string, copy: string, destination: string) =>
+    (await authenticatedApi<{variant: {id: string}}>(`/api/growth/social/content/${contentId}/variants/${provider}`, {
+      method:"PUT",body:JSON.stringify({copy,media_references:[],destination_reference:destination})
+    })).variant,
+  approveSocialVariant: async (id: string) =>
+    authenticatedApi(`/api/growth/social/variants/${id}/approve`,{method:"POST",body:JSON.stringify({copy_approved:true,media_approved:true})}),
+  createSocialPublishJob: async (connectionId: string, variantId: string) =>
+    (await authenticatedApi<{publish_job:{id:string}}>("/api/growth/social/publish-jobs",{method:"POST",body:JSON.stringify({connection_id:connectionId,content_variant_id:variantId})})).publish_job,
+  approveSocialPublishJob: async (job: SocialPublishJob) =>
+    (await authenticatedApi<{publish_job:SocialPublishJob}>(`/api/growth/social/publish-jobs/${job.id}/approve`,{method:"POST",body:JSON.stringify({approved:true,expected_fingerprint:job.current_fingerprint})})).publish_job,
+  publishSocialJob: async (job: SocialPublishJob) =>
+    (await authenticatedApi<{publish_job:SocialPublishJob}>(`/api/growth/social/publish-jobs/${job.id}/publish`,{method:"POST",body:JSON.stringify({confirm_publish:true,expected_fingerprint:job.approval_fingerprint})})).publish_job,
   socialProviders: async () =>
     (await authenticatedApi<{ status: "success"; providers: SocialProviderOverview[] }>(
       "/api/growth/social/providers",

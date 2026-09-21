@@ -128,7 +128,7 @@ export const readLinkedInOAuthReturn = (
         ? "LinkedIn member identity connected. Publishing is not enabled."
         : provider === "facebook"
           ? "Meta identity connected. Facebook Page and linked Instagram professional discovery are available. Publishing is not enabled."
-          : provider === "tiktok" ? "TikTok identity connected" : "X account identity connected. Publishing is not enabled.",
+          : provider === "tiktok" ? "TikTok identity connected" : "X connected. Check the connection card for granted publishing capability.",
     };
   }
 
