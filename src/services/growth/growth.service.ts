@@ -169,13 +169,15 @@ export const growthService = {
     (await authenticatedApi<{ status: "success"; summary: GrowthRecord }>(
       "/api/growth/traction/summary",
     )).summary,
+  handoffMedia: async () => (await authenticatedApi<{media:{id:string;display_name:string;filename:string}[]}>("/api/growth/social/handoff-media")).media,
+  prepareSocialHandoff: async (job:SocialPublishJob) => (await authenticatedApi<{handoff:{url:string;expires_at:string;state:string;completion:string}}>(`/api/growth/social/publish-jobs/${job.id}/handoff`,{method:"POST",body:JSON.stringify({confirmed:true,expected_fingerprint:job.approval_fingerprint})})).handoff,
   socialPublishJobs: async () =>
     (await authenticatedApi<{publish_jobs: SocialPublishJob[]}>("/api/growth/social/publish-jobs")).publish_jobs,
   socialPublishJob: async (id: string) =>
     (await authenticatedApi<{publish_job: SocialPublishJob}>(`/api/growth/social/publish-jobs/${id}`)).publish_job,
-  saveSocialVariant: async (contentId: string, provider: string, copy: string, destination: string) =>
+  saveSocialVariant: async (contentId: string, provider: string, copy: string, destination: string, media: {publishing_asset_id:string}[] = []) =>
     (await authenticatedApi<{variant: {id: string}}>(`/api/growth/social/content/${contentId}/variants/${provider}`, {
-      method:"PUT",body:JSON.stringify({copy,media_references:[],destination_reference:destination})
+      method:"PUT",body:JSON.stringify({copy,media_references:media,destination_reference:destination})
     })).variant,
   approveSocialVariant: async (id: string) =>
     authenticatedApi(`/api/growth/social/variants/${id}/approve`,{method:"POST",body:JSON.stringify({copy_approved:true,media_approved:true})}),

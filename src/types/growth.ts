@@ -215,6 +215,7 @@ export type SocialProviderOverview = {
   future_permissions?: string[];
   capabilities: string[];
   approval_required: boolean;
+  handoff_enabled?: boolean;
   publishing_enabled?: boolean;
   publishing_destination?: string | null;
   reauthorization_required?: boolean;
@@ -222,6 +223,7 @@ export type SocialProviderOverview = {
 };
 
 export type SocialPublishJob = {
+  media_references?: {publishing_asset_id:string}[];
   id: string; provider: string; content_variant_id: string;
   status: string; copy: string; account_name: string; destination_reference: string;
   current_fingerprint: string; approval_fingerprint: string | null;
