@@ -30,7 +30,7 @@ export function SocialTextPublisher({provider}: {provider:SocialProviderOverview
    <p className="text-sm text-white/70">Destination: <strong>{job.account_name}</strong> · Status: {job.status}</p>
    <p className="whitespace-pre-wrap break-words text-white">{job.copy}</p>
    {job.needs_review&&<p role="alert" className="text-sm text-amber-200">Outcome unconfirmed. Check X before taking further action. This job cannot be resent.</p>}
-   {job.last_error_code&&<p role="status" className="text-sm text-amber-200">{job.last_error_code.replaceAll('_',' ')}{job.retry_after?` · Retry after ${new Date(job.retry_after).toLocaleString('en-GB')}`:''}</p>}
+   {job.last_error_code&&<p role="status" className="text-sm text-black">{job.last_error_code.replaceAll('_',' ')}{job.retry_after?` · Retry after ${new Date(job.retry_after).toLocaleString('en-GB')}`:''}</p>}
    {job.provider_post_url&&<a href={job.provider_post_url} target="_blank" rel="noreferrer" className="block text-[#35d3c8] underline">View published post</a>}
    <div className="flex flex-wrap gap-2">
     {job.status==='draft'&&<button className={button} disabled={busy||!enabled} onClick={()=>void approve()}>Approve this text and account</button>}
