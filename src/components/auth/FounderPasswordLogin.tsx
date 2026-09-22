@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ApiError } from "@/lib/authenticated-api";
 import { rdLabService } from "@/services/rd-lab/rd-lab.service";
 
 type FounderPasswordLoginProps = {
@@ -24,6 +25,7 @@ export function FounderPasswordLogin({
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -44,13 +46,20 @@ export function FounderPasswordLogin({
           className="mt-8 space-y-5"
           onSubmit={async (event) => {
             event.preventDefault();
+            if (busy) return;
             setBusy(true);
             setError("");
             try {
-              await rdLabService.login(email, password, remember);
+              await rdLabService.login(email.trim().toLowerCase(), password, remember);
               navigate(destination, { replace: true });
-            } catch {
-              setError("Invalid email or password");
+            } catch (err) {
+              setError(
+                err instanceof ApiError && err.status === 401
+                  ? "The email or password was not accepted. Check your email and use Show password to check what you entered."
+                  : err instanceof ApiError && err.status === 429
+                    ? "Too many sign-in attempts. Please wait a few minutes before trying again."
+                    : "Unable to connect to the sign-in service. Please try again shortly.",
+              );
             } finally {
               setBusy(false);
             }
@@ -71,13 +80,23 @@ export function FounderPasswordLogin({
             Password
             <input
               required
-              type="password"
+              type={showPassword ? "text" : "password"}
+              id="founder-password"
               autoComplete="current-password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               className="mt-2 w-full rounded-xl border border-[#3a2a41]/15 bg-white px-4 py-3 text-[#251d29] outline-none focus:border-[#df3fae]"
             />
           </label>
+          <button
+            type="button"
+            aria-controls="founder-password"
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword((visible) => !visible)}
+            className="min-h-11 rounded-lg px-2 text-sm font-medium text-[#574b5d] underline focus-visible:outline focus-visible:outline-2"
+          >
+            {showPassword ? "Hide password" : "Show password"}
+          </button>
           <label className="flex items-center gap-3 text-sm text-[#756a7a]">
             <input
               type="checkbox"
