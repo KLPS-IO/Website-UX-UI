@@ -14,9 +14,9 @@ import { AnimatedHeadline } from "@/components/AnimatedHeadline";
 const navItems = [
   { href: "#overview", label: "Overview" },
   { href: "/innovation-lab/funnel/mission-control", label: "Funnel" },
-  { href: "#founder", label: "Founder" },
+  { href: "/data-room", label: "Founder" },
   { href: "/data-room", label: "Data Room" },
-  { href: "#vault", label: "Vault" },
+  { href: "/data-room", label: "Vault" },
 ];
 
 const companyWins = [
@@ -152,7 +152,7 @@ const InnovationLab = () => {
                 KLPS
               </span>
             </a>
-            <nav className="hidden items-center gap-1 lg:flex">
+            <nav aria-label="Innovation Lab" className="hidden items-center gap-1 lg:flex">
               {navItems.map((item, index) => (
                 <NavLink
                   key={item.label}
@@ -190,6 +190,22 @@ const InnovationLab = () => {
       </header>
 
       <main id="overview" className="pt-16">
+        <nav
+          aria-label="Innovation Lab mobile navigation"
+          className="border-b border-border bg-white/[0.02] px-4 py-3 lg:hidden"
+        >
+          <div className="mx-auto grid max-w-xl grid-cols-3 gap-2">
+            {[...navItems, { href: "/rd-lab", label: "R&D Lab" }].map((item) => (
+              <NavLink
+                key={item.label}
+                href={item.href}
+                className="flex min-h-11 items-center justify-center rounded-full border border-border bg-white/[0.03] px-2 py-2 text-sm font-medium text-foreground transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
+        </nav>
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 -z-10">
             <img
