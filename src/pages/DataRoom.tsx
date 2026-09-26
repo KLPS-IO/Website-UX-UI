@@ -859,7 +859,7 @@ const DataRoom = () => {
   }
 
   if (!isAdmin) {
-    return <GuestDataRoom firstName={user.firstName} documents={documents}
+    return <GuestDataRoom firstName={user.firstName} email={user.email} documents={documents}
       categoryFor={getDocumentCategory} onOpen={viewDocument} onSignOut={logout}
       error={error} metrics={metrics} />;
   }

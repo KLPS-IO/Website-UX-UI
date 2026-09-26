@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 type Document = { id: string; filename: string; category?: string };
 type Props = {
   firstName?: string;
+  email: string;
   documents: Document[];
   categoryFor: (document: Document) => string;
   onOpen: (document: Document) => Promise<void>;
@@ -11,13 +12,29 @@ type Props = {
   error: string;
   metrics: { participants: number; voiceRecordings: number; commercialInterestCount: number } | null;
 };
+const folders = [
+  { title: "Company Overview", guidance: "Latest pitch deck; one-page business overview covering the problem, solution, business model and current stage." },
+  { title: "Market & Customer Evidence", guidance: "Customer discovery summary; survey findings; anonymised interview themes; competitor comparison; verified traction and tester results." },
+  { title: "Product & Technology", guidance: "Product overview; selected MVP1 blueprint content; prototype photos or demonstrations; completed testing and limitations; development roadmap and next milestones." },
+  { title: "Team & Advisers", guidance: "Founder biography and relevant experience; current responsibilities; confirmed advisers and their involvement; planned key hires." },
+  { title: "Financials & Funding", guidance: "Dated financial summary; forecast with assumptions; funding sought; use of funds linked to milestones; relevant supplier quotations." },
+  { title: "Company & Legal", guidance: "Incorporation certificate; current ownership/cap table; IP ownership and status; relevant signed agreements; appropriate policies." },
+];
 const labels: Record<string, string> = {
   "Pitch Deck": "Company Overview",
-  Financials: "Financial Information",
-  Legal: "Legal & Corporate",
-  "IP Portfolio": "Legal & Corporate",
+  Financials: "Financials & Funding",
+  Funding: "Financials & Funding",
+  Legal: "Company & Legal",
+  "IP Portfolio": "Company & Legal",
   Technology: "Product & Technology",
-  Market: "Commercial & Market",
+  Market: "Market & Customer Evidence",
+  "Team": "Team & Advisers",
+  "Team & Organisation": "Team & Advisers",
+};
+const previousLabels: Record<string, string> = {
+  "Commercial & Market": "Market & Customer Evidence",
+  "Financial Information": "Financials & Funding",
+  "Legal & Corporate": "Company & Legal",
 };
 
 function FolderIllustration() {
@@ -29,15 +46,19 @@ function FolderIllustration() {
   </svg>;
 }
 
-export function GuestDataRoom({ firstName, documents, categoryFor, onOpen, onSignOut, error, metrics }: Props) {
+export function GuestDataRoom({ firstName, email, documents, categoryFor, onOpen, onSignOut, error, metrics }: Props) {
   const [params] = useSearchParams();
-  const selected = params.get("folder");
-  const groups = new Map<string, Document[]>();
+  const requested = params.get("folder");
+  const selected = requested ? previousLabels[requested] || requested : null;
+  const selectedFolder = folders.find(folder => folder.title === selected);
+  const groups = new Map<string, Document[]>(folders.map(folder => [folder.title, []]));
   documents.forEach(document => {
     const category = categoryFor(document);
-    const label = labels[category] || category;
+    const rawCategory = document.category?.trim() || "";
+    const label = folders.find(folder => folder.title === rawCategory)?.title || labels[rawCategory] || previousLabels[rawCategory] || labels[category] || category;
     groups.set(label, [...(groups.get(label) || []), document]);
   });
+  const welcomeName = firstName?.trim() || email;
   const items = selected ? groups.get(selected) : undefined;
   const focus = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-4";
   return <main className="min-h-screen bg-white text-[#241b20]" style={{ colorScheme: "light" }}>
@@ -50,7 +71,7 @@ export function GuestDataRoom({ firstName, documents, categoryFor, onOpen, onSig
     <div className="mx-auto max-w-6xl px-6 py-12 md:py-20">
       {selected && <Link to="/data-room" className={`mb-8 inline-flex items-center gap-2 rounded text-sm text-[#9d245d] ${focus}`}><ArrowLeft size={16} /> Back to data room</Link>}
       <p className="mb-5 text-xs font-medium uppercase tracking-[0.22em] text-[#b52b70]">Confidential access</p>
-      <h1 className="font-serif text-4xl leading-tight md:text-6xl">{selected ? (items ? selected : "Folder unavailable") : firstName ? `Welcome, ${firstName}.` : "Welcome."}</h1>
+      <h1 className="break-words font-serif text-4xl leading-tight md:text-6xl">{selected ? (selectedFolder ? selected : "Folder unavailable") : `Welcome, ${welcomeName}`}</h1>
       {!selected && <p className="mt-6 max-w-xl text-base leading-7 text-[#71616a]">Welcome to our data room. Select a folder below to review the available information.</p>}
       {error && <p role="alert" className="mt-6 rounded border border-pink-200 p-4 text-[#9d245d]">{error}</p>}
       {!selected ? <>
@@ -60,17 +81,23 @@ export function GuestDataRoom({ firstName, documents, categoryFor, onOpen, onSig
           <span><strong className="text-[#241b20]">{metrics.commercialInterestCount}</strong> expressed commercial interest</span>
         </section>}
         <h2 className="mt-12 font-serif text-2xl">Document library</h2>
-        {groups.size === 0 && <p className="mt-6 text-[#71616a]">No documents are currently available for your account.</p>}
+
         <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {[...groups].map(([label, docs]) => <Link key={label} to={`?folder=${encodeURIComponent(label)}`} className={`group rounded-2xl border border-pink-100 p-5 transition-shadow duration-200 hover:shadow-[0_0_30px_rgba(236,72,153,0.16)] focus-visible:shadow-[0_0_30px_rgba(236,72,153,0.16)] motion-reduce:transition-none ${focus}`}>
+          {folders.map(({ title: label }, index) => { const docs = groups.get(label) || []; return <Link key={label} to={`?folder=${encodeURIComponent(label)}`} className={`group rounded-2xl border border-pink-100 p-5 transition-shadow duration-200 hover:shadow-[0_0_30px_rgba(236,72,153,0.16)] focus-visible:shadow-[0_0_30px_rgba(236,72,153,0.16)] motion-reduce:transition-none ${focus}`}>
             <FolderIllustration />
-            <h3 className="mt-4 text-center font-serif text-2xl">{label}</h3>
-            <div className="mt-6 flex items-center justify-between border-t border-pink-100 pt-4 text-xs text-[#71616a]"><span>{docs.length} {docs.length === 1 ? "document" : "documents"}</span><ArrowUpRight size={17} /></div>
-          </Link>)}
+            <h3 className="mt-4 text-center font-serif text-2xl">{String(index + 1).padStart(2, "0")} · {label}</h3>
+            <div className="mt-6 flex items-center justify-between border-t border-pink-100 pt-4 text-xs text-[#71616a]"><span>{docs.length ? `${docs.length} ${docs.length === 1 ? "document" : "documents"}` : "Not yet available"}</span><ArrowUpRight size={17} /></div>
+          </Link>; })}
         </div>
-      </> : items ? <ul className="mt-10 divide-y divide-pink-100 border-y border-pink-100">{items.map(doc => <li key={doc.id}>
+      </> : selectedFolder ? <>
+        <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
+          <h2 className="font-semibold text-[#241b20]">Documents include</h2>
+          <p className="mt-2">{selectedFolder.guidance}</p>
+        </section>
+        {!items?.length && <p className="mt-8 text-[#71616a]">Not yet available. No documents are currently available for your account in this folder.</p>}
+        <ul className="mt-10 divide-y divide-pink-100 border-y border-pink-100">{(items || []).map(doc => <li key={doc.id}>
         <button onClick={() => void onOpen(doc)} className={`flex w-full items-center justify-between gap-5 rounded px-3 py-6 text-left hover:bg-pink-50 ${focus}`}><span className="break-words">{doc.filename}</span><span className="flex shrink-0 items-center gap-2 text-sm text-[#9d245d]">View <ArrowUpRight size={16} /></span></button>
-      </li>)}</ul> : <p className="mt-6 text-[#71616a]">This folder has no documents available for your account.</p>}
+      </li>)}</ul></> : <p className="mt-6 text-[#71616a]">This folder has no documents available for your account.</p>}
     </div>
   </main>;
 }

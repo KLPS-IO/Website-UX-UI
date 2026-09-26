@@ -7,7 +7,7 @@ const sameOriginApi = ["klps.co.uk", "www.klps.co.uk"].includes(
 );
 
 export const API_BASE = (
-  sameOriginApi
+  sameOriginApi || import.meta.env.DEV
     ? ""
     : configuredApiBase || "https://klps-lema-production.up.railway.app"
 ).replace(/\/$/, "");
