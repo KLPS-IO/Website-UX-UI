@@ -1,3 +1,4 @@
+import { GuestDataRoom } from "@/components/data-room/GuestDataRoom";
 import { PageHeader, Section } from "@/components/Section";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { API_BASE } from "@/config/api";
@@ -19,6 +20,7 @@ const TOKEN_KEY = "klps.dataRoom.sessionToken";
 type DataRoomUser = {
   id?: string;
   email: string;
+  firstName?: string;
   role?:
     | "founder"
     | "admin"
@@ -356,6 +358,7 @@ const normaliseUser = (payload: unknown): DataRoomUser | null => {
   return {
     id: stringValue(user.id),
     email,
+    firstName: (stringValue(user.first_name) || stringValue(user.firstName) || stringValue(user.name) || stringValue(user.full_name)).trim().split(/\s+/)[0] || undefined,
     role,
     isAdmin: Boolean(booleanValue(user.isAdmin) || booleanValue(user.is_admin)),
     isFounder: Boolean(
@@ -853,6 +856,12 @@ const DataRoom = () => {
 
   if (!user) {
     return <LoginGate onVerified={handleVerifiedUser} />;
+  }
+
+  if (!isAdmin) {
+    return <GuestDataRoom firstName={user.firstName} documents={documents}
+      categoryFor={getDocumentCategory} onOpen={viewDocument} onSignOut={logout}
+      error={error} metrics={metrics} />;
   }
 
   return (
