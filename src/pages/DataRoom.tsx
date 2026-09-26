@@ -358,7 +358,7 @@ const normaliseUser = (payload: unknown): DataRoomUser | null => {
   return {
     id: stringValue(user.id),
     email,
-    firstName: (stringValue(user.first_name) || stringValue(user.firstName) || stringValue(user.name) || stringValue(user.full_name)).trim().split(/\s+/)[0] || undefined,
+    firstName: (stringValue(user.first_name) || stringValue(user.firstName) || stringValue(user.name) || stringValue(user.full_name) || "").trim().split(/\s+/)[0] || undefined,
     role,
     isAdmin: Boolean(booleanValue(user.isAdmin) || booleanValue(user.is_admin)),
     isFounder: Boolean(
