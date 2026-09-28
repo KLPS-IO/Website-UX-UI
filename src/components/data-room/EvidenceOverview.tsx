@@ -87,19 +87,19 @@ export function EvidenceOverview({ documents, onOpen }: Props) {
           </article>}
           {onlineSurvey && <article className="py-6">
             <h4 className="font-semibold">03 · June 2026 online customer survey sourcebook</h4>
-            <p className="mt-2 text-sm leading-6 text-[#71616a]">Available: aggregate response-count tables, source-field references, methods and an inventory of supporting answers. Based on 44 complete survey records in the supplied database export, dated 10–25 June 2026.</p>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">Available: verified sourcebook v1.1 with aggregate response-count tables, source-field references, methods and an answer inventory. On 28 September 2026, a fresh read-only CSV export confirmed all 44 June survey records, 44 participant records and 158 linked answers. All 12 aggregate tables match; there are no unmatched records. See page 10 for the verification record.</p>
             <p className="mt-2 text-sm leading-6 text-[#71616a]">The export also includes 158 linked answer records from 42 participants: 123 typed answers and 35 audio-file references. These are survey answers, not 158 interviews. The audio has not been reviewed and no transcripts were supplied.</p>
-            <p className="mt-2 text-sm leading-6 text-[#71616a]">Individual answers, quotations, recordings and response-level data are not published here while sharing permissions are clarified. Question definitions, product check-ins and supplier records are excluded from these customer-discovery counts.</p>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">A complete private review appendix now links every survey and stored answer to stable anonymous references. Individual answers, quotations, recordings and response-level data are not published here while sharing permissions are clarified. Question definitions, product check-ins and supplier records are excluded from these customer-discovery counts.</p>
             {view(onlineSurvey, "View sourcebook · Ref 03")}
           </article>}
           <article className="pt-6">
-            <h4 className="font-semibold">Sources still to be linked</h4>
+            <h4 className="font-semibold">Evidence prepared and remaining gaps</h4>
             <ul className="mt-3 list-disc space-y-3 pl-5 text-sm leading-6 text-[#71616a]">
-              <li><strong>Customer interviews:</strong> dated, anonymised notes or transcripts, exact quotations with page or timestamp references, participant counts and the themes they support.</li>
-              <li><strong>Online customer survey source material:</strong> the full questionnaire and an appropriately anonymised response-level export, once sharing permissions are confirmed. Reference 03 provides aggregate counts and source fields for the June 2026 responses.</li>
+              <li><strong>Interviews and transcripts:</strong> no separate interview evidence has been verified. The database transcript table is empty. Linked survey answers remain distinct from interviews; any later interview pack should include dates, participant counts and source references for quotations.</li>
+              <li><strong>Online survey source material:</strong> CSV exports and the complete pseudonymised response appendix are prepared for private review. Sharing permissions and the full original questionnaire still need confirming. Reference 03 v1.1 provides the verified aggregate evidence available to investors.</li>
               <li><strong>Product testing:</strong> when available, the tested version, dates, method, tester count and observed outcomes.</li>
             </ul>
-            <p className="mt-4 text-sm leading-6 text-[#71616a]">These additional source materials are not yet linked here. We do not combine survey, interview and testing totals without checking participant overlap.</p>
+            <p className="mt-4 text-sm leading-6 text-[#71616a]">Private review materials are not available through this investor page. We do not combine survey, interview and testing totals without checking participant overlap.</p>
           </article>
         </div>
       </section>
