@@ -1,3 +1,4 @@
+import { EvidenceOverview } from "./EvidenceOverview";
 import { CompanyOverview } from "./CompanyOverview";
 import { ArrowLeft, ArrowRight, ArrowUpRight, LogOut } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -250,9 +251,10 @@ export function GuestDataRoom({
         ) : selectedFolder ? (
           <>
             {selected === "Company Overview" && <CompanyOverview metrics={metrics} />}
+            {selected === "Market & Customer Evidence" && <EvidenceOverview documents={items || []} onOpen={onOpen} />}
             {(selected !== "Company Overview" || Boolean(items?.length)) && <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
               <h2 className="font-semibold text-[#241b20]">
-                {selected === "Company Overview" ? "Supporting documents" : "Documents include"}
+                {selected === "Company Overview" || selected === "Market & Customer Evidence" ? "Supporting documents" : "Documents include"}
               </h2>
               <p className="mt-2">{selectedFolder.guidance}</p>
             </section>}
