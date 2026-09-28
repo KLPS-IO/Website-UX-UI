@@ -33,20 +33,20 @@ export function EvidenceOverview({ documents, onOpen }: Props) {
         <div className="rounded-2xl border border-pink-100 bg-pink-50/40 p-6">
           <p className="text-xs font-semibold uppercase tracking-widest text-[#9d245d]">Reference 03 · Online customer survey</p>
           <h3 id="online-survey-heading" className="mt-3 font-serif text-2xl">Understanding body changes and customer needs</h3>
-          <p className="mt-2 font-medium">10–25 June 2026 · 44 responses / 44 distinct participant IDs</p>
-          <p className="mt-2 text-sm leading-6 text-[#71616a]">Structured customer-discovery responses, supported by complete response-count tables. This sample is separate from the earlier underwear survey below; participant overlap has not been checked, so the counts are not combined.</p>
+          <p className="mt-2 font-medium">June 2026 · 44 submitted responses</p>
+          <p className="mt-2 text-sm leading-6 text-[#71616a]">Structured customer-discovery responses, presented as selected whole-sample findings. This sample is separate from the earlier underwear survey below; participant overlap has not been checked, so the counts are not combined.</p>
         </div>
         <div className="grid gap-5 lg:grid-cols-3">
           {[
-            {title: "Personal understanding is a clear research priority", detail: "28 of 44 (63.6%) selected each of personal baseline, patterns they might be missing, and habits affecting symptoms. These are overlapping selections, not separate groups.", implication: "Investigate personalised, low-effort insight into body changes; validate usefulness through product testing.", locator: "desired_insights · page 2"},
-            {title: "People already spend on existing approaches", detail: "34 of 44 (77.3%) reported having spent money. The sourcebook lists the approaches selected, including supplements, exercise support and apps.", implication: "Explore which unmet needs remain despite existing spending. This is not KLPS revenue.", locator: "spent_money · page 3; spending options · page 6"},
-            {title: "Stated interest needs a behavioural follow-up", detail: "31 of 44 (70.5%) selected definitely or probably for would_use. 22 of 44 (50.0%) selected yes for would_pay; 19 selected maybe, 2 no and 1 did not answer.", implication: "Test actual uptake, repeated use and payment. Survey interest is not an order or purchase commitment.", locator: "would_use / would_pay · page 3"},
+            {title: "Personal understanding is a clear research priority", detail: "28 of 44 (63.6%) selected each of personal baseline, patterns they might be missing, and habits affecting symptoms. These are overlapping selections, not separate groups.", implication: "Investigate personalised, low-effort insight into body changes; validate usefulness through product testing.", locator: "desired_insights · summary page 1"},
+            {title: "People already spend on existing approaches", detail: "34 of 44 (77.3%) reported having spent money. 43 of 44 answered this field; percentages use all 44 submitted responses.", implication: "Explore which unmet needs remain despite existing spending. This is not KLPS revenue.", locator: "spent_money · summary page 1"},
+            {title: "Stated interest needs a behavioural follow-up", detail: "31 of 44 (70.5%) selected definitely or probably for would_use. 22 of 44 (50.0%) selected yes for would_pay. Each field was answered by 43 of 44; percentages use all 44 submissions.", implication: "Test actual uptake, repeated use and payment. Survey interest is not an order or purchase commitment.", locator: "would_use / would_pay · summary page 1"},
           ].map((finding) => <article key={finding.title} className="rounded-2xl border border-pink-100 p-6">
             <h4 className="font-serif text-xl">{finding.title}</h4>
             <dl className="mt-4 space-y-4 text-sm leading-6">
               <div><dt className="font-semibold">What we learned</dt><dd className="mt-1 text-[#71616a]">{finding.detail}</dd></div>
               <div><dt className="font-semibold">What this informs</dt><dd className="mt-1 text-[#71616a]">{finding.implication}</dd></div>
-              <div><dt className="font-semibold">Supporting evidence</dt><dd className="mt-1 text-[#71616a]">Reference 03 · {finding.locator}<br />10–25 June 2026 · n = 44 responses</dd></div>
+              <div><dt className="font-semibold">Supporting evidence</dt><dd className="mt-1 text-[#71616a]">Reference 03 · {finding.locator}<br />June 2026 · n = 44 responses</dd></div>
             </dl>
             {view(onlineSurvey, "View evidence · Ref 03")}
           </article>)}
@@ -86,17 +86,17 @@ export function EvidenceOverview({ documents, onOpen }: Props) {
             {view(canvas, "View canvas · Ref 02")}
           </article>}
           {onlineSurvey && <article className="py-6">
-            <h4 className="font-semibold">03 · June 2026 online customer survey sourcebook</h4>
-            <p className="mt-2 text-sm leading-6 text-[#71616a]">Available: verified sourcebook v1.1 with aggregate response-count tables, source-field references, methods and an answer inventory. On 28 September 2026, a fresh read-only CSV export confirmed all 44 June survey records, 44 participant records and 158 linked answers. All 12 aggregate tables match; there are no unmatched records. See page 10 for the verification record.</p>
-            <p className="mt-2 text-sm leading-6 text-[#71616a]">The export also includes 158 linked answer records from 42 participants: 123 typed answers and 35 audio-file references. These are survey answers, not 158 interviews. The audio has not been reviewed and no transcripts were supplied.</p>
-            <p className="mt-2 text-sm leading-6 text-[#71616a]">A complete private review appendix now links every survey and stored answer to stable anonymous references. Individual answers, quotations, recordings and response-level data are not published here while sharing permissions are clarified. Question definitions, product check-ins and supplier records are excluded from these customer-discovery counts.</p>
-            {view(onlineSurvey, "View sourcebook · Ref 03")}
+            <h4 className="font-semibold">03 · June 2026 investor research summary</h4>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">Available: two-page investor summary v1.2 with selected aggregate findings, answered counts, methodology and limitations. Figures reconcile with the verified June 2026 source data. No repeated survey IDs, repeated participant IDs within the survey, or exact duplicate full answer sets were found. Test-entry status remains unverified.</p>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">The private source material includes linked typed and audio-reference survey answers. These are not separate customer interviews. No individual quotations or demographic combinations are included in the investor summary.</p>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">A complete private review appendix now links every survey and stored answer to stable pseudonymous references. Individual answers, quotations, recordings and response-level data are not published here while sharing permissions are clarified. Question definitions, product check-ins and supplier records are excluded from these customer-discovery counts.</p>
+            {view(onlineSurvey, "View investor summary · Ref 03")}
           </article>}
           <article className="pt-6">
             <h4 className="font-semibold">Evidence prepared and remaining gaps</h4>
             <ul className="mt-3 list-disc space-y-3 pl-5 text-sm leading-6 text-[#71616a]">
               <li><strong>Interviews and transcripts:</strong> no separate interview evidence has been verified. The database transcript table is empty. Linked survey answers remain distinct from interviews; any later interview pack should include dates, participant counts and source references for quotations.</li>
-              <li><strong>Online survey source material:</strong> CSV exports and the complete pseudonymised response appendix are prepared for private review. Sharing permissions and the full original questionnaire still need confirming. Reference 03 v1.1 provides the verified aggregate evidence available to investors.</li>
+              <li><strong>Online survey source material:</strong> CSV exports and the complete pseudonymised response appendix are prepared for private review. Sharing permissions and the full original questionnaire still need confirming. Reference 03 v1.2 provides a short aggregate investor report. Detailed exports and the individual appendix remain private; no monetary price claim is made before the question wording and currency are confirmed.</li>
               <li><strong>Product testing:</strong> when available, the tested version, dates, method, tester count and observed outcomes.</li>
             </ul>
             <p className="mt-4 text-sm leading-6 text-[#71616a]">Private review materials are not available through this investor page. We do not combine survey, interview and testing totals without checking participant overlap.</p>
