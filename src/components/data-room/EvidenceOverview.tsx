@@ -6,6 +6,7 @@ type Props = {
   onOpen: (document: EvidenceDocument) => Promise<void>;
 };
 const surveyId = "907925a6-1121-4787-921f-dfa416cc9103";
+const onlineSurveyId = "57e82cef-4d66-4d1a-bfb2-35460bbb9234";
 const canvasId = "9d9b6431-9c0f-49be-97d3-d0a433957055";
 const findings = [
   { title: "Fit, fabric and quality are prominent priorities", detail: "68 of 120 records selected quality (56.7%); 67 selected fit and 67 selected fabric (55.8% each).", implication: "These priorities inform what to evaluate in product development.", locator: "Q12 · report page 2" },
@@ -14,6 +15,7 @@ const findings = [
 ];
 
 export function EvidenceOverview({ documents, onOpen }: Props) {
+  const onlineSurvey = documents.find((doc) => doc.id === onlineSurveyId);
   const survey = documents.find((doc) => doc.id === surveyId);
   const canvas = documents.find((doc) => doc.id === canvasId);
   const view = (doc: EvidenceDocument, label: string) => (
@@ -27,6 +29,29 @@ export function EvidenceOverview({ documents, onOpen }: Props) {
         <h2 id="evidence-overview-title" className="font-serif text-3xl">Evidence Overview</h2>
         <p className="mt-3 leading-7 text-[#71616a]">Follow each finding to its supporting document and source reference. Findings describe the evidence available; implications explain how it informs our next steps.</p>
       </div>
+      {onlineSurvey && <section aria-labelledby="online-survey-heading" className="space-y-5">
+        <div className="rounded-2xl border border-pink-100 bg-pink-50/40 p-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#9d245d]">Reference 03 · Online customer survey</p>
+          <h3 id="online-survey-heading" className="mt-3 font-serif text-2xl">Understanding body changes and customer needs</h3>
+          <p className="mt-2 font-medium">10–25 June 2026 · 44 responses / 44 distinct participant IDs</p>
+          <p className="mt-2 text-sm leading-6 text-[#71616a]">Structured customer-discovery responses, supported by complete response-count tables. This sample is separate from the earlier underwear survey below; participant overlap has not been checked, so the counts are not combined.</p>
+        </div>
+        <div className="grid gap-5 lg:grid-cols-3">
+          {[
+            {title: "Personal understanding is a clear research priority", detail: "28 of 44 (63.6%) selected each of personal baseline, patterns they might be missing, and habits affecting symptoms. These are overlapping selections, not separate groups.", implication: "Investigate personalised, low-effort insight into body changes; validate usefulness through product testing.", locator: "desired_insights · page 2"},
+            {title: "People already spend on existing approaches", detail: "34 of 44 (77.3%) reported having spent money. The sourcebook lists the approaches selected, including supplements, exercise support and apps.", implication: "Explore which unmet needs remain despite existing spending. This is not KLPS revenue.", locator: "spent_money · page 3; spending options · page 6"},
+            {title: "Stated interest needs a behavioural follow-up", detail: "31 of 44 (70.5%) selected definitely or probably for would_use. 22 of 44 (50.0%) selected yes for would_pay; 19 selected maybe, 2 no and 1 did not answer.", implication: "Test actual uptake, repeated use and payment. Survey interest is not an order or purchase commitment.", locator: "would_use / would_pay · page 3"},
+          ].map((finding) => <article key={finding.title} className="rounded-2xl border border-pink-100 p-6">
+            <h4 className="font-serif text-xl">{finding.title}</h4>
+            <dl className="mt-4 space-y-4 text-sm leading-6">
+              <div><dt className="font-semibold">What we learned</dt><dd className="mt-1 text-[#71616a]">{finding.detail}</dd></div>
+              <div><dt className="font-semibold">What this informs</dt><dd className="mt-1 text-[#71616a]">{finding.implication}</dd></div>
+              <div><dt className="font-semibold">Supporting evidence</dt><dd className="mt-1 text-[#71616a]">Reference 03 · {finding.locator}<br />10–25 June 2026 · n = 44 responses</dd></div>
+            </dl>
+            {view(onlineSurvey, "View evidence · Ref 03")}
+          </article>)}
+        </div>
+      </section>}
       {survey && <>
         <div className="rounded-2xl border border-pink-100 bg-pink-50/40 p-6">
           <p className="text-xs font-semibold uppercase tracking-widest text-[#9d245d]">Reference 01 · Early underwear survey</p>
@@ -60,14 +85,21 @@ export function EvidenceOverview({ documents, onOpen }: Props) {
             <p className="mt-2 text-sm leading-6 text-[#71616a]">Supporting company analysis of customer needs and the proposed value proposition. Treat this as an interpretation to connect to primary evidence, rather than a separate participant study. Study dates and sample size are not established in this overview.</p>
             {view(canvas, "View canvas · Ref 02")}
           </article>}
+          {onlineSurvey && <article className="py-6">
+            <h4 className="font-semibold">03 · June 2026 online customer survey sourcebook</h4>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">Available: aggregate response-count tables, source-field references, methods and an inventory of supporting answers. Based on 44 complete survey records in the supplied database export, dated 10–25 June 2026.</p>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">The export also includes 158 linked answer records from 42 participants: 123 typed answers and 35 audio-file references. These are survey answers, not 158 interviews. The audio has not been reviewed and no transcripts were supplied.</p>
+            <p className="mt-2 text-sm leading-6 text-[#71616a]">Individual answers, quotations, recordings and response-level data are not published here while sharing permissions are clarified. Question definitions, product check-ins and supplier records are excluded from these customer-discovery counts.</p>
+            {view(onlineSurvey, "View sourcebook · Ref 03")}
+          </article>}
           <article className="pt-6">
             <h4 className="font-semibold">Sources still to be linked</h4>
             <ul className="mt-3 list-disc space-y-3 pl-5 text-sm leading-6 text-[#71616a]">
               <li><strong>Customer interviews:</strong> dated, anonymised notes or transcripts, exact quotations with page or timestamp references, participant counts and the themes they support.</li>
-              <li><strong>Online customer surveys:</strong> the questionnaire, dated anonymised response export, sample size and the question behind each finding.</li>
+              <li><strong>Online customer survey source material:</strong> the full questionnaire and an appropriately anonymised response-level export, once sharing permissions are confirmed. Reference 03 provides aggregate counts and source fields for the June 2026 responses.</li>
               <li><strong>Product testing:</strong> when available, the tested version, dates, method, tester count and observed outcomes.</li>
             </ul>
-            <p className="mt-4 text-sm leading-6 text-[#71616a]">These source packs are not yet linked here. We do not combine survey, interview and testing totals without checking participant overlap.</p>
+            <p className="mt-4 text-sm leading-6 text-[#71616a]">These additional source materials are not yet linked here. We do not combine survey, interview and testing totals without checking participant overlap.</p>
           </article>
         </div>
       </section>
