@@ -286,7 +286,7 @@ async function fetchSecureResearchMetrics(): Promise<ResearchMetrics> {
       lastError = error;
 
       const isFinalAttempt = attempt === METRICS_RETRY_DELAYS_MS.length;
-      if (isFinalAttempt) break;
+      if (isFinalAttempt || !isRetryableLoginError(error)) break;
 
       await wait(METRICS_RETRY_DELAYS_MS[attempt]);
     }
@@ -622,6 +622,7 @@ function LoginGate({
 
 const DataRoom = () => {
   const [loading, setLoading] = useState(true);
+  const secureLoadVersion = useRef(0);
   const [user, setUser] = useState<DataRoomUser | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [metrics, setMetrics] = useState<ResearchMetrics | null>(null);
@@ -694,26 +695,28 @@ const DataRoom = () => {
   }, []);
 
   const loadSecureData = async (nextUser: DataRoomUser) => {
+    const version = ++secureLoadVersion.current;
     setError("");
     setUser(nextUser);
     setDocuments([]);
     setLogs([]);
+    setMetrics(null);
 
     const docsPayload = await apiRequest<unknown>(endpointSets.documents);
+    if (version !== secureLoadVersion.current) return;
     setDocuments(normaliseDocuments(docsPayload));
 
-    try {
-      setMetrics(await fetchSecureResearchMetrics());
-    } catch (error) {
-      console.error("Data room research metrics unavailable", error);
-      setMetrics(null);
-    }
-
+    // Optional admin data must not hold up access to the document library.
+    // The metrics endpoint is admin-only; do not request it for investors.
     if (isAdminUser(nextUser)) {
-      const logPayload = await apiRequest<unknown>(endpointSets.logs).catch(
-        () => ({ logs: [] }),
-      );
-      setLogs(normaliseLogs(logPayload));
+      void fetchSecureResearchMetrics().then((value) => {
+        if (version === secureLoadVersion.current) setMetrics(value);
+      }).catch((error) => {
+        console.error("Data room research metrics unavailable", error);
+      });
+      void apiRequest<unknown>(endpointSets.logs).then((payload) => {
+        if (version === secureLoadVersion.current) setLogs(normaliseLogs(payload));
+      }).catch(() => undefined);
     }
   };
 
@@ -817,6 +820,8 @@ const DataRoom = () => {
       : compactMetricsUnavailableLabel;
 
   const logout = async () => {
+    secureLoadVersion.current++;
+    setMetrics(null);
     await apiRequest(endpointSets.logout, { method: "POST" }).catch(
       () => undefined,
     );
@@ -848,7 +853,7 @@ const DataRoom = () => {
     return (
       <main className="data-room-theme flex min-h-screen items-center justify-center bg-obsidian px-6 text-foreground">
         <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
-          Checking secure session...
+          {user ? "Loading your documents..." : "Checking secure session..."}
         </div>
       </main>
     );
