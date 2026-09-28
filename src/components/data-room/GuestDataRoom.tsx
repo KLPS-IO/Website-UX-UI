@@ -259,17 +259,17 @@ export function GuestDataRoom({
                 Not yet available. No documents are currently available for your
                 account in this folder.
               </p>
-            )}
+            )} 
             <ul className="mt-10 divide-y divide-pink-100 border-y border-pink-100">
               {(items || []).map((doc) => (
                 <li key={doc.id}>
                   <button
                     onClick={() => void onOpen(doc)}
                     className={`flex w-full items-center justify-between gap-5 rounded px-3 py-6 text-left hover:bg-pink-50 ${focus}`}
-                  >
-                    <span className="break-words">{doc.filename}</span>
+                  > 
+                    <span className="break-words">{doc.filename}</span> 
                     <span className="flex shrink-0 items-center gap-2 text-sm text-[#9d245d]">
-                      View <ArrowUpRight size={16} />
+                     Dowload PDF V.2.0 <ArrowUpRight size={16} />
                     </span>
                   </button>
                 </li>
