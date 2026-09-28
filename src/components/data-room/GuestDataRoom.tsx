@@ -273,7 +273,7 @@ export function GuestDataRoom({
                   > 
                     <span className="break-words">{doc.filename}</span> 
                     <span className="flex shrink-0 items-center gap-2 text-sm text-[#9d245d]">
-                     Dowload PDF V.2.0 <ArrowUpRight size={16} />
+                     View document <ArrowUpRight size={16} />
                     </span>
                   </button>
                 </li>
