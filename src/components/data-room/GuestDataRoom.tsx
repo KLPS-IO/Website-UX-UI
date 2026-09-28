@@ -1,3 +1,4 @@
+import { CompanyOverview } from "./CompanyOverview";
 import { ArrowLeft, ArrowRight, ArrowUpRight, LogOut } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -26,7 +27,7 @@ const folders = [
   {
     title: "Company Overview",
     guidance:
-      "Latest pitch deck; one-page business overview covering the problem, solution, business model and current stage.",
+      "Company, product, customer evidence, progress, team and funding plans.",
   },
   {
     title: "Market & Customer Evidence",
@@ -235,7 +236,7 @@ export function GuestDataRoom({
                     </h3>
                     <div className="mt-6 flex items-center justify-between border-t border-pink-100 pt-4 text-xs text-[#71616a]">
                       <span>
-                        {docs.length
+                        {label === "Company Overview" ? "Company briefing" : docs.length
                           ? `${docs.length} ${docs.length === 1 ? "document" : "documents"}`
                           : "Not yet available"}
                       </span>
@@ -248,19 +249,20 @@ export function GuestDataRoom({
           </>
         ) : selectedFolder ? (
           <>
-            <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
+            {selected === "Company Overview" && <CompanyOverview metrics={metrics} />}
+            {(selected !== "Company Overview" || Boolean(items?.length)) && <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
               <h2 className="font-semibold text-[#241b20]">
-                Documents include
+                {selected === "Company Overview" ? "Supporting documents" : "Documents include"}
               </h2>
               <p className="mt-2">{selectedFolder.guidance}</p>
-            </section>
-            {!items?.length && (
+            </section>}
+            {!items?.length && selected !== "Company Overview" && (
               <p className="mt-8 text-[#71616a]">
                 Not yet available. No documents are currently available for your
                 account in this folder.
               </p>
             )}
-            <ul className="mt-10 divide-y divide-pink-100 border-y border-pink-100">
+            {Boolean(items?.length) && <ul className="mt-10 divide-y divide-pink-100 border-y border-pink-100">
               {(items || []).map((doc) => (
                 <li key={doc.id}>
                   <button
@@ -274,7 +276,7 @@ export function GuestDataRoom({
                   </button>
                 </li>
               ))}
-            </ul>
+            </ul>}
           </>
         ) : (
           <p className="mt-6 text-[#71616a]">
