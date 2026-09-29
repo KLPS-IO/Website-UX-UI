@@ -28,6 +28,17 @@ test("dashboard separates one HMRC penalty point from a zero financial penalty",
   assert.match(types,/financial_penalty:string/);
 });
 
+test("submitted 26A2 stays visible while the penalty review remains outstanding",()=>{
+  const panel=readFileSync(path.resolve("src/components/finance/FinanceCompliancePanel.tsx"),"utf8");
+  assert.match(panel,/notice\?\.filed\?model\.filings/);
+  assert.match(panel,/— SUBMITTED/);
+  assert.match(panel,/Nil VAT return/);
+  assert.match(panel,/HMRC receipt recorded/);
+  assert.match(panel,/event\.status!=="cancelled"/);
+  assert.match(panel,/HMRC review decision/);
+  assert.doesNotMatch(panel,/hmrc_receipt_id/i);
+});
+
 test("VAT ledger accepts period and expense action deep links",()=>{
   const ledger=readFileSync(path.resolve("src/pages/Finance.vat-ledger.tsx"),"utf8");
   assert.match(ledger,/searchParams\.get\("period"\)/);assert.match(ledger,/searchParams\.get\("expense"\)/);assert.match(ledger,/edit\(row\)/);
