@@ -14,6 +14,20 @@ test("dashboard shows readiness, remaining days, explicit refresh and all-action
   assert.match(panel,/readiness_state/);assert.match(panel,/days remaining/);assert.match(panel,/>Refresh</);assert.match(panel,/View all Finance Actions/);
 });
 
+test("dashboard separates one HMRC penalty point from a zero financial penalty",()=>{
+  const panel=readFileSync(path.resolve("src/components/finance/FinanceCompliancePanel.tsx"),"utf8");
+  const types=readFileSync(path.resolve("src/types/finance-compliance.ts"),"utf8");
+  assert.match(panel,/VAT return overdue — action required/);
+  assert.match(panel,/Late-submission penalty point/);
+  assert.match(panel,/Financial penalty/);
+  assert.match(panel,/HMRC review decision/);
+  assert.match(panel,/financial_penalty/);
+  assert.doesNotMatch(panel,/£200|200\.00/);
+  assert.match(types,/penalty_points:number/);
+  assert.match(types,/total_penalty_points:number/);
+  assert.match(types,/financial_penalty:string/);
+});
+
 test("VAT ledger accepts period and expense action deep links",()=>{
   const ledger=readFileSync(path.resolve("src/pages/Finance.vat-ledger.tsx"),"utf8");
   assert.match(ledger,/searchParams\.get\("period"\)/);assert.match(ledger,/searchParams\.get\("expense"\)/);assert.match(ledger,/edit\(row\)/);
