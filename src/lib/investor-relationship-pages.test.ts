@@ -30,13 +30,15 @@ test("company and legal overview uses a standalone versioned investor disclosure
   assert.doesNotMatch(room, /\/api\/finance\/company|normaliseCompanyLegal/);
   assert.match(page, /Investor legal disclosure/);
   assert.match(page, /Ownership, IP and governance/);
+  assert.match(page, /Capitalisation · actual current position/);
+  assert.match(page, /Corporate and investment readiness/);
   assert.match(disclosure, /Founder-only Financial OS records/);
   assert.match(disclosure, /version: "1\.0"/);
   assert.match(disclosure, /companyNumber: "16436591"/);
   assert.doesNotMatch(page, /vatRegistrationNumber|businessBankAccount|bankBalance/);
 });
 
-test("financials folder publishes the approved v1 cap table and qualified forecast", () => {
+test("financials folder publishes the approved qualified forecast and links to the legal cap table", () => {
   const room = source("src/components/data-room/GuestDataRoom.tsx");
   const page = source("src/components/data-room/InvestorFinancialSnapshot.tsx");
   const disclosure = source("src/config/investorDisclosure.ts");
@@ -44,8 +46,9 @@ test("financials folder publishes the approved v1 cap table and qualified foreca
   assert.match(room, /Company and capital snapshot v1\.0/);
   for (const expected of ["Emma Mendez", "forecastSales: 9125", "customers: 50", "estimatedDirectCostPerUnit: 60", "amount: 7000", "introductoryPriceRange: \"£150–£200\"", "12-month financial forecast"])
     assert.match(disclosure, new RegExp(expected));
-  assert.match(page, /Capitalisation · actual current position/);
-  assert.match(page, /Company readiness snapshot/);
+  assert.doesNotMatch(page, /Capitalisation · actual current position/);
+  assert.match(page, /Review the current cap table and ownership structure/);
+  assert.match(page, /Finance, commercial and product readiness/);
   assert.match(page, /Near-term capital deployment/);
   assert.doesNotMatch(page, /late-submission|£200 liability|26A2/i);
   assert.doesNotMatch(disclosure, /personal Start Up Loan|Universal Credit|Klarna|personal credit card/i);
