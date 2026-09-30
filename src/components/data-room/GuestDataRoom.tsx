@@ -2,6 +2,7 @@ import { EvidenceOverview } from "./EvidenceOverview";
 import { CompanyOverview } from "./CompanyOverview";
 import { DevelopmentConversations } from "./DevelopmentConversations";
 import { TeamAdvisersOverview } from "./TeamAdvisersOverview";
+import { CompanyLegalOverview, type CompanyLegalSnapshot } from "./CompanyLegalOverview";
 import { ArrowLeft, ArrowRight, ArrowUpRight, LogOut } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { newestVersionFirst } from "@/lib/data-room-document-order";
@@ -27,6 +28,8 @@ type Props = {
     voiceRecordings: number;
     commercialInterestCount: number;
   } | null;
+  companyLegal: CompanyLegalSnapshot | null;
+  companyLegalLoading: boolean;
 };
 const folders = [
   {
@@ -142,6 +145,8 @@ export function GuestDataRoom({
   onSignOut,
   error,
   metrics,
+  companyLegal,
+  companyLegalLoading,
 }: Props) {
   const [params] = useSearchParams();
   const requested = params.get("folder");
@@ -168,6 +173,7 @@ export function GuestDataRoom({
     : selectedItems;
   const hasBuiltInOverview = selected === "Company Overview"
     || selected === "Product & Technology"
+    || selected === "Company & Legal"
     || selected === "Team & Advisers"
     || selected === "Development Conversations";
   const focus =
@@ -305,6 +311,9 @@ export function GuestDataRoom({
                   View confidential blueprint <ArrowUpRight size={16} />
                 </Link>
               </section>
+            )}
+            {selected === "Company & Legal" && (
+              <CompanyLegalOverview company={companyLegal} loading={companyLegalLoading} />
             )}
             {(!hasBuiltInOverview || Boolean(items?.length)) && <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
               <h2 className="font-semibold text-[#241b20]">

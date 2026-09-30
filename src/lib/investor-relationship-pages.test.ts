@@ -19,6 +19,21 @@ test("data room provides dedicated team and development-conversation pages", () 
   assert.match(room, /Version 1\.0 · August 2026 · WP1 · TRL 3/);
   assert.match(room, /newestVersionFirst/);
   assert.match(room, /selected === "Product & Technology"/);
+  assert.match(room, /CompanyLegalOverview/);
+  assert.match(room, /selected === "Company & Legal"/);
+});
+
+test("company and legal overview is a safe projection of the canonical FOS record", () => {
+  const page = source("src/components/data-room/CompanyLegalOverview.tsx");
+  const room = source("src/pages/DataRoom.tsx");
+  assert.match(room, /\/api\/data-room\/company/);
+  assert.match(room, /\/api\/finance\/company/);
+  assert.match(room, /normaliseCompanyLegal/);
+  assert.match(page, /Legal identity/);
+  assert.match(page, /Ownership, IP and compliance position/);
+  assert.match(page, /Working fundraising scenarios are excluded/);
+  assert.match(page, /Sensitive tax identifiers, bank details and internal legal notes are excluded/);
+  assert.doesNotMatch(page, /vatRegistrationNumber|businessBankAccount|bankBalance/);
 });
 
 test("team page explains roles without implying executive authority", () => {
