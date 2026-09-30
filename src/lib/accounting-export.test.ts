@@ -33,13 +33,13 @@ test("blocked reasons are founder-readable and retain payment source detail",()=
   assert.equal(blockingReasonCopy("reviewed_gbp_vat_missing"),"VAT amount is missing");
   assert.equal(blockingReasonCopy("paid_account_nominal_code_missing:founder_director_funded"),"Payment account is not mapped: founder director funded");
   assert.equal(blockingReasonCopy("critical_warning:vat_conflict"),"Critical VAT warning: vat conflict");
-  assert.match(blockingReasonCopy("supplier_document_insufficient_evidence"),/Intentionally excluded/);
+  assert.match(blockingReasonCopy("supplier_document_insufficient_evidence"),/Intended for founder use only and excluded./);
   assert.match(blockingReasonCopy("vat_period_date_conflict"),/Stored VAT period conflicts/);
 });
 
-test("MTD review distinguishes eligible, blocked and intentionally excluded transactions",()=>{
+test("MTD review distinguishes eligible, blocked and Intended for founder use only and excluded. transactions",()=>{
   const component=readFileSync("src/components/finance/MtdAccountingExportDialog.tsx","utf8");
-  assert.match(component,/Intentionally excluded/);assert.match(component,/excluded_row_count/);assert.match(component,/excluded_expense_ids/);assert.match(component,/exclusion_reasons/);
+  assert.match(component,/Intended for founder use only and excluded./);assert.match(component,/excluded_row_count/);assert.match(component,/excluded_expense_ids/);assert.match(component,/exclusion_reasons/);
   assert.match(component,/supplier_document_review_status/);
   assert.match(component,/VAT period conflict/);assert.match(component,/Founder review required before accounting export/);assert.match(component,/vat_period_date_conflict/);
 });
