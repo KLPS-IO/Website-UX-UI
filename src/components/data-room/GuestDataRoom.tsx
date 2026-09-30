@@ -4,7 +4,7 @@ import { DevelopmentConversations } from "./DevelopmentConversations";
 import { TeamAdvisersOverview } from "./TeamAdvisersOverview";
 import { CompanyLegalOverview } from "./CompanyLegalOverview";
 import { InvestorFinancialSnapshot } from "./InvestorFinancialSnapshot";
-import { DataRoomContact } from "./DataRoomContact";
+import { ContactEmmaButton, DataRoomContactDialog } from "./DataRoomContact";
 import { ArrowLeft, ArrowRight, ArrowUpRight, LogOut } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { newestVersionFirst } from "@/lib/data-room-document-order";
@@ -189,12 +189,15 @@ export function GuestDataRoom({
           <span className="font-serif text-lg font-semibold">
             Private Data Room
           </span>
+          <div className="flex items-center gap-2">
+          <ContactEmmaButton className={`rounded px-3 py-2 text-sm text-[#9d245d] ${focus}`} />
           <button
             onClick={() => void onSignOut()}
             className={`flex items-center gap-2 rounded px-2 py-2 text-sm ${focus}`}
           >
             <LogOut size={16} /> Sign out
           </button>
+          </div>
         </div>
       </header>
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-20">
@@ -360,8 +363,8 @@ export function GuestDataRoom({
             </a>
           </div>
         )}
-        <DataRoomContact />
       </div>
+      <DataRoomContactDialog />
     </main>
   );
 }

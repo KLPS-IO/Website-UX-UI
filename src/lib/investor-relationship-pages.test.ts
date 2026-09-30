@@ -51,11 +51,19 @@ test("financials folder publishes the approved v1 cap table and qualified foreca
 test("private data room provides direct founder contact and verified KLPS social profiles", () => {
   const contact = source("src/components/data-room/DataRoomContact.tsx");
   const room = source("src/components/data-room/GuestDataRoom.tsx");
-  assert.match(room, /DataRoomContact/);
-  assert.match(contact, /mailto:emmamendez@klps\.co\.uk/);
+  const overview = source("src/components/data-room/CompanyOverview.tsx");
+  const blueprint = source("src/pages/DataRoomTechnologyBlueprint.tsx");
+  const guide = source("src/pages/DataRoomGuide.tsx");
+  assert.match(room, /ContactEmmaButton/);
+  assert.match(room, /DataRoomContactDialog/);
+  assert.match(overview, /ContactEmmaButton/);
+  assert.match(blueprint, /ContactEmmaButton/);
+  assert.match(guide, /ContactEmmaButton/);
+  assert.doesNotMatch(contact, /mailto:/);
+  assert.match(contact, /navigator\.clipboard\.writeText/);
+  assert.match(contact, /Click to copy email address/);
   assert.match(contact, /wa\.me\/447983417736/);
   assert.match(contact, /tel:\+447983417736/);
-  assert.match(contact, /No contact form or intermediary inbox is used/);
   for (const expected of [
     "instagram.com/klps_wear",
     "x.com/klps_wear",

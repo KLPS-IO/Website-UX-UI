@@ -6,6 +6,7 @@ import { mvp1Blueprint } from "@/features/technology-blueprint/mvp1Blueprint";
 import { TechnicalPublication } from "@/features/technology-blueprint/TechnicalPublication";
 import { exportBlueprintPdf } from "@/features/technology-blueprint/exportBlueprintPdf";
 import "@/features/technology-blueprint/blueprint.css";
+import { ContactEmmaButton, DataRoomContactDialog } from "@/components/data-room/DataRoomContact";
 
 export default function DataRoomTechnologyBlueprint() {
   const [access, setAccess] = useState<"checking" | "allowed" | "denied">(
@@ -105,6 +106,7 @@ export default function DataRoomTechnologyBlueprint() {
             ))}
           </select>
           <span className="spacer" />
+          <ContactEmmaButton />
           <button type="button" onClick={() => window.print()}>
             <Printer className="inline h-4 w-4" />{" "}
             <span className="label">Print</span>
@@ -126,6 +128,7 @@ export default function DataRoomTechnologyBlueprint() {
           aria-hidden="true"
         />
       </nav>
+      <DataRoomContactDialog />
       <TechnicalPublication document={mvp1Blueprint} />
     </main>
   );

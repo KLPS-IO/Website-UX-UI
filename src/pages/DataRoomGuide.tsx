@@ -1,8 +1,9 @@
-import { ArrowLeft, CheckCircle2, Download, ExternalLink, Folder, Mail, MessageCircle, Phone, Printer, ShieldCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, Folder, Printer, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { PageHeader, SectionTitle, Surface } from "@/components/finance/PageHeader";
 import { exportCurrentFinancePagePdf, printCurrentFinancePage } from "@/lib/finance-page-export";
 import { useDataRoomViewer } from "@/hooks/useDataRoomViewer";
+import { ContactEmmaButton, DataRoomContactDialog } from "@/components/data-room/DataRoomContact";
 
 const folders = [
   ["00", "Read First", "Orientation, navigation and data-room guidance."],
@@ -32,15 +33,6 @@ const evidenceControls = [
   "Entity relationships",
 ] as const;
 
-const socialLinks = [
-  ["Instagram", "https://www.instagram.com/klps_wear/"],
-  ["X", "https://x.com/klps_wear"],
-  ["YouTube", "https://www.youtube.com/@KLPS-official"],
-  ["LinkedIn", "https://www.linkedin.com/in/klpswear/"],
-  ["Facebook", "https://www.facebook.com/profile.php?id=61592718058230"],
-  ["TikTok", "https://www.tiktok.com/@klps_wear"],
-] as const;
-
 export default function DataRoomGuidePage() {
   const viewer = useDataRoomViewer();
 
@@ -59,6 +51,7 @@ export default function DataRoomGuidePage() {
         <Link to="/data-room/finance/documents" className="guide-action"><Folder className="h-4 w-4" /> Open Documents</Link>
       </div>
       <div className="flex flex-wrap gap-2">
+        <ContactEmmaButton className="guide-action" />
         <button className="guide-action" onClick={printCurrentFinancePage}><Printer className="h-4 w-4" /> Print</button>
         <button className="guide-action" onClick={() => void exportCurrentFinancePagePdf("/data-room/guide")}><Download className="h-4 w-4" /> Export PDF</button>
       </div>
@@ -106,25 +99,12 @@ export default function DataRoomGuidePage() {
         </GuideSection>
 
         <GuideSection number="05" title="Contact">
-          <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-[0.1em] text-muted-foreground">Founder &amp; CEO</div>
-              <div className="mt-2 text-xl font-semibold">Emma Mendez</div>
-              <div className="mt-5 space-y-3">
-                <a className="flex w-fit items-center gap-2 text-brand-orange hover:underline" href="mailto:emmamendez@klps.co.uk"><Mail className="h-4 w-4" /> emmamendez@klps.co.uk</a>
-                <a className="flex w-fit items-center gap-2 text-brand-orange hover:underline" href="https://wa.me/447983417736?text=Hello%20Emma%2C%20I%27m%20getting%20in%20touch%20regarding%20the%20KLPS%20data%20room." target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /> Message on WhatsApp</a>
-                <a className="flex w-fit items-center gap-2 text-brand-orange hover:underline" href="tel:+447983417736"><Phone className="h-4 w-4" /> 07983 417736</a>
-                <a className="flex w-fit items-center gap-2 text-brand-orange hover:underline" href="https://klps.co.uk" target="_blank" rel="noreferrer"><ExternalLink className="h-4 w-4" /> klps.co.uk</a>
-              </div>
-              <nav aria-label="KLPS social media" className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-                {socialLinks.map(([label, href]) => <a key={label} href={href} target="_blank" rel="noreferrer" className="text-brand-orange hover:underline">{label}</a>)}
-              </nav>
-            </div>
-            <div className="rounded-xl border border-border bg-background/60 px-5 py-4 text-sm"><div className="text-xs uppercase tracking-wider text-muted-foreground">Version</div><div className="mt-1 font-semibold">1.0</div></div>
-          </div>
+          <p>Emma Mendez is the direct founder contact for questions about KLPS or the evidence in this data room.</p>
+          <ContactEmmaButton className="guide-action mt-4" />
         </GuideSection>
       </div>
     </main>
+    <DataRoomContactDialog />
   </div>;
 }
 

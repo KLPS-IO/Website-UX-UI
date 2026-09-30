@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ContactEmmaButton } from "./DataRoomContact";
 
 type ResearchMetrics = {
   participants: number;
@@ -78,7 +79,7 @@ export function CompanyOverview({ metrics }: { metrics: ResearchMetrics | null }
         <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
           <Link className={linkStyle} to={folderLink('Pitch Deck')}>Pitch Deck</Link>
           <Link className={linkStyle} to={folderLink('Company & Legal')}>Company & Legal</Link>
-          <a className={linkStyle} href="mailto:emmamendez@klps.co.uk">Contact Emma</a>
+          <ContactEmmaButton className={linkStyle} />
         </div>
       </section>
     </article>
