@@ -31,6 +31,14 @@ export const investorDisclosure = {
     introductoryPriceRange: "£150–£200",
     qualification: "Planning forecast, not contracted revenue or existing sales. Unit costs will be refined when production quotations are confirmed.",
   },
+  twelveMonthForecast: {
+    source: "Investor-safe extract from the Start Up Loan cash-flow forecast",
+    periodLabels: ["M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10", "M11", "M12"],
+    sales: [450, 600, 800, 700, 700, 875, 800, 800, 1000, 1000, 800, 600],
+    directCosts: [180, 240, 300, 240, 240, 300, 240, 240, 300, 300, 240, 180],
+    grossContribution: [270, 360, 500, 460, 460, 575, 560, 560, 700, 700, 560, 420],
+    qualification: "Forward-looking planning assumptions prepared for the Start Up Loan application. The forecast is not actual trading, contracted revenue or guaranteed performance. Pending loan proceeds are not treated as received in this investor disclosure.",
+  },
   funding: {
     receivedExternalInvestment: 0,
     startUpLoan: { amount: 7000, status: "in_progress" as DisclosureStatus, statement: "Application materials and supporting forecast prepared; no loan proceeds are treated as received." },

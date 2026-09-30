@@ -1,4 +1,4 @@
-import { Check, Circle, FileCheck2, PieChart, Scale, ShieldCheck } from "lucide-react";
+import { Check, Circle, FileCheck2, Scale, ShieldCheck } from "lucide-react";
 import { investorDisclosure } from "@/config/investorDisclosure";
 
 const Value = ({ label, value }: { label: string; value: string }) => <div><dt className="text-xs uppercase tracking-[0.14em] text-[#9b8993]">{label}</dt><dd className="mt-1 break-words font-medium text-[#241b20]">{value}</dd></div>;
@@ -9,12 +9,6 @@ export function CompanyLegalOverview() {
     <section className="rounded-2xl border border-pink-100 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-medium uppercase tracking-[0.18em] text-[#b52b70]">Investor legal disclosure</p><h2 className="mt-2 font-serif text-2xl text-[#241b20]">{disclosure.company.legalName}</h2><p className="mt-2 text-sm text-[#71616a]">Company number {disclosure.company.companyNumber}</p></div><span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800"><ShieldCheck size={15} /> Published v{disclosure.version}</span></div>
       <dl className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><Value label="Trading name" value={disclosure.company.tradingName} /><Value label="Company type" value={disclosure.company.companyType} /><Value label="Company status" value={disclosure.company.companyStatus} /><Value label="Jurisdiction" value={disclosure.company.jurisdiction} /><Value label="Operating stage" value={disclosure.company.stage} /><Value label="Disclosure date" value={disclosure.asOf} /></dl>
-    </section>
-    <section className="rounded-2xl border border-pink-100 p-6">
-      <h2 className="flex items-center gap-2 font-semibold text-[#241b20]"><PieChart size={18} /> Capitalisation · actual current position</h2>
-      <div className="mt-5 overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm"><thead className="border-b border-pink-100 text-xs uppercase tracking-wider text-[#9b8993]"><tr>{["Shareholder", "Share class", "Shares", "Ownership", "Voting rights"].map(value => <th key={value} className="p-3 first:pl-0">{value}</th>)}</tr></thead><tbody>{disclosure.capTable.holdings.map(holding => <tr key={holding.shareholder} className="border-b border-pink-100 text-[#241b20]"><td className="py-4 pr-3 font-medium">{holding.shareholder}</td><td className="p-3">{holding.shareClass}</td><td className="p-3">{holding.shares}</td><td className="p-3">{holding.ownership}%</td><td className="p-3">{holding.votingRights}%</td></tr>)}<tr className="font-semibold text-[#241b20]"><td className="py-4 pr-3">Total</td><td className="p-3">—</td><td className="p-3">{disclosure.capTable.totalShares}</td><td className="p-3">100%</td><td className="p-3">100%</td></tr></tbody></table></div>
-      <div className="mt-5 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">{[["Founder-owned", "100%"], ["External equity raised", "£0"], ["External investors", disclosure.capTable.externalInvestors], ["Convertible instruments", disclosure.capTable.convertibles], ["Options issued", "None"], ["Option pool", "None currently established"], ["Preference shares", "None"], ["Previous equity rounds", "None"]].map(([label, value]) => <div key={label} className="rounded-lg bg-pink-50/60 px-3 py-2"><strong className="text-[#241b20]">{label}:</strong> {value}</div>)}</div>
-      <p className="mt-4 text-xs text-[#71616a]">{disclosure.capTable.note}</p>
     </section>
     <section className="rounded-2xl border border-pink-100 p-6">
       <h2 className="font-semibold text-[#241b20]">Corporate and investment readiness</h2>

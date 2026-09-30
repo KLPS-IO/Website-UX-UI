@@ -117,7 +117,7 @@ export function DevelopmentConversations() {
         ))}
       </div>
 
-      <p className="text-sm">Statuses describe the latest evidenced position available to KLPS and should be updated when a response, proposal, decision or completed engagement changes the record.</p>
+      <p className="text-sm">Statuses describe the latest evidenced position available to KLPS and will be updated when responses, proposal, decision or completed engagement changes the record.</p>
     </article>
   );
 }
