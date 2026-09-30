@@ -82,6 +82,11 @@ const previousLabels: Record<string, string> = {
   "Financial Information": "Financials & Funding",
   "Legal & Corporate": "Company & Legal",
 };
+const builtInFolderHints: Record<string, string> = {
+  "Company Overview": "Company briefing",
+  "Team & Advisers": "Founder and adviser profiles",
+  "Development Conversations": "Research and supplier engagement",
+};
 
 function FolderIllustration() {
   return (
@@ -247,9 +252,9 @@ export function GuestDataRoom({
                     </h3>
                     <div className="mt-6 flex items-center justify-between border-t border-pink-100 pt-4 text-xs text-[#71616a]">
                       <span>
-                        {label === "Company Overview" ? "Company briefing" : docs.length
+                        {builtInFolderHints[label] || (docs.length
                           ? `${docs.length} ${docs.length === 1 ? "document" : "documents"}`
-                          : "Not yet available"}
+                          : "Not yet available")}
                       </span>
                       <ArrowUpRight size={17} />
                     </div>

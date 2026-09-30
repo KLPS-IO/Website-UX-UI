@@ -12,6 +12,8 @@ test("data room provides dedicated team and development-conversation pages", () 
   assert.match(room, /title: "Development Conversations"/);
   assert.match(room, /hasBuiltInOverview/);
   assert.match(room, /selected === "Pitch Deck"/);
+  assert.match(room, /"Team & Advisers": "Founder and adviser profiles"/);
+  assert.match(room, /"Development Conversations": "Research and supplier engagement"/);
 });
 
 test("team page explains roles without implying executive authority", () => {
