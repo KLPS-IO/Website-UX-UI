@@ -99,7 +99,7 @@ test("second-pass Blueprint uses a varied editorial model without repeating evid
       "utf8",
     );
   for (const title of [
-    "The hardest sensor to build",
+    "The hardest sensor to build is one people forget they’re wearing",
     "What if the garment was the interface?",
     "What is the signal today?",
     "What still needs proving?",

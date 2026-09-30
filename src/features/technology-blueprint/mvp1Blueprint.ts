@@ -229,7 +229,7 @@ export const mvp1Blueprint: TechnologyBlueprint = {
   sections: [
     section(
       "00",
-      "The hardest sensor to build is the one people forget to wear.",
+      "The hardest sensor to build is one people forget they’re wearing.",
       "Could sensing disappear into everyday life?",
       "IN DEVELOPMENT",
       [
