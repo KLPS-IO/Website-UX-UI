@@ -1,51 +1,40 @@
-import { Banknote, CircleDollarSign, Landmark, ListChecks, PieChart } from "lucide-react";
+import { Banknote, Building2, Check, Circle, CircleDollarSign, Landmark, PieChart, ShieldCheck } from "lucide-react";
 import { investorDisclosure, type DisclosureStatus } from "@/config/investorDisclosure";
 
 const pounds = (value: number) => new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 }).format(value);
-const statusLabel: Record<DisclosureStatus, string> = { verified: "Verified", completed: "Established", in_progress: "In progress", planned: "Planned", not_evidenced: "Not published" };
+const statusLabel: Record<DisclosureStatus, string> = { verified: "Verified", completed: "Established", in_progress: "In progress", planned: "Pre-seed preparation", not_evidenced: "Not published" };
 const statusStyle: Record<DisclosureStatus, string> = { verified: "bg-emerald-50 text-emerald-800 border-emerald-200", completed: "bg-emerald-50 text-emerald-800 border-emerald-200", in_progress: "bg-amber-50 text-amber-900 border-amber-200", planned: "bg-blue-50 text-blue-800 border-blue-200", not_evidenced: "bg-slate-50 text-slate-700 border-slate-200" };
 
 export function InvestorFinancialSnapshot() {
-  const disclosure = investorDisclosure;
+  const d = investorDisclosure;
   return <article className="mt-10 space-y-6 text-[#71616a]">
     <section className="rounded-2xl border border-pink-100 bg-pink-50/40 p-6 md:p-8">
-      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#b52b70]">Company &amp; Capital Snapshot</p>
-      <h2 className="mt-3 font-serif text-3xl text-[#241b20]">Founder-owned. Pre-investment. Building deliberately.</h2>
-      <p className="mt-3 text-sm">Version {disclosure.version} · information correct as at {disclosure.asOf}</p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <Metric label="Current ownership" value="100% founder" note="No external investors" />
-        <Metric label="Founding pilot forecast" value="50 customers" note={`${pounds(disclosure.commercialForecast.forecastSales)} forecast sales`} />
-        <Metric label="External capital received" value="£0" note="Applications are not cash" />
-      </div>
+      <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-medium uppercase tracking-[0.18em] text-[#b52b70]">Company &amp; Capital Snapshot</p><h2 className="mt-3 font-serif text-3xl text-[#241b20]">Founder-owned. Pre-investment. Building deliberately.</h2><p className="mt-3 text-sm">Version {d.version} · information correct as at {d.asOf}</p></div><span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800"><ShieldCheck size={15} /> Published v{d.version}</span></div>
+      <div className="mt-6 grid gap-4 sm:grid-cols-3"><Metric label="Current ownership" value="100% founder" note="Clean, undiluted cap table" /><Metric label="Founding pilot" value="50 customers" note={`${pounds(d.commercialForecast.forecastSales)} forecast revenue`} /><Metric label="External equity raised" value="£0" note="First raise preparation underway" /></div>
     </section>
 
-    <Section icon={PieChart} title="Cap table · actual current position">
-      <div className="overflow-x-auto"><table className="w-full min-w-[650px] text-left text-sm"><thead className="border-b border-pink-100 text-xs uppercase tracking-wider text-[#9b8993]"><tr>{["Shareholder", "Class", "Shares", "Ownership", "Nominal value", "Voting rights"].map(value => <th key={value} className="p-3 first:pl-0">{value}</th>)}</tr></thead><tbody>{disclosure.capTable.holdings.map(holding => <tr key={holding.shareholder} className="border-b border-pink-100 text-[#241b20]"><td className="py-4 pr-3 font-medium">{holding.shareholder}</td><td className="p-3">{holding.shareClass}</td><td className="p-3">{holding.shares}</td><td className="p-3">{holding.ownership}%</td><td className="p-3">{pounds(holding.nominalValue)}</td><td className="p-3">{holding.votingRights}%</td></tr>)}</tbody></table></div>
-      <p className="mt-4 text-sm">No external investors, option pool or convertibles. {disclosure.capTable.note}</p>
+    <Section icon={Building2} title="Corporate snapshot"><dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"><Value label="Company" value={d.company.legalName} /><Value label="Company number" value={d.company.companyNumber} /><Value label="Status" value={d.company.companyStatus} /><Value label="Jurisdiction" value={d.company.jurisdiction} /><Value label="Stage" value={d.company.stage} /><Value label="Trading name" value={d.company.tradingName} /></dl></Section>
+
+    <Section icon={PieChart} title="Capitalisation · actual current position">
+      <div className="overflow-x-auto"><table className="w-full min-w-[620px] text-left text-sm"><thead className="border-b border-pink-100 text-xs uppercase tracking-wider text-[#9b8993]"><tr>{["Shareholder", "Share class", "Shares", "Ownership", "Voting rights"].map(value => <th key={value} className="p-3 first:pl-0">{value}</th>)}</tr></thead><tbody>{d.capTable.holdings.map(h => <tr key={h.shareholder} className="border-b border-pink-100 text-[#241b20]"><td className="py-4 pr-3 font-medium">{h.shareholder}</td><td className="p-3">{h.shareClass}</td><td className="p-3">{h.shares}</td><td className="p-3">{h.ownership}%</td><td className="p-3">{h.votingRights}%</td></tr>)}<tr className="font-semibold text-[#241b20]"><td className="py-4 pr-3">Total</td><td className="p-3">—</td><td className="p-3">{d.capTable.totalShares}</td><td className="p-3">100%</td><td className="p-3">100%</td></tr></tbody></table></div>
+      <div className="mt-5 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">{[["Founder-owned", "100%"], ["External equity raised", "£0"], ["External investors", d.capTable.externalInvestors], ["Convertible instruments", d.capTable.convertibles], ["Options issued", "None"], ["Option pool", "None currently established"], ["Preference shares", "None"], ["Previous equity rounds", "None"]].map(([label, value]) => <div key={label} className="rounded-lg bg-pink-50/60 px-3 py-2"><strong className="text-[#241b20]">{label}:</strong> {value}</div>)}</div>
+      <p className="mt-4 text-xs">{d.capTable.note}</p>
     </Section>
 
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Section icon={CircleDollarSign} title="Commercial pilot economics">
-        <dl className="grid grid-cols-2 gap-4"><Value label="Pilot cohort" value={`${disclosure.commercialForecast.customers} customers`} /><Value label="Forecast sales" value={pounds(disclosure.commercialForecast.forecastSales)} /><Value label="Direct cost / unit" value={pounds(disclosure.commercialForecast.estimatedDirectCostPerUnit)} /><Value label="Forecast direct costs" value={pounds(disclosure.commercialForecast.forecastDirectCosts)} /><Value label="Gross contribution" value={pounds(disclosure.commercialForecast.forecastGrossContribution)} /></dl>
-        <p className="mt-4 text-xs leading-5">{disclosure.commercialForecast.qualification}</p>
-      </Section>
-      <Section icon={Banknote} title="Funding progress">
-        <Status label={`Start Up Loan · ${pounds(disclosure.funding.startUpLoan.amount)}`} status={disclosure.funding.startUpLoan.status} text={disclosure.funding.startUpLoan.statement} />
-        <Status label="SEIS readiness" status={disclosure.funding.seis.status} text={disclosure.funding.seis.statement} />
-        <p className="mt-4 text-xs leading-5">{disclosure.funding.unconfirmedFundingTreatment}</p>
-      </Section>
-    </div>
+    <section className="grid gap-6 lg:grid-cols-2">
+      <Section icon={Landmark} title="Current financial position"><p className="font-medium text-[#241b20]">Pre-revenue · Product development</p><p className="mt-2 text-sm leading-6">KLPS is progressing through product development toward prototype validation and an initial controlled commercial cohort.</p><dl className="mt-5 grid grid-cols-2 gap-4"><Value label="Founder salary from KLPS" value={pounds(d.currentFinancialPosition.founderSalary)} /><Value label="Employees" value={String(d.currentFinancialPosition.employees)} /><Value label="Manufacturing premises" value={d.currentFinancialPosition.manufacturingPremises} /><Value label="External equity raised" value={pounds(d.currentFinancialPosition.externalEquityRaised)} /></dl></Section>
+      <Section icon={Banknote} title="Funding activity"><Status label="SEIS preparation" status={d.funding.seis.status} text="Investment-readiness and SEIS preparation underway ahead of the company's first external equity raise." /><Status label="Start Up Loan" status={d.funding.startUpLoan.status} text={`£7,000 application supporting defined product-development expenditure and prototype progression. ${d.funding.startUpLoan.statement}`} /><Status label="Equity fundraising" status={d.funding.equityRaise.status} text={d.funding.equityRaise.statement} /></Section>
+    </section>
 
-    <Section icon={Landmark} title="£7,000 proposed use of funds">
-      <div className="grid gap-3 sm:grid-cols-2">{disclosure.useOfFunds.map(row => <div key={row.item} className="flex items-start justify-between gap-4 rounded-xl bg-pink-50/60 p-4 text-sm"><span>{row.item}</span><strong className="shrink-0 text-[#241b20]">{pounds(row.amount)}</strong></div>)}</div>
-    </Section>
+    <Section icon={CircleDollarSign} title="Commercial model · Founding 50"><div className="overflow-x-auto"><table className="w-full min-w-[520px] text-left text-sm"><tbody>{[["Initial commercial cohort", `${d.commercialForecast.customers} customers`], ["Forecast revenue", pounds(d.commercialForecast.forecastSales)], ["Estimated direct cost of sales", pounds(d.commercialForecast.forecastDirectCosts)], ["Gross contribution", pounds(d.commercialForecast.forecastGrossContribution)], ["Commercial unit cost assumption", pounds(d.commercialForecast.estimatedDirectCostPerUnit)], ["Introductory price range", d.commercialForecast.introductoryPriceRange]].map(([label, value]) => <tr key={label} className="border-b border-pink-100"><th className="py-3 pr-6 font-medium text-[#71616a]">{label}</th><td className="py-3 font-semibold text-[#241b20]">{value}</td></tr>)}</tbody></table></div><p className="mt-4 text-xs leading-5">{d.commercialForecast.qualification}</p></Section>
 
-    <Section icon={ListChecks} title="Operating readiness">
-      <div className="grid gap-3 md:grid-cols-2">{disclosure.operatingReadiness.map(item => <Status key={item.label} label={item.label} status={item.status} text={item.statement} />)}</div>
-      <Status label="Cash and runway" status={disclosure.cashPosition.status} text={disclosure.cashPosition.statement} />
-    </Section>
+    <Section icon={Banknote} title="Near-term capital deployment"><div className="overflow-x-auto"><table className="w-full min-w-[520px] text-left text-sm"><tbody>{d.useOfFunds.map(row => <tr key={row.item} className="border-b border-pink-100"><td className="py-3 pr-6">{row.item}</td><td className="py-3 text-right font-semibold text-[#241b20]">{pounds(row.amount)}</td></tr>)}<tr className="font-semibold text-[#241b20]"><td className="py-4">Total</td><td className="py-4 text-right">£7,000</td></tr></tbody></table></div><p className="mt-4 text-sm leading-6">This funding is intended to move KLPS through engineering development, prototype iteration and preparation for controlled wearer and commercial testing. It does not fund founder salary.</p></Section>
 
-    <p className="text-xs leading-5">{disclosure.governanceNote} Supporting evidence and later approved disclosure versions supersede this snapshot.</p>
+    <Section icon={ShieldCheck} title="Company readiness snapshot"><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{d.readiness.map(group => <div key={group.area} className="rounded-xl border border-pink-100 p-4"><h3 className="font-semibold text-[#241b20]">{group.area}</h3><ul className="mt-3 space-y-2 text-sm">{group.items.map(([label, complete]) => <li key={label} className="flex gap-2">{complete ? <Check size={16} className="mt-0.5 shrink-0 text-emerald-600" /> : <Circle size={14} className="mt-1 shrink-0 text-amber-600" />}<span>{label}</span></li>)}</ul></div>)}</div></Section>
+
+    <Section icon={ShieldCheck} title="Ownership, IP & governance"><div className="grid gap-4 md:grid-cols-2"><Info title="Ownership" text="KLPS is 100% founder-owned with no external equity issued, no options, no convertibles and no preference shares." /><Info title="Intellectual property · strategy in development" text={d.intellectualProperty} /><Info title="Finance & compliance" text={d.financeAndCompliance} /><Info title="Disclosure boundary" text={d.governanceNote} /></div></Section>
+
+    <footer className="rounded-xl border border-pink-100 bg-pink-50/50 p-4 text-xs leading-5"><strong className="text-[#241b20]">Disclosure basis:</strong> {d.disclosureBasis}</footer>
   </article>;
 }
 
@@ -53,3 +42,4 @@ function Section({ icon: Icon, title, children }: { icon: typeof PieChart; title
 function Metric({ label, value, note }: { label: string; value: string; note: string }) { return <div className="rounded-xl border border-pink-100 bg-white p-4"><p className="text-xs uppercase tracking-wider text-[#9b8993]">{label}</p><p className="mt-2 text-2xl font-semibold text-[#241b20]">{value}</p><p className="mt-1 text-xs">{note}</p></div>; }
 function Value({ label, value }: { label: string; value: string }) { return <div><dt className="text-xs uppercase tracking-wider text-[#9b8993]">{label}</dt><dd className="mt-1 font-medium text-[#241b20]">{value}</dd></div>; }
 function Status({ label, status, text }: { label: string; status: DisclosureStatus; text: string }) { return <div className="mb-3 rounded-xl border border-pink-100 p-4"><div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-sm font-semibold text-[#241b20]">{label}</h3><span className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider ${statusStyle[status]}`}>{statusLabel[status]}</span></div><p className="mt-2 text-sm leading-6">{text}</p></div>; }
+function Info({ title, text }: { title: string; text: string }) { return <div className="rounded-xl bg-pink-50/60 p-4"><h3 className="text-sm font-semibold text-[#241b20]">{title}</h3><p className="mt-2 text-sm leading-6">{text}</p></div>; }

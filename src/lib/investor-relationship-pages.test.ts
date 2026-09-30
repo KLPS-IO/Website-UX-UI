@@ -29,7 +29,7 @@ test("company and legal overview uses a standalone versioned investor disclosure
   const disclosure = source("src/config/investorDisclosure.ts");
   assert.doesNotMatch(room, /\/api\/finance\/company|normaliseCompanyLegal/);
   assert.match(page, /Investor legal disclosure/);
-  assert.match(page, /Ownership, IP and compliance position/);
+  assert.match(page, /Ownership, IP and governance/);
   assert.match(disclosure, /Founder-only Financial OS records/);
   assert.match(disclosure, /version: "1\.0"/);
   assert.match(disclosure, /companyNumber: "16436591"/);
@@ -42,10 +42,13 @@ test("financials folder publishes the approved v1 cap table and qualified foreca
   const disclosure = source("src/config/investorDisclosure.ts");
   assert.match(room, /InvestorFinancialSnapshot/);
   assert.match(room, /Company and capital snapshot v1\.0/);
-  for (const expected of ["Emma Mendez", "forecastSales: 9125", "customers: 50", "estimatedDirectCostPerUnit: 60", "amount: 7000", "Financial penalty: £0", "Current cash and cash-only runway are not published"])
+  for (const expected of ["Emma Mendez", "forecastSales: 9125", "customers: 50", "estimatedDirectCostPerUnit: 60", "amount: 7000", "introductoryPriceRange: \"£150–£200\"", "12-month financial forecast"])
     assert.match(disclosure, new RegExp(expected));
-  assert.match(page, /Applications are not cash/);
-  assert.match(page, /Cap table · actual current position/);
+  assert.match(page, /Capitalisation · actual current position/);
+  assert.match(page, /Company readiness snapshot/);
+  assert.match(page, /Near-term capital deployment/);
+  assert.doesNotMatch(page, /late-submission|£200 liability|26A2/i);
+  assert.doesNotMatch(disclosure, /personal Start Up Loan|Universal Credit|Klarna|personal credit card/i);
 });
 
 test("private data room provides direct founder contact and verified KLPS social profiles", () => {

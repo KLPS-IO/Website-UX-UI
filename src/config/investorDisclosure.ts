@@ -28,12 +28,14 @@ export const investorDisclosure = {
     estimatedDirectCostPerUnit: 60,
     forecastDirectCosts: 3000,
     forecastGrossContribution: 6125,
+    introductoryPriceRange: "£150–£200",
     qualification: "Planning forecast, not contracted revenue or existing sales. Unit costs will be refined when production quotations are confirmed.",
   },
   funding: {
     receivedExternalInvestment: 0,
     startUpLoan: { amount: 7000, status: "in_progress" as DisclosureStatus, statement: "Application materials and supporting forecast prepared; no loan proceeds are treated as received." },
     seis: { status: "in_progress" as DisclosureStatus, statement: "Investment-readiness work is underway. No SEIS Advance Assurance or investor commitment is claimed." },
+    equityRaise: { status: "planned" as DisclosureStatus, statement: "No external equity has been issued. Investor materials, financial model and due-diligence data room are being prepared for KLPS's first external raise." },
     unconfirmedFundingTreatment: "Applications, grants, investment discussions and borrowing are excluded from cash until received.",
   },
   useOfFunds: [
@@ -43,16 +45,20 @@ export const investorDisclosure = {
     { item: "10 prototype and pilot garments", amount: 1000 },
     { item: "Prototype iteration, replacement materials and testing", amount: 1806 },
   ],
-  operatingReadiness: [
-    { label: "Business banking", status: "completed" as DisclosureStatus, statement: "Business bank account established. Account identifiers and balances remain founder-only." },
-    { label: "Accounting and VAT", status: "completed" as DisclosureStatus, statement: "QuickFile is in use. VAT return 26A2 was submitted on 29 September 2026 as a nil return with £0 payable." },
-    { label: "HMRC filing record", status: "verified" as DisclosureStatus, statement: "One non-financial late-submission point is recorded for 26A2. Financial penalty: £0; no £200 liability is represented." },
-    { label: "Business credit card", status: "in_progress" as DisclosureStatus, statement: "Provider research/onboarding only. No approved facility, limit or borrowing capacity is represented." },
-  ],
+  currentFinancialPosition: { founderSalary: 0, employees: 0, manufacturingPremises: "None", externalEquityRaised: 0 },
+  financeAndCompliance: "Business banking and accounting infrastructure established. VAT registered and filings maintained through QuickFile. Detailed banking, tax and accounting records are retained within controlled founder records and can be provided during due diligence where appropriate.",
   cashPosition: {
     status: "not_evidenced" as DisclosureStatus,
     statement: "Current cash and cash-only runway are not published in this v1.0 investor snapshot. Planned or pending funding is not substituted for cash.",
   },
-  intellectualProperty: "No patent, freedom-to-operate or complete IP-assignment position is represented as verified. Dated engineering records and controlled evidence are maintained while the formal IP position develops.",
+  intellectualProperty: "KLPS maintains dated engineering, product-development and research records as the technical architecture develops. Formal protection, ownership documentation and freedom-to-operate requirements will be reviewed as the product progresses toward commercial manufacture. No registered patent is currently claimed.",
+  readiness: [
+    { area: "Corporate", items: [["UK limited company", true], ["Founder-controlled", true], ["100% founder ownership", true], ["Business banking established", true]] },
+    { area: "Finance", items: [["Accounting infrastructure established", true], ["VAT registered", true], ["12-month financial forecast", true], ["£7k Start Up Loan application in progress", false]] },
+    { area: "Investment", items: [["Investor data room established", true], ["Cap table established", true], ["First raise preparation underway", true], ["SEIS preparation underway", false]] },
+    { area: "Commercial", items: [["Founding 50 commercial model established", true], ["£150–£200 introductory pricing model", true], ["50-customer controlled pilot forecast", true], ["Manufacturing cost validation in progress", false]] },
+    { area: "Product", items: [["Early technical development completed", true], ["Prototype pathway established", true], ["External engineering engagement underway", true], ["Final manufacturing specification pending", false]] },
+  ],
   governanceNote: "This disclosure is purpose-built for authorised investor review. Founder-only Financial OS records, account details, personal credit information, internal scenarios and private notes are excluded.",
+  disclosureBasis: "Information reflects the company's position as at 30 September 2026. Applications and planned financing are identified as such and should not be interpreted as secured or committed funding.",
 } as const;
