@@ -300,7 +300,7 @@ export function GuestDataRoom({
                   Current engineering record
                 </p>
                 <h2 className="mt-3 font-serif text-2xl text-[#241b20]">
-                  KLPS Technology Blueprint — Engineering Record 01
+                  KLPS Technology Blueprint - Engineering Record 01
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-[#71616a]">
                   Version 1.0 · August 2026 · WP1 · TRL 3 — experimental proof of concept
