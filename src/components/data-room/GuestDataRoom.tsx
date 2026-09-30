@@ -297,14 +297,16 @@ export function GuestDataRoom({
             This folder has no documents available for your account.
           </p>
         )}
-        <div>
-        <a
-          href="https://klps.co.uk/pitch-deck-preview"
-          className={`mb-8 mt-10 inline-flex items-center gap-2 rounded text-sm text-[#9d245d] ${focus}`}
-        >
-          <ArrowRight size={16} /> Latest Pitch Deck Viewable Online Version (V 3.0)
-        </a>
-      </div>
+        {selected === "Pitch Deck" && (
+          <div>
+            <a
+              href="https://klps.co.uk/pitch-deck-preview"
+              className={`mb-8 mt-10 inline-flex items-center gap-2 rounded text-sm text-[#9d245d] ${focus}`}
+            >
+              <ArrowRight size={16} /> Latest Pitch Deck Viewable Online Version (V 3.0)
+            </a>
+          </div>
+        )}
       </div>
     </main>
   );
