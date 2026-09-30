@@ -8,7 +8,6 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { FundingWorkspace } from "@/components/data-room/FundingWorkspace";
 import { visibleFundingApplications } from "@/config/fundingApplications";
-import type { CompanyLegalSnapshot } from "@/components/data-room/CompanyLegalOverview";
 
 const LEGACY_KEYS = [
   "klps.dataRoom.session",
@@ -239,7 +238,6 @@ const endpointSets = {
     "/api/data-room/auth/session",
   ],
   documents: ["/api/data-room/documents", "/api/documents"],
-  companyLegal: ["/api/data-room/company", "/api/finance/company"],
   documentAccess: (id: string) => [`/api/data-room/documents/${id}/url`],
   metrics: ["/api/research/metrics"],
   logs: ["/api/data-room/admin/access-logs", "/api/admin/access-logs"],
@@ -414,40 +412,6 @@ const normaliseDocuments = (payload: unknown): DocumentItem[] => {
     updatedAt: stringValue(doc.updatedAt),
     updated_at: stringValue(doc.updated_at),
   }));
-};
-
-const normaliseCompanyLegal = (payload: unknown): CompanyLegalSnapshot | null => {
-  const root = isRecord(payload) ? payload : {};
-  const company = isRecord(root.company) ? root.company : root;
-  const office = isRecord(company.registered_office) ? company.registered_office : {};
-  const values = (...keys: string[]) => Array.from(new Set(
-    keys.map((key) => stringValue(office[key]) || stringValue(company[key]))
-      .filter((value): value is string => Boolean(value?.trim())),
-  ));
-  const legalName = stringValue(company.legal_name) || stringValue(company.legalName) || "";
-  const companyNumber = stringValue(company.company_number) || stringValue(company.companyNumber) || "";
-  if (!legalName || !companyNumber) return null;
-  const sicSource = company.sic_codes ?? company.sicCodes;
-
-  return {
-    legalName,
-    tradingName: stringValue(company.trading_name) || stringValue(company.tradingName) || "",
-    companyNumber,
-    companyType: stringValue(company.company_type) || stringValue(company.companyType) || "",
-    companyStatus: stringValue(company.company_status) || stringValue(company.companyStatus) || "",
-    incorporationDate: stringValue(company.incorporation_date) || stringValue(company.incorporationDate) || "",
-    country: stringValue(company.country) || "",
-    sicCodes: Array.isArray(sicSource) ? sicSource.filter((value): value is string => typeof value === "string") : [],
-    registeredOffice: values("address_line_1", "addressLine1", "registered_office_address_line_1", "address_line_2", "addressLine2", "registered_office_address_line_2", "address_line_3", "addressLine3", "registered_office_address_line_3", "city", "registered_office_city", "region", "registered_office_region", "postcode", "registered_office_postcode", "country", "registered_office_country"),
-    financialYearEnd: stringValue(company.financial_year_end) || stringValue(company.financialYearEnd) || "",
-    firstAccountsPeriodEnd: stringValue(company.first_accounts_period_end) || stringValue(company.firstAccountsPeriodEnd) || "",
-    firstAccountsFilingDeadline: stringValue(company.first_accounts_filing_deadline) || stringValue(company.firstAccountsFilingDeadline) || "",
-    corporationTaxStatus: stringValue(company.corporation_tax_status) || stringValue(company.corporationTaxStatus) || "",
-    icoStatus: stringValue(company.ico_status) || stringValue(company.icoStatus) || "",
-    vatStatus: stringValue(company.vat_status) || stringValue(company.vatStatus) || "",
-    dataStatus: stringValue(company.data_status) || stringValue(company.dataStatus) || "",
-    lastReviewed: stringValue(company.last_reviewed) || stringValue(company.lastReviewed) || "",
-  };
 };
 
 const normaliseLogs = (payload: unknown): AccessLog[] => {
@@ -662,8 +626,6 @@ const DataRoom = () => {
   const [user, setUser] = useState<DataRoomUser | null>(null);
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [metrics, setMetrics] = useState<ResearchMetrics | null>(null);
-  const [companyLegal, setCompanyLegal] = useState<CompanyLegalSnapshot | null>(null);
-  const [companyLegalLoading, setCompanyLegalLoading] = useState(false);
   const [logs, setLogs] = useState<AccessLog[]>([]);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
@@ -739,20 +701,10 @@ const DataRoom = () => {
     setDocuments([]);
     setLogs([]);
     setMetrics(null);
-    setCompanyLegal(null);
-    setCompanyLegalLoading(true);
 
     const docsPayload = await apiRequest<unknown>(endpointSets.documents);
     if (version !== secureLoadVersion.current) return;
     setDocuments(normaliseDocuments(docsPayload));
-
-    void apiRequest<unknown>(endpointSets.companyLegal).then((payload) => {
-      if (version === secureLoadVersion.current) setCompanyLegal(normaliseCompanyLegal(payload));
-    }).catch(() => {
-      if (version === secureLoadVersion.current) setCompanyLegal(null);
-    }).finally(() => {
-      if (version === secureLoadVersion.current) setCompanyLegalLoading(false);
-    });
 
     // Optional admin data must not hold up access to the document library.
     // The metrics endpoint is admin-only; do not request it for investors.
@@ -870,8 +822,6 @@ const DataRoom = () => {
   const logout = async () => {
     secureLoadVersion.current++;
     setMetrics(null);
-    setCompanyLegal(null);
-    setCompanyLegalLoading(false);
     await apiRequest(endpointSets.logout, { method: "POST" }).catch(
       () => undefined,
     );
@@ -916,8 +866,7 @@ const DataRoom = () => {
   if (!isAdmin) {
     return <GuestDataRoom firstName={user.firstName} email={user.email} documents={documents}
       categoryFor={getDocumentCategory} onOpen={viewDocument} onSignOut={logout}
-      error={error} metrics={metrics} companyLegal={companyLegal}
-      companyLegalLoading={companyLegalLoading} />;
+      error={error} metrics={metrics} />;
   }
 
   return (
