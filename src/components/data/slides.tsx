@@ -103,7 +103,7 @@ function Slide01() {
           position: "absolute",
           top: 110,
           left: 110,
-          right: 600,
+          right: 110,
         }}
       >
         {/* Logo */}
@@ -202,8 +202,8 @@ function Slide01() {
         <div
           style={{
             position: "absolute",
-            top: 460,
-            left: 780,
+            top: 350,
+            left: 1040,
           }}
         >
           <video
@@ -214,8 +214,10 @@ function Slide01() {
             playsInline
             style={{
               width: "430px",
+              height: "306px",
               borderRadius: "24px",
               boxShadow: "0 30px 80px rgba(0,0,0,.12)",
+              objectFit: "cover",
             }}
           >
             <source src={klpsVideo} type="video/mp4" />
@@ -226,6 +228,7 @@ function Slide01() {
             alt=""
             style={{
               width: "430px",
+              height: "306px",
               borderRadius: "24px",
               boxShadow: "0 30px 80px rgba(0,0,0,.12)",
               objectFit: "cover",

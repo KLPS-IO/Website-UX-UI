@@ -52,3 +52,8 @@ test("adviser slide links to the supporting private data-room page", () => {
   assert.match(slides, /data-room\?folder=Team%20%26%20Advisers/);
   assert.match(slides, /Team and adviser information in the private data room/);
 });
+
+test("cover prototype media remains clear of the headline", () => {
+  const slides = source("src/components/data/slides.tsx");
+  assert.match(slides, /top: 350,\s+left: 1040,/);
+});
