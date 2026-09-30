@@ -14,6 +14,11 @@ test("data room provides dedicated team and development-conversation pages", () 
   assert.match(room, /selected === "Pitch Deck"/);
   assert.match(room, /"Team & Advisers": "Founder and adviser profiles"/);
   assert.match(room, /"Development Conversations": "Research and supplier engagement"/);
+  assert.match(room, /"Product & Technology": "Versioned engineering records"/);
+  assert.match(room, /KLPS Technology Blueprint — Engineering Record 01/);
+  assert.match(room, /Version 1\.0 · August 2026 · WP1 · TRL 3/);
+  assert.match(room, /newestVersionFirst/);
+  assert.match(room, /selected === "Product & Technology"/);
 });
 
 test("team page explains roles without implying executive authority", () => {

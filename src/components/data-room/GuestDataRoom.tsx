@@ -4,8 +4,16 @@ import { DevelopmentConversations } from "./DevelopmentConversations";
 import { TeamAdvisersOverview } from "./TeamAdvisersOverview";
 import { ArrowLeft, ArrowRight, ArrowUpRight, LogOut } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
+import { newestVersionFirst } from "@/lib/data-room-document-order";
 
-type Document = { id: string; filename: string; category?: string };
+type Document = {
+  id: string;
+  filename: string;
+  category?: string;
+  version?: string;
+  updatedAt?: string;
+  updated_at?: string;
+};
 type Props = {
   firstName?: string;
   email: string;
@@ -86,6 +94,7 @@ const builtInFolderHints: Record<string, string> = {
   "Company Overview": "Company briefing",
   "Team & Advisers": "Founder and adviser profiles",
   "Development Conversations": "Research and supplier engagement",
+  "Product & Technology": "Versioned engineering records",
 };
 
 function FolderIllustration() {
@@ -153,8 +162,14 @@ export function GuestDataRoom({
     groups.set(label, [...(groups.get(label) || []), document]);
   });
   const welcomeName = firstName?.trim() || email;
-  const items = selected ? groups.get(selected) : undefined;
-  const hasBuiltInOverview = selected === "Company Overview" || selected === "Team & Advisers" || selected === "Development Conversations";
+  const selectedItems = selected ? groups.get(selected) : undefined;
+  const items = selected === "Product & Technology"
+    ? newestVersionFirst(selectedItems || [])
+    : selectedItems;
+  const hasBuiltInOverview = selected === "Company Overview"
+    || selected === "Product & Technology"
+    || selected === "Team & Advisers"
+    || selected === "Development Conversations";
   const focus =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-4";
   return (
@@ -269,6 +284,28 @@ export function GuestDataRoom({
             {selected === "Team & Advisers" && <TeamAdvisersOverview />}
             {selected === "Development Conversations" && <DevelopmentConversations />}
             {selected === "Market & Customer Evidence" && <EvidenceOverview documents={items || []} onOpen={onOpen} />}
+            {selected === "Product & Technology" && (
+              <section className="mt-10 max-w-2xl rounded-2xl border border-pink-100 p-6">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#b52b70]">
+                  Current engineering record
+                </p>
+                <h2 className="mt-3 font-serif text-2xl text-[#241b20]">
+                  KLPS Technology Blueprint — Engineering Record 01
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-[#71616a]">
+                  Version 1.0 · August 2026 · WP1 · TRL 3 — experimental proof of concept
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#71616a]">
+                  Scientific hypothesis → MVP1 → next engineering gates
+                </p>
+                <Link
+                  to="/data-room/technology/mvp1-blueprint"
+                  className={`mt-5 inline-flex items-center gap-2 rounded text-sm font-medium text-[#9d245d] ${focus}`}
+                >
+                  View confidential blueprint <ArrowUpRight size={16} />
+                </Link>
+              </section>
+            )}
             {(!hasBuiltInOverview || Boolean(items?.length)) && <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
               <h2 className="font-semibold text-[#241b20]">
                 {selected === "Company Overview" || selected === "Market & Customer Evidence" ? "Supporting documents" : "Documents include"}
