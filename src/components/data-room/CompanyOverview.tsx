@@ -57,11 +57,11 @@ export function CompanyOverview({ metrics }: { metrics: ResearchMetrics | null }
 
       <section>
         <h2 className="font-serif text-2xl text-[#241b20]">Founder and advisory support</h2>
-        <p className="mt-3"><strong className="text-[#241b20]">Emma Mendez — Founder & CEO.</strong> Emma brings experience in enterprise software and work with advanced materials and wearable technology, and leads KLPS’s product direction and business development.</p>
+        <p className="mt-3"><strong className="text-[#241b20]">Emma Mendez - Founder & CEO.</strong> Emma brings experience in enterprise software and work with advanced materials and wearable technology, and leads KLPS’s product direction and business development.</p>
         <ul className="mt-4 space-y-2">
-          <li><strong className="text-[#241b20]">Oyin A.</strong> — commercial advice and connections in women-in-tech.</li>
-          <li><strong className="text-[#241b20]">Muneeb A.</strong> — technical advice spanning LLM systems, MVP development and computer vision.</li>
-          <li><strong className="text-[#241b20]">Imran K.</strong> — professional services and procurement advice.</li>
+          <li><strong className="text-[#241b20]">Oyin A.</strong> - commercial advice and connections in women-in-tech.</li>
+          <li><strong className="text-[#241b20]">Muneeb A.</strong> - technical advice spanning LLM systems, MVP development and computer vision.</li>
+          <li><strong className="text-[#241b20]">Imran K.</strong> - professional services and procurement advice.</li>
         </ul>
         <p className="mt-3"><Link className={linkStyle} to={folderLink('Team & Advisers')}>Review team and adviser information</Link></p>
       </section>

@@ -303,7 +303,7 @@ export function GuestDataRoom({
                   KLPS Technology Blueprint - Engineering Record 01
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-[#71616a]">
-                  Version 1.0 · August 2026 · WP1 · TRL 3 — experimental proof of concept
+                  Version 1.0 · August 2026 · WP1 · TRL 3 - experimental proof of concept
                 </p>
                 <p className="mt-2 text-sm leading-6 text-[#71616a]">
                   Scientific hypothesis → MVP1 → next engineering gates
