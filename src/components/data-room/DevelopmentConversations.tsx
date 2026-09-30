@@ -3,6 +3,9 @@ type Conversation = {
   location: string;
   period: string;
   status: string;
+  statusTone: "green" | "amber" | "neutral";
+  lifecycle: string;
+  lifecycleTone: "green" | "amber" | "red";
   discussion: string;
   nextStep: string;
 };
@@ -13,6 +16,9 @@ const conversations: Conversation[] = [
     location: "Manchester",
     period: "Oct 2025 – May 2026",
     status: "Outline project plan received",
+    statusTone: "green",
+    lifecycle: "On pause — scope under review",
+    lifecycleTone: "amber",
     discussion: "Early technical discussions covered graphene–nylon fibre feasibility, sample preparation and characterisation. The outline scope received in May covers fibre production rather than creation of a woven textile.",
     nextStep: "KLPS to assess how the fibre-only scope fits the next technical phase.",
   },
@@ -21,14 +27,20 @@ const conversations: Conversation[] = [
     location: "Germany",
     period: "2026 · month to confirm",
     status: "Supplier conversation",
+    statusTone: "neutral",
+    lifecycle: "Concluded — no further action",
+    lifecycleTone: "red",
     discussion: "Initial discussion recorded around wearable-electronics and smart-textile development capability. No contracted delivery relationship is represented.",
-    nextStep: "Confirm the dated record and determine whether a scoped feasibility discussion should continue.",
+    nextStep: "No further action is currently planned. Reopen only if KLPS decides the supplier should be reconsidered.",
   },
   {
     organisation: "Ignitec Ltd",
     location: "Bristol",
     period: "Sep 2026",
     status: "Proposal pending",
+    statusTone: "amber",
+    lifecycle: "In progress",
+    lifecycleTone: "green",
     discussion: "A product-development workshop has been discussed for the next wearable prototype, including scope, engineering activity and associated costs.",
     nextStep: "Review the proposal when received and decide whether the scope, deliverables and budget are suitable.",
   },
@@ -37,6 +49,9 @@ const conversations: Conversation[] = [
     location: "Burnley",
     period: "Sep 2026",
     status: "Introductory outreach sent",
+    statusTone: "neutral",
+    lifecycle: "Awaiting response",
+    lifecycleTone: "amber",
     discussion: "KLPS requested an introductory call about garment integration, comfort, washability and the feasibility of developing a smaller wearable prototype.",
     nextStep: "Await a response and assess technical fit, development process and indicative feasibility-stage cost.",
   },
@@ -45,10 +60,25 @@ const conversations: Conversation[] = [
     location: "Nottingham",
     period: "Sep 2026",
     status: "Introductory outreach sent",
+    statusTone: "neutral",
+    lifecycle: "Awaiting response",
+    lifecycleTone: "amber",
     discussion: "KLPS requested an introductory discussion about integrating sensing electronics into textiles, with emphasis on comfort, reliable sensing and washability.",
     nextStep: "Await a response and assess technical fit and indicative feasibility-stage cost.",
   },
 ];
+
+const statusClasses = {
+  green: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  amber: "border-amber-200 bg-amber-50 text-amber-800",
+  neutral: "border-pink-200 bg-pink-50 text-[#8b1f53]",
+};
+
+const lifecycleClasses = {
+  green: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  amber: "border-amber-200 bg-amber-50 text-amber-800",
+  red: "border-red-200 bg-red-50 text-red-700",
+};
 
 export function DevelopmentConversations() {
   return (
@@ -68,7 +98,10 @@ export function DevelopmentConversations() {
                 <h2 className="mt-2 font-serif text-2xl text-[#241b20]">{conversation.organisation}</h2>
                 <p className="mt-1 text-sm">{conversation.location}</p>
               </div>
-              <span className="w-fit rounded-full border border-pink-200 bg-pink-50 px-3 py-1 text-xs font-medium text-[#8b1f53]">{conversation.status}</span>
+              <div className="flex items-end gap-2 sm:flex-col" aria-label={`Status: ${conversation.status}. ${conversation.lifecycle}.`}>
+                <span className={`w-fit rounded-full border px-3 py-1 text-xs font-medium ${statusClasses[conversation.statusTone]}`}>{conversation.status}</span>
+                <span className={`w-fit rounded-full border px-3 py-1 text-[11px] font-medium ${lifecycleClasses[conversation.lifecycleTone]}`}>{conversation.lifecycle}</span>
+              </div>
             </div>
             <div className="mt-5 grid gap-5 border-t border-pink-100 pt-5 md:grid-cols-2">
               <div>

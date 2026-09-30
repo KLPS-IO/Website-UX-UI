@@ -37,6 +37,12 @@ test("engagement page distinguishes outreach, proposals and non-contracted conve
   assert.match(page, /Outline project plan received/);
   assert.match(page, /Proposal pending/);
   assert.match(page, /Introductory outreach sent/);
+  assert.match(page, /Concluded — no further action/);
+  assert.match(page, /On pause — scope under review/);
+  assert.match(page, /Awaiting response/);
+  assert.match(page, /bg-emerald-50/);
+  assert.match(page, /bg-amber-50/);
+  assert.match(page, /bg-red-50/);
   assert.match(page, /do not represent contracted partnerships unless expressly stated/);
   assert.doesNotMatch(page, /WearNex/);
 });
