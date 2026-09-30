@@ -1,5 +1,7 @@
 import { EvidenceOverview } from "./EvidenceOverview";
 import { CompanyOverview } from "./CompanyOverview";
+import { DevelopmentConversations } from "./DevelopmentConversations";
+import { TeamAdvisersOverview } from "./TeamAdvisersOverview";
 import { ArrowLeft, ArrowRight, ArrowUpRight, LogOut } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -46,6 +48,11 @@ const folders = [
       "Founder biography and relevant experience; current responsibilities; confirmed advisers and their involvement; planned key hires.",
   },
   {
+    title: "Development Conversations",
+    guidance:
+      "Dated research and supplier conversations, the scope discussed, current status and proportionate next steps.",
+  },
+  {
     title: "Financials & Funding",
     guidance:
       "Dated financial summary; forecast with assumptions; funding sought; use of funds linked to milestones; relevant supplier quotations.",
@@ -67,6 +74,8 @@ const labels: Record<string, string> = {
   Market: "Market & Customer Evidence",
   Team: "Team & Advisers",
   "Team & Organisation": "Team & Advisers",
+  Partnerships: "Development Conversations",
+  Suppliers: "Development Conversations",
 };
 const previousLabels: Record<string, string> = {
   "Commercial & Market": "Market & Customer Evidence",
@@ -140,6 +149,7 @@ export function GuestDataRoom({
   });
   const welcomeName = firstName?.trim() || email;
   const items = selected ? groups.get(selected) : undefined;
+  const hasBuiltInOverview = selected === "Company Overview" || selected === "Team & Advisers" || selected === "Development Conversations";
   const focus =
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-500 focus-visible:ring-offset-4";
   return (
@@ -251,14 +261,16 @@ export function GuestDataRoom({
         ) : selectedFolder ? (
           <>
             {selected === "Company Overview" && <CompanyOverview metrics={metrics} />}
+            {selected === "Team & Advisers" && <TeamAdvisersOverview />}
+            {selected === "Development Conversations" && <DevelopmentConversations />}
             {selected === "Market & Customer Evidence" && <EvidenceOverview documents={items || []} onOpen={onOpen} />}
-            {(selected !== "Company Overview" || Boolean(items?.length)) && <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
+            {(!hasBuiltInOverview || Boolean(items?.length)) && <section className="mt-8 max-w-2xl text-sm leading-7 text-[#71616a]">
               <h2 className="font-semibold text-[#241b20]">
                 {selected === "Company Overview" || selected === "Market & Customer Evidence" ? "Supporting documents" : "Documents include"}
               </h2>
               <p className="mt-2">{selectedFolder.guidance}</p>
             </section>}
-            {!items?.length && selected !== "Company Overview" && (
+            {!items?.length && !hasBuiltInOverview && (
               <p className="mt-8 text-[#71616a]">
                 Not yet available. No documents are currently available for your
                 account in this folder.

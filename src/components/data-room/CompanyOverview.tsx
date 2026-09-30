@@ -48,7 +48,10 @@ export function CompanyOverview({ metrics }: { metrics: ResearchMetrics | null }
         <h2 className="font-serif text-2xl text-[#241b20]">Next prototype milestone</h2>
         <p className="mt-3">In her 25 September update, Emma reported a meeting with a Bristol company and a workshop booked for the coming weeks to develop the next working prototype. Workshop funding was being assembled, with the supplier’s proposal and paperwork expected on 28 September.</p>
         <p className="mt-3">The next steps are to confirm the workshop scope and budget, build the next prototype and document its measured performance, limitations and user feedback before progressing towards commercial pilots.</p>
-        <p className="mt-3"><Link className={linkStyle} to={folderLink('Product & Technology')}>Explore product and technology</Link></p>
+        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-3">
+          <Link className={linkStyle} to={folderLink('Product & Technology')}>Explore product and technology</Link>
+          <Link className={linkStyle} to={folderLink('Development Conversations')}>Review development conversations</Link>
+        </div>
       </section>
 
       <section>

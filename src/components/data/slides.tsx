@@ -2105,10 +2105,24 @@ function Slide10() {
         </div> */}
         <h2
           className="slide-title"
-          style={{ color: "var(--brand-ink)", marginBottom: 72 }}
+          style={{ color: "var(--brand-ink)", marginBottom: 20 }}
         >
           Advisors
         </h2>
+        <a
+          href="https://klps.co.uk/data-room?folder=Team%20%26%20Advisers"
+          style={{
+            display: "inline-block",
+            color: "var(--brand-magenta)",
+            fontSize: 22,
+            fontWeight: 700,
+            marginBottom: 34,
+            textDecoration: "underline",
+            textUnderlineOffset: 6,
+          }}
+        >
+          Team and adviser information in the private data room
+        </a>
         <div
           style={{
             display: "grid",
