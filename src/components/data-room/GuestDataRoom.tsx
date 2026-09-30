@@ -3,6 +3,7 @@ import { CompanyOverview } from "./CompanyOverview";
 import { DevelopmentConversations } from "./DevelopmentConversations";
 import { TeamAdvisersOverview } from "./TeamAdvisersOverview";
 import { CompanyLegalOverview, type CompanyLegalSnapshot } from "./CompanyLegalOverview";
+import { DataRoomContact } from "./DataRoomContact";
 import { ArrowLeft, ArrowRight, ArrowUpRight, LogOut } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { newestVersionFirst } from "@/lib/data-room-document-order";
@@ -358,6 +359,7 @@ export function GuestDataRoom({
             </a>
           </div>
         )}
+        <DataRoomContact />
       </div>
     </main>
   );

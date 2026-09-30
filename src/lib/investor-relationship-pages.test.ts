@@ -36,6 +36,26 @@ test("company and legal overview is a safe projection of the canonical FOS recor
   assert.doesNotMatch(page, /vatRegistrationNumber|businessBankAccount|bankBalance/);
 });
 
+test("private data room provides direct founder contact and verified KLPS social profiles", () => {
+  const contact = source("src/components/data-room/DataRoomContact.tsx");
+  const room = source("src/components/data-room/GuestDataRoom.tsx");
+  assert.match(room, /DataRoomContact/);
+  assert.match(contact, /mailto:emmamendez@klps\.co\.uk/);
+  assert.match(contact, /wa\.me\/447983417736/);
+  assert.match(contact, /tel:\+447983417736/);
+  assert.match(contact, /No contact form or intermediary inbox is used/);
+  for (const expected of [
+    "instagram.com/klps_wear",
+    "x.com/klps_wear",
+    "youtube.com/@KLPS-official",
+    "linkedin.com/in/klpswear",
+    "facebook.com/profile.php?id=61592718058230",
+    "tiktok.com/@klps_wear",
+    "https://klps.co.uk",
+  ]) assert.match(contact, new RegExp(expected.replace(/[.?+^$[\]\\(){}|-]/g, "\\$&")));
+  assert.doesNotMatch(contact, /<form/i);
+});
+
 test("team page explains roles without implying executive authority", () => {
   const team = source("src/components/data-room/TeamAdvisersOverview.tsx");
   for (const name of ["Emma Mendez", "Oyin A.", "Muneeb A.", "Imran K."])
