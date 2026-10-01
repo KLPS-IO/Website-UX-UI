@@ -1,3 +1,5 @@
+import {Link} from 'react-router-dom';
+import {NarrativeOpportunities} from '@/components/growth/NarrativeOpportunities';
 import { ContentTrackedLinks, AcquisitionReport } from '@/components/growth/Acquisition';
 import {
   AlertCircle, ArrowRight, BarChart3, CalendarDays, ChevronRight, Clock3, Lightbulb,
@@ -106,7 +108,7 @@ export function MissionControlPage() {
     ["Consistency", valueOrDash(data?.growth_snapshot.posts_published), "Published posts in latest combined snapshot", CalendarDays, "magenta"],
     ["Engagement", data?.growth_snapshot.engagement_rate == null ? "—" : `${data.growth_snapshot.engagement_rate}%`, reportingDetail(data, "engagement_rate"), Target, "purple"],
   ] as const;
-  const opportunities = data?.ranked_opportunities ?? [];
+  const opportunities = data?.ranked_candidates ?? [];
 
   return <div>
     <PageIntro eyebrow="Your daily operating brief" title="Mission Control" description="Know what to do next, why it matters and what needs attention." />
@@ -142,6 +144,7 @@ export function MissionControlPage() {
               <span className="capitalize">{recommendation.urgency} priority</span>
             </div>
             <div className="mt-7 flex flex-wrap gap-2">
+              {recommendation.related_entity_type === "narrative_opportunity" && <Link to={`/innovation-lab/funnel/intelligence#opportunity-${recommendation.related_entity_id}`} className="rounded-xl border px-3 py-2 text-sm underline">Review in Intelligence</Link>}
               <ActionButton disabled={saving} onClick={() => void createMission(true)}>Use suggested mission</ActionButton>
               <SecondaryButton disabled={saving} onClick={() => setMissionForm(true)}>Choose another date</SecondaryButton>
               <SecondaryButton disabled={saving} onClick={() => void dismissRecommendation()}>Dismiss for now</SecondaryButton>
@@ -167,7 +170,7 @@ export function MissionControlPage() {
 
     <div className="mt-6 grid gap-6 xl:grid-cols-2">
       <GrowthPanel title="Coach" eyebrow="Next best action"><div className="rounded-xl border border-[#35d3c8]/25 bg-[#35d3c8]/[0.07] p-5"><Sparkles className="h-5 w-5 text-[#087f7a]" /><p className="mt-4 text-base font-medium text-white">{data?.coach_message.title ?? "No recommendation available"}</p><p className="mt-2 text-sm leading-6 text-white/60">{data?.coach_message.explanation}</p><span className="mt-4 inline-block text-[10px] uppercase tracking-[0.18em] text-[#087f7a]">Deterministic · saved data</span></div></GrowthPanel>
-      <GrowthPanel title="Opportunities" eyebrow="Ranked by saved-data rule"><div className="divide-y divide-white/[0.08]">{opportunities.length ? opportunities.map((opportunity, index) => <div key={opportunity.id} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"><div className="w-14 text-xs font-bold text-[#a91876]">{opportunity.score} pts</div><div className="min-w-0 flex-1"><div className="text-sm font-medium text-white">{opportunity.title}</div><div className="mt-0.5 text-xs text-white/50">{opportunity.reason}</div></div>{index === 0 && <ChevronRight className="h-4 w-4 text-[#a91876]" />}</div>) : <p className="text-sm text-white/55">No ranked content opportunities yet.</p>}</div></GrowthPanel>
+      <GrowthPanel title="Opportunities" eyebrow="Ranked by saved-data rule"><div className="divide-y divide-white/[0.08]">{opportunities.length ? opportunities.map((opportunity, index) => <div key={opportunity.deduplication_key} className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"><div className="w-14 text-xs font-bold text-[#a91876]">{opportunity.score} pts</div><div className="min-w-0 flex-1"><div className="text-sm font-medium text-white">{opportunity.title}</div><div className="mt-0.5 text-xs text-white/50">{opportunity.why_it_matters}</div><div className="mt-2 flex flex-wrap gap-2">{opportunity.related_entity_type === 'narrative_opportunity' && <Link className="text-xs underline" to={`/innovation-lab/funnel/intelligence#opportunity-${opportunity.related_entity_id}`}>Review in Intelligence</Link>}<button className="text-xs underline disabled:opacity-40" disabled={saving} onClick={async()=>{setSaving(true);setError('');try{await growthService.acceptMissionCandidate(opportunity,missionDate);setNotice('Suggested mission saved.');await load();}catch(e){setError(e instanceof Error?e.message:'Mission could not be saved.');}finally{setSaving(false);}}}>Make this a mission</button></div></div>{index === 0 && <ChevronRight className="h-4 w-4 text-[#a91876]" />}</div>) : <p className="text-sm text-white/55">No ranked mission opportunities yet.</p>}</div></GrowthPanel>
     </div>
 
     <div className="mt-6"><GrowthPanel title="Progress" eyebrow="This week"><div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">{[
@@ -337,6 +340,7 @@ export function IntelligencePage() {
   return <div><PageIntro eyebrow="Turn signals into learning" title="Intelligence" description="Recommendations and evidence—not a wall of charts." />
     {error && <InlineMessage tone="error">{error}</InlineMessage>}
     <div className="mb-5 flex flex-wrap gap-2"><ActionButton onClick={() => setMetricsOpen(true)}>Update metrics</ActionButton><SecondaryButton onClick={() => setInsightOpen(true)}>Add insight</SecondaryButton></div>
+    <NarrativeOpportunities onChanged={load} />
     <AcquisitionReport />
     {insights.length ? <div className="grid gap-5 md:grid-cols-2">{insights.map((insight) => <section key={insight.id} className="rounded-2xl border border-[#35d3c8]/20 bg-white/[0.035] p-6"><Lightbulb className="h-5 w-5 text-[#087f7a]" /><div className="mt-5 text-xs font-bold uppercase tracking-[0.08em] text-[#087f7a]">{String(insight.category)}</div><h2 className="mt-2 text-lg font-semibold leading-7 text-white">{String(insight.title)}</h2><p className="mt-2 text-sm text-white/55">{String(insight.evidence ?? "Evidence not yet described")}</p><div className="mt-5 border-t border-white/[0.08] pt-4"><div className="text-xs font-bold uppercase tracking-[0.08em] text-white/55">Decision</div><p className="mt-2 text-sm text-white/65">{String(insight.recommended_decision ?? "Not yet decided")}</p><p className="mt-2 text-xs text-white/40">{String(insight.source_type ?? "manual")} · confidence {insight.confidence == null ? "not recorded" : `${Math.round(Number(insight.confidence) * 100)}%`}</p></div><button type="button" onClick={async () => { await growthService.update("insights", insight.id, { status: "archived" }); await load(); }} className="mt-4 text-xs font-bold text-white/50 underline">Archive</button></section>)}</div> : <GrowthPanel title="No evidence-led insights yet" eyebrow="Honest empty state"><p className="text-sm text-white/55">Add a founder observation after recording the supporting evidence, or enter metrics to establish a measurable baseline.</p></GrowthPanel>}
     <div className="mt-6"><GrowthPanel title="Voice of the Customer" eyebrow={`${voice.length} permission-aware record${voice.length === 1 ? "" : "s"}`}>{voice.length ? <div className="space-y-3">{voice.map(item => <blockquote key={item.id} className="rounded-xl border border-white/10 p-4"><p className="text-sm leading-6 text-white/75">“{String(item.exact_customer_language)}”</p><footer className="mt-2 text-xs font-bold uppercase tracking-[.06em] text-[#35d3c8]">{String(item.use_status).replaceAll("_"," ")}</footer></blockquote>)}</div> : <p className="text-sm text-white/55">No exact customer language has been recorded. Quotes remain internal unless explicit external-use permission is stored.</p>}</GrowthPanel></div>
