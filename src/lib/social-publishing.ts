@@ -7,3 +7,7 @@ export function canPublishJob(job: {status: string; execution_state: string; app
     && Boolean(job.approval_fingerprint) && job.approval_fingerprint === job.current_fingerprint
     && (!job.retry_after || Date.parse(job.retry_after) <= Date.now());
 }
+
+export function canManuallyShareX(job: Parameters<typeof canPublishJob>[0]) {
+ return job.status === 'approved' && job.execution_state === 'not_started' && canPublishJob(job);
+}

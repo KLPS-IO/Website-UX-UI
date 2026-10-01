@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {xPublishingEnabled,canPublishJob} from './social-publishing.ts';
+import {xPublishingEnabled,canPublishJob,canManuallyShareX} from './social-publishing.ts';
 test('X card checks stored grant and connected state, not only backend feature availability',()=>{
  const p={provider:'x',publishing_enabled:true,connection:{status:'connected',granted_scopes:['tweet.read','users.read','offline.access']}};
  assert.equal(xPublishingEnabled(p),false);p.connection.granted_scopes.push('tweet.write');assert.equal(xPublishingEnabled(p),true);
@@ -11,4 +11,13 @@ test('publish button requires approved current content; generated, scheduled and
  for(const status of ['draft','scheduled','publishing','published','failed'])assert.equal(canPublishJob({...j,status}),false);
  assert.equal(canPublishJob({...j,current_fingerprint:'changed'}),false);assert.equal(canPublishJob({...j,execution_state:'unknown',needs_review:true}),false);
  assert.equal(canPublishJob({...j,status:'retry',execution_state:'rejected',retry_after:new Date(Date.now()+60000).toISOString()}),false);
+});
+
+test('manual X handoff requires current explicit approval and never offers retries of attempted jobs',()=>{
+ const job={status:'approved',execution_state:'not_started',approval_fingerprint:'current',current_fingerprint:'current',retry_after:null,needs_review:false};
+ assert.equal(canManuallyShareX(job),true);
+ for(const status of ['draft','scheduled','retry','failed','published'])assert.equal(canManuallyShareX({...job,status}),false);
+ for(const execution_state of ['rejected','unknown','in_flight','succeeded'])assert.equal(canManuallyShareX({...job,execution_state}),false);
+ assert.equal(canManuallyShareX({...job,current_fingerprint:'changed'}),false);
+ assert.equal(canManuallyShareX({...job,approval_fingerprint:null}),false);
 });

@@ -1,3 +1,4 @@
+import { waitlistAttributionToken } from '@/lib/waitlist-attribution';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Share2 } from "lucide-react";
@@ -42,6 +43,7 @@ const Waitlist = () => {
           email: email.trim(),
           phone: phone.trim() || null,
           source: "waitlist",
+          attribution_token: await waitlistAttributionToken(),
         }),
       });
 

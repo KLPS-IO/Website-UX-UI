@@ -60,7 +60,7 @@ test("successful X return requires canonical connection and defers capability to
     () => undefined
   );
   assert.equal(result?.provider,"x");
-  assert.equal(result?.message,"X connected. Check the connection card for granted publishing capability.");
+  assert.equal(result?.message,"X identity connected. Approve copy in Growth OS and post manually on X; paid API execution is disabled.");
   assert.equal(await processLinkedInOAuthReturn(
     "https://klps.co.uk/innovation-lab/funnel/settings?social_provider=x&social_status=connected",
     async () => [{provider:"x",connection:{status:"disconnected"}}],

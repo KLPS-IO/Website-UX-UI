@@ -1,3 +1,4 @@
+import WaitlistAttributionConsent from '@/components/WaitlistAttributionConsent';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -68,7 +69,8 @@ const App = () => (
       <BrowserRouter
         future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
       >
-        <Suspense fallback={<div className="min-h-screen bg-background" aria-label="Loading page" />}>
+        <WaitlistAttributionConsent />
+      <Suspense fallback={<div className="min-h-screen bg-background" aria-label="Loading page" />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />

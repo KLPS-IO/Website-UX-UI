@@ -73,9 +73,9 @@ test("Funnel OS social connections use the authenticated backend and expose no s
   assert.match(connections,/Future provider approval/);
   assert.match(connections,/Unavailable until separately approved and activated/);
   assert.match(connections,/TikTok identity only\. Publishing is not enabled/);
-  assert.match(connections,/X identity connected\. Reconnect to grant tweet\.write/);
-  assert.match(connections,/tweet\.read/);
-  assert.match(connections,/Text publishing enabled\. Each post still requires founder approval/);
+  assert.match(connections,/X is manual-only/);
+  assert.match(connections,/Existing OAuth scopes are preserved/);
+  assert.match(connections,/Paid API execution is disabled/);
   assert.match(connections,/Setup required/);
   assert.match(pages,/<SocialConnections \/>/);
   assert.doesNotMatch(connections,/client_secret|access_token|refresh_token/i);
