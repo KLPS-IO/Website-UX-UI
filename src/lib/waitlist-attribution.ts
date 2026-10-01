@@ -17,9 +17,9 @@ export function allowAttribution(code:string): Promise<void> {
  attempt={code,token};
  pending=(async()=>{
   const response=await fetch(`${API_BASE}/api/waitlist/visits`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,token,consent:true}),signal:AbortSignal.timeout(8000)});
-  if(!response.ok)throw new Error('Measurement unavailable. You can still join the waitlist.');
+  if(!response.ok)throw new Error('Link tracking is unavailable. You can still join the waitlist.');
   const body=await response.json();
-  if(typeof body.expires_at!=='string'||!Number.isFinite(Date.parse(body.expires_at)))throw new Error('Measurement unavailable.');
+  if(typeof body.expires_at!=='string'||!Number.isFinite(Date.parse(body.expires_at)))throw new Error('Link tracking is unavailable. You can still join the waitlist.');
   memory={token,expires_at:body.expires_at};try {sessionStorage.setItem(key,JSON.stringify(memory));} catch { /* In-memory session still works. */ }
  })().finally(()=>{pending=null;});
  return pending;
