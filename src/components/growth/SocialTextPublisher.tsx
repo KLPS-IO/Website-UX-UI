@@ -5,6 +5,8 @@ import { canManuallyShareX } from '@/lib/social-publishing';
 
 export function SocialTextPublisher({provider}: {provider:SocialProviderOverview}) {
  const [text,setText]=useState(''),[job,setJob]=useState<SocialPublishJob|null>(null),[jobs,setJobs]=useState<SocialPublishJob[]>([]);
+ const [sources,setSources]=useState<Array<{id:string;title?:unknown;caption?:unknown}>>([]),[sourceId,setSourceId]=useState('');
+ useEffect(()=>{void growthService.list('content',{platform:provider.provider}).then(setSources).catch(()=>setError('Studio content could not be loaded.'));},[provider.provider]);
  const [busy,setBusy]=useState(false),[error,setError]=useState('');
  const enabled=provider.connection?.status==='connected';
  const refresh=async()=>{const items=await growthService.socialPublishJobs();setJobs(items.filter(item=>item.provider===provider.provider));};
@@ -12,7 +14,7 @@ export function SocialTextPublisher({provider}: {provider:SocialProviderOverview
  const action=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');try{await fn();await refresh();}catch(e){setError(e instanceof Error?e.message:'The action could not be completed. Refresh this job before retrying.');}finally{setBusy(false);}};
  const prepare=()=>action(async()=>{
   if(!provider.connection||!provider.publishing_destination||!text.trim())return;
-  const source=await growthService.create('content',{title:text.trim().slice(0,80),content_type:'text',platform:provider.provider,status:'script',caption:text.trim()});
+  const source=sourceId?{id:sourceId}:await growthService.create('content',{title:text.trim().slice(0,80),content_type:'text',platform:provider.provider,status:'script',caption:text.trim()});
   const variant=await growthService.saveSocialVariant(source.id,provider.provider,text.trim(),provider.publishing_destination);
   const draft=await growthService.createSocialPublishJob(provider.connection.id,variant.id);
   setJob(await growthService.socialPublishJob(draft.id));
@@ -24,7 +26,7 @@ export function SocialTextPublisher({provider}: {provider:SocialProviderOverview
   <p className="text-sm text-white/65">Review and approve the text and account, then copy or open X. You complete the final post on X. Growth OS does not call the paid publishing API or claim a confirmed publication.</p>
   {!enabled&&<p className="text-sm text-amber-200">Connect X identity to prepare an account-bound manual post.</p>}
   {error&&<p role="alert" className="rounded bg-red-50 p-3 text-sm text-red-950">{error}</p>}
-  {!job?<><label className="block text-sm text-white" htmlFor="x-post-copy">Post text</label><textarea id="x-post-copy" value={text} onChange={e=>setText(e.target.value)} rows={5} maxLength={4000} className="w-full rounded-lg border border-white/20 bg-black/25 p-3 text-white" placeholder="Write the text you want to review"/><p className="text-xs text-white/60">Text only. X's 280 weighted-character limit is checked before approval.</p><button className={button} disabled={busy||!enabled||!text.trim()} onClick={()=>void prepare()}>Prepare for review</button></>:<div className="space-y-3 rounded-lg border border-white/20 p-4">
+  {!job?<><label className="block text-sm text-white">Studio source<select className="w-full bg-white p-2 text-black" value={sourceId} onChange={e=>{setSourceId(e.target.value);const row=sources.find(s=>s.id===e.target.value);if(row)setText(String(row.caption??''));}}><option value="">New standalone content</option>{sources.map(s=><option key={s.id} value={s.id}>{String(s.title)}</option>)}</select></label><label className="block text-sm text-white" htmlFor="x-post-copy">Post text</label><textarea id="x-post-copy" value={text} onChange={e=>setText(e.target.value)} rows={5} maxLength={4000} className="w-full rounded-lg border border-white/20 bg-black/25 p-3 text-white" placeholder="Write the text you want to review"/><p className="text-xs text-white/60">Text only. X's 280 weighted-character limit is checked before approval.</p><button className={button} disabled={busy||!enabled||!text.trim()} onClick={()=>void prepare()}>Prepare for review</button></>:<div className="space-y-3 rounded-lg border border-white/20 p-4">
    <p className="text-sm text-white/70">Destination: <strong>{job.account_name}</strong> · Status: {job.status}</p>
    <p className="whitespace-pre-wrap break-words text-white">{job.copy}</p>
    {job.needs_review&&<p role="alert" className="text-sm text-amber-200">Outcome unconfirmed. Check X before taking further action. This job cannot be resent.</p>}
@@ -35,7 +37,7 @@ export function SocialTextPublisher({provider}: {provider:SocialProviderOverview
     {canManuallyShareX(job)&&<><button className={button} disabled={busy||!enabled} onClick={()=>void navigator.clipboard.writeText(job.copy).catch(()=>setError('Copy unavailable. Select the approved text manually.'))}>Copy approved text</button><a className={button} href={`https://x.com/intent/post?text=${encodeURIComponent(job.copy)}`} target="_blank" rel="noopener noreferrer">Open X to post manually</a></>}
 
     <button className={button} disabled={busy} onClick={()=>void action(async()=>setJob(await growthService.socialPublishJob(job.id)))}>Refresh status</button>
-    <button className={button} disabled={busy} onClick={()=>{setJob(null);setText('');setError('');}}>New draft</button>
+    <button className={button} disabled={busy} onClick={()=>{setJob(null);setText('');setSourceId('');setError('');}}>New draft</button>
    </div>
   </div>}
   {jobs.length>0&&<div><h5 className="text-sm font-semibold text-white">Recent publish jobs</h5><ul className="mt-2 space-y-1">{jobs.slice(0,10).map(item=><li key={item.id}><button className="text-left text-sm text-white/70 underline" disabled={busy} onClick={()=>setJob(item)}>{item.copy.slice(0,65)} · {item.status}{item.needs_review?' — check X':''}</button></li>)}</ul></div>}
