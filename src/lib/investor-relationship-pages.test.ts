@@ -15,7 +15,7 @@ test("data room provides dedicated team and development-conversation pages", () 
   assert.match(room, /"Team & Advisers": "Founder and adviser profiles"/);
   assert.match(room, /"Development Conversations": "Research and supplier engagement"/);
   assert.match(room, /"Product & Technology": "Versioned engineering records"/);
-  assert.match(room, /KLPS Technology Blueprint — Engineering Record 01/);
+  assert.match(room, /KLPS Technology Blueprint [-—] Engineering Record 01/);
   assert.match(room, /Version 1\.0 · August 2026 · WP1 · TRL 3/);
   assert.match(room, /newestVersionFirst/);
   assert.match(room, /selected === "Product & Technology"/);
@@ -58,6 +58,11 @@ test("financials folder publishes the cap table, qualified forecast and linked p
   assert.match(page, /View development conversations/);
   assert.match(page, /View technical blueprint/);
   assert.match(page, /Near-term capital deployment/);
+  assert.match(page, /Ignitec proposal 915/);
+  assert.match(page, /Cash required/);
+  assert.match(page, /Not accepted/);
+  assert.match(disclosure, /grossCashRequirement: 3060/);
+  assert.match(disclosure, /correction requested · not accepted/);
   assert.doesNotMatch(page, /late-submission|£200 liability|26A2/i);
   assert.doesNotMatch(disclosure, /personal Start Up Loan|Universal Credit|Klarna|personal credit card/i);
 });
@@ -101,6 +106,7 @@ test("team page explains roles without implying executive authority", () => {
 test("engagement page distinguishes outreach, proposals and non-contracted conversations", () => {
   const page = source("src/components/data-room/DevelopmentConversations.tsx");
   for (const organisation of [
+    "WearNex",
     "University of Manchester Henry Royce Institute",
     "Interactive Wear AG",
     "Ignitec Ltd",
@@ -109,7 +115,13 @@ test("engagement page distinguishes outreach, proposals and non-contracted conve
   ])
     assert.match(page, new RegExp(organisation));
   assert.match(page, /Outline project plan received/);
-  assert.match(page, /Proposal pending/);
+  assert.match(page, /Technical discovery meeting completed/);
+  assert.match(page, /Follow-up scope requested/);
+  assert.match(page, /Spoken, non-binding indications/);
+  assert.match(page, /No quotation, order or development engagement was agreed/);
+  assert.match(page, /Proposal received — correction requested/);
+  assert.match(page, /Decision pending — not accepted/);
+  assert.match(page, /Proposal 915/);
   assert.match(page, /Introductory outreach sent/);
   assert.match(page, /Concluded — no further action/);
   assert.match(page, /On pause — scope under review/);
@@ -118,7 +130,6 @@ test("engagement page distinguishes outreach, proposals and non-contracted conve
   assert.match(page, /bg-amber-50/);
   assert.match(page, /bg-red-50/);
   assert.match(page, /do not represent contracted partnerships unless expressly stated/);
-  assert.doesNotMatch(page, /WearNex/);
 });
 
 test("adviser slide links to the supporting private data-room page", () => {
