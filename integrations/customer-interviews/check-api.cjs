@@ -1,0 +1,26 @@
+// Route contract test with isolated storage/auth adapters; never touches a database.
+const path=require('node:path');
+const assert=require('node:assert/strict');
+const {createRequire}=require('node:module');
+const root='/Users/emmamendez/Documents/Source/KLPS-Core';
+const fromCore=createRequire(path.join(root,'package.json'));
+process.env.TS_NODE_TRANSPILE_ONLY='true';
+process.env.TS_NODE_PROJECT=path.join(root,'tsconfig.json');
+process.env.TS_NODE_COMPILER_OPTIONS=JSON.stringify({module:'Node16',moduleResolution:'Node16'});
+fromCore('ts-node/register');
+const records=new Map();let outage=false;
+function stub(relative,exports){const filename=path.join(root,relative);require.cache[filename]={id:filename,filename,loaded:true,exports};}
+stub('server/src/storage/postgres.client.ts',{pool:{query:async(sql,params)=>{if(outage)throw Error('TEST storage outage');if(sql.startsWith('INSERT')){if(!records.has(params[0]))records.set(params[0],JSON.parse(params[1]));return {rows:[]};}if(sql.startsWith('UPDATE')){if(!records.has(params[0]))return {rows:[]};records.set(params[0],JSON.parse(params[1]));return {rows:[{id:params[0]}]};}if(sql.startsWith('DELETE')){records.delete(params[0]);return {rows:[]};}return {rows:[...records.values()].map(payload=>({payload}))};}}});
+stub('server/src/services/data-room.service.ts',{requireDataRoomAuth:(req,res,next)=>req.headers['x-test-role']?next():res.sendStatus(401),requireAdmin:(req,res,next)=>req.headers['x-test-role']==='founder_admin'?next():res.sendStatus(403)});
+const express=fromCore('express');const app=express();app.use(express.json());app.use('/api/research/interviews',fromCore(path.join(root,'server/src/routes/customer-interviews.routes.ts')).default);
+(async()=>{const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));const url=`http://127.0.0.1:${server.address().port}/api/research/interviews`;
+const request=(method='GET',body,role='founder_admin')=>fetch(url,{method,headers:{'content-type':'application/json',...(role?{'x-test-role':role}:{})},...(body?{body:JSON.stringify(body)}:{})});
+try{assert.equal((await request('GET',null,'')).status,401);assert.equal((await request('GET',null,'investor')).status,403);
+const fields=['source','relationship','segment','status','story','impact','alternative','gap','outcome','frequency','spend','spendBasis','problem','offer','price','priceResponse','objection','commitment','contact','paymentReference','paidAmount','notes'];
+const r=Object.fromEntries(fields.map(k=>[k,'']));Object.assign(r,{id:'10000000-0000-0000-0000-000000000000',createdAt:new Date().toISOString(),version:'klps-discovery-v2',adult:true,consent:true,source:'TEST venue',story:'TEST only',status:'completed',priceResponse:'not tested',commitment:'none',contact:'omit@example.com'});
+const c=['garment','garmentReason','technology','technologyReason','fabric','fabricReason','style','wardrobe','routine','mainConcern','concernOrigin','insightNeed','insightAction','safetyWords','proofNeeded','burden','ageBand','wearContext','priceBasis'];r.concepts={...Object.fromEntries(c.map(k=>[k,''])),tested:true,garment:'gymwear',technology:'embedded',order:['gymwear','none'],techConcerns:['Skin contact / irritation']};
+assert.equal((await request('POST',{...r,consent:false})).status,400);assert.equal((await request('POST',{...r,spend:'-1'})).status,400);assert.equal((await request('POST',{...r,commitment:'paid'})).status,400);assert.equal((await request('POST',{...r,price:'175',priceResponse:'interested at stated price'})).status,400);
+assert.equal((await request('POST',r)).status,201);assert.equal((await request('POST',r)).status,201);assert.equal(records.size,1);const list=await (await request()).json();assert.equal(list.interviews[0].contact,'');assert.equal(list.interviews[0].concepts.garment,'gymwear');assert.equal((await request()).headers.get('cache-control'),'private, no-store');
+assert.equal((await request('PUT',{...r,segment:'TEST segment'})).status,201);assert.equal(records.get(r.id).segment,'TEST segment');outage=true;assert.equal((await request('POST',r)).status,503);outage=false;
+assert.equal((await fetch(`${url}/${r.id}`,{method:'DELETE',headers:{'x-test-role':'founder_admin'}})).status,200);assert.equal(records.size,0);assert.equal((await request('PUT',r)).status,404);console.log('PASS: auth middleware composition, consent, amount and offer validation, idempotent save, concept persistence, contact consent, update, delete and outage handling (isolated adapters).');
+}finally{server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

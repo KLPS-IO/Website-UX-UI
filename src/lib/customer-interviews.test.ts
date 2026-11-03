@@ -1,0 +1,7 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { emptyInterview, evidenceSummary } from './customer-interviews.ts';
+import { emptyConcepts, garmentOptions } from './interview-concepts.ts';
+test('new interviews do not presume underwear or a price and rotate all garment options',()=>{const r=emptyInterview();assert.equal(r.price,'');assert.equal(r.concepts.tested,false);assert.equal(r.concepts.garment,'');assert.deepEqual([...r.concepts.order].sort(),garmentOptions.map(o=>o.id).sort());assert.notDeepEqual(emptyConcepts('00000000-0000-0000-0000-000000000000').order,emptyConcepts('00000001-0000-0000-0000-000000000000').order);});
+test('summary excludes pilots, partials, stated intent and deposits from completed sales',()=>{const rows=[{...emptyInterview(),status:'pilot',problem:'yes'},{...emptyInterview(),status:'partial',problem:'yes'},{...emptyInterview(),problem:'no',commitment:'deposit',priceResponse:'interested at stated price'},{...emptyInterview(),problem:'yes',spend:'0',commitment:'paid',paymentReference:'',paidAmount:'10'},{...emptyInterview(),problem:'yes',spend:'12',commitment:'paid',paymentReference:'test-reference',paidAmount:'10'}];const summary=evidenceSummary(rows);assert.match(summary,/completed 3 discovery/);assert.match(summary,/2\/3 reported a concrete/);assert.match(summary,/1\/3 reported actual spending/);assert.match(summary,/1\/3 have a recorded payment reference/);});
+test('empty evidence does not produce meaningless zero denominators',()=>{assert.doesNotMatch(evidenceSummary([]),/0\/0/);});

@@ -36,6 +36,7 @@ const DataRoom = lazy(() => import("@/pages/DataRoom"));
 const InnovationLab = lazy(() => import("@/pages/InnovationLab"));
 const SlideDeck = lazy(() => import("./components/SlideDeck").then((module) => ({ default: module.SlideDeck })));
 const SlideDeckPdfExport = lazy(() => import("./components/SlideDeckPdfExport").then((module) => ({ default: module.SlideDeckPdfExport })));
+const CustomerInterviews = lazy(() => import("@/pages/CustomerInterviews"));
 const BodyDiscoverySurvey = lazy(() => import("@/pages/BodyDiscoverySurvey"));
 const FinanceRoute = lazy(() => import("@/routes/FinanceRoute"));
 const DataRoomGuidePage = lazy(() => import("@/pages/DataRoomGuide"));
@@ -76,6 +77,7 @@ const App = () => (
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/data-deletion" element={<DataDeletionInstructions />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/founder/customer-interviews" element={<CustomerInterviews />} />
           <Route path="/body-discovery" element={<BodyDiscoverySurvey />} />
           <Route path="/innovation-lab" element={<InnovationLab />} />
           <Route
