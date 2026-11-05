@@ -22,6 +22,7 @@ type DataRoomUser = {
   email: string;
   firstName?: string;
   role?:
+    | "founder_admin"
     | "founder"
     | "admin"
     | "authorised_user"
@@ -1054,12 +1055,12 @@ const DataRoom = () => {
                 Live Customer Discovery - Shaping Product Strategy.
               </h3>
 
-              <Link
+              {user.role === "founder_admin" && <Link
                 to="/founder/customer-interviews"
                 className="mt-4 inline-flex items-center justify-center rounded-full border border-accent/40 bg-accent/10 px-5 py-2.5 text-sm font-medium text-accent transition-colors hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 Open Customer Interviews
-              </Link>
+              </Link>}
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
                 Early customer discovery indicates a strong demand for
