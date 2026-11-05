@@ -1,52 +1,48 @@
 import { useEffect, useRef, useState } from 'react';
 import { authenticatedBlob } from '@/lib/authenticated-api';
-export type AudioTake = { blob: Blob; durationSeconds: number };
-export type SavedAudio = { questionKey: string; contentType: string; durationSeconds: number; bytes: number };
+export type AudioTake = { blob: Blob; durationSeconds: number; captureWarnings?: string[] };
+export type SavedAudio = { questionKey: string; contentType: string; durationSeconds: number; bytes: number; captureWarnings?: string[] };
 const MAX_BYTES = 10 * 1024 * 1024;
-export function InterviewAudio({ questionKey, value, enabled, onChange, onActive, maxSeconds = 180 }: {
-  questionKey: string; value?: AudioTake; enabled: boolean; maxSeconds?: number;
-  onChange: (value?: AudioTake) => void; onActive: (active: boolean) => void;
-}) {
-  const [state, setState] = useState<'idle'|'starting'|'recording'>('idle');
-  const [seconds, setSeconds] = useState(0);
-  const [error, setError] = useState('');
-  const [url, setUrl] = useState('');
-  const recorder = useRef<MediaRecorder>();
-  const stream = useRef<MediaStream>();
-  const timer = useRef<ReturnType<typeof setInterval>>();
-  const alive = useRef(true);
-  const started = useRef(0);
-  const duration = useRef(0);
-  const callback = useRef({onChange, onActive}); callback.current = {onChange, onActive};
-  useEffect(() => { alive.current = true; return () => { alive.current = false; clearInterval(timer.current); if(recorder.current?.state === 'recording') recorder.current.stop(); stream.current?.getTracks().forEach(t=>t.stop()); callback.current.onActive(false); }; }, []);
-  useEffect(() => { if(!value){ setUrl(''); return; } const u=URL.createObjectURL(value.blob); setUrl(u); return ()=>URL.revokeObjectURL(u); }, [value]);
-  function stop() { if(recorder.current?.state === 'recording'){ duration.current=Math.min(maxSeconds,(performance.now()-started.current)/1000); recorder.current.stop(); clearInterval(timer.current); } }
-  async function start() {
-    if(!enabled||state!=='idle')return;
-    setError(''); setState('starting'); callback.current.onActive(true);
-    try {
-      if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined')throw Error('Audio recording is unavailable in this browser. Open this HTTPS page in Safari or Chrome.');
-      const mic=await navigator.mediaDevices.getUserMedia({audio:true});
-      if(!alive.current){mic.getTracks().forEach(t=>t.stop());return;}
-      stream.current=mic;
-      const mime=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));
-      const rec=new MediaRecorder(mic,mime?{mimeType:mime}:undefined); recorder.current=rec;
-      const chunks:Blob[]=[];let bytes=0;let failed=false;
-      rec.ondataavailable=e=>{if(e.data.size){chunks.push(e.data);bytes+=e.data.size;if(bytes>MAX_BYTES){failed=true;setError('Recording exceeded 10 MB. Please record a shorter answer.');stop();}}};
-      rec.onerror=()=>{failed=true;setError('Recording was interrupted. Please try again.');stop();};
-      rec.onstop=()=>{clearInterval(timer.current);mic.getTracks().forEach(t=>t.stop());if(!alive.current)return;setState('idle');callback.current.onActive(false);const blob=new Blob(chunks,{type:rec.mimeType||chunks[0]?.type||mime});if(!failed&&blob.size>0&&blob.size<=MAX_BYTES){callback.current.onChange({blob,durationSeconds:Math.round(duration.current*10)/10});}else if(!failed)setError('No audio was captured. Please try again.');};
-      started.current=performance.now();duration.current=0;setSeconds(0);rec.start(1000);setState('recording');
-      timer.current=setInterval(()=>{const elapsed=(performance.now()-started.current)/1000;setSeconds(Math.floor(elapsed));if(elapsed>=maxSeconds)stop();},250);
-    } catch(e) {stream.current?.getTracks().forEach(t=>t.stop());setState('idle');callback.current.onActive(false);setError(e instanceof Error&&e.name==='NotAllowedError'?'Microphone access was denied. Allow microphone access in browser settings and try again.':e instanceof Error?e.message:'Could not start the microphone.');}
-  }
-  return <div className="rounded-xl border border-purple-200 bg-purple-50 p-4 space-y-3" aria-label={`Audio answer: ${questionKey}`}>
-    <p className="font-medium">{state==='recording'?`● Recording · ${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`:value?'Recorded answer ready to save':'Answer by voice'}</p>
-    <p className="text-sm text-stone-600">{Math.floor(maxSeconds/60)} minute maximum. Ask her permission before recording. Keep this tab open and the phone awake.</p>
-    {url&&<audio controls preload="metadata" src={url} className="w-full"/>}
-    {state==='recording'?<button type="button" className="rounded-full bg-red-700 px-5 py-3 text-white" onClick={stop}>Stop recording</button>:<button type="button" className="rounded-full bg-purple-900 px-5 py-3 text-white disabled:opacity-40" disabled={!enabled||state==='starting'} onClick={()=>void start()}>{state==='starting'?'Opening microphone…':value?'Re-record answer':'Record answer'}</button>}
-    {value&&state==='idle'&&<button type="button" className="ml-3 underline" onClick={()=>callback.current.onChange(undefined)}>Remove unsaved take</button>}
-    {error&&<p role="alert" className="text-sm text-red-800">{error}</p>}
-  </div>;
+export function MicrophoneSetup({enabled,value,onChange}:{enabled:boolean;value:string;onChange:(deviceId:string)=>void}){
+ const [devices,setDevices]=useState<MediaDeviceInfo[]>([]);const [busy,setBusy]=useState(false);const [error,setError]=useState('');
+ async function check(){setBusy(true);setError('');let mic:MediaStream|undefined;try{mic=await navigator.mediaDevices.getUserMedia({audio:true});setDevices((await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind==='audioinput'));}catch{setError('Could not list microphones. Check browser microphone permission and the connection.');}finally{mic?.getTracks().forEach(t=>t.stop());setBusy(false);}}
+ return <div className="rounded-xl border border-purple-200 bg-purple-50 p-4 space-y-3"><h3 className="font-semibold">Microphone check</h3><p className="text-sm">Connect your microphone first, then check the available inputs. Make a short test and listen back before interviewing.</p><button type="button" disabled={!enabled||busy} className="rounded-full border bg-white px-4 py-2 disabled:opacity-40" onClick={()=>void check()}>{busy?'Checking…':'Check available microphones'}</button>{devices.length>0&&<label className="block text-sm font-medium">Recording microphone<select aria-label="Recording microphone" className="mt-2 w-full rounded-xl border bg-white p-3" disabled={!enabled} value={value} onChange={e=>onChange(e.target.value)}><option value="">Browser default microphone</option>{devices.map((d,i)=><option key={d.deviceId||i} value={d.deviceId}>{d.label||`Microphone ${i+1}`}</option>)}</select></label>}{error&&<p role="alert" className="text-sm text-red-800">{error}</p>}</div>;
+}
+export function InterviewAudio({ questionKey, value, enabled, onChange, onActive, maxSeconds = 180, deviceId='' }: {
+ questionKey:string;value?:AudioTake;enabled:boolean;maxSeconds?:number;deviceId?:string;onChange:(value?:AudioTake)=>void;onActive:(active:boolean)=>void;
+}){
+ const [state,setState]=useState<'idle'|'starting'|'recording'>('idle');const [seconds,setSeconds]=useState(0);const [url,setUrl]=useState('');const [error,setError]=useState('');const [warning,setWarning]=useState('');const [input,setInput]=useState('');const [level,setLevel]=useState(0);const [awake,setAwake]=useState(false);
+ const recorder=useRef<MediaRecorder>();const stream=useRef<MediaStream>();const timer=useRef<ReturnType<typeof setInterval>>();const meter=useRef<ReturnType<typeof setInterval>>();const context=useRef<AudioContext>();const wake=useRef<WakeLockSentinel>();const alive=useRef(true);const started=useRef(0);const warnings=useRef<string[]>([]);const callback=useRef({onChange,onActive});callback.current={onChange,onActive};
+ function flag(code:string,message:string){if(!warnings.current.includes(code))warnings.current.push(code);if(alive.current)setWarning(message);}
+ function release(){clearInterval(timer.current);clearInterval(meter.current);stream.current?.getTracks().forEach(t=>{t.onmute=null;t.onunmute=null;t.onended=null;t.stop();});if(context.current){void context.current.close().catch(()=>{});context.current=undefined;}if(wake.current){void wake.current.release().catch(()=>{});wake.current=undefined;}if(alive.current){setAwake(false);setLevel(0);}}
+ async function keepAwake(){try{if(!navigator.wakeLock||document.visibilityState!=='visible'||(wake.current&&!wake.current.released))return;const lock=await navigator.wakeLock.request('screen');if(!alive.current||recorder.current?.state!=='recording'){await lock.release();return;}wake.current=lock;setAwake(true);lock.addEventListener('release',()=>{if(wake.current===lock){wake.current=undefined;if(alive.current)setAwake(false);}});}catch{if(alive.current)setAwake(false);}}
+ function stop(){const rec=recorder.current;if(rec&&rec.state!=='inactive'){clearInterval(timer.current);rec.stop();}}
+ useEffect(()=>{alive.current=true;const visibility=()=>{if(recorder.current?.state!=='recording')return;if(document.visibilityState==='hidden')flag('backgrounded','The page went into the background. Audio may have paused; check the clip before saving.');else void keepAwake();};document.addEventListener('visibilitychange',visibility);return()=>{alive.current=false;document.removeEventListener('visibilitychange',visibility);stop();release();callback.current.onActive(false);};},[]);
+ useEffect(()=>{if(!value){setUrl('');return;}const u=URL.createObjectURL(value.blob);setUrl(u);return()=>URL.revokeObjectURL(u);},[value]);
+ async function start(){
+  if(!enabled||state!=='idle')return;setError('');setWarning('');setInput('');setState('starting');callback.current.onActive(true);warnings.current=[];
+  try{
+   if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined')throw Error('Recording is unavailable in this browser. Open the HTTPS page in Chrome or Safari.');
+   const mic=await navigator.mediaDevices.getUserMedia({audio:{...(deviceId?{deviceId:{exact:deviceId}}:{}),channelCount:{ideal:1}}});
+   if(!alive.current){mic.getTracks().forEach(t=>t.stop());return;}stream.current=mic;setInput(mic.getAudioTracks()[0]?.label||'Browser microphone');
+   const mime=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));const rec=new MediaRecorder(mic,mime?{mimeType:mime}:undefined);recorder.current=rec;const chunks:Blob[]=[];let bytes=0;
+   mic.getAudioTracks().forEach(track=>{track.onmute=()=>flag('microphone_muted','Microphone signal was interrupted. Wait for it to resume and check this part afterwards.');track.onunmute=()=>{if(alive.current)setWarning('Microphone resumed. Check the recording for the interrupted section.');};track.onended=()=>{flag('microphone_ended','Microphone disconnected. The captured part will be kept for preview.');stop();};});
+   rec.ondataavailable=e=>{if(e.data.size){chunks.push(e.data);bytes+=e.data.size;if(bytes>MAX_BYTES){setError('Recording exceeded 10 MB. Please record a shorter answer.');stop();}}};
+   rec.onerror=()=>{flag('recorder_error','The browser interrupted recording. Any captured audio is kept for preview.');stop();};
+   rec.onstop=()=>{const durationSeconds=Math.max(0.1,Math.round(Math.min(maxSeconds,(performance.now()-started.current)/1000)*10)/10);release();if(!alive.current)return;setState('idle');callback.current.onActive(false);const blob=new Blob(chunks,{type:rec.mimeType||chunks[0]?.type||mime});if(blob.size>0&&blob.size<=MAX_BYTES)callback.current.onChange({blob,durationSeconds,captureWarnings:[...warnings.current]});else if(blob.size===0)setError('No audio was captured. Please check the microphone and try again.');};
+   started.current=performance.now();setSeconds(0);rec.start(1000);setState('recording');void keepAwake();timer.current=setInterval(()=>{const elapsed=(performance.now()-started.current)/1000;setSeconds(Math.floor(elapsed));if(elapsed>=maxSeconds)stop();},250);
+   // Optional meter only. A meter failure must never stop the recording.
+   try{const Ctx=window.AudioContext||(window as Window & {webkitAudioContext?:typeof AudioContext}).webkitAudioContext;if(Ctx){const ctx=new Ctx();context.current=ctx;await ctx.resume();if(rec.state!=='recording'){void ctx.close().catch(()=>{});return;}const analyser=ctx.createAnalyser();analyser.fftSize=256;ctx.createMediaStreamSource(mic).connect(analyser);const samples=new Uint8Array(analyser.fftSize);meter.current=setInterval(()=>{analyser.getByteTimeDomainData(samples);let sum=0;for(const sample of samples)sum+=((sample-128)/128)**2;if(alive.current)setLevel(Math.min(100,Math.round(Math.sqrt(sum/samples.length)*400)));},200);}}catch{}
+  }catch(e){release();if(!alive.current)return;setState('idle');callback.current.onActive(false);setError(e instanceof Error&&e.name==='NotAllowedError'?'Microphone access was denied. Allow it in browser settings and try again.':e instanceof Error&&e.name==='OverconstrainedError'?'The selected microphone is unavailable. Reconnect it or choose the browser default.':e instanceof Error?e.message:'Could not start the microphone.');}
+ }
+ return <div className="rounded-xl border border-purple-200 bg-purple-50 p-4 space-y-3" aria-label={`Audio answer: ${questionKey}`}>
+  <p className="font-medium">{state==='recording'?`● Recording · ${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`:value?'Recorded answer ready to save':'Answer by voice'}</p><p className="text-sm text-stone-600">{Math.floor(maxSeconds/60)} minute maximum. Keep this page visible while recording.</p>
+  {state==='recording'&&<><p className="text-xs">Input: {input}. {awake?'Screen kept awake.':'Keep the screen awake and avoid switching apps.'}</p><div role="meter" aria-label="Microphone input level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={level} className="h-3 overflow-hidden rounded-full bg-purple-200"><div className="h-full bg-purple-800 transition-[width]" style={{width:`${level}%`}}/></div><p className="text-xs">Speak briefly and check that the level moves.</p></>}
+  {url&&<audio src={url} controls className="w-full"/>}
+  {state==='recording'?<button type="button" className="rounded-full bg-red-700 px-5 py-3 text-white" onClick={stop}>Stop recording</button>:<button type="button" className="rounded-full bg-purple-900 px-5 py-3 text-white disabled:opacity-40" disabled={!enabled||state==='starting'} onClick={()=>void start()}>{state==='starting'?'Opening microphone…':value?'Re-record answer':'Record answer'}</button>}
+  {value&&state==='idle'&&<button type="button" className="ml-3 underline" onClick={()=>callback.current.onChange(undefined)}>Remove unsaved take</button>}
+  {(warning||Boolean(value?.captureWarnings?.length))&&<p role="status" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{warning||'An interruption was detected in this take. Listen back before saving it.'}</p>}{error&&<p role="alert" className="text-sm text-red-800">{error}</p>}
+ </div>;
 }
 export function SavedInterviewAudio({id,audio,transcriptId,autoLoad=false,label}:{id:string;audio:SavedAudio;transcriptId?:string;autoLoad?:boolean;label?:string}) {
  const [url,setUrl]=useState('');const [error,setError]=useState('');const [loading,setLoading]=useState(false);const [speed,setSpeed]=useState('1');const player=useRef<HTMLAudioElement>(null);
@@ -56,5 +52,5 @@ export function SavedInterviewAudio({id,audio,transcriptId,autoLoad=false,label}
  async function load(){setLoading(true);setError('');try{const blob=await authenticatedBlob(path);setUrl(URL.createObjectURL(blob));}catch(e){setError(e&&typeof e==='object'&&'status' in e&&e.status===409?'This recording changed. Refresh the interview before reviewing this transcript.':'Could not load private recording. Sign in again or retry.');}finally{setLoading(false);}}
  useEffect(()=>{if(!autoLoad)return;let cancelled=false;let objectUrl='';setUrl('');setLoading(true);setError('');authenticatedBlob(path).then(blob=>{if(cancelled)return;objectUrl=URL.createObjectURL(blob);setUrl(objectUrl);}).catch(e=>{if(!cancelled)setError(e&&typeof e==='object'&&'status' in e&&e.status===409?'This recording changed. Refresh the interview before reviewing this transcript.':'Could not load the matching audio. Please retry.');}).finally(()=>{if(!cancelled)setLoading(false);});return()=>{cancelled=true;if(objectUrl)URL.revokeObjectURL(objectUrl);};},[path,autoLoad]);
  const rounded=Math.round(audio.durationSeconds);const duration=`${Math.floor(rounded/60)}:${String(rounded%60).padStart(2,'0')}`;
- return <div className="min-w-0 rounded-xl border border-purple-200 bg-purple-50/60 p-3 space-y-3"><p className="font-medium">{label||audio.questionKey} · {duration}</p>{url?<><audio ref={player} aria-label={label||`Recording ${audio.questionKey}`} controls preload="metadata" src={url} className="w-full min-w-0"/><div className="flex flex-wrap items-center gap-3 text-sm"><button type="button" className="rounded-full border border-purple-200 bg-white px-3 py-2" onClick={()=>{if(player.current)player.current.currentTime=Math.max(0,player.current.currentTime-5);}}>Back 5 seconds</button><label>Speed <select aria-label={`Playback speed for ${audio.questionKey}`} className="ml-1 rounded-lg border border-purple-200 bg-white px-2 py-2" value={speed} onChange={e=>setSpeed(e.target.value)}>{['0.75','1','1.25','1.5'].map(value=><option value={value} key={value}>{value}×</option>)}</select></label></div></>:<button type="button" disabled={loading} className="underline" onClick={()=>void load()}>{loading?'Loading matching audio…':transcriptId?'Load matching audio':'Load private recording'}</button>}{url&&<a href={url} download={`${id}-${audio.questionKey}.${audio.contentType.includes('mp4')?'m4a':audio.contentType.includes('ogg')?'ogg':'webm'}`} className="inline-block text-sm underline">Download this audio</a>}{error&&<p role="alert" className="text-sm text-red-800">{error}</p>}</div>;
+ return <div className="min-w-0 rounded-xl border border-purple-200 bg-purple-50/60 p-3 space-y-3"><p className="font-medium">{label||audio.questionKey} · {duration}</p>{Boolean(audio.captureWarnings?.length)&&<p className="rounded-lg bg-amber-50 p-2 text-xs text-amber-900">The browser reported an interruption during this take. Check for gaps before using the transcript.</p>}{url?<><audio ref={player} aria-label={label||`Recording ${audio.questionKey}`} controls preload="metadata" src={url} className="w-full min-w-0"/><div className="flex flex-wrap items-center gap-3 text-sm"><button type="button" className="rounded-full border border-purple-200 bg-white px-3 py-2" onClick={()=>{if(player.current)player.current.currentTime=Math.max(0,player.current.currentTime-5);}}>Back 5 seconds</button><label>Speed <select aria-label={`Playback speed for ${audio.questionKey}`} className="ml-1 rounded-lg border border-purple-200 bg-white px-2 py-2" value={speed} onChange={e=>setSpeed(e.target.value)}>{['0.75','1','1.25','1.5'].map(value=><option value={value} key={value}>{value}×</option>)}</select></label></div></>:<button type="button" disabled={loading} className="underline" onClick={()=>void load()}>{loading?'Loading matching audio…':transcriptId?'Load matching audio':'Load private recording'}</button>}{url&&<a href={url} download={`${id}-${audio.questionKey}.${audio.contentType.includes('mp4')?'m4a':audio.contentType.includes('ogg')?'ogg':'webm'}`} className="inline-block text-sm underline">Download this audio</a>}{error&&<p role="alert" className="text-sm text-red-800">{error}</p>}</div>;
 }
