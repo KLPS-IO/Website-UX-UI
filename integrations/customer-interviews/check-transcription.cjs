@@ -8,7 +8,7 @@ stub('server/src/storage/postgres.client.ts',{pool:{query:async(sql,args=[])=>{
  if(sql==='SELECT payload FROM research_field_interviews WHERE id=$1')return {rows:args[0]===interview?[{payload:record}]:[]};
  if(sql.startsWith('SELECT * FROM research_field_transcripts'))return {rows:[...jobs.values()]};
  if(sql.includes('INSERT INTO research_field_transcripts')){if(!jobs.size)jobs.set('f0000000-0000-0000-0000-000000000000',{id:'f0000000-0000-0000-0000-000000000000',interview_id:args[0],question_key:args[1],audio_object_key:args[2],status:'queued',revision:0,original_text:null,edited_text:null});return {rows:[]};}
- if(sql.includes('UPDATE research_field_transcripts t SET')){const row=jobs.get(args[0]);if(!row||row.revision!==args[4]||!['draft','approved'].includes(row.status))return {rows:[]};row.edited_text=args[2];row.status=args[3];row.revision++;return {rows:[row]};}
+ if(sql.includes('UPDATE research_field_transcripts t SET')){const row=jobs.get(args[0]);if(!row||row.revision!==args[4]||!['draft','approved'].includes(row.status))return {rows:[]};const same=row.edited_text===args[2];row.speaker_spans=args[5]!==null&&args[5]!==undefined?JSON.parse(args[5]):same?(row.speaker_spans||[]):[];row.speakers_reviewed=args[6]!==null&&args[6]!==undefined?args[6]:same?Boolean(row.speakers_reviewed):false;row.edited_text=args[2];row.status=args[3];row.revision++;return {rows:[row]};}
  return {rows:[]};
 }}});
 stub('server/src/services/data-room.service.ts',{requireDataRoomAuth:(req,res,next)=>req.headers['x-test-role']?next():res.sendStatus(401),requireAdmin:(req,res,next)=>req.headers['x-test-role']==='founder_admin'?next():res.sendStatus(403)});
@@ -29,7 +29,13 @@ stub('server/src/services/r2.service.ts',{readFromR2:async()=>({body:Buffer.from
   const job=[...jobs.values()][0];job.status='draft';job.original_text='Original unedited words.';job.edited_text=job.original_text;
   assert.equal((await request('PATCH',{text:'Corrected words.',approve:true,revision:0},'founder_admin','/'+job.id)).status,200);assert.equal(job.status,'approved');assert.equal(job.original_text,'Original unedited words.');
   assert.equal((await request('PATCH',{text:'Old edits.',approve:false,revision:0},'founder_admin','/'+job.id)).status,409);assert.equal(job.edited_text,'Corrected words.');
-  assert.equal((await request('PATCH',{text:'Later edits.',approve:false,revision:1},'founder_admin','/'+job.id)).status,200);assert.equal(job.status,'draft');record.audio=[];assert.equal((await(await request()).json()).transcripts.length,0);
+  assert.equal((await request('PATCH',{text:'Later edits.',approve:false,revision:1},'founder_admin','/'+job.id)).status,200);assert.equal(job.status,'draft');
+  const labelled='Emma question. Participant answer.';const split=labelled.indexOf('Participant');const spans=[{start:0,end:split,role:'emma'},{start:split,end:labelled.length,role:'participant'}];
+  assert.equal((await request('PATCH',{text:labelled,approve:true,revision:job.revision,speakerSpans:[{start:0,end:999,role:'emma'}],speakersReviewed:true},'founder_admin','/'+job.id)).status,400);
+  assert.equal((await request('PATCH',{text:labelled,approve:true,revision:job.revision,speakerSpans:[spans[0]],speakersReviewed:true},'founder_admin','/'+job.id)).status,400);
+  const reviewed=await(await request('PATCH',{text:labelled,approve:true,revision:job.revision,speakerSpans:spans,speakersReviewed:true},'founder_admin','/'+job.id)).json();assert.equal(reviewed.transcript.participant_text,'Participant answer.');assert.equal(reviewed.transcript.participant_analysis_ready,true);assert.equal(job.original_text,'Original unedited words.');
+  const oldClient=await(await request('PATCH',{text:'Changed wording.',approve:true,revision:job.revision},'founder_admin','/'+job.id)).json();assert.equal(oldClient.transcript.participant_text,null);assert.equal(oldClient.transcript.speakers_reviewed,false);
+  record.audio=[];assert.equal((await(await request()).json()).transcripts.length,0);
   console.log('PASS: SDK request/model, no implicit provider retries, sanitized errors, founder-only routes, missing-key handling, queue deduplication, private source references, immutable original, explicit approval, revision conflicts and stale audio filtering. No real audio or API key used.');
  }finally{server.close();delete process.env.OPENAI_API_KEY;}
 })().catch(e=>{console.error(e);process.exitCode=1;});
