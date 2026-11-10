@@ -1,3 +1,4 @@
+import { discoverySource } from '@/lib/discovery-followup';
 import { useState, useRef } from "react";
 import { API_BASE } from "@/config/api";
 import { type ConcernsMap } from "@/components/survey/BodyMap";
@@ -389,6 +390,7 @@ function BodyDiscoverySurvey() {
       formData.append(
         "payload",
         JSON.stringify({
+          discoverySource: discoverySource(window.location.search) || undefined,
           bodyType,
           bodyShape,
           otherBodyType: bodyShape || null,

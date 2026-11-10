@@ -33,5 +33,11 @@ const listAudio=await(await request()).json();assert.equal(listAudio.interviews[
 const audioURL=`${url}/${spoken.id}/audio/story`;assert.equal((await fetch(audioURL)).status,401);assert.equal((await fetch(audioURL,{headers:{'x-test-role':'founder_admin'}})).status,200);assert.equal((await fetch(audioURL+'?transcriptId=30000000-0000-0000-0000-000000000000',{headers:{'x-test-role':'founder_admin'}})).status,200);assert.equal((await fetch(audioURL+'?transcriptId=40000000-0000-0000-0000-000000000000',{headers:{'x-test-role':'founder_admin'}})).status,409);assert.equal((await fetch(audioURL+'?transcriptId=invalid',{headers:{'x-test-role':'founder_admin'}})).status,400);
 assert.equal((await multipart(spoken)).status,200);assert.equal(objects.size,1);
 await fetch(`${url}/${spoken.id}`,{method:'DELETE',headers:{'x-test-role':'founder_admin'}});assert.equal(objects.size,0);assert.equal(records.size,0);
+const reflectionRecord={...spoken,id:'50000000-0000-0000-0000-000000000000',version:'klps-discovery-v4',status:'pilot',newAudio:[{questionKey:'reflection',durationSeconds:2}]};
+const reflectionForm=()=>{const f=new FormData();f.append('payload',JSON.stringify(reflectionRecord));f.append('reflection',new Blob([Buffer.from([0x1a,0x45,0xdf,0xa3,1,2,3,4])],{type:'audio/webm'}),'reflection.webm');return f;};
+assert.equal((await fetch(url,{method:'POST',headers:{'x-test-role':'founder_admin'},body:reflectionForm()})).status,201);
+assert.equal(records.get(reflectionRecord.id).audio[0].questionKey,'reflection');
+assert.equal((await fetch(`${url}/${reflectionRecord.id}/audio/reflection`,{headers:{'x-test-role':'founder_admin'}})).status,200);
+reflectionRecord.status='completed';assert.equal((await fetch(url,{method:'PUT',headers:{'x-test-role':'founder_admin'},body:reflectionForm()})).status,400);
 console.log('PASS: auth middleware composition, consent, amount and offer validation, idempotent save, concept persistence, contact consent, update, delete, multipart audio, audio consent, private playback, audio deletion and outage handling (isolated adapters).');
 }finally{server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
