@@ -8,9 +8,9 @@ test('public discovery links carry only a bounded campaign label', () => {
   assert.equal(discoverySource('?discovery='+ 'a'.repeat(49)), '');
   assert.equal(discoveryPath('/body-discovery', 'cafe'), '/body-discovery?discovery=cafe');
 });
-test('cafe practice starts as a pilot with an open offer and preserves earlier scripts', () => {
+test('live discovery starts as completed with an open offer and preserves earlier scripts', () => {
   const record = emptyInterview();
-  assert.equal(record.status, 'pilot');
+  assert.equal(record.status, 'completed');
   assert.equal(record.offer, '');
   assert.equal(record.version, INTERVIEW_VERSION);
   assert.match(questionsForVersion(record.version)[0][2], /last time you bought/);
