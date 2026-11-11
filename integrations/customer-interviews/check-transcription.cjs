@@ -26,9 +26,9 @@ stub('server/src/services/r2.service.ts',{readFromR2:async()=>({body:Buffer.from
   delete process.env.OPENAI_API_KEY;assert.equal((await request('GET',null,'')).status,401);assert.equal((await request('GET',null,'investor')).status,403);assert.equal((await request('POST',{})).status,503);
   process.env.OPENAI_API_KEY='test-only';assert.equal((await request('POST',{})).status,202);assert.equal((await request('POST',{})).status,202);assert.equal(jobs.size,1);assert.equal(wakeups,2);
   const listing=await(await request()).json();assert.equal(listing.transcripts[0].audio_object_key,undefined);
-  const reflection={...listing.transcripts[0],id:'d0000000-0000-0000-0000-000000000000',question_key:'reflection',audio_object_key:'private/test/reflection',status:'approved',edited_text:'Founder hypothesis.',speaker_spans:[{start:0,end:19,role:'participant'}],speakers_reviewed:true};
-  record.audio.push({questionKey:'reflection',objectKey:'private/test/reflection'});jobs.set(reflection.id,reflection);
-  const withReflection=await(await request()).json();const founder=withReflection.transcripts.find(t=>t.question_key==='reflection');
+  const reflection={...listing.transcripts[0],id:'d0000000-0000-0000-0000-000000000000',question_key:'reflection__11111111-1111-4111-8111-111111111111',audio_object_key:'private/test/reflection',status:'approved',edited_text:'Founder hypothesis.',speaker_spans:[{start:0,end:19,role:'participant'}],speakers_reviewed:true};
+  record.audio.push({questionKey:'reflection__11111111-1111-4111-8111-111111111111',objectKey:'private/test/reflection'});jobs.set(reflection.id,reflection);
+  const withReflection=await(await request()).json();const founder=withReflection.transcripts.find(t=>t.question_key.startsWith('reflection'));
   assert.equal(founder.evidence_kind,'founder_reflection');assert.equal(founder.participant_analysis_ready,false);assert.equal(founder.participant_text,null);assert.deepEqual(founder.participant_passages,[]);
   jobs.delete(reflection.id);record.audio.pop();
   const job=[...jobs.values()][0];job.status='draft';job.original_text='Original unedited words.';job.edited_text=job.original_text;

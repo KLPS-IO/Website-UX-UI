@@ -10,7 +10,8 @@ process.env.TS_NODE_COMPILER_OPTIONS=JSON.stringify({module:'Node16',moduleResol
 fromCore('ts-node/register');
 const records=new Map();let outage=false;
 function stub(relative,exports){const filename=path.join(root,relative);require.cache[filename]={id:filename,filename,loaded:true,exports};}
-stub('server/src/storage/postgres.client.ts',{pool:{query:async(sql,params)=>{if(outage)throw Error('TEST storage outage');if(sql.startsWith('SELECT id FROM research_field_transcripts'))return {rows:params[0]==='30000000-0000-0000-0000-000000000000'&&records.get(params[1])?.audio?.some(a=>a.questionKey===params[2]&&a.objectKey===params[3])?[{id:params[0]}]:[]};if(sql.startsWith('SELECT')&&params)return {rows:records.has(params[0])?[{payload:records.get(params[0])}]:[]};if(sql.startsWith('INSERT')){if(!records.has(params[0]))records.set(params[0],JSON.parse(params[1]));return {rows:[]};}if(sql.startsWith('UPDATE')){if(!records.has(params[0]))return {rows:[]};records.set(params[0],JSON.parse(params[1]));return {rows:[{id:params[0]}]};}if(sql.startsWith('DELETE')){records.delete(params[0]);return {rows:[]};}return {rows:[...records.values()].map(payload=>({payload}))};}}});
+const query=async(sql,params)=>{if(['BEGIN','COMMIT','ROLLBACK'].includes(sql)||sql.includes('pg_advisory_xact_lock'))return {rows:[]};if(outage)throw Error('TEST storage outage');if(sql.startsWith('SELECT id FROM research_field_transcripts'))return {rows:params[0]==='30000000-0000-0000-0000-000000000000'&&records.get(params[1])?.audio?.some(a=>a.questionKey===params[2]&&a.objectKey===params[3])?[{id:params[0]}]:[]};if(sql.startsWith('SELECT')&&params)return {rows:records.has(params[0])?[{payload:records.get(params[0])}]:[]};if(sql.startsWith('INSERT')){if(!records.has(params[0]))records.set(params[0],JSON.parse(params[1]));return {rows:[]};}if(sql.startsWith('UPDATE')){if(!records.has(params[0]))return {rows:[]};records.set(params[0],JSON.parse(params[1]));return {rows:[{id:params[0]}]};}if(sql.startsWith('DELETE')){records.delete(params[0]);return {rows:[]};}return {rows:[...records.values()].map(payload=>({payload}))};};
+stub('server/src/storage/postgres.client.ts',{pool:{query,connect:async()=>({query,release(){}})}});
 stub('server/src/services/data-room.service.ts',{requireDataRoomAuth:(req,res,next)=>req.headers['x-test-role']?next():res.sendStatus(401),requireAdmin:(req,res,next)=>req.headers['x-test-role']==='founder_admin'?next():res.sendStatus(403)});
 const objects=new Map();stub('server/src/services/r2.service.ts',{uploadToR2:async(key,buffer,contentType)=>{objects.set(key,{body:buffer,contentType});},readFromR2:async(key)=>{if(!objects.has(key))throw Error('not found');return objects.get(key);},deleteFromR2:async(key)=>{objects.delete(key);}});
 const express=fromCore('express');const app=express();app.use(express.json());app.use('/api/research/interviews',fromCore(path.join(root,'server/src/routes/customer-interviews.routes.ts')).default);
@@ -39,5 +40,17 @@ assert.equal((await fetch(url,{method:'POST',headers:{'x-test-role':'founder_adm
 assert.equal(records.get(reflectionRecord.id).audio[0].questionKey,'reflection');
 assert.equal((await fetch(`${url}/${reflectionRecord.id}/audio/reflection`,{headers:{'x-test-role':'founder_admin'}})).status,200);
 reflectionRecord.status='completed';assert.equal((await fetch(url,{method:'PUT',headers:{'x-test-role':'founder_admin'},body:reflectionForm()})).status,400);
+const appendBase={...spoken,id:'60000000-0000-0000-0000-000000000000',status:'partial',version:'klps-discovery-v5'};
+const appendClip=async(key,overrides={})=>{const payload={...appendBase,...overrides,newAudio:[{questionKey:key,durationSeconds:1200}]};const f=new FormData();f.append('payload',JSON.stringify(payload));f.append(key,new Blob([Buffer.from([0x1a,0x45,0xdf,0xa3,1,2,3,4])],{type:'audio/webm'}),'clip.webm');return fetch(`${url}/${appendBase.id}/clips`,{method:'POST',headers:{'x-test-role':'founder_admin'},body:f});};
+const one='story__11111111-1111-4111-8111-111111111111',two='story__22222222-2222-4222-8222-222222222222';
+assert.equal((await appendClip(one)).status,201);assert.equal((await appendClip(two)).status,201);
+assert.equal(records.get(appendBase.id).audio.length,2);assert.equal(records.get(appendBase.id).status,'partial');
+const count=objects.size;assert.equal((await appendClip(one)).status,200);assert.equal(objects.size,count);assert.equal(records.get(appendBase.id).audio.length,2);
+assert.equal((await appendClip(two,{audioConsent:false})).status,400);
+assert.equal((await fetch(`${url}/${appendBase.id}/audio/${one}`,{headers:{'x-test-role':'founder_admin'}})).status,200);
+assert.equal((await request('PUT',{...appendBase,status:'completed',newAudio:[],segment:'review segment'})).status,201);
+assert.equal(records.get(appendBase.id).status,'completed');assert.equal(records.get(appendBase.id).audio.length,2);
+const three='story__33333333-3333-4333-8333-333333333333';assert.equal((await appendClip(three)).status,201);assert.equal(records.get(appendBase.id).segment,'review segment');assert.equal(records.get(appendBase.id).status,'completed');assert.equal(records.get(appendBase.id).audio.length,3);
+
 console.log('PASS: auth middleware composition, consent, amount and offer validation, idempotent save, concept persistence, contact consent, update, delete, multipart audio, audio consent, private playback, audio deletion and outage handling (isolated adapters).');
 }finally{server.close();}})().catch(e=>{console.error(e);process.exitCode=1;});

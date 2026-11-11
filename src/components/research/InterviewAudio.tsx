@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { authenticatedBlob } from '@/lib/authenticated-api';
-export type AudioTake = { blob: Blob; durationSeconds: number; captureWarnings?: string[] };
+export type AudioTake = { clipKey?: string; blob: Blob; durationSeconds: number; captureWarnings?: string[] };
 export type SavedAudio = { questionKey: string; contentType: string; durationSeconds: number; bytes: number; captureWarnings?: string[] };
-const MAX_BYTES = 10 * 1024 * 1024;
 export function MicrophoneSetup({enabled,value,onChange,onAvailability}:{enabled:boolean;value:string;onChange:(deviceId:string)=>void;onAvailability?:(available:boolean)=>void}){
  const [devices,setDevices]=useState<MediaDeviceInfo[]>([]);const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [checked,setChecked]=useState(false);const [verified,setVerified]=useState('');const [missing,setMissing]=useState(false);
  const mounted=useRef(true);const selected=useRef(value);selected.current=value;const availability=useRef(onAvailability);availability.current=onAvailability;
@@ -21,40 +20,159 @@ export function MicrophoneSetup({enabled,value,onChange,onAvailability}:{enabled
  {!checked&&<p className="text-xs text-stone-600">Select Check available microphones to request microphone permission and reveal device names.</p>}
  <details className="text-sm"><summary className="cursor-pointer underline">Jieli Technology USB Composite Device is not listed?</summary><p className="mt-2">Only audio inputs exposed by Chrome can appear here. A USB connection prompt alone does not confirm that its microphone is available to the website. Check the receiver connection, allow this site’s microphone permission, then refresh the list. Chrome may expose it under a different audio name or through the browser default input; use Test selected input to check the reported input name.</p></details>{error&&<p role="alert" className="text-sm text-red-800">{error}</p>}</section>;
 }
-export function InterviewAudio({ questionKey, value, enabled, onChange, onActive, maxSeconds = 180, deviceId='' }: {
- questionKey:string;value?:AudioTake;enabled:boolean;maxSeconds?:number;deviceId?:string;onChange:(value?:AudioTake)=>void;onActive:(active:boolean)=>void;
-}){
- const [state,setState]=useState<'idle'|'starting'|'recording'>('idle');const [seconds,setSeconds]=useState(0);const [url,setUrl]=useState('');const [error,setError]=useState('');const [warning,setWarning]=useState('');const [input,setInput]=useState('');const [level,setLevel]=useState(0);const [awake,setAwake]=useState(false);
- const recorder=useRef<MediaRecorder>();const stream=useRef<MediaStream>();const timer=useRef<ReturnType<typeof setInterval>>();const meter=useRef<ReturnType<typeof setInterval>>();const context=useRef<AudioContext>();const wake=useRef<WakeLockSentinel>();const alive=useRef(true);const started=useRef(0);const warnings=useRef<string[]>([]);const callback=useRef({onChange,onActive});callback.current={onChange,onActive};
- function flag(code:string,message:string){if(!warnings.current.includes(code))warnings.current.push(code);if(alive.current)setWarning(message);}
- function release(){clearInterval(timer.current);clearInterval(meter.current);stream.current?.getTracks().forEach(t=>{t.onmute=null;t.onunmute=null;t.onended=null;t.stop();});if(context.current){void context.current.close().catch(()=>{});context.current=undefined;}if(wake.current){void wake.current.release().catch(()=>{});wake.current=undefined;}if(alive.current){setAwake(false);setLevel(0);}}
- async function keepAwake(){try{if(!navigator.wakeLock||document.visibilityState!=='visible'||(wake.current&&!wake.current.released))return;const lock=await navigator.wakeLock.request('screen');if(!alive.current||recorder.current?.state!=='recording'){await lock.release();return;}wake.current=lock;setAwake(true);lock.addEventListener('release',()=>{if(wake.current===lock){wake.current=undefined;if(alive.current)setAwake(false);}});}catch{if(alive.current)setAwake(false);}}
- function stop(){const rec=recorder.current;if(rec&&rec.state!=='inactive'){clearInterval(timer.current);rec.stop();}}
- useEffect(()=>{alive.current=true;const visibility=()=>{if(recorder.current?.state!=='recording')return;if(document.visibilityState==='hidden')flag('backgrounded','The page went into the background. Audio may have paused; check the clip before saving.');else void keepAwake();};document.addEventListener('visibilitychange',visibility);return()=>{alive.current=false;document.removeEventListener('visibilitychange',visibility);stop();release();callback.current.onActive(false);};},[]);
- useEffect(()=>{if(!value){setUrl('');return;}const u=URL.createObjectURL(value.blob);setUrl(u);return()=>URL.revokeObjectURL(u);},[value]);
- async function start(){
-  if(!enabled||state!=='idle')return;setError('');setWarning('');setInput('');setState('starting');callback.current.onActive(true);warnings.current=[];
-  try{
-   if(!navigator.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined')throw Error('Recording is unavailable in this browser. Open the HTTPS page in Chrome or Safari.');
-   const mic=await navigator.mediaDevices.getUserMedia({audio:{...(deviceId?{deviceId:{exact:deviceId}}:{}),channelCount:{ideal:1}}});
-   if(!alive.current){mic.getTracks().forEach(t=>t.stop());return;}stream.current=mic;const track=mic.getAudioTracks()[0];const actual=track?.getSettings().deviceId;if(deviceId&&!['default','communications'].includes(deviceId)&&actual&&actual!==deviceId)throw Error('Chrome did not open the selected microphone. Check the input before recording.');setInput(track?.label||'Browser microphone');
-   const mime=['audio/webm;codecs=opus','audio/mp4','audio/webm','audio/ogg;codecs=opus'].find(t=>MediaRecorder.isTypeSupported(t));const rec=new MediaRecorder(mic,mime?{mimeType:mime}:undefined);recorder.current=rec;const chunks:Blob[]=[];let bytes=0;
-   mic.getAudioTracks().forEach(track=>{track.onmute=()=>flag('microphone_muted','Microphone signal was interrupted. Wait for it to resume and check this part afterwards.');track.onunmute=()=>{if(alive.current)setWarning('Microphone resumed. Check the recording for the interrupted section.');};track.onended=()=>{flag('microphone_ended','Microphone disconnected. The captured part will be kept for preview.');stop();};});
-   rec.ondataavailable=e=>{if(e.data.size){chunks.push(e.data);bytes+=e.data.size;if(bytes>MAX_BYTES){setError('Recording exceeded 10 MB. Please record a shorter answer.');stop();}}};
-   rec.onerror=()=>{flag('recorder_error','The browser interrupted recording. Any captured audio is kept for preview.');stop();};
-   rec.onstop=()=>{const durationSeconds=Math.max(0.1,Math.round(Math.min(maxSeconds,(performance.now()-started.current)/1000)*10)/10);release();if(!alive.current)return;setState('idle');callback.current.onActive(false);const blob=new Blob(chunks,{type:rec.mimeType||chunks[0]?.type||mime});if(blob.size>0&&blob.size<=MAX_BYTES)callback.current.onChange({blob,durationSeconds,captureWarnings:[...warnings.current]});else if(blob.size===0)setError('No audio was captured. Please check the microphone and try again.');};
-   started.current=performance.now();setSeconds(0);rec.start(1000);setState('recording');void keepAwake();timer.current=setInterval(()=>{const elapsed=(performance.now()-started.current)/1000;setSeconds(Math.floor(elapsed));if(elapsed>=maxSeconds)stop();},250);
-   // Optional meter only. A meter failure must never stop the recording.
-   try{const Ctx=window.AudioContext||(window as Window & {webkitAudioContext?:typeof AudioContext}).webkitAudioContext;if(Ctx){const ctx=new Ctx();context.current=ctx;await ctx.resume();if(rec.state!=='recording'){void ctx.close().catch(()=>{});return;}const analyser=ctx.createAnalyser();analyser.fftSize=256;ctx.createMediaStreamSource(mic).connect(analyser);const samples=new Uint8Array(analyser.fftSize);meter.current=setInterval(()=>{analyser.getByteTimeDomainData(samples);let sum=0;for(const sample of samples)sum+=((sample-128)/128)**2;if(alive.current)setLevel(Math.min(100,Math.round(Math.sqrt(sum/samples.length)*400)));},200);}}catch{}
-  }catch(e){release();if(!alive.current)return;setState('idle');callback.current.onActive(false);setError(e instanceof Error&&e.name==='NotAllowedError'?'Microphone access was denied. Allow it in browser settings and try again.':e instanceof Error&&e.name==='OverconstrainedError'?'The selected microphone is unavailable. Reconnect it or choose the browser default.':e instanceof Error?e.message:'Could not start the microphone.');}
- }
- return <div className="rounded-xl border border-purple-200 bg-purple-50 p-4 space-y-3" aria-label={`Audio answer: ${questionKey}`}>
-  <p className="font-medium">{state==='recording'?`● Recording · ${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')}`:value?'Recorded answer ready to save':'Answer by voice'}</p><p className="text-sm text-stone-600">{Math.floor(maxSeconds/60)} minute maximum. Keep this page visible while recording.</p>
-  {state==='recording'&&<><p className="text-xs">Input: {input}. {awake?'Screen kept awake.':'Keep the screen awake and avoid switching apps.'}</p><div role="meter" aria-label="Microphone input level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={level} className="h-3 overflow-hidden rounded-full bg-purple-200"><div className="h-full bg-purple-800 transition-[width]" style={{width:`${level}%`}}/></div><p className="text-xs">Speak briefly and check that the level moves.</p></>}
-  {url&&<audio src={url} controls className="w-full"/>}
-  {state==='recording'?<button type="button" className="rounded-full bg-red-700 px-5 py-3 text-white" onClick={stop}>Stop recording</button>:<button type="button" className="rounded-full bg-purple-900 px-5 py-3 text-white disabled:opacity-40" disabled={!enabled||state==='starting'} onClick={()=>void start()}>{state==='starting'?'Opening microphone…':value?'Re-record answer':'Record answer'}</button>}
-  {value&&state==='idle'&&<button type="button" className="ml-3 underline" onClick={()=>callback.current.onChange(undefined)}>Remove unsaved take</button>}
-  {(warning||Boolean(value?.captureWarnings?.length))&&<p role="status" className="rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{warning||'An interruption was detected in this take. Listen back before saving it.'}</p>}{error&&<p role="alert" className="text-sm text-red-800">{error}</p>}
+export function InterviewAudio({ questionKey, enabled, onChange, onActive, onCheckpoint, deviceId = '' }: {
+    questionKey: string;
+    enabled: boolean;
+    deviceId?: string;
+    onChange: (value: AudioTake) => void;
+    onCheckpoint?: (value: AudioTake) => Promise<unknown>;
+    onActive: (active: boolean) => void;
+}) {
+    const [state, setState] = useState<'idle' | 'starting' | 'recording' | 'paused'>('idle');
+    const [seconds, setSeconds] = useState(0);
+    const [error, setError] = useState('');
+    const [warning, setWarning] = useState('');
+    const [input, setInput] = useState('');
+    const [level, setLevel] = useState(0);
+    const recorder = useRef<MediaRecorder>();
+    const stream = useRef<MediaStream>();
+    const timer = useRef<ReturnType<typeof setInterval>>();
+    const meter = useRef<ReturnType<typeof setInterval>>();
+    const context = useRef<AudioContext>();
+    const wake = useRef<WakeLockSentinel>();
+    const alive = useRef(true);
+    const elapsed = useRef(0);
+    const started = useRef(0);
+    const warnings = useRef<string[]>([]);
+    const callback = useRef({ onChange, onActive, onCheckpoint });
+    callback.current = { onChange, onActive, onCheckpoint };
+    const rotating = useRef(false);
+    function duration() { return elapsed.current + (recorder.current?.state === 'recording' ? performance.now() - started.current : 0); }
+    function release() { clearInterval(timer.current); clearInterval(meter.current); stream.current?.getTracks().forEach(track => { track.onmute = null; track.onended = null; track.stop(); }); if (context.current) {
+        void context.current.close().catch(() => { });
+        context.current = undefined;
+    } if (wake.current) {
+        void wake.current.release().catch(() => { });
+        wake.current = undefined;
+    } setLevel(0); }
+    async function keepAwake() { try {
+        if (!navigator.wakeLock || document.visibilityState !== 'visible' || (wake.current && !wake.current.released))
+            return;
+        const lock = await navigator.wakeLock.request('screen');
+        if (!alive.current || !recorder.current || recorder.current.state === 'inactive') {
+            await lock.release();
+            return;
+        }
+        wake.current = lock;
+    }
+    catch { /* Capture continues when screen wake lock is unavailable. */ } }
+    function flag(code: string, message: string) { if (!warnings.current.includes(code))
+        warnings.current.push(code); if (alive.current)
+        setWarning(message); }
+    function stop() { const rec = recorder.current; if (rec && rec.state !== 'inactive') {
+        elapsed.current = duration();
+        rec.stop();
+    } }
+    function pause() { if (recorder.current?.state !== 'recording')
+        return; elapsed.current = duration(); recorder.current.pause(); setState('paused'); }
+    function resume() { if (recorder.current?.state !== 'paused')
+        return; started.current = performance.now(); recorder.current.resume(); setState('recording'); void keepAwake(); }
+    useEffect(() => { alive.current = true; const visibility = () => { if (!recorder.current || recorder.current.state === 'inactive')
+        return; if (document.visibilityState === 'hidden')
+        flag('backgrounded', 'The page went into the background. Check this part of the recording for interruptions.');
+    else
+        void keepAwake(); }; document.addEventListener('visibilitychange', visibility); return () => { alive.current = false; rotating.current = false; document.removeEventListener('visibilitychange', visibility); stop(); release(); callback.current.onActive(false); }; }, []);
+    async function start() {
+        if (!enabled || recorder.current && recorder.current.state !== 'inactive')
+            return;
+        setError('');
+        setWarning('');
+        setState('starting');
+        callback.current.onActive(true);
+        warnings.current = [];
+        elapsed.current = 0;
+        rotating.current = false;
+        try {
+            if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined')
+                throw Error('Open this secure page in Chrome or Safari to record.');
+            const mic = await navigator.mediaDevices.getUserMedia({ audio: { ...(deviceId ? { deviceId: { exact: deviceId } } : {}), channelCount: { ideal: 1 } } });
+            if (!alive.current) {
+                mic.getTracks().forEach(t => t.stop());
+                return;
+            }
+            stream.current = mic;
+            const track = mic.getAudioTracks()[0];
+            const actual = track?.getSettings().deviceId;
+            if (deviceId && !['default', 'communications'].includes(deviceId) && actual && actual !== deviceId)
+                throw Error('The browser opened a different microphone. Check the selected input.');
+            setInput(track?.label || 'Browser microphone');
+            const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find(type => MediaRecorder.isTypeSupported(type));
+            const rec = new MediaRecorder(mic, { ...(mime ? { mimeType: mime } : {}), audioBitsPerSecond: 64000 });
+            recorder.current = rec;
+            const chunks: Blob[] = [];
+            let bytes = 0;
+            let lastCheckpoint = 0;
+            const clipKey = `${questionKey}__${crypto.randomUUID()}`;
+            track.onmute = () => flag('microphone_muted', 'Microphone signal interrupted. Check the captured audio.');
+            track.onended = () => { flag('microphone_ended', 'Microphone disconnected. Saving the captured part.'); stop(); };
+            rec.ondataavailable = event => { if (!event.data.size)
+                return; chunks.push(event.data); bytes += event.data.size; if (performance.now() - lastCheckpoint >= 15000 || chunks.length === 1) {
+                lastCheckpoint = performance.now();
+                const checkpoint = { clipKey, blob: new Blob(chunks, { type: rec.mimeType || mime || event.data.type }), durationSeconds: Math.max(0.1, Math.round(duration() / 100) / 10), captureWarnings: [...warnings.current] };
+                void callback.current.onCheckpoint?.(checkpoint).catch(() => { if (alive.current)
+                    setWarning('Device backup is unavailable. Stop and save regularly, and keep this page open until server saving is confirmed.'); });
+            } if (bytes >= 18 * 1024 * 1024 && rec.state === 'recording') {
+                rotating.current = true;
+                stop();
+            } };
+            rec.onerror = () => { rotating.current = false; flag('recorder_error', 'Recording was interrupted. Saving the captured part.'); stop(); };
+            rec.onstop = () => { const durationSeconds = Math.max(0.1, Math.round(elapsed.current / 100) / 10); const blob = new Blob(chunks, { type: rec.mimeType || mime || chunks[0]?.type }); const again = rotating.current; release(); if (!alive.current)
+                return; setState('idle'); callback.current.onActive(false); if (blob.size)
+                callback.current.onChange({ clipKey, blob, durationSeconds, captureWarnings: [...warnings.current] });
+            else
+                setError('No audio was captured. Please test the microphone.'); if (again) {
+                setWarning('A long recording was saved as a clip. Continuing in another clip.');
+                void start();
+            } };
+            started.current = performance.now();
+            rec.start(1000);
+            setSeconds(0);
+            setState('recording');
+            void keepAwake();
+            timer.current = setInterval(() => setSeconds(Math.floor(duration() / 1000)), 250);
+            try {
+                const Ctx = window.AudioContext || (window as Window & {
+                    webkitAudioContext?: typeof AudioContext;
+                }).webkitAudioContext;
+                if (Ctx) {
+                    const ctx = new Ctx();
+                    context.current = ctx;
+                    await ctx.resume();
+                    if (rec.state === 'inactive')
+                        return;
+                    const analyser = ctx.createAnalyser();
+                    analyser.fftSize = 256;
+                    ctx.createMediaStreamSource(mic).connect(analyser);
+                    const samples = new Uint8Array(analyser.fftSize);
+                    meter.current = setInterval(() => { analyser.getByteTimeDomainData(samples); let sum = 0; for (const sample of samples)
+                        sum += ((sample - 128) / 128) ** 2; setLevel(Math.min(100, Math.round(Math.sqrt(sum / samples.length) * 400))); }, 200);
+                }
+            }
+            catch { /* Input meter is optional. */ }
+        }
+        catch (e) {
+            release();
+            setState('idle');
+            callback.current.onActive(false);
+            setError(e instanceof Error ? e.message : 'Could not start the microphone.');
+        }
+    }
+    return <div className="rounded-xl border border-purple-200 bg-purple-50 p-4 space-y-3" aria-label={`Audio answer: ${questionKey}`}>
+  <p className="font-semibold">{state === 'recording' ? '● Recording' : state === 'paused' ? 'Paused' : 'Record a clip'}{['recording', 'paused'].includes(state) && ` · ${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`}</p>
+  <p className="text-sm">Record for as long as you need. Audio is backed up on this device about every 15 seconds while this page is running. Stop and save uploads this clip automatically. You can add more clips to this question.</p>
+  {['recording', 'paused'].includes(state) && <><p className="text-xs">Input: {input}. Keep this page visible and the screen awake.</p><div role="meter" aria-label="Microphone input level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={level} className="h-3 overflow-hidden rounded-full bg-purple-200"><div className="h-full bg-purple-800" style={{ width: `${level}%` }}/></div></>}
+  <div className="flex flex-wrap gap-3">{state === 'recording' && <button type="button" className="rounded-full border bg-white px-5 py-3" onClick={pause}>Pause recording</button>}{state === 'paused' && <button type="button" className="rounded-full border bg-white px-5 py-3" onClick={resume}>Resume recording</button>}{['recording', 'paused'].includes(state) ? <button type="button" className="rounded-full bg-red-700 px-5 py-3 text-white" onClick={() => { rotating.current = false; stop(); }}>Stop and save clip</button> : <button type="button" disabled={!enabled || state === 'starting'} className="rounded-full bg-purple-900 px-5 py-3 text-white disabled:opacity-40" onClick={() => void start()}>{state === 'starting' ? 'Opening microphone…' : 'Record another clip'}</button>}</div>
+  {warning && <p role="status" className="rounded-lg bg-amber-50 p-3 text-sm">{warning}</p>}{error && <p role="alert" className="text-red-800">{error}</p>}
  </div>;
 }
 export function SavedInterviewAudio({id,audio,transcriptId,autoLoad=false,label}:{id:string;audio:SavedAudio;transcriptId?:string;autoLoad?:boolean;label?:string}) {
