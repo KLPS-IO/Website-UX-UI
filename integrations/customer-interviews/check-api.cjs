@@ -41,11 +41,11 @@ assert.equal(records.get(reflectionRecord.id).audio[0].questionKey,'reflection')
 assert.equal((await fetch(`${url}/${reflectionRecord.id}/audio/reflection`,{headers:{'x-test-role':'founder_admin'}})).status,200);
 reflectionRecord.status='completed';assert.equal((await fetch(url,{method:'PUT',headers:{'x-test-role':'founder_admin'},body:reflectionForm()})).status,400);
 const appendBase={...spoken,id:'60000000-0000-0000-0000-000000000000',status:'partial',version:'klps-discovery-v5'};
-const appendClip=async(key,overrides={})=>{const payload={...appendBase,...overrides,newAudio:[{questionKey:key,durationSeconds:1200}]};const f=new FormData();f.append('payload',JSON.stringify(payload));f.append(key,new Blob([Buffer.from([0x1a,0x45,0xdf,0xa3,1,2,3,4])],{type:'audio/webm'}),'clip.webm');return fetch(`${url}/${appendBase.id}/clips`,{method:'POST',headers:{'x-test-role':'founder_admin'},body:f});};
+const appendClip=async(key,overrides={},duration=1200)=>{const payload={...appendBase,...overrides,newAudio:[{questionKey:key,durationSeconds:duration}]};const f=new FormData();f.append('payload',JSON.stringify(payload));f.append(key,new Blob([Buffer.from([0x1a,0x45,0xdf,0xa3,1,2,3,4])],{type:'audio/webm'}),'clip.webm');return fetch(`${url}/${appendBase.id}/clips`,{method:'POST',headers:{'x-test-role':'founder_admin'},body:f});};
 const one='story__11111111-1111-4111-8111-111111111111',two='story__22222222-2222-4222-8222-222222222222';
 assert.equal((await appendClip(one)).status,201);assert.equal((await appendClip(two)).status,201);
 assert.equal(records.get(appendBase.id).audio.length,2);assert.equal(records.get(appendBase.id).status,'partial');
-const count=objects.size;assert.equal((await appendClip(one)).status,200);assert.equal(objects.size,count);assert.equal(records.get(appendBase.id).audio.length,2);
+const count=objects.size;assert.equal((await appendClip(one)).status,200);assert.equal(objects.size,count);assert.equal(records.get(appendBase.id).audio.length,2);assert.equal((await appendClip(one,{},1201)).status,409);
 assert.equal((await appendClip(two,{audioConsent:false})).status,400);
 assert.equal((await fetch(`${url}/${appendBase.id}/audio/${one}`,{headers:{'x-test-role':'founder_admin'}})).status,200);
 assert.equal((await request('PUT',{...appendBase,status:'completed',newAudio:[],segment:'review segment'})).status,201);
