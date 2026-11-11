@@ -13,7 +13,8 @@ test('live discovery starts as completed with an open offer and preserves earlie
   assert.equal(record.status, 'completed');
   assert.equal(record.offer, '');
   assert.equal(record.version, INTERVIEW_VERSION);
-  assert.match(questionsForVersion(record.version)[0][2], /last time you bought/);
+  assert.match(questionsForVersion(record.version)[0][2], /tried or used recently/);
+  assert.match(questionsForVersion('klps-discovery-v4')[0][2], /last time you bought/);
   assert.match(questionsForVersion('klps-discovery-v3')[0][2], /past month/);
   assert.doesNotMatch(questionsForVersion(record.version).map(q => q[2]).join(' '), /bundle|box/);
 });

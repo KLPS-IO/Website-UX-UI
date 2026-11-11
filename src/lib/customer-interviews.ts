@@ -1,6 +1,13 @@
 import { emptyConcepts, type ConceptAnswers } from './interview-concepts.ts';
-export const INTERVIEW_VERSION = 'klps-discovery-v4';
+export const INTERVIEW_VERSION = 'klps-discovery-v5';
 export const questions = [
+  ['story', '1 · Start with something real', "What's something you've tried or used recently for your own comfort or care?", 'Let her choose the subject. If she buys for someone else, follow that experience. A product, device, service or something she already owns can all be a starting point.'],
+  ['impact', '2 · Why she tried it', 'What made you try it?', 'Stay with the example she just gave. Find out what happened on a particular occasion and how much it mattered to her.'],
+  ['alternative', '3 · How she chose and paid', 'How did you choose that one?', 'Learn what she actually bought or tried, where she found it, what she paid and when. Ask each follow-up separately.'],
+  ['gap', '4 · How it worked', 'How did it work for you?', 'Give her room to say it worked well. Find out what happened when she used it and whether she kept using it.'],
+  ['outcome', '5 · What she would improve', 'If you could improve one thing about that experience, what would it be?', 'Accept that she may change nothing. Keep the improvement grounded in her own experience, then thank her and offer an optional next step.'],
+] as const;
+export const purchaseQuestions = [
   ['story', '1 · A recent purchase or experience', 'Tell me about the last time you bought something to help with your own comfort or care, or for someone you care for.', 'Follow her example. Establish who used it and who paid. If she has no relevant purchase, ask about a recent experience or accept that answer.'],
   ['impact', '2 · What led her to look', 'What was happening that made you look for something?', 'Ask when it happened, how often it happens, and what was difficult. Check the past-month frequency separately before coding it.'],
   ['alternative', '3 · What she already buys or tries', 'What did you buy or try, where did you find it, and roughly what did you spend?', 'Include things she already owned, homemade solutions and doing nothing. Ask when she spent it and the spending period. Unknown is not £0.'],
@@ -15,7 +22,7 @@ export const legacyQuestions = [
   ['outcome', '5 · The result that matters · 40 sec', 'What one thing would have made that situation easier? How would you know it had helped?', 'Ask what information, if any, would change what she does. Do not introduce a garment until discovery is finished.'],
 ] as const;
 type GuideQuestion = readonly ['story'|'impact'|'alternative'|'gap'|'outcome', string, string, string?];
-export const questionsForVersion = (version?: string): readonly GuideQuestion[] => version === INTERVIEW_VERSION ? questions : legacyQuestions;
+export const questionsForVersion = (version?: string): readonly GuideQuestion[] => version === INTERVIEW_VERSION ? questions : version === 'klps-discovery-v4' ? purchaseQuestions : legacyQuestions;
 export type Interview = {
   audioConsent?: boolean; audio?: { questionKey: string; contentType: string; durationSeconds: number; bytes: number }[]; analysisStatus?: string; concepts: ConceptAnswers; id: string; createdAt: string; version: string; consent: boolean; adult: boolean;
   source: string; relationship: string; segment: string; status: string;
