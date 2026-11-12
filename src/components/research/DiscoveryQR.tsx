@@ -15,9 +15,9 @@ export default function DiscoveryQR({ source }: { source: string }) {
     return () => { live = false; };
   }, [url]);
   return <section className="rounded-2xl border border-purple-200 bg-white p-6 space-y-4">
-    <h2 className="text-2xl font-semibold">Leave her with one easy next step</h2>
-    <p>“If you’d like to share more in your own time, you can scan this. There’s a survey and an optional product waitlist. Both are completely your choice.”</p>
-    {image && <img src={image} alt="Scan to open KLPS discovery follow-up choices" width={320} height={320} className="mx-auto w-full max-w-[320px]" />}
+    <h2 className="text-2xl font-semibold">Invite her to join the waitlist</h2>
+    <p>“Would you like to join the KLPS waitlist and hear how the products develop? You can scan this and sign up now if you’d like. There’s a survey on the same page too, which you can come back to in your own time.”</p>
+    {image && <img src={image} alt="Scan to join the KLPS waitlist or return to the optional survey" width={320} height={320} className="mx-auto w-full max-w-[320px]" />}
     {error && <p role="alert">{error}</p>}
     <a className="block break-all underline text-sm" href={url} target="_blank" rel="noreferrer">{url}</a>
     <p className="text-sm text-stone-600">This public link carries the recruitment channel only. It gives no access to interviews, recordings or founder notes. Research follow-up permission is recorded separately below. Survey responses and waitlist signups remain separate evidence.</p>
